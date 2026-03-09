@@ -208,7 +208,7 @@
             } catch (error) { console.error(error); }
         }
 
-        // --- FIREBASE LOGIC ---
+        // --- FIREBASE LOGIC (COMENTARIOS) ---
         function escucharComentariosNube() {
             const contenedor = document.getElementById('listaComentarios');
             const q = window.query(
@@ -260,47 +260,78 @@
             }
         };
 
-        // --- SISTEMAS DE INTERACCIÓN (LOCAL STORAGE) ---
-        window.toggleWatchlist = () => {
-            const isSaved = localStorage.getItem(`watchlist_${movieID}`);
-            const btn = document.getElementById('btnWatchlist');
-            if(!isSaved) {
-                localStorage.setItem(`watchlist_${movieID}`, 'true');
-                btn.classList.add('bg-zinc-100', 'text-black', 'border-white');
-                btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
-            } else {
-                localStorage.removeItem(`watchlist_${movieID}`);
-                btn.classList.remove('bg-zinc-100', 'text-black', 'border-white');
-                btn.classList.add('bg-zinc-900', 'text-zinc-400', 'border-white/5');
-            }
-        };
+        // --- SISTEMAS DE INTERACCIÓN (FIREBASE SYNC) ---
+        async function checkStatus() {
+            const userActual = localStorage.getItem('usuarioMovieM');
+            if (!userActual) return;
 
-        window.toggleLike = () => {
-            const isLiked = localStorage.getItem(`like_${movieID}`);
-            const btn = document.getElementById('btnLike');
-            if(!isLiked) {
-                localStorage.setItem(`like_${movieID}`, 'true');
-                btn.classList.add('bg-red-600', 'border-red-600', 'text-white');
-                btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
-            } else {
-                localStorage.removeItem(`like_${movieID}`);
-                btn.classList.remove('bg-red-600', 'border-red-600', 'text-white');
-                btn.classList.add('bg-zinc-900', 'text-zinc-400', 'border-white/5');
-            }
-        };
-
-        function checkStatus() {
-            if(localStorage.getItem(`watchlist_${movieID}`)) {
-                const btn = document.getElementById('btnWatchlist');
-                btn.classList.add('bg-zinc-100', 'text-black', 'border-white');
-                btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
-            }
-            if(localStorage.getItem(`like_${movieID}`)) {
-                const btn = document.getElementById('btnLike');
-                btn.classList.add('bg-red-600', 'border-red-600', 'text-white');
-                btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
-            }
+            try {
+                const userRef = window.doc(window.db, "usuarios", userActual);
+                const userDoc = await window.getDoc(userRef);
+                
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    // Check Watchlist
+                    if (data.watchlist && data.watchlist.includes(movieID)) {
+                        const btn = document.getElementById('btnWatchlist');
+                        btn.classList.add('bg-zinc-100', 'text-black', 'border-white');
+                        btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
+                    }
+                    // Check Like
+                    if (data.likes && data.likes.includes(movieID)) {
+                        const btn = document.getElementById('btnLike');
+                        btn.classList.add('bg-red-600', 'border-red-600', 'text-white');
+                        btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
+                    }
+                }
+            } catch (e) { console.error("Error al checkear status:", e); }
         }
+
+        window.toggleWatchlist = async () => {
+            const userActual = localStorage.getItem('usuarioMovieM');
+            if (!userActual) return alert("Debes iniciar sesión para guardar películas.");
+
+            const btn = document.getElementById('btnWatchlist');
+            const userRef = window.doc(window.db, "usuarios", userActual);
+            const isSaved = btn.classList.contains('bg-zinc-100');
+
+            try {
+                await window.setDoc(userRef, { 
+                    watchlist: isSaved ? window.arrayRemove(movieID) : window.arrayUnion(movieID) 
+                }, { merge: true });
+                
+                if(!isSaved) {
+                    btn.classList.add('bg-zinc-100', 'text-black', 'border-white');
+                    btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
+                } else {
+                    btn.classList.remove('bg-zinc-100', 'text-black', 'border-white');
+                    btn.classList.add('bg-zinc-900', 'text-zinc-400', 'border-white/5');
+                }
+            } catch (e) { console.error("Error en Watchlist:", e); }
+        };
+
+        window.toggleLike = async () => {
+            const userActual = localStorage.getItem('usuarioMovieM');
+            if (!userActual) return alert("Debes iniciar sesión para dar like.");
+
+            const btn = document.getElementById('btnLike');
+            const userRef = window.doc(window.db, "usuarios", userActual);
+            const isLiked = btn.classList.contains('bg-red-600');
+
+            try {
+                await window.setDoc(userRef, { 
+                    likes: isLiked ? window.arrayRemove(movieID) : window.arrayUnion(movieID) 
+                }, { merge: true });
+                
+                if(!isLiked) {
+                    btn.classList.add('bg-red-600', 'border-red-600', 'text-white');
+                    btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
+                } else {
+                    btn.classList.remove('bg-red-600', 'border-red-600', 'text-white');
+                    btn.classList.add('bg-zinc-900', 'text-zinc-400', 'border-white/5');
+                }
+            } catch (e) { console.error("Error en Like:", e); }
+        };
 
         // --- MODAL ACTORES & TRAILER ---
         window.verActor = async (id) => {
