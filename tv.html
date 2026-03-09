@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieM | TV en Vivo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- HLS.js para reproducir streams M3U8 -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.14/dist/hls.min.js"></script>
+    <style>
+        :root { --accent-color: #dc2626; }
+        .text-accent { color: var(--accent-color); }
+        .bg-accent { background-color: var(--accent-color); }
+        .border-accent { border-color: var(--accent-color); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .live-dot { animation: livepulse 1.5s infinite; }
+        @keyframes livepulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .4; transform: scale(1.3); }
+        }
+        .card-mini { transition: all .2s ease; }
+        .card-mini:hover { transform: scale(1.03); }
+        .card-mini:active { transform: scale(.97); }
+        .card-mini.activo { border-color: var(--accent-color) !important; }
+        .fade-in { animation: fi .5s ease forwards; opacity: 0; }
+        @keyframes fi { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        video { background: #000; }
+        /* Spinner de carga */
+        .spinner { animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-zinc-950 text-white font-sans overflow-x-hidden min-h-screen">
+
+<!-- Nav compacta -->
+<nav class="px-4 md:px-6 py-3 flex items-center justify-between bg-zinc-950/90 backdrop-blur-md sticky top-0 w-full z-50 border-b border-white/5">
+    <h1 onclick="location.href='index.html'" class="text-lg md:text-xl font-black italic tracking-tighter cursor-pointer">
+        MOVIE<span class="text-accent">M</span>
+    </h1>
+    <div class="flex items-center gap-3">
+        <div id="badgeLive" class="flex items-center gap-1.5 bg-red-600/10 border border-red-600/30 px-3 py-1.5 rounded-full">
+            <span class="w-2 h-2 rounded-full bg-red-500 live-dot"></span>
+            <span class="text-[10px] font-black uppercase tracking-widest text-red-400">En Vivo</span>
+        </div>
+        <button onclick="location.href='canales.html'" class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-white transition">← Canales</button>
+    </div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-3 md:px-6 pt-4 pb-28 md:pb-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+
+        <!-- Player principal -->
+        <div class="lg:col-span-2 fade-in">
+            <!-- Pantalla del video -->
+            <div class="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/5 mb-4" style="aspect-ratio:16/9">
+                <!-- Estado: cargando -->
+                <div id="estadoCargando" class="absolute inset-0 flex flex-col items-center justify-center bg-zinc-900 z-10">
+                    <svg class="spinner w-10 h-10 text-accent mb-4" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    </svg>
+                    <p class="text-zinc-400 text-sm font-bold uppercase tracking-widest">Conectando...</p>
+                </div>
+                <!-- Estado: error -->
+                <div id="estadoError" class="absolute inset-0 flex-col items-center justify-center bg-zinc-900 z-10 hidden">
+                    <div class="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center mb-4">
+                        <svg class="w-7 h-7 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                        </svg>
+                    </div>
+                    <p class="text-zinc-400 text-sm font-black uppercase mb-1">Señal no disponible</p>
+                    <p class="text-zinc-600 text-xs text-center max-w-xs mb-5">El stream de este canal no está disponible en este momento.</p>
+                    <button onclick="location.href='canales.html'" class="bg-accent text-white px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-widest">Ver otros canales</button>
+                </div>
+                <!-- Video element -->
+                <video id="videoPlayer" class="w-full h-full" controls autoplay playsinline></video>
+            </div>
+
+            <!-- Info del canal activo -->
+            <div id="infoCanal" class="flex items-center gap-4 mb-4 fade-in">
+                <div id="logoCanal" class="w-14 h-14 md:w-16 md:h-16 rounded-2xl overflow-hidden bg-zinc-900 border border-white/5 flex items-center justify-center p-2 shrink-0">
+                    <img id="logoImg" src="" class="max-w-full max-h-full object-contain" alt="">
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                        <h2 id="nombreCanal" class="text-lg md:text-xl font-black uppercase tracking-tighter"></h2>
+                        <div class="flex items-center gap-1 bg-red-600/10 border border-red-600/30 px-2 py-0.5 rounded-full shrink-0">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 live-dot"></span>
+                            <span class="text-[8px] font-black uppercase text-red-400">Live</span>
+                        </div>
+                    </div>
+                    <p id="categoriaCanal" class="text-zinc-500 text-xs font-bold uppercase tracking-widest"></p>
+                </div>
+                <!-- Botón fullscreen -->
+                <button onclick="entrarFullscreen()" class="shrink-0 bg-zinc-800 hover:bg-accent border border-white/5 p-2.5 rounded-xl transition" title="Pantalla completa">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Nota de calidad -->
+            <div class="bg-zinc-900/50 border border-white/5 rounded-xl px-4 py-3 flex items-start gap-3 text-xs text-zinc-500 mb-2">
+                <svg class="w-4 h-4 shrink-0 mt-0.5 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Streams públicos internacionales. La disponibilidad puede variar. Si un canal no carga, probá otro.</span>
+            </div>
+        </div>
+
+        <!-- Sidebar: lista de canales -->
+        <aside class="lg:col-span-1 fade-in" style="animation-delay:.15s">
+            <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-4 flex items-center gap-2">
+                <span class="w-4 h-px bg-accent"></span> Otros Canales
+            </h3>
+            <div id="listaCanalesSidebar" class="space-y-2 overflow-y-auto no-scrollbar max-h-[calc(100vh-200px)]"></div>
+        </aside>
+    </div>
+</main>
+
+<!-- Bottom nav mobile -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-zinc-950/95 backdrop-blur-xl border-t border-white/5">
+    <div class="flex items-center justify-around py-3 px-2">
+        <a href="index.html" class="flex flex-col items-center gap-1 text-zinc-500">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            <span class="text-[9px] font-black uppercase tracking-widest">Inicio</span>
+        </a>
+        <a href="mi_lista.html" class="flex flex-col items-center gap-1 text-zinc-500">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+            <span class="text-[9px] font-black uppercase tracking-widest">Mi Lista</span>
+        </a>
+        <a href="canales.html" class="flex flex-col items-center gap-1 text-accent">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.361a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
+            <span class="text-[9px] font-black uppercase tracking-widest">TV</span>
+        </a>
+        <a href="perfil.html" class="flex flex-col items-center gap-1 text-zinc-500">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            <span class="text-[9px] font-black uppercase tracking-widest">Perfil</span>
+        </a>
+    </div>
+</nav>
+
+<script>
+var c = localStorage.getItem('movieM_color');
+if (c) document.documentElement.style.setProperty('--accent-color', c);
+
+// ── Definición de canales con streams HLS públicos ────────────
+const CANALES = [
+    { id:'cnn',       nombre:'CNN en Español',  logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/CNN_International_logo.svg/300px-CNN_International_logo.svg.png',    categoria:'Noticias',       pais:'🇺🇸', color:'#cc0000',
+      stream:'https://cnn-cnninternational-1-us.samsung.wurl.tv/manifest/playlist.m3u8' },
+    { id:'bbc',       nombre:'BBC World News',  logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/BBC_World_News_2022_%28Boxed%29.svg/300px-BBC_World_News_2022_%28Boxed%29.svg.png', categoria:'Noticias', pais:'🇬🇧', color:'#bb1919',
+      stream:'https://vs-cmaf-push-worldnews-uk.akamaized.net/x=4/i=urn:bbc:pips:service:bbc_world_service/pc_hd_abr_v2_uk_hls_live_http.m3u8' },
+    { id:'dw',        nombre:'DW Español',      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Deutsche_Welle_symbol_2012.svg/300px-Deutsche_Welle_symbol_2012.svg.png', categoria:'Noticias', pais:'🇩🇪', color:'#0b6cbc',
+      stream:'https://dwamdstream106.akamaized.net/hls/live/2017996/dwstream106/index.m3u8' },
+    { id:'france24',  nombre:'France 24 ES',    logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/France_24_logo.svg/300px-France_24_logo.svg.png', categoria:'Noticias', pais:'🇫🇷', color:'#f50000',
+      stream:'https://static.france24.com/live/F24_ES_HI_HLS/live_web.m3u8' },
+    { id:'aljazeera', nombre:'Al Jazeera',      logo:'https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Aljazeera_eng.svg/300px-Aljazeera_eng.svg.png', categoria:'Noticias', pais:'🇶🇦', color:'#e8a000',
+      stream:'https://live-hls-web-aje.getaj.net/AJE/index.m3u8' },
+    { id:'rt',        nombre:'RT en Español',   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/RT_logo.svg/300px-RT_logo.svg.png', categoria:'Noticias', pais:'🇷🇺', color:'#b22222',
+      stream:'https://rt-esp.rttv.com/live/rtesp/playlist.m3u8' },
+    { id:'euronews',  nombre:'Euronews ES',     logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Euronews_2022_Logo.svg/300px-Euronews_2022_Logo.svg.png', categoria:'Noticias', pais:'🇪🇺', color:'#003f7f',
+      stream:'https://rakuten-euronewses-1-eu.samsung.wurl.tv/manifest/playlist.m3u8' },
+    { id:'cbsn',      nombre:'CBS News',        logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/CBS_News_logo.svg/300px-CBS_News_logo.svg.png', categoria:'Noticias', pais:'🇺🇸', color:'#4169e1',
+      stream:'https://cbsn-us.cbsnews.com/combinedve.m3u8' },
+    { id:'abcnews',   nombre:'ABC News',        logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/ABC_News_logo.svg/300px-ABC_News_logo.svg.png', categoria:'Noticias', pais:'🇺🇸', color:'#003087',
+      stream:'https://abcnewslive-abcnewslive.samsung.wurl.tv/manifest/playlist.m3u8' },
+    { id:'bloomberg', nombre:'Bloomberg TV',    logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/New_Bloomberg_Logo.svg/300px-New_Bloomberg_Logo.svg.png', categoria:'Noticias', pais:'🇺🇸', color:'#ff6600',
+      stream:'https://bloomberg-bloomberg-1-us.samsung.wurl.tv/manifest/playlist.m3u8' },
+    { id:'pluto',     nombre:'Pluto TV Movies', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Pluto_TV_logo.svg/300px-Pluto_TV_logo.svg.png', categoria:'Entretenimiento', pais:'🌐', color:'#f5bc00',
+      stream:'https://service-stitcher.clusters.pluto.tv/v1/stitch/hls/channel/5e82f2f4fb38d4001bffdbe6/master.m3u8?appName=web&appVersion=unknown&clientTime=0&deviceDNT=0&deviceId=unknown&deviceMake=unknown&deviceModel=web&deviceType=web&deviceVersion=unknown&sid=unknown' },
+    { id:'nasa',      nombre:'NASA TV',         logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/NASA_logo.svg/300px-NASA_logo.svg.png', categoria:'Ciencia', pais:'🇺🇸', color:'#0b3d91',
+      stream:'https://ntv1.akamaized.net/hls/live/631694/NTV1/master.m3u8' },
+    { id:'nature',    nombre:'Nature World TV', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/National_Geographic_Channel.svg/300px-National_Geographic_Channel.svg.png', categoria:'Naturaleza', pais:'🌐', color:'#f5a800',
+      stream:'https://nmplus-naturemondehd.samsung.wurl.tv/manifest/playlist.m3u8' },
+    { id:'olympic',   nombre:'Olympic Channel', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Olympic_Channel_logo.svg/300px-Olympic_Channel_logo.svg.png', categoria:'Deportes', pais:'🌐', color:'#0085c3',
+      stream:'https://olympicchannellatam-olympicchannellatam.samsung.wurl.tv/manifest/playlist.m3u8' },
+    { id:'weather',   nombre:'Weather Channel', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/The_Weather_Channel_logo_2005-present.svg/300px-The_Weather_Channel_logo_2005-present.svg.png', categoria:'Clima', pais:'🇺🇸', color:'#1a6ab1',
+      stream:'https://weather-lh.akamaihd.net/i/twc_1@92006/master.m3u8' },
+];
+
+var hlsInstance = null;
+var canalActualId = null;
+
+// ── Obtener canal por id ───────────────────────────────────────
+function getCanalById(id) {
+    return CANALES.find(function(c){ return c.id === id; }) || CANALES[0];
+}
+
+// ── Cargar stream HLS en el player ────────────────────────────
+function cargarCanal(canal) {
+    canalActualId = canal.id;
+    var video = document.getElementById('videoPlayer');
+
+    // UI: info del canal
+    document.getElementById('nombreCanal').innerText = canal.nombre;
+    document.getElementById('categoriaCanal').innerText = canal.categoria + ' · ' + canal.pais;
+    document.getElementById('logoImg').src = canal.logo;
+    document.title = 'MovieM | ' + canal.nombre;
+
+    // Mostrar estado cargando
+    mostrarEstado('cargando');
+
+    // Destruir instancia HLS anterior
+    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+
+    // Resaltar canal activo en sidebar
+    document.querySelectorAll('.card-mini').forEach(function(el) {
+        el.classList.toggle('activo', el.dataset.id === canal.id);
+    });
+
+    // Intentar cargar con HLS.js (navegadores sin soporte nativo M3U8)
+    if (Hls.isSupported()) {
+        hlsInstance = new Hls({
+            enableWorker: true,
+            lowLatencyMode: true,
+            backBufferLength: 90,
+        });
+        hlsInstance.loadSource(canal.stream);
+        hlsInstance.attachMedia(video);
+        hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
+            video.play().catch(function(){});
+            mostrarEstado('ok');
+        });
+        hlsInstance.on(Hls.Events.ERROR, function(event, data) {
+            if (data.fatal) {
+                if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+                    // Intentar recuperar
+                    hlsInstance.startLoad();
+                } else {
+                    mostrarEstado('error');
+                }
+            }
+        });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Safari / iOS — soporte nativo HLS
+        video.src = canal.stream;
+        video.addEventListener('loadedmetadata', function() {
+            video.play().catch(function(){});
+            mostrarEstado('ok');
+        }, { once: true });
+        video.addEventListener('error', function() {
+            mostrarEstado('error');
+        }, { once: true });
+    } else {
+        mostrarEstado('error');
+    }
+}
+
+function mostrarEstado(estado) {
+    document.getElementById('estadoCargando').style.display = estado === 'cargando' ? 'flex' : 'none';
+    var errEl = document.getElementById('estadoError');
+    errEl.style.display = estado === 'error' ? 'flex' : 'none';
+    errEl.classList.toggle('hidden', estado !== 'error');
+}
+
+function entrarFullscreen() {
+    var video = document.getElementById('videoPlayer');
+    if (video.requestFullscreen) video.requestFullscreen();
+    else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+    else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen(); // iOS
+}
+window.entrarFullscreen = entrarFullscreen;
+
+// ── Renderizar sidebar de canales ─────────────────────────────
+function renderSidebar() {
+    var lista = document.getElementById('listaCanalesSidebar');
+    lista.innerHTML = '';
+    CANALES.forEach(function(canal) {
+        var div = document.createElement('div');
+        div.className = 'card-mini cursor-pointer flex items-center gap-3 bg-zinc-900/50 hover:bg-zinc-800 border border-white/5 rounded-2xl p-3 transition-all';
+        div.dataset.id = canal.id;
+        div.onclick = function() { cargarCanal(canal); };
+        div.innerHTML =
+            '<div class="w-10 h-10 rounded-xl overflow-hidden bg-zinc-800 flex items-center justify-center p-1.5 shrink-0">'
+            + '<img src="' + canal.logo + '" class="max-w-full max-h-full object-contain" loading="lazy" onerror="this.style.opacity=\'0\'">'
+            + '</div>'
+            + '<div class="flex-1 min-w-0">'
+            + '<p class="text-xs font-black uppercase tracking-tight truncate">' + canal.nombre + '</p>'
+            + '<p class="text-[9px] text-zinc-600 uppercase font-bold">' + canal.categoria + ' ' + canal.pais + '</p>'
+            + '</div>'
+            + '<div class="flex items-center gap-1 shrink-0">'
+            + '<span class="w-1.5 h-1.5 rounded-full bg-red-500 live-dot"></span>'
+            + '</div>';
+        lista.appendChild(div);
+    });
+}
+
+// ── Init ──────────────────────────────────────────────────────
+var params = new URLSearchParams(location.search);
+var canalId = params.get('id') || 'cnn';
+var canalInicial = getCanalById(canalId);
+
+renderSidebar();
+cargarCanal(canalInicial);
+</script>
+</body>
+</html>
