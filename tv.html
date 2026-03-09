@@ -5,37 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieM | TV Argentina en Vivo</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.14/dist/hls.min.js"></script>
     <style>
         :root { --accent-color: #dc2626; }
-        .text-accent { color: var(--accent-color); }
-        .bg-accent { background-color: var(--accent-color); }
-        .border-accent { border-color: var(--accent-color); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .text-accent  { color: var(--accent-color); }
+        .bg-accent    { background-color: var(--accent-color); }
+        .border-accent{ border-color: var(--accent-color); }
+        .no-scrollbar::-webkit-scrollbar { display:none }
+        .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none }
         .live-dot { animation: livepulse 1.5s infinite; }
         @keyframes livepulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: .4; transform: scale(1.3); }
+            0%,100%{ opacity:1; transform:scale(1)   }
+            50%    { opacity:.4; transform:scale(1.3) }
         }
-        .card-mini { transition: all .2s ease; }
-        .card-mini:hover { transform: scale(1.03); background: rgba(39, 39, 42, 0.8); }
-        .card-mini.activo { border-color: var(--accent-color) !important; background: rgba(220, 38, 38, 0.05); }
-        .fade-in { animation: fi .5s ease forwards; opacity: 0; }
+        .card-mini { transition: all .18s ease; cursor:pointer; }
+        .card-mini:hover  { background:rgba(39,39,42,.9)!important; }
+        .card-mini.activo { border-color:var(--accent-color)!important; background:rgba(220,38,38,.08)!important; }
+        .fade-in { animation: fi .5s ease forwards; opacity:0; }
         @keyframes fi { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-        video { background: #000; border-radius: 12px; }
-        .spinner { animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        #playerBox {
+            position:relative;
+            background:#000;
+            border-radius:16px;
+            overflow:hidden;
+            border:1px solid rgba(255,255,255,.06);
+            box-shadow:0 25px 60px rgba(0,0,0,.7);
+        }
+        #playerBox::before { content:''; display:block; padding-top:56.25%; }
+        #playerBox iframe, #playerBox #overlay {
+            position:absolute; inset:0; width:100%; height:100%;
+        }
+        #playerBox iframe { border:none; }
+        #overlay {
+            display:flex; flex-direction:column;
+            align-items:center; justify-content:center;
+            background:#09090b; z-index:10;
+            transition: opacity .4s ease;
+        }
+        #overlay.oculto { opacity:0; pointer-events:none; }
+        .spin { animation: spinA 1s linear infinite; }
+        @keyframes spinA { to{ transform:rotate(360deg) } }
     </style>
 </head>
-<body class="bg-zinc-950 text-white font-sans overflow-x-hidden min-h-screen">
+<body class="bg-zinc-950 text-white font-sans min-h-screen overflow-x-hidden">
 
 <nav class="px-4 md:px-6 py-3 flex items-center justify-between bg-zinc-950/90 backdrop-blur-md sticky top-0 w-full z-50 border-b border-white/5">
-    <h1 onclick="location.href='index.html'" class="text-lg md:text-xl font-black italic tracking-tighter cursor-pointer">
-        MOVIE<span class="text-accent">M</span>
-    </h1>
+    <h1 onclick="location.href='index.html'" class="text-lg md:text-xl font-black italic tracking-tighter cursor-pointer">MOVIE<span class="text-accent">M</span></h1>
     <div class="flex items-center gap-3">
-        <div id="badgeLive" class="flex items-center gap-1.5 bg-red-600/10 border border-red-600/30 px-3 py-1.5 rounded-full">
+        <div class="flex items-center gap-1.5 bg-red-600/10 border border-red-600/30 px-3 py-1.5 rounded-full">
             <span class="w-2 h-2 rounded-full bg-red-500 live-dot"></span>
             <span class="text-[10px] font-black uppercase tracking-widest text-red-400">En Vivo</span>
         </div>
@@ -43,178 +59,165 @@
     </div>
 </nav>
 
-<main class="max-w-7xl mx-auto px-3 md:px-6 pt-4 pb-28 md:pb-8">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+<main class="max-w-7xl mx-auto px-3 md:px-6 pt-5 pb-28 md:pb-8">
+    <div class="flex flex-col lg:flex-row gap-5 md:gap-6">
 
-        <div class="lg:col-span-2 fade-in">
-            <div class="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/5 mb-4" style="aspect-ratio:16/9">
-                <div id="estadoCargando" class="absolute inset-0 flex flex-col items-center justify-center bg-zinc-900 z-10">
-                    <svg class="spinner w-10 h-10 text-accent mb-4" fill="none" viewBox="0 0 24 24">
+        <div class="flex-1 min-w-0 fade-in">
+            <div id="playerBox" class="mb-4">
+                <div id="overlay">
+                    <svg class="spin w-10 h-10 text-accent mb-4" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                     </svg>
-                    <p class="text-zinc-400 text-sm font-bold uppercase tracking-widest">Conectando señal...</p>
+                    <p id="overlayTxt" class="text-zinc-400 text-sm font-bold uppercase tracking-widest">Conectando...</p>
                 </div>
-                <div id="estadoError" class="absolute inset-0 flex-col items-center justify-center bg-zinc-900 z-10 hidden">
-                    <p class="text-zinc-400 text-sm font-black uppercase mb-1">Señal no disponible</p>
-                    <button onclick="location.reload()" class="bg-accent text-white px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-widest mt-4">Reintentar</button>
-                </div>
-                <video id="videoPlayer" class="w-full h-full" controls autoplay playsinline></video>
+                <iframe id="ytFrame" allow="autoplay; encrypted-media; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe>
             </div>
 
-            <div id="infoCanal" class="flex items-center gap-4 mb-4 fade-in">
-                <div id="logoCanal" class="w-14 h-14 md:w-16 md:h-16 rounded-2xl overflow-hidden bg-white flex items-center justify-center p-2 shrink-0 shadow-lg">
-                    <img id="logoImg" src="" class="max-w-full max-h-full object-contain" alt="Logo Canal">
+            <div class="flex items-center gap-4 mb-5">
+                <div class="w-14 h-14 rounded-2xl overflow-hidden bg-white flex items-center justify-center p-1.5 shrink-0 shadow-lg">
+                    <img id="logoImg" src="" alt="" class="max-w-full max-h-full object-contain">
                 </div>
                 <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2 mb-1">
-                        <h2 id="nombreCanal" class="text-lg md:text-xl font-black uppercase tracking-tighter"></h2>
-                        <div class="bg-red-600/10 border border-red-600/30 px-2 py-0.5 rounded-full">
+                    <div class="flex items-center gap-2 mb-0.5 flex-wrap">
+                        <h2 id="nombreCanal" class="text-xl font-black uppercase tracking-tighter"></h2>
+                        <div class="flex items-center gap-1 bg-red-600/10 border border-red-600/30 px-2 py-0.5 rounded-full shrink-0">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 live-dot"></span>
                             <span class="text-[8px] font-black uppercase text-red-400">Live</span>
                         </div>
                     </div>
                     <p id="categoriaCanal" class="text-zinc-500 text-xs font-bold uppercase tracking-widest"></p>
                 </div>
-                <button onclick="entrarFullscreen()" class="shrink-0 bg-zinc-800 hover:bg-accent p-2.5 rounded-xl transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                <button onclick="fullscreen()" title="Pantalla completa" class="shrink-0 bg-zinc-800 hover:bg-accent p-2.5 rounded-xl transition border border-white/5 active:scale-95">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+                    </svg>
                 </button>
+            </div>
+
+            <div class="bg-zinc-900/40 border border-white/5 rounded-xl px-4 py-3 flex gap-3 text-xs text-zinc-500 items-start">
+                <svg class="w-4 h-4 shrink-0 mt-0.5 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>Transmisión vía YouTube Live oficial de cada canal. Si el player muestra un error de YouTube, hacé clic en <b>"Ver en YouTube"</b> que aparece dentro del player.</span>
             </div>
         </div>
 
-        <aside class="lg:col-span-1 fade-in" style="animation-delay:.15s">
-            <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-4 flex items-center gap-2">
+        <aside class="w-full lg:w-72 shrink-0 fade-in" style="animation-delay:.12s">
+            <p class="text-[10px] font-black uppercase tracking-[.25em] text-zinc-500 mb-3 flex items-center gap-2">
                 <span class="w-4 h-px bg-accent"></span> Canales Argentinos
-            </h3>
-            <div id="listaCanalesSidebar" class="space-y-2 overflow-y-auto no-scrollbar max-h-[calc(100vh-250px)]"></div>
+            </p>
+            <div id="sidebar" class="space-y-2 lg:overflow-y-auto no-scrollbar lg:max-h-[calc(100vh-220px)]"></div>
         </aside>
     </div>
 </main>
 
-<nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-zinc-950/95 backdrop-blur-xl border-t border-white/5 py-3 px-6 flex justify-around">
-    <a href="index.html" class="text-zinc-500 text-[10px] font-bold uppercase">Inicio</a>
-    <a href="canales.html" class="text-accent text-[10px] font-bold uppercase">TV</a>
-    <a href="perfil.html" class="text-zinc-500 text-[10px] font-bold uppercase">Perfil</a>
+<nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-zinc-950/95 backdrop-blur-xl border-t border-white/5">
+    <div class="flex items-center justify-around py-3 px-2">
+        <a href="index.html" class="flex flex-col items-center gap-1 text-zinc-500">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            <span class="text-[9px] font-black uppercase tracking-widest">Inicio</span>
+        </a>
+        <a href="mi_lista.html" class="flex flex-col items-center gap-1 text-zinc-500">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+            <span class="text-[9px] font-black uppercase tracking-widest">Mi Lista</span>
+        </a>
+        <a href="canales.html" class="flex flex-col items-center gap-1 text-accent">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.361a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
+            <span class="text-[9px] font-black uppercase tracking-widest">TV</span>
+        </a>
+        <a href="perfil.html" class="flex flex-col items-center gap-1 text-zinc-500">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            <span class="text-[9px] font-black uppercase tracking-widest">Perfil</span>
+        </a>
+    </div>
 </nav>
 
 <script>
-// Configuración de Canales Argentinos Estables
-const CANALES = [
-    { 
-        id:'tn', nombre:'Todo Noticias (TN)', 
-        logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Todo_Noticias_2016.svg/300px-Todo_Noticias_2016.svg.png', 
-        categoria:'Noticias', pais:'🇦🇷', 
-        stream:'https://live-tn-ar.vustreams.com/live/7492c3a5-1049-4171-884d-2d02e0780287/playlist.m3u8' 
-    },
-    { 
-        id:'c5n', nombre:'C5N', 
-        logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/C5N_logo_2015.svg/300px-C5N_logo_2015.svg.png', 
-        categoria:'Noticias', pais:'🇦🇷', 
-        stream:'https://c5n.stmv.cloud/c5n/c5n/playlist.m3u8' 
-    },
-    { 
-        id:'tvpublica', nombre:'TV Pública', 
-        logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Televisi%C3%B3n_P%C3%BAblica_Argentina_-_Logo_2021.svg/200px-Televisi%C3%B3n_P%C3%BAblica_Argentina_-_Logo_2021.svg.png', 
-        categoria:'General', pais:'🇦🇷', 
-        stream:'https://edge-buenosaires-02-vmf.tigo.com.py/live/TV_PUBLICA_ARGENTINA/playlist.m3u8' 
-    },
-    { 
-        id:'canal26', nombre:'Canal 26', 
-        logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Canal_26_Logo_2023.png/300px-Canal_26_Logo_2023.png', 
-        categoria:'Noticias', pais:'🇦🇷', 
-        stream:'https://cloud2.fmsv.com.ar:19360/canal26/canal26.m3u8' 
-    },
-    { 
-        id:'cronica', nombre:'Crónica TV', 
-        logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Cr%C3%B3nica_TV_logo_2017.svg/300px-Cr%C3%B3nica_TV_logo_2017.svg.png', 
-        categoria:'Noticias', pais:'🇦🇷', 
-        stream:'https://rudo.video/live/cronicatv/playlist.m3u8' 
-    },
-    { 
-        id:'lanacion', nombre:'LN+', 
-        logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/LN%2B_logo.svg/300px-LN%2B_logo.svg.png', 
-        categoria:'Noticias', pais:'🇦🇷', 
-        stream:'https://d2hfdfp98p5p79.cloudfront.net/playlist.m3u8' 
-    },
-    { 
-        id:'nettv', nombre:'Net TV', 
-        logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Logo_Net_TV.png/300px-Logo_Net_TV.png', 
-        categoria:'Entretenimiento', pais:'🇦🇷', 
-        stream:'https://rudo.video/live/nettv/playlist.m3u8' 
-    }
+var saved = localStorage.getItem('movieM_color');
+if (saved) document.documentElement.style.setProperty('--accent-color', saved);
+
+var CANALES = [
+    { id:'tn',       nombre:'TN · Todo Noticias', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Todo_Noticias_2016.svg/300px-Todo_Noticias_2016.svg.png',                                                                           categoria:'Noticias',       ytId:'UCba3hpU7EFBSk817y9qZkiA' },
+    { id:'c5n',      nombre:'C5N',                logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/C5N_logo_2015.svg/300px-C5N_logo_2015.svg.png',                                                                                      categoria:'Noticias',       ytId:'UCFgk2Q2mVO1BklRQhSv6p0w' },
+    { id:'cronica',  nombre:'Crónica TV',          logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Cr%C3%B3nica_TV_logo_2017.svg/300px-Cr%C3%B3nica_TV_logo_2017.svg.png',                                                             categoria:'Noticias',       ytId:'UCpMq9_BtSwFBIJxAdgJAIjQ' },
+    { id:'canal26',  nombre:'Canal 26',            logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Canal_26_Logo_2023.png/300px-Canal_26_Logo_2023.png',                                                                                categoria:'Noticias',       ytId:'UCrpMfcQNog595v5gAS-oUsQ' },
+    { id:'a24',      nombre:'A24',                 logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/A24_television_argentina_logo.svg/300px-A24_television_argentina_logo.svg.png',                                                      categoria:'Noticias',       ytId:'UCcpnN-HVGKMPiXHnmLGKt_Q' },
+    { id:'lnmas',    nombre:'LN+',                 logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/LN%2B_logo.svg/300px-LN%2B_logo.svg.png',                                                                                           categoria:'Noticias',       ytId:'UCCifSIBrAAg7Bh7AXvEhzgA' },
+    { id:'eltrece',  nombre:'El Trece',            logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Logo_El_Trece_2019.svg/300px-Logo_El_Trece_2019.svg.png',                                                                           categoria:'Entretenimiento',ytId:'UC8LQiFBCHlpwzKdM8yGEuZQ' },
+    { id:'america',  nombre:'América TV',          logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Am%C3%A9rica_TV_logo_2019.svg/300px-Am%C3%A9rica_TV_logo_2019.svg.png',                                                             categoria:'Entretenimiento',ytId:'UCHnyfMqiRRG1u-2MsSQLbXA' },
+    { id:'tvpublica',nombre:'TV Pública',          logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Televisi%C3%B3n_P%C3%BAblica_Argentina_-_Logo_2021.svg/200px-Televisi%C3%B3n_P%C3%BAblica_Argentina_-_Logo_2021.svg.png',           categoria:'General',        ytId:'UCD8bmPdWUEOWFhMaQlSfqEw' },
+    { id:'nettv',    nombre:'Net TV',              logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Logo_Net_TV.png/300px-Logo_Net_TV.png',                                                                                              categoria:'Entretenimiento',ytId:'UCpqHygxQDdxTCWQHK03TuOQ' },
 ];
 
-let hlsInstance = null;
+var canalActual = null;
 
-function getCanalById(id) {
-    return CANALES.find(c => c.id === id) || CANALES[0];
+function showOverlay(txt) {
+    document.getElementById('overlayTxt').innerText = txt || 'Conectando...';
+    document.getElementById('overlay').classList.remove('oculto');
+}
+function hideOverlay() {
+    document.getElementById('overlay').classList.add('oculto');
 }
 
 function cargarCanal(canal) {
-    const video = document.getElementById('videoPlayer');
-    document.getElementById('nombreCanal').innerText = canal.nombre;
-    document.getElementById('categoriaCanal').innerText = `${canal.categoria} · ${canal.pais}`;
-    document.getElementById('logoImg').src = canal.logo;
-    
-    mostrarEstado('cargando');
+    canalActual = canal;
+    document.getElementById('nombreCanal').innerText    = canal.nombre;
+    document.getElementById('categoriaCanal').innerText = canal.categoria + ' · 🇦🇷 Argentina';
+    document.getElementById('logoImg').src              = canal.logo;
+    document.title = 'MovieM | ' + canal.nombre;
 
-    if (hlsInstance) { hlsInstance.destroy(); }
-
-    document.querySelectorAll('.card-mini').forEach(el => {
+    document.querySelectorAll('.card-mini').forEach(function(el) {
         el.classList.toggle('activo', el.dataset.id === canal.id);
     });
 
-    if (Hls.isSupported()) {
-        hlsInstance = new Hls({ enableWorker: true, lowLatencyMode: true });
-        hlsInstance.loadSource(canal.stream);
-        hlsInstance.attachMedia(video);
-        hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
-            video.play().catch(() => {});
-            mostrarEstado('ok');
-        });
-        hlsInstance.on(Hls.Events.ERROR, (event, data) => {
-            if (data.fatal) mostrarEstado('error');
-        });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = canal.stream;
-        video.addEventListener('loadedmetadata', () => {
-            video.play();
-            mostrarEstado('ok');
-        });
-    }
+    showOverlay('Conectando con ' + canal.nombre + '...');
+
+    var src = 'https://www.youtube.com/embed/live_stream'
+        + '?channel=' + canal.ytId
+        + '&autoplay=1&rel=0&modestbranding=1';
+
+    var frame = document.getElementById('ytFrame');
+    frame.src = 'about:blank';
+    setTimeout(function() {
+        frame.src = src;
+        frame.onload = function() { setTimeout(hideOverlay, 900); };
+    }, 100);
 }
 
-function mostrarEstado(estado) {
-    document.getElementById('estadoCargando').style.display = estado === 'cargando' ? 'flex' : 'none';
-    document.getElementById('estadoError').style.display = estado === 'error' ? 'flex' : 'none';
+function fullscreen() {
+    var box = document.getElementById('playerBox');
+    if (box.requestFullscreen)            box.requestFullscreen();
+    else if (box.webkitRequestFullscreen) box.webkitRequestFullscreen();
 }
-
-function entrarFullscreen() {
-    const video = document.getElementById('videoPlayer');
-    if (video.requestFullscreen) video.requestFullscreen();
-    else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
-}
+window.fullscreen = fullscreen;
 
 function renderSidebar() {
-    const lista = document.getElementById('listaCanalesSidebar');
-    lista.innerHTML = CANALES.map(canal => `
-        <div class="card-mini cursor-pointer flex items-center gap-3 bg-zinc-900/50 border border-white/5 rounded-2xl p-3" 
-             data-id="${canal.id}" onclick="cargarCanal(getCanalById('${canal.id}'))">
-            <div class="w-10 h-10 rounded-xl overflow-hidden bg-white flex items-center justify-center p-1 shrink-0">
-                <img src="${canal.logo}" class="max-w-full max-h-full object-contain">
-            </div>
-            <div class="flex-1 min-w-0">
-                <p class="text-xs font-black uppercase tracking-tight truncate">${canal.nombre}</p>
-                <p class="text-[9px] text-zinc-600 uppercase font-bold">${canal.categoria}</p>
-            </div>
-        </div>
-    `).join('');
+    var sb = document.getElementById('sidebar');
+    sb.innerHTML = '';
+    CANALES.forEach(function(c) {
+        var div = document.createElement('div');
+        div.className = 'card-mini flex items-center gap-3 bg-zinc-900/50 border border-white/5 rounded-2xl p-3 active:scale-95';
+        div.dataset.id = c.id;
+        div.onclick = function() { cargarCanal(c); };
+        div.innerHTML =
+            '<div class="w-10 h-10 rounded-xl overflow-hidden bg-white flex items-center justify-center p-1 shrink-0">'
+          +   '<img src="' + c.logo + '" class="max-w-full max-h-full object-contain" loading="lazy">'
+          + '</div>'
+          + '<div class="flex-1 min-w-0">'
+          +   '<p class="text-xs font-black uppercase tracking-tight truncate">' + c.nombre + '</p>'
+          +   '<p class="text-[9px] text-zinc-600 uppercase font-bold">' + c.categoria + '</p>'
+          + '</div>'
+          + '<span class="w-1.5 h-1.5 rounded-full bg-red-500 live-dot shrink-0"></span>';
+        sb.appendChild(div);
+    });
 }
 
-// Iniciar
-const params = new URLSearchParams(location.search);
-const canalInicial = getCanalById(params.get('id'));
+var params  = new URLSearchParams(location.search);
+var initId  = params.get('id') || 'tn';
+var init    = CANALES.find(function(c){ return c.id === initId; }) || CANALES[0];
 renderSidebar();
-cargarCanal(canalInicial);
+cargarCanal(init);
 </script>
 </body>
 </html>
