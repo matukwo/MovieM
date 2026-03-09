@@ -19,7 +19,7 @@
         #playerOverlay{display:none;background:#000;position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;z-index:200;flex-direction:column;-webkit-overflow-scrolling:touch}
         #playerOverlay .player-wrap{position:relative;flex:1;width:100%;overflow:hidden;-webkit-transform:translateZ(0);transform:translateZ(0)}
         #movieFrame{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
-        .server-btn{transition:all .2s;border:1px solid rgba(255,255,255,.1);color:#71717a}
+        .server-btn{transition:all .2s;border:1px solid rgba(255,255,255,.1);color:#71717a;background:transparent}
         .server-btn.active{background:#dc2626;border-color:#dc2626;color:#fff}
     </style>
 </head>
@@ -30,14 +30,10 @@
     <div class="w-full flex justify-between items-center px-3 py-2 md:px-4 md:py-3 bg-zinc-950 border-b border-white/5" style="flex-shrink:0">
         <div class="flex items-center gap-2 md:gap-4">
             <span class="text-red-600 font-black tracking-tighter text-base md:text-xl">MOVIE<span class="text-white font-light">M</span></span>
-            <!-- Selector de servidor -->
             <div class="flex items-center gap-1.5">
                 <span class="text-[9px] text-zinc-600 font-black uppercase tracking-widest hidden sm:block">Servidor</span>
                 <button id="btnServer1" onclick="cambiarServidor(1)" class="server-btn active text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">S1</button>
-                <button id="btnServer2" onclick="cambiarServidor(2)" class="server-btn text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full flex items-center gap-1">
-                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                    S2 Mobile
-                </button>
+                <button id="btnServer2" onclick="cambiarServidor(2)" class="server-btn text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">S2</button>
             </div>
         </div>
         <button onclick="cerrarPelicula()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-3 py-1.5 rounded-full border border-white/5">Cerrar ×</button>
@@ -88,10 +84,10 @@
                 <!-- Botones mobile compactos -->
                 <div class="flex gap-2 flex-wrap">
                     <button onclick="verPelicula(1)" class="bg-red-600 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95 shadow-lg">
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Ver S1
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Ver
                     </button>
-                    <button onclick="verPelicula(2)" class="bg-zinc-700 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95 shadow-lg">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg> S2 📱
+                    <button onclick="verPelicula(2)" class="bg-zinc-700 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> S2
                     </button>
                     <button onclick="abrirTrailer()" class="bg-zinc-800 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95">
                         <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6zM21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9 9-4.03 9-9zm-16.1 0c0-3.92 3.18-7.1 7.1-7.1s7.1 3.18 7.1 7.1-3.18 7.1-7.1 7.1-7.1-3.18-7.1-7.1z"/></svg> Trailer
@@ -130,7 +126,7 @@
                     <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> VER PELICULA
                 </button>
                 <button onclick="verPelicula(2)" class="bg-zinc-800 text-white px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-zinc-700 transition-all shadow-xl active:scale-95 tracking-tight uppercase border border-white/10">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg> S2 📱 MOBILE
+                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> S2
                 </button>
                 <button onclick="abrirTrailer()" class="bg-white text-black px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-600 hover:text-white transition-all shadow-xl active:scale-95">
                     <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6zM21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9 9-4.03 9-9zm-16.1 0c0-3.92 3.18-7.1 7.1-7.1s7.1 3.18 7.1 7.1-3.18 7.1-7.1 7.1-7.1-3.18-7.1-7.1z"/></svg> VER TRAILER
@@ -400,23 +396,25 @@
 
         // --- SISTEMAS DE INTERACCIÓN ---
         async function checkStatus() {
-            if (!miUID_pelicula) return; // esperar a que onAuthStateChanged entregue el UID
-
+            if (!miUID_pelicula) return;
             try {
                 const userRef = window.doc(window.db, "usuarios", miUID_pelicula);
                 const userDoc = await window.getDoc(userRef);
-                
                 if (userDoc.exists()) {
                     const data = userDoc.data();
                     if (data.watchlist && data.watchlist.includes(movieID)) {
-                        const btn = document.getElementById('btnWatchlist');
-                        btn.classList.add('bg-zinc-100', 'text-black', 'border-white');
-                        btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
+                        ['btnWatchlist','btnWatchlistDesktop'].forEach(id => {
+                            const b = document.getElementById(id); if(!b) return;
+                            b.classList.add('bg-zinc-100','text-black','border-white');
+                            b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5');
+                        });
                     }
                     if (data.likes && data.likes.includes(movieID)) {
-                        const btn = document.getElementById('btnLike');
-                        btn.classList.add('bg-red-600', 'border-red-600', 'text-white');
-                        btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
+                        ['btnLike','btnLikeDesktop'].forEach(id => {
+                            const b = document.getElementById(id); if(!b) return;
+                            b.classList.add('bg-red-600','border-red-600','text-white');
+                            b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5');
+                        });
                     }
                 }
             } catch (e) { console.error("Error al checkear status:", e); }
@@ -424,45 +422,31 @@
 
         window.toggleWatchlist = async () => {
             if (!miUID_pelicula) return alert("Debes iniciar sesión para guardar películas.");
-
             const btn = document.getElementById('btnWatchlist');
             const userRef = window.doc(window.db, "usuarios", miUID_pelicula);
             const isSaved = btn.classList.contains('bg-zinc-100');
-
             try {
-                await window.setDoc(userRef, { 
-                    watchlist: isSaved ? window.arrayRemove(movieID) : window.arrayUnion(movieID) 
-                }, { merge: true });
-                
-                if(!isSaved) {
-                    btn.classList.add('bg-zinc-100', 'text-black', 'border-white');
-                    btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
-                } else {
-                    btn.classList.remove('bg-zinc-100', 'text-black', 'border-white');
-                    btn.classList.add('bg-zinc-900', 'text-zinc-400', 'border-white/5');
-                }
+                await window.setDoc(userRef, { watchlist: isSaved ? window.arrayRemove(movieID) : window.arrayUnion(movieID) }, { merge: true });
+                ['btnWatchlist','btnWatchlistDesktop'].forEach(id => {
+                    const b = document.getElementById(id); if(!b) return;
+                    if(!isSaved) { b.classList.add('bg-zinc-100','text-black','border-white'); b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5'); }
+                    else { b.classList.remove('bg-zinc-100','text-black','border-white'); b.classList.add('bg-zinc-900','text-zinc-400','border-white/5'); }
+                });
             } catch (e) { console.error("Error en Watchlist:", e); }
         };
 
         window.toggleLike = async () => {
             if (!miUID_pelicula) return alert("Debes iniciar sesión para dar like.");
-
             const btn = document.getElementById('btnLike');
             const userRef = window.doc(window.db, "usuarios", miUID_pelicula);
             const isLiked = btn.classList.contains('bg-red-600');
-
             try {
-                await window.setDoc(userRef, { 
-                    likes: isLiked ? window.arrayRemove(movieID) : window.arrayUnion(movieID) 
-                }, { merge: true });
-                
-                if(!isLiked) {
-                    btn.classList.add('bg-red-600', 'border-red-600', 'text-white');
-                    btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
-                } else {
-                    btn.classList.remove('bg-red-600', 'border-red-600', 'text-white');
-                    btn.classList.add('bg-zinc-900', 'text-zinc-400', 'border-white/5');
-                }
+                await window.setDoc(userRef, { likes: isLiked ? window.arrayRemove(movieID) : window.arrayUnion(movieID) }, { merge: true });
+                ['btnLike','btnLikeDesktop'].forEach(id => {
+                    const b = document.getElementById(id); if(!b) return;
+                    if(!isLiked) { b.classList.add('bg-red-600','border-red-600','text-white'); b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5'); }
+                    else { b.classList.remove('bg-red-600','border-red-600','text-white'); b.classList.add('bg-zinc-900','text-zinc-400','border-white/5'); }
+                });
             } catch (e) { console.error("Error en Like:", e); }
         };
 
@@ -536,8 +520,8 @@
         let servidorActivo = 1;
 
         function getUrlPelicula(servidor) {
-            if (servidor === 2) return `https://multiembed.mov/?video_id=${movieID}&tmdb=1`;
-            return `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
+            if (servidor === 2) return `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
+            return `https://autoembed.cc/movie/tmdb-${movieID}`;
         }
 
         window.verPelicula = (servidor = 1) => {
@@ -547,7 +531,6 @@
             document.body.style.overflow = 'hidden';
             document.body.style.position = 'fixed';
             document.body.style.width = '100%';
-            // Actualizar botones servidor
             document.getElementById('btnServer1').classList.toggle('active', servidor === 1);
             document.getElementById('btnServer2').classList.toggle('active', servidor === 2);
         };
