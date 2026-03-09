@@ -1,221 +1,128 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>MovieM | Mi Perfil</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script type="module" src="firebase-config.js"></script>
-    <style>
-        :root { --accent-color: #dc2626; }
-        .text-accent { color: var(--accent-color); }
-        .bg-accent { background-color: var(--accent-color); }
-        .border-accent { border-color: var(--accent-color); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .avatar-container:hover .overlay-edit { opacity: 1; }
-        #actorCarousel { transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        
-        /* Animación para aparecer */
-        .fade-in { animation: fadeIn 0.5s ease forwards; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    </style>
-</head>
-<body class="bg-zinc-950 text-white font-sans overflow-x-hidden">
+<script type="module">
+    // Importamos las herramientas necesarias de Firebase (asegúrate que firebase-config.js las exporte)
+    import { auth, db } from './firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-<div id="modalAvatarOpciones" class="fixed inset-0 z-[300] flex items-center justify-center bg-black/90 hidden px-4">
-    <div class="bg-zinc-900 border border-white/10 w-full max-w-sm rounded-3xl p-8 shadow-2xl text-center">
-        <h4 class="text-xs font-black uppercase tracking-[0.2em] mb-8 text-accent">Foto de Perfil</h4>
-        <div class="space-y-4">
-            <label class="flex items-center justify-center gap-4 w-full bg-white text-black font-black py-4 rounded-2xl text-[10px] uppercase tracking-widest cursor-pointer hover:bg-zinc-200 transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                Subir desde mi PC
-                <input type="file" id="inputFileAvatar" accept="image/*" class="hidden" onchange="subirFotoLocal(event)">
-            </label>
-            <button onclick="abrirBuscadorAvatar()" class="w-full bg-zinc-800 text-white font-black py-4 rounded-2xl text-[10px] uppercase tracking-widest hover:bg-zinc-700 transition">Buscar un personaje</button>
-        </div>
-        <button onclick="cerrarOpcionesAvatar()" class="mt-8 text-[9px] font-bold uppercase text-zinc-500 tracking-widest">Cerrar</button>
-    </div>
-</div>
-
-<div id="modalBusqueda" class="fixed inset-0 z-[350] flex items-center justify-center bg-black/80 hidden px-4">
-    <div class="bg-zinc-900 border border-white/10 w-full max-w-md rounded-3xl p-6 shadow-2xl">
-        <h4 id="tituloModalBusqueda" class="text-xs font-black uppercase tracking-widest mb-4 text-accent text-center">Buscar</h4>
-        <input type="text" id="inputBusquedaGral" placeholder="Escribe aquí..." class="w-full bg-zinc-800 border border-zinc-700 p-3 rounded-xl text-sm outline-none focus:border-accent mb-4 text-white">
-        <div id="resultadosGral" class="max-h-60 overflow-y-auto space-y-2 no-scrollbar"></div>
-        <button onclick="cerrarModalBusqueda()" class="w-full mt-4 text-[10px] font-bold uppercase tracking-widest text-zinc-500">Cancelar</button>
-    </div>
-</div>
-
-<nav class="p-6 grid grid-cols-3 items-center bg-zinc-950/80 backdrop-blur-md sticky top-0 w-full z-50 border-b border-white/5">
-    <div class="flex space-x-6 text-xs font-bold uppercase tracking-widest text-zinc-400">
-        <a href="index.html" class="hover:text-white transition">Inicio</a>
-        <a href="milista.html" class="hover:text-white transition">Mi Lista</a>
-    </div>
-    <div class="flex justify-center">
-        <h1 class="text-3xl font-black text-accent tracking-tighter cursor-pointer" onclick="window.location.href='index.html'">MOVIE<span class="text-white font-light">M</span></h1>
-    </div>
-    <div class="flex items-center justify-end">
-        <button id="btnUsuario" class="w-10 h-10 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:bg-accent transition group shadow-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 v-5 text-zinc-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-        </button>
-    </div>
-</nav>
-
-<div id="modalLogin" class="fixed top-24 right-6 z-[100] hidden">
-    <div class="bg-zinc-900/95 border border-white/10 w-72 rounded-2xl shadow-2xl p-6 text-center">
-        <div class="w-16 h-16 bg-zinc-800 border-2 border-accent rounded-full mx-auto mb-3 flex items-center justify-center text-2xl font-black italic shadow-xl overflow-hidden" id="miniAvatar">M</div>
-        <p class="text-zinc-200 font-black uppercase tracking-tighter text-lg mb-4" id="modalUserLabel">Usuario</p>
-        <button onclick="cerrarSesion()" class="w-full py-3 rounded-xl border border-zinc-800 text-[10px] font-bold text-zinc-500 hover:text-white transition">Cerrar Sesión</button>
-    </div>
-</div>
-
-<main id="mainContent" class="hidden max-w-6xl mx-auto pt-12 px-6 pb-12 fade-in">
-    <section class="flex flex-col md:flex-row items-center md:items-start gap-10 mb-16 border-b border-white/5 pb-12 w-full">
-        <div class="relative avatar-container cursor-pointer shrink-0" onclick="abrirOpcionesAvatar()">
-            <div class="w-32 h-32 bg-zinc-900 border-4 border-accent rounded-full flex items-center justify-center text-6xl font-black italic shadow-2xl overflow-hidden" id="userAvatarFrame">M</div>
-            <div class="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 overlay-edit transition-opacity">
-                <svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-            </div>
-        </div>
-
-        <div class="flex-1 flex flex-col md:flex-row gap-8 w-full items-center md:items-start">
-            <div class="flex-1 text-center md:text-left w-full">
-                <div class="flex flex-col md:flex-row md:items-center gap-6 mb-4 justify-center md:justify-start">
-                    <h2 class="text-4xl font-black uppercase tracking-tighter" id="profileName">Usuario</h2>
-                </div>
-                
-                <div id="contenedorBio" class="mb-4 flex items-start gap-4 justify-center md:justify-start group min-h-[80px]">
-                    <p class="text-zinc-300 text-lg italic leading-relaxed max-w-xl" id="userBio">Escribe algo sobre ti...</p>
-                    <button onclick="editarBio()" class="text-accent opacity-0 group-hover:opacity-100 transition-opacity mt-1.5 shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                    </button>
-                </div>
-                <div class="flex flex-wrap justify-center md:justify-start gap-2" id="generosCont"></div>
-            </div>
-        </div>
-    </section>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
-        <div class="lg:col-span-2 space-y-12 w-full">
-            <section class="w-full">
-                <h3 class="text-xs font-black uppercase tracking-[0.3em] text-zinc-500 mb-6 flex items-center gap-2"><span class="w-8 h-px bg-accent"></span> Películas Favoritas</h3>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="favContainer"></div>
-            </section>
-        </div>
-
-        <aside class="space-y-8 w-full lg:pt-1">
-            <section class="bg-zinc-900/30 p-6 rounded-3xl border border-white/5 text-center relative overflow-hidden group shadow-lg min-h-[220px] flex flex-col">
-                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-4 italic">Actores Favoritos</h3>
-                <div class="relative overflow-hidden flex-1"><div id="actorCarousel" class="flex transition-transform duration-500 h-full"></div></div>
-                <button onclick="prevActor()" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
-                <button onclick="nextActor()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
-                <button onclick="abrirBuscadorActor()" class="mt-4 text-[9px] font-black uppercase tracking-widest text-accent hover:underline">+ Agregar Actor</button>
-            </section>
-        </aside>
-    </div>
-</main>
-
-<div id="noSession" class="flex flex-col items-center justify-center min-h-[70vh] text-center px-6">
-    <div class="w-20 h-20 bg-zinc-900 rounded-full flex items-center justify-center mb-6 border border-white/5">
-        <svg class="w-10 h-10 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-    </div>
-    <h2 class="text-2xl font-black uppercase italic mb-2">Acceso Restringido</h2>
-    <p class="text-zinc-500 max-w-xs mb-8">Debes iniciar sesión para ver y personalizar tu perfil de cinéfilo.</p>
-    <button onclick="window.location.href='index.html'" class="bg-white text-black px-8 py-3 rounded-full font-black uppercase text-xs tracking-widest hover:bg-red-600 hover:text-white transition">Ir al Inicio / Login</button>
-</div>
-
-<script>
     const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
-    let tipoBusqueda = 'peli', slotSeleccionado = null, actorIndex = 0;
+    let usuarioActual = null;
 
-    // --- SESIÓN Y CONTROL DE VISTA ---
-    window.onload = () => {
-        const u = localStorage.getItem('usuarioMovieM');
-        if (u) {
-            // Mostrar contenido, ocultar mensaje de error
+    // --- CONTROL DE SESIÓN (FIREBASE + LOCALSTORAGE) ---
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // Usuario autenticado
+            usuarioActual = user;
+            const userName = user.displayName || user.email.split('@')[0];
+            localStorage.setItem('usuarioMovieM', userName);
+            
+            // UI Update
             document.getElementById('mainContent').classList.remove('hidden');
             document.getElementById('noSession').classList.add('hidden');
-            
-            document.getElementById('profileName').innerText = u;
-            document.getElementById('modalUserLabel').innerText = u;
-            
-            // Cargar datos específicos del usuario (LocalStorage o Firebase)
-            cargarDatosUsuario(u);
+            document.getElementById('profileName').innerText = userName;
+            document.getElementById('modalUserLabel').innerText = userName;
+
+            cargarDatosUsuario(userName);
         } else {
-            // Ocultar contenido, mostrar mensaje de error
+            // No hay sesión
+            localStorage.removeItem('usuarioMovieM');
             document.getElementById('mainContent').classList.add('hidden');
             document.getElementById('noSession').classList.remove('hidden');
         }
+    });
+
+    // --- CERRAR SESIÓN ---
+    window.cerrarSesion = async () => {
+        try {
+            await auth.signOut();
+            localStorage.removeItem('usuarioMovieM');
+            window.location.href = 'index.html';
+        } catch (error) {
+            console.error("Error al cerrar sesión", error);
+        }
     };
 
-    function cerrarSesion() {
-        localStorage.removeItem('usuarioMovieM');
-        window.location.reload(); // Recarga para aplicar los cambios de vista
-    }
-
-    // --- CARGAR DATOS (Personalizados por usuario) ---
-    function cargarDatosUsuario(userName) {
-        // Usamos prefijos con el nombre del usuario para que cada uno tenga sus datos
+    // --- CARGAR DATOS ---
+    async function cargarDatosUsuario(userName) {
+        // 1. Intentar cargar de LocalStorage para rapidez
         renderizarBio(localStorage.getItem(`bio_${userName}`));
         renderizarAvatar(localStorage.getItem(`avatar_${userName}`));
+        
+        // 2. Intentar sincronizar con Firestore para persistencia real
+        try {
+            const userRef = doc(db, "usuarios", userName);
+            const docSnap = await getDoc(userRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                if (data.bio) {
+                    renderizarBio(data.bio);
+                    localStorage.setItem(`bio_${userName}`, data.bio);
+                }
+                if (data.avatar) {
+                    renderizarAvatar(data.avatar);
+                    localStorage.setItem(`avatar_${userName}`, data.avatar);
+                }
+            }
+        } catch (e) {
+            console.warn("No se pudo sincronizar con la nube, usando datos locales.");
+        }
+        
+        // Renderizadores visuales
         renderizarFavs(userName);
-        renderizarActores(userName);
-        renderizarGeneros(userName);
+        // renderizarActores(userName); // Asegúrate de tener estas funciones definidas abajo
     }
 
-    // --- FUNCIONES DE RENDERIZADO ---
-    function renderizarAvatar(f) {
+    // --- FUNCIONES DE INTERFAZ ---
+    window.renderizarAvatar = (f) => {
         if(f) {
             const imgHTML = `<img src="${f}" class="w-full h-full object-cover">`;
             document.getElementById('userAvatarFrame').innerHTML = imgHTML;
             document.getElementById('miniAvatar').innerHTML = imgHTML;
         }
-    }
+    };
 
-    function renderizarBio(t) {
-        document.getElementById('contenedorBio').innerHTML = `<p class="text-zinc-300 text-lg italic leading-relaxed" id="userBio">${t || "Escribe algo sobre ti..."}</p>
-            <button onclick="editarBio()" class="text-accent opacity-0 group-hover:opacity-100 transition-opacity mt-1.5 shrink-0"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>`;
-    }
+    window.renderizarBio = (t) => {
+        const cont = document.getElementById('contenedorBio');
+        if(!cont) return;
+        cont.innerHTML = `
+            <p class="text-zinc-300 text-lg italic leading-relaxed" id="userBio">${t || "Escribe algo sobre ti..."}</p>
+            <button onclick="editarBio()" class="text-accent opacity-0 group-hover:opacity-100 transition-opacity mt-1.5 shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+            </button>`;
+    };
 
-    function guardarBio() {
-        const val = document.getElementById('editBioInput').value;
-        const u = localStorage.getItem('usuarioMovieM');
-        localStorage.setItem(`bio_${u}`, val); 
-        renderizarBio(val);
-    }
-
-    // --- LÓGICA DE INTERFAZ (Modales, Buscadores, etc.) ---
-    // Se mantienen igual pero usando el prefijo de usuario para guardar...
-    function abrirOpcionesAvatar() { document.getElementById('modalAvatarOpciones').classList.remove('hidden'); }
-    function cerrarOpcionesAvatar() { document.getElementById('modalAvatarOpciones').classList.add('hidden'); }
-    
-    function abrirBuscadorActor() { tipoBusqueda = 'actor'; mostrarModalBusqueda("Agregar Actor"); }
-    function mostrarModalBusqueda(t) { 
-        document.getElementById('tituloModalBusqueda').innerText = t; 
-        document.getElementById('modalBusqueda').classList.remove('hidden'); 
-        document.getElementById('inputBusquedaGral').focus(); 
-    }
-    function cerrarModalBusqueda() { document.getElementById('modalBusqueda').classList.add('hidden'); }
-
-    // Mantenemos el resto de tus funciones (renderizarFavs, Actores, etc.) adaptando el storage:
-    // Ejemplo para favoritos:
-    function renderizarFavs(userName) {
-        let favs = JSON.parse(localStorage.getItem(`favs_${userName}`)) || [null, null, null, null];
-        document.getElementById('favContainer').innerHTML = favs.map((f, i) => `
-            <div class="aspect-[2/3] bg-zinc-900 rounded-xl border border-white/10 flex items-center justify-center overflow-hidden cursor-pointer hover:border-accent transition group relative">
-                ${f ? `<img src="https://image.tmdb.org/t/p/w500${f.poster}" class="w-full h-full object-cover">` : `<span class="text-zinc-700 text-3xl font-bold" onclick="abrirBuscadorFav(${i})">+</span>`}
-            </div>`).join('');
-    }
-
-    document.getElementById('btnUsuario').onclick = () => document.getElementById('modalLogin').classList.toggle('hidden');
-    
-    // Resto de funciones (editarBio, nextActor, prevActor, etc) iguales a tu código original...
-    function editarBio() {
+    window.editarBio = () => {
         const p = document.getElementById('userBio');
         const contenedor = document.getElementById('contenedorBio');
-        contenedor.innerHTML = `<div class="w-full"><textarea id="editBioInput" class="w-full bg-zinc-900 border border-accent p-3 rounded-xl text-lg outline-none text-zinc-300 h-24 resize-none">${p.innerText}</textarea>
-            <div class="flex gap-2 mt-2"><button onclick="guardarBio()" class="text-[9px] font-black uppercase bg-accent px-3 py-1 rounded-lg">Guardar</button>
-            <button onclick="window.location.reload()" class="text-[9px] font-black uppercase bg-zinc-800 px-3 py-1 rounded-lg">Cancelar</button></div></div>`;
-    }
+        contenedor.innerHTML = `
+            <div class="w-full">
+                <textarea id="editBioInput" class="w-full bg-zinc-900 border border-accent p-3 rounded-xl text-lg outline-none text-zinc-300 h-24 resize-none">${p.innerText}</textarea>
+                <div class="flex gap-2 mt-2">
+                    <button onclick="guardarBioFirestore()" class="text-[9px] font-black uppercase bg-accent px-3 py-1 rounded-lg">Guardar</button>
+                    <button onclick="location.reload()" class="text-[9px] font-black uppercase bg-zinc-800 px-3 py-1 rounded-lg">Cancelar</button>
+                </div>
+            </div>`;
+    };
+
+    window.guardarBioFirestore = async () => {
+        const nuevaBio = document.getElementById('editBioInput').value;
+        const u = localStorage.getItem('usuarioMovieM');
+        
+        // Guardar local
+        localStorage.setItem(`bio_${u}`, nuevaBio);
+        renderizarBio(nuevaBio);
+
+        // Guardar en la nube (Firestore)
+        if (u) {
+            try {
+                await updateDoc(doc(db, "usuarios", u), { bio: nuevaBio });
+            } catch (e) { console.error("Error al guardar en nube", e); }
+        }
+    };
+
+    // Lógica de apertura de modal de usuario
+    document.getElementById('btnUsuario').onclick = () => {
+        document.getElementById('modalLogin').classList.toggle('hidden');
+    };
+
+    // (Aquí puedes pegar el resto de tus funciones de renderizarFavs y carrusel que ya tenías)
 </script>
-</body>
-</html>
