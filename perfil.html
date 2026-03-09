@@ -1,5 +1,5 @@
 <script type="module">
-    // Importamos las herramientas necesarias de Firebase (asegúrate que firebase-config.js las exporte)
+    // 1. Importaciones (Asegúrate de que firebase-config.js tenga los exports)
     import { auth, db } from './firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -7,30 +7,33 @@
     const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
     let usuarioActual = null;
 
-    // --- CONTROL DE SESIÓN (FIREBASE + LOCALSTORAGE) ---
+    // --- CONTROL DE SESIÓN ---
     onAuthStateChanged(auth, (user) => {
+        const mainContent = document.getElementById('mainContent');
+        const noSession = document.getElementById('noSession');
+
         if (user) {
-            // Usuario autenticado
             usuarioActual = user;
             const userName = user.displayName || user.email.split('@')[0];
             localStorage.setItem('usuarioMovieM', userName);
             
-            // UI Update
-            document.getElementById('mainContent').classList.remove('hidden');
-            document.getElementById('noSession').classList.add('hidden');
+            // Mostrar interfaz de usuario
+            if(mainContent) mainContent.classList.remove('hidden');
+            if(noSession) noSession.classList.add('hidden');
+            
             document.getElementById('profileName').innerText = userName;
             document.getElementById('modalUserLabel').innerText = userName;
 
             cargarDatosUsuario(userName);
         } else {
-            // No hay sesión
+            // Usuario no logueado
             localStorage.removeItem('usuarioMovieM');
-            document.getElementById('mainContent').classList.add('hidden');
-            document.getElementById('noSession').classList.remove('hidden');
+            if(mainContent) mainContent.classList.add('hidden');
+            if(noSession) noSession.classList.remove('hidden');
         }
     });
 
-    // --- CERRAR SESIÓN ---
+    // --- FUNCIONES GLOBALES (Exportadas a window para que funcionen los onclick) ---
     window.cerrarSesion = async () => {
         try {
             await auth.signOut();
@@ -41,13 +44,41 @@
         }
     };
 
-    // --- CARGAR DATOS ---
+    window.editarBio = () => {
+        const p = document.getElementById('userBio');
+        const contenedor = document.getElementById('contenedorBio');
+        if(!p || !contenedor) return;
+
+        contenedor.innerHTML = `
+            <div class="w-full">
+                <textarea id="editBioInput" class="w-full bg-zinc-900 border border-accent p-3 rounded-xl text-lg outline-none text-zinc-300 h-24 resize-none">${p.innerText}</textarea>
+                <div class="flex gap-2 mt-2">
+                    <button onclick="guardarBioFirestore()" class="text-[9px] font-black uppercase bg-accent px-3 py-1 rounded-lg">Guardar</button>
+                    <button onclick="location.reload()" class="text-[9px] font-black uppercase bg-zinc-800 px-3 py-1 rounded-lg">Cancelar</button>
+                </div>
+            </div>`;
+    };
+
+    window.guardarBioFirestore = async () => {
+        const nuevaBio = document.getElementById('editBioInput').value;
+        const u = localStorage.getItem('usuarioMovieM');
+        
+        localStorage.setItem(`bio_${u}`, nuevaBio);
+        renderizarBio(nuevaBio);
+
+        if (u) {
+            try {
+                const userRef = doc(db, "usuarios", u);
+                await updateDoc(userRef, { bio: nuevaBio });
+            } catch (e) { console.error("Error al guardar en nube", e); }
+        }
+    };
+
+    // --- FUNCIONES DE APOYO ---
     async function cargarDatosUsuario(userName) {
-        // 1. Intentar cargar de LocalStorage para rapidez
         renderizarBio(localStorage.getItem(`bio_${userName}`));
         renderizarAvatar(localStorage.getItem(`avatar_${userName}`));
         
-        // 2. Intentar sincronizar con Firestore para persistencia real
         try {
             const userRef = doc(db, "usuarios", userName);
             const docSnap = await getDoc(userRef);
@@ -63,24 +94,26 @@
                 }
             }
         } catch (e) {
-            console.warn("No se pudo sincronizar con la nube, usando datos locales.");
+            console.warn("Sincronización fallida, usando datos locales.");
         }
         
-        // Renderizadores visuales
-        renderizarFavs(userName);
-        // renderizarActores(userName); // Asegúrate de tener estas funciones definidas abajo
+        // Aquí debes asegurarte de que renderizarFavs esté definida
+        if (typeof window.renderizarFavs === 'function') {
+            window.renderizarFavs(userName);
+        }
     }
 
-    // --- FUNCIONES DE INTERFAZ ---
-    window.renderizarAvatar = (f) => {
-        if(f) {
+    function renderizarAvatar(f) {
+        const frame = document.getElementById('userAvatarFrame');
+        const mini = document.getElementById('miniAvatar');
+        if(f && frame && mini) {
             const imgHTML = `<img src="${f}" class="w-full h-full object-cover">`;
-            document.getElementById('userAvatarFrame').innerHTML = imgHTML;
-            document.getElementById('miniAvatar').innerHTML = imgHTML;
+            frame.innerHTML = imgHTML;
+            mini.innerHTML = imgHTML;
         }
-    };
+    }
 
-    window.renderizarBio = (t) => {
+    function renderizarBio(t) {
         const cont = document.getElementById('contenedorBio');
         if(!cont) return;
         cont.innerHTML = `
@@ -88,41 +121,13 @@
             <button onclick="editarBio()" class="text-accent opacity-0 group-hover:opacity-100 transition-opacity mt-1.5 shrink-0">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
             </button>`;
-    };
+    }
 
-    window.editarBio = () => {
-        const p = document.getElementById('userBio');
-        const contenedor = document.getElementById('contenedorBio');
-        contenedor.innerHTML = `
-            <div class="w-full">
-                <textarea id="editBioInput" class="w-full bg-zinc-900 border border-accent p-3 rounded-xl text-lg outline-none text-zinc-300 h-24 resize-none">${p.innerText}</textarea>
-                <div class="flex gap-2 mt-2">
-                    <button onclick="guardarBioFirestore()" class="text-[9px] font-black uppercase bg-accent px-3 py-1 rounded-lg">Guardar</button>
-                    <button onclick="location.reload()" class="text-[9px] font-black uppercase bg-zinc-800 px-3 py-1 rounded-lg">Cancelar</button>
-                </div>
-            </div>`;
-    };
-
-    window.guardarBioFirestore = async () => {
-        const nuevaBio = document.getElementById('editBioInput').value;
-        const u = localStorage.getItem('usuarioMovieM');
-        
-        // Guardar local
-        localStorage.setItem(`bio_${u}`, nuevaBio);
-        renderizarBio(nuevaBio);
-
-        // Guardar en la nube (Firestore)
-        if (u) {
-            try {
-                await updateDoc(doc(db, "usuarios", u), { bio: nuevaBio });
-            } catch (e) { console.error("Error al guardar en nube", e); }
-        }
-    };
-
-    // Lógica de apertura de modal de usuario
-    document.getElementById('btnUsuario').onclick = () => {
-        document.getElementById('modalLogin').classList.toggle('hidden');
-    };
-
-    // (Aquí puedes pegar el resto de tus funciones de renderizarFavs y carrusel que ya tenías)
+    // Eventos de UI
+    const btnUser = document.getElementById('btnUsuario');
+    if(btnUser) {
+        btnUser.onclick = () => {
+            document.getElementById('modalLogin').classList.toggle('hidden');
+        };
+    }
 </script>
