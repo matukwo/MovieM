@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>MovieM | Mi Perfil</title>
+    <title>MovieM | Perfil</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module" src="firebase-config.js"></script>
     <style>
@@ -11,10 +11,12 @@
         .bg-accent { background-color: var(--accent-color); }
         .border-accent { border-color: var(--accent-color); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .avatar-container:hover .overlay-edit { opacity: 1; }
+        /* Solo mostrar overlay si tiene la clase 'can-edit' */
+        .can-edit.avatar-container:hover .overlay-edit { opacity: 1; }
         #actorCarousel { transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
         .fade-in { animation: fadeIn 0.5s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .hidden-admin { display: none !important; }
     </style>
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden">
@@ -77,7 +79,7 @@
 
 <main id="mainContent" class="hidden max-w-6xl mx-auto pt-12 px-6 pb-12 fade-in">
     <section class="flex flex-col md:flex-row items-center md:items-start gap-10 mb-16 border-b border-white/5 pb-12 w-full">
-        <div class="relative avatar-container cursor-pointer shrink-0" onclick="abrirOpcionesAvatar()">
+        <div id="avatarClickContainer" class="relative avatar-container cursor-pointer shrink-0" onclick="abrirOpcionesAvatar()">
             <div class="w-32 h-32 bg-zinc-900 border-4 border-accent rounded-full flex items-center justify-center text-6xl font-black italic shadow-2xl overflow-hidden" id="userAvatarFrame">M</div>
             <div class="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 overlay-edit transition-opacity">
                 <svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
@@ -96,7 +98,7 @@
                 
                 <div id="contenedorBio" class="mb-4 flex items-start gap-4 justify-center md:justify-start group min-h-[80px]">
                     <p class="text-zinc-300 text-lg italic leading-relaxed max-w-xl" id="userBio">Cargando...</p>
-                    <button onclick="editarBio()" class="text-accent opacity-0 group-hover:opacity-100 transition-opacity mt-1.5 shrink-0">
+                    <button id="btnEditarBio" onclick="editarBio()" class="text-accent opacity-0 group-hover:opacity-100 transition-opacity mt-1.5 shrink-0 hidden-admin">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                     </button>
                 </div>
@@ -106,8 +108,7 @@
             <div class="w-full md:w-48 shrink-0 md:pt-2">
                 <div class="bg-zinc-900/30 p-5 rounded-3xl border border-white/5 text-center min-h-[120px] flex flex-col justify-center">
                     <h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-4 italic">Siguiendo a</h3>
-                    <div class="flex flex-wrap justify-center gap-2.5" id="siguiendoAvatares">
-                        </div>
+                    <div class="flex flex-wrap justify-center gap-2.5" id="siguiendoAvatares"></div>
                 </div>
             </div>
         </div>
@@ -119,12 +120,6 @@
                 <h3 class="text-xs font-black uppercase tracking-[0.3em] text-zinc-500 mb-6 flex items-center gap-2"><span class="w-8 h-px bg-accent"></span> Películas Favoritas</h3>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="favContainer"></div>
             </section>
-            <section class="w-full">
-                <h3 class="text-xs font-black uppercase tracking-[0.3em] text-zinc-500 mb-6 flex items-center gap-2"><span class="w-8 h-px bg-accent"></span> Últimos Comentarios</h3>
-                <div class="space-y-4" id="contenedorComentarios">
-                    <p class="text-zinc-600 text-xs italic">Aún no has comentado nada.</p>
-                </div>
-            </section>
         </div>
 
         <aside class="space-y-8 w-full lg:pt-1">
@@ -133,7 +128,7 @@
                 <div class="relative overflow-hidden flex-1"><div id="actorCarousel" class="flex transition-transform duration-500 h-full"></div></div>
                 <button onclick="prevActor()" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
                 <button onclick="nextActor()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
-                <button onclick="abrirBuscadorActor()" class="mt-4 text-[9px] font-black uppercase tracking-widest text-accent hover:underline">+ Agregar Actor</button>
+                <button id="btnAgregarActor" onclick="abrirBuscadorActor()" class="mt-4 text-[9px] font-black uppercase tracking-widest text-accent hover:underline hidden-admin">+ Agregar Actor</button>
             </section>
         </aside>
     </div>
@@ -143,9 +138,9 @@
     <div class="w-20 h-20 bg-zinc-900 rounded-full flex items-center justify-center mb-6 border border-white/5">
         <svg class="w-10 h-10 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
     </div>
-    <h2 class="text-2xl font-black uppercase italic mb-2">Acceso Restringido</h2>
-    <p class="text-zinc-500 max-w-xs mb-8">Debes iniciar sesión para ver y personalizar tu perfil de cinéfilo.</p>
-    <button onclick="window.location.href='index.html'" class="bg-white text-black px-8 py-3 rounded-full font-black uppercase text-xs tracking-widest hover:bg-red-600 hover:text-white transition shadow-xl">Ir al Inicio / Login</button>
+    <h2 class="text-2xl font-black uppercase italic mb-2" id="errorTitle">Acceso Restringido</h2>
+    <p class="text-zinc-500 max-w-xs mb-8" id="errorMsg">Debes iniciar sesión para ver perfiles.</p>
+    <button onclick="window.location.href='index.html'" class="bg-white text-black px-8 py-3 rounded-full font-black uppercase text-xs tracking-widest hover:bg-red-600 hover:text-white transition shadow-xl">Ir al Inicio</button>
 </div>
 
 <script type="module">
@@ -154,7 +149,9 @@
     import { doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
-    let userEmail = null;
+    let isOwner = false;
+    let currentProfileID = null; // El nombre de usuario que estamos viendo
+
     let userData = {
         bio: "Escribe algo sobre ti...",
         avatar: "",
@@ -168,71 +165,111 @@
 
     let tipoBusqueda = 'peli', slotSeleccionado = null, actorIndex = 0;
 
-    // --- SEGURIDAD Y CARGA ---
+    // --- LÓGICA DE URL Y SEGURIDAD ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const userFromURL = urlParams.get('u'); 
+
     onAuthStateChanged(auth, async (user) => {
         const main = document.getElementById('mainContent');
         const noSession = document.getElementById('noSession');
         
-        if (user) {
-            userEmail = user.email;
-            const userName = user.displayName || user.email.split('@')[0];
-            document.getElementById('profileName').innerText = userName;
-            document.getElementById('modalUserLabel').innerText = userName;
-            
-            await sincronizarDatos(userEmail);
-            
-            main.classList.remove('hidden');
-            noSession.classList.add('hidden');
-        } else {
+        // Determinar qué perfil cargar
+        const myName = user ? (user.displayName || user.email.split('@')[0]) : null;
+        currentProfileID = userFromURL || myName;
+
+        if (!currentProfileID) {
             main.classList.add('hidden');
             noSession.classList.remove('hidden');
+            return;
+        }
+
+        isOwner = (user && currentProfileID === myName);
+        await sincronizarDatos(currentProfileID);
+        
+        main.classList.remove('hidden');
+        noSession.classList.add('hidden');
+        
+        if (user) {
+            document.getElementById('modalUserLabel').innerText = myName;
         }
     });
 
-    async function sincronizarDatos(email) {
-        const userRef = doc(db, "usuarios", email);
+    async function sincronizarDatos(username) {
+        const userRef = doc(db, "usuarios", username);
         const docSnap = await getDoc(userRef);
 
         if (docSnap.exists()) {
             userData = { ...userData, ...docSnap.data() };
+            renderizarTodo();
         } else {
-            await setDoc(userRef, userData);
+            if (isOwner) {
+                // Si soy el dueño y no existe el doc, lo creo
+                await setDoc(userRef, userData);
+                renderizarTodo();
+            } else {
+                // Si no existe y no soy el dueño, error
+                document.getElementById('mainContent').classList.add('hidden');
+                document.getElementById('noSession').classList.remove('hidden');
+                document.getElementById('errorTitle').innerText = "Usuario no encontrado";
+                document.getElementById('errorMsg').innerText = "El perfil que buscas no existe en MovieM.";
+            }
         }
-        renderizarTodo();
-    }
-
-    async function guardarEnNube() {
-        if (!userEmail) return;
-        try {
-            await updateDoc(doc(db, "usuarios", userEmail), userData);
-        } catch(e) { console.error("Error guardando:", e); }
     }
 
     function renderizarTodo() {
+        document.getElementById('profileName').innerText = currentProfileID;
         renderizarBio(userData.bio);
         renderizarAvatar(userData.avatar);
         renderizarFavs();
         renderizarActores();
         renderizarGeneros();
-        cambiarColor(userData.color);
+        cambiarColor(userData.color, false); // false para no guardar al renderizar inicial
         document.getElementById('countSeguidores').innerText = userData.seguidores;
         document.getElementById('countSiguiendo').innerText = userData.siguiendo;
+        
+        // Gestionar permisos visuales
+        gestionarPermisosEdicion();
     }
 
-    // --- FUNCIONES DE UI ---
-    window.cambiarColor = (hex) => {
+    function gestionarPermisosEdicion() {
+        const adminElements = document.querySelectorAll('.hidden-admin');
+        const avatarCont = document.getElementById('avatarClickContainer');
+
+        if (isOwner) {
+            adminElements.forEach(el => el.classList.remove('hidden'));
+            avatarCont.classList.add('can-edit');
+            avatarCont.style.cursor = "pointer";
+        } else {
+            adminElements.forEach(el => el.classList.add('hidden'));
+            avatarCont.classList.remove('can-edit');
+            avatarCont.style.cursor = "default";
+            avatarCont.onclick = null; // Desactiva click en avatar
+        }
+    }
+
+    async function guardarEnNube() {
+        if (!isOwner) return;
+        try {
+            await updateDoc(doc(db, "usuarios", currentProfileID), userData);
+        } catch(e) { console.error("Error guardando:", e); }
+    }
+
+    // --- UI FUNCTIONS (Ajustadas para lectura/escritura) ---
+
+    window.cambiarColor = (hex, save = true) => {
         document.documentElement.style.setProperty('--accent-color', hex);
         userData.color = hex;
-        guardarEnNube();
+        if(save && isOwner) guardarEnNube();
     };
 
     window.cerrarSesion = () => auth.signOut().then(() => window.location.href = 'index.html');
 
     // Avatar
-    window.abrirOpcionesAvatar = () => document.getElementById('modalAvatarOpciones').classList.remove('hidden');
+    window.abrirOpcionesAvatar = () => { if(isOwner) document.getElementById('modalAvatarOpciones').classList.remove('hidden'); };
     window.cerrarOpcionesAvatar = () => document.getElementById('modalAvatarOpciones').classList.add('hidden');
     
     window.subirFotoLocal = (e) => {
+        if(!isOwner) return;
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
@@ -254,6 +291,7 @@
 
     // Bio
     window.editarBio = () => {
+        if(!isOwner) return;
         const p = document.getElementById('userBio');
         document.getElementById('contenedorBio').innerHTML = `
             <div class="w-full">
@@ -274,7 +312,7 @@
     function renderizarBio(t) {
         document.getElementById('contenedorBio').innerHTML = `
             <p class="text-zinc-300 text-lg italic leading-relaxed" id="userBio">${t}</p>
-            <button onclick="editarBio()" class="text-accent opacity-0 group-hover:opacity-100 transition-opacity mt-1.5 shrink-0">
+            <button id="btnEditarBio" onclick="editarBio()" class="text-accent opacity-0 group-hover:opacity-100 transition-opacity mt-1.5 shrink-0 ${isOwner ? '' : 'hidden'}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
             </button>`;
     }
@@ -282,37 +320,51 @@
     // Favoritas
     function renderizarFavs() {
         document.getElementById('favContainer').innerHTML = userData.favs.map((f, i) => `
-            <div class="aspect-[2/3] bg-zinc-900 rounded-xl border border-white/10 flex items-center justify-center overflow-hidden cursor-pointer hover:border-accent transition group relative">
-                ${f ? `<img src="https://image.tmdb.org/t/p/w500${f.poster}" class="w-full h-full object-cover"><div onclick="quitarFav(${i})" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-[9px] font-bold uppercase">Quitar</div>` : `<span class="text-zinc-700 text-3xl font-bold" onclick="abrirBuscadorFav(${i})">+</span>`}
+            <div class="aspect-[2/3] bg-zinc-900 rounded-xl border border-white/10 flex items-center justify-center overflow-hidden transition group relative ${isOwner ? 'cursor-pointer hover:border-accent' : ''}">
+                ${f ? `<img src="https://image.tmdb.org/t/p/w500${f.poster}" class="w-full h-full object-cover">
+                       ${isOwner ? `<div onclick="quitarFav(${i})" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-[9px] font-bold uppercase">Quitar</div>` : ''}` 
+                    : `<span class="text-zinc-700 text-3xl font-bold" ${isOwner ? `onclick="abrirBuscadorFav(${i})"` : ''}>${isOwner ? '+' : ''}</span>`}
             </div>`).join('');
     }
-    window.abrirBuscadorFav = (i) => { tipoBusqueda = 'peli'; slotSeleccionado = i; mostrarModalBusqueda("Película Favorita"); };
-    window.quitarFav = (i) => { userData.favs[i] = null; renderizarFavs(); guardarEnNube(); };
+    window.abrirBuscadorFav = (i) => { if(isOwner) { tipoBusqueda = 'peli'; slotSeleccionado = i; mostrarModalBusqueda("Película Favorita"); } };
+    window.quitarFav = (i) => { if(isOwner) { userData.favs[i] = null; renderizarFavs(); guardarEnNube(); } };
 
     // Actores
     function renderizarActores() {
         const container = document.getElementById('actorCarousel');
         if (userData.actores.length === 0) { container.innerHTML = `<div class="min-w-full flex items-center justify-center text-zinc-600 text-[10px] font-bold uppercase italic">Sin actores</div>`; return; }
-        container.innerHTML = userData.actores.map(a => `<div class="min-w-full flex flex-col items-center justify-center h-full"><div class="w-24 h-24 rounded-full border-2 border-accent overflow-hidden mb-2 shadow-xl shrink-0"><img src="${a.foto.startsWith('http')?a.foto:'https://image.tmdb.org/t/p/w200'+a.foto}" class="w-full h-full object-cover"></div><p class="text-[10px] font-black text-white uppercase tracking-widest truncate w-full px-2">${a.nombre}</p><button onclick="eliminarActor()" class="text-[8px] text-zinc-600 mt-1 hover:text-red-500 uppercase font-bold">Quitar</button></div>`).join('');
+        container.innerHTML = userData.actores.map(a => `
+            <div class="min-w-full flex flex-col items-center justify-center h-full">
+                <div class="w-24 h-24 rounded-full border-2 border-accent overflow-hidden mb-2 shadow-xl shrink-0">
+                    <img src="${a.foto.startsWith('http')?a.foto:'https://image.tmdb.org/t/p/w200'+a.foto}" class="w-full h-full object-cover">
+                </div>
+                <p class="text-[10px] font-black text-white uppercase tracking-widest truncate w-full px-2">${a.nombre}</p>
+                ${isOwner ? `<button onclick="eliminarActor()" class="text-[8px] text-zinc-600 mt-1 hover:text-red-500 uppercase font-bold">Quitar</button>` : ''}
+            </div>`).join('');
     }
-    window.abrirBuscadorActor = () => { tipoBusqueda = 'actor'; mostrarModalBusqueda("Agregar Actor"); };
-    window.eliminarActor = () => { userData.actores.splice(actorIndex, 1); actorIndex = 0; moverCarrusel(); renderizarActores(); guardarEnNube(); };
+    window.abrirBuscadorActor = () => { if(isOwner) { tipoBusqueda = 'actor'; mostrarModalBusqueda("Agregar Actor"); } };
+    window.eliminarActor = () => { if(isOwner) { userData.actores.splice(actorIndex, 1); actorIndex = 0; moverCarrusel(); renderizarActores(); guardarEnNube(); } };
     window.nextActor = () => { if(actorIndex < userData.actores.length - 1) actorIndex++; else actorIndex = 0; moverCarrusel(); };
     window.prevActor = () => { if(actorIndex > 0) actorIndex--; else actorIndex = userData.actores.length - 1; moverCarrusel(); };
     function moverCarrusel() { document.getElementById('actorCarousel').style.transform = `translateX(-${actorIndex * 100}%)`; }
 
     // Géneros
     function renderizarGeneros() {
-        document.getElementById('generosCont').innerHTML = userData.generos.map((g, i) => `
-            <span onclick="quitarGenero(${i})" class="px-3 py-1 bg-zinc-900 border border-white/10 rounded-full text-[10px] font-bold uppercase tracking-wider text-zinc-400 hover:border-accent hover:text-white transition cursor-pointer group">
-                ${g} <span class="hidden group-hover:inline ml-1 text-accent">×</span>
-            </span>`).join('') + `<button onclick="agregarGenero()" class="px-3 py-1 border border-dashed border-zinc-700 rounded-full text-[10px] font-bold uppercase text-zinc-600 hover:text-accent hover:border-accent transition">+</button>`;
+        let html = userData.generos.map((g, i) => `
+            <span ${isOwner ? `onclick="quitarGenero(${i})"` : ''} class="px-3 py-1 bg-zinc-900 border border-white/10 rounded-full text-[10px] font-bold uppercase tracking-wider text-zinc-400 ${isOwner ? 'hover:border-accent hover:text-white cursor-pointer' : ''} transition group">
+                ${g} ${isOwner ? '<span class="hidden group-hover:inline ml-1 text-accent">×</span>' : ''}
+            </span>`).join('');
+        
+        if(isOwner) {
+            html += `<button onclick="agregarGenero()" class="px-3 py-1 border border-dashed border-zinc-700 rounded-full text-[10px] font-bold uppercase text-zinc-600 hover:text-accent hover:border-accent transition">+</button>`;
+        }
+        document.getElementById('generosCont').innerHTML = html;
     }
-    window.agregarGenero = () => { const g = prompt("Género:"); if(g) { userData.generos.push(g); renderizarGeneros(); guardarEnNube(); } };
-    window.quitarGenero = (i) => { userData.generos.splice(i, 1); renderizarGeneros(); guardarEnNube(); };
+    window.agregarGenero = () => { if(isOwner) { const g = prompt("Género:"); if(g) { userData.generos.push(g); renderizarGeneros(); guardarEnNube(); } } };
+    window.quitarGenero = (i) => { if(isOwner) { userData.generos.splice(i, 1); renderizarGeneros(); guardarEnNube(); } };
 
     // --- BUSCADOR LOGIC ---
-    window.abrirBuscadorAvatar = () => { tipoBusqueda = 'avatar'; mostrarModalBusqueda("Buscar Personaje"); cerrarOpcionesAvatar(); };
+    window.abrirBuscadorAvatar = () => { if(isOwner) { tipoBusqueda = 'avatar'; mostrarModalBusqueda("Buscar Personaje"); cerrarOpcionesAvatar(); } };
     function mostrarModalBusqueda(t) { document.getElementById('tituloModalBusqueda').innerText = t; document.getElementById('modalBusqueda').classList.remove('hidden'); document.getElementById('inputBusquedaGral').focus(); }
     window.cerrarModalBusqueda = () => { document.getElementById('modalBusqueda').classList.add('hidden'); document.getElementById('resultadosGral').innerHTML = ""; };
 
@@ -339,7 +391,6 @@
         });
     });
 
-    // Control del botón de perfil
     document.getElementById('btnUsuario').onclick = () => document.getElementById('modalLogin').classList.toggle('hidden');
 
 </script>
