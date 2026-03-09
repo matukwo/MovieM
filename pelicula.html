@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieM | Detalle Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module" src="firebase-config.js"></script>
@@ -243,7 +244,9 @@
         window.publicarComentario = async () => {
             const txt = document.getElementById('comentarioTxt').value.trim();
             if(!txt || currentRating === 0) return alert("Por favor, deja una valoración.");
-            const userActual = localStorage.getItem('usuarioMovieM') || 'Invitado';
+            const userActual = localStorage.getItem('usuarioMovieM');
+            
+            if (!userActual) return alert("Debes iniciar sesión para comentar.");
 
             try {
                 await window.addDoc(window.collection(window.db, "comentarios"), {
@@ -260,7 +263,7 @@
             }
         };
 
-        // --- SISTEMAS DE INTERACCIÓN (FIREBASE SYNC) ---
+        // --- SISTEMAS DE INTERACCIÓN (CORREGIDO) ---
         async function checkStatus() {
             const userActual = localStorage.getItem('usuarioMovieM');
             if (!userActual) return;
@@ -271,13 +274,13 @@
                 
                 if (userDoc.exists()) {
                     const data = userDoc.data();
-                    // Check Watchlist
+                    // Check Watchlist UI
                     if (data.watchlist && data.watchlist.includes(movieID)) {
                         const btn = document.getElementById('btnWatchlist');
                         btn.classList.add('bg-zinc-100', 'text-black', 'border-white');
                         btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
                     }
-                    // Check Like
+                    // Check Like UI
                     if (data.likes && data.likes.includes(movieID)) {
                         const btn = document.getElementById('btnLike');
                         btn.classList.add('bg-red-600', 'border-red-600', 'text-white');
@@ -289,13 +292,17 @@
 
         window.toggleWatchlist = async () => {
             const userActual = localStorage.getItem('usuarioMovieM');
-            if (!userActual) return alert("Debes iniciar sesión para guardar películas.");
+            // Verificamos si existe el usuario en localStorage
+            if (!userActual || userActual === 'undefined') {
+                return alert("Debes iniciar sesión para guardar películas.");
+            }
 
             const btn = document.getElementById('btnWatchlist');
             const userRef = window.doc(window.db, "usuarios", userActual);
             const isSaved = btn.classList.contains('bg-zinc-100');
 
             try {
+                // Usamos setDoc con {merge: true} para asegurar que el documento exista sin sobreescribir todo
                 await window.setDoc(userRef, { 
                     watchlist: isSaved ? window.arrayRemove(movieID) : window.arrayUnion(movieID) 
                 }, { merge: true });
@@ -307,12 +314,17 @@
                     btn.classList.remove('bg-zinc-100', 'text-black', 'border-white');
                     btn.classList.add('bg-zinc-900', 'text-zinc-400', 'border-white/5');
                 }
-            } catch (e) { console.error("Error en Watchlist:", e); }
+            } catch (e) { 
+                console.error("Error en Watchlist:", e);
+                alert("Hubo un problema con la base de datos. Revisa tu API Key.");
+            }
         };
 
         window.toggleLike = async () => {
             const userActual = localStorage.getItem('usuarioMovieM');
-            if (!userActual) return alert("Debes iniciar sesión para dar like.");
+            if (!userActual || userActual === 'undefined') {
+                return alert("Debes iniciar sesión para dar like.");
+            }
 
             const btn = document.getElementById('btnLike');
             const userRef = window.doc(window.db, "usuarios", userActual);
