@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>MovieM | Detalle Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="firebase-config.js"></script>
     <style>
         .star { cursor: pointer; transition: color 0.2s ease; }
         #starRating:hover .star { color: #ca8a04; }
@@ -48,7 +49,7 @@
     <div id="backdrop" class="fixed inset-0 w-full h-full bg-cover bg-center opacity-30 blur-sm -z-10 transition-all duration-700"></div>
     <div class="fixed inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent -z-10"></div>
 
-    <button onclick="window.history.back()" class="fixed top-8 left-8 bg-black/50 p-3 rounded-full hover:bg-red-600 transition z-50 border border-white/10 shadow-2xl">
+    <button onclick="window.location.href='index.html'" class="fixed top-8 left-8 bg-black/50 p-3 rounded-full hover:bg-red-600 transition z-50 border border-white/10 shadow-2xl">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
     </button>
 
@@ -130,12 +131,12 @@
                     <span onclick="setRating(5)" class="star text-4xl">★</span>
                 </div>
                 <textarea id="comentarioTxt" placeholder="¿Qué te pareció la película?" class="w-full bg-zinc-800/50 border-none p-5 rounded-2xl text-white mb-6 h-36 outline-none focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"></textarea>
-                <button id="btnPublicar" onclick="publicarComentario()" class="w-full bg-red-600 py-4 rounded-2xl font-black hover:bg-red-700 transition tracking-widest uppercase text-sm">PUBLICAR EN MOVIEM</button>
+                <button onclick="publicarComentario()" class="w-full bg-red-600 py-4 rounded-2xl font-black hover:bg-red-700 transition tracking-widest uppercase text-sm shadow-xl active:scale-95">PUBLICAR EN MOVIEM</button>
             </div>
             <div>
-                <h3 class="text-2xl font-bold mb-8 flex items-center gap-3">Opiniones de la Comunidad <span class="text-[10px] bg-zinc-800 px-2 py-1 rounded text-zinc-500 font-bold uppercase tracking-wider">GLOBAL</span></h3>
+                <h3 class="text-2xl font-bold mb-8 flex items-center gap-3">Opiniones de la Comunidad <span class="text-[10px] bg-red-600 px-2 py-1 rounded text-white font-black uppercase tracking-wider">GLOBAL</span></h3>
                 <div id="listaComentarios" class="space-y-4 max-h-[400px] overflow-y-auto no-scrollbar pr-2">
-                    <p class="text-zinc-600 text-sm italic">Cargando comentarios...</p>
+                    <p class="text-zinc-600 text-xs animate-pulse">Sincronizando con la nube...</p>
                 </div>
             </div>
         </section>
@@ -163,16 +164,11 @@
     </div>
 
     <script>
-        // --- CONFIGURACIÓN SUPABASE Y TMDB ---
-        const SB_URL = "https://jrrccbqfvpexvysj79o1.supabase.co"; 
-        const SB_KEY = "sb_publishable_jR_RCCBQFvpEXvYsj79O1A_tQnMhyyJ";
         const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
-        
         const urlParams = new URLSearchParams(window.location.search);
         const movieID = urlParams.get('id');
         let currentRating = 0;
 
-        // --- CARGAR PÁGINA (TMDB) ---
         async function cargarPagina() {
             try {
                 const [pRes, cRes] = await Promise.all([
@@ -207,79 +203,76 @@
                         <p class="text-[8px] text-zinc-600 truncate italic px-1">${actor.character}</p>
                     </div>`).join('');
 
-                renderComentarios(); // Carga real de Supabase
+                escucharComentariosNube(); // Nueva función de Firebase
                 checkStatus();
             } catch (error) { console.error(error); }
         }
 
-        // --- SISTEMA DE COMENTARIOS SUPABASE ---
-        async function renderComentarios() {
-            const lista = document.getElementById('listaComentarios');
-            try {
-                const res = await fetch(`${SB_URL}/rest/v1/comentarios?movie_id=eq.${movieID}&order=created_at.desc`, {
-                    headers: { "apikey": SB_KEY, "Authorization": `Bearer ${SB_KEY}` }
-                });
-                const comentarios = await res.json();
+        // --- SISTEMA DE COMENTARIOS FIREBASE (NUEVO) ---
+        function escucharComentariosNube() {
+            const contenedor = document.getElementById('listaComentarios');
+            
+            // Consulta a Firebase: Comentarios de esta película ordenados por fecha
+            const q = window.query(
+                window.collection(window.db, "comentarios"),
+                window.where("movieID", "==", movieID),
+                window.orderBy("fecha", "desc")
+            );
 
-                if (!comentarios || comentarios.length === 0) {
-                    lista.innerHTML = `<p class="text-zinc-600 text-sm italic">Nadie ha opinado aún. ¡Sé el primero!</p>`;
+            window.onSnapshot(q, (snapshot) => {
+                contenedor.innerHTML = "";
+                
+                if (snapshot.empty) {
+                    contenedor.innerHTML = `<p class="text-zinc-600 text-sm italic">Nadie ha comentado globalmente aún. ¡Sé el primero!</p>`;
                     return;
                 }
 
-                lista.innerHTML = comentarios.map(c => `
-                    <div class="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 shadow-xl fade-in mb-4">
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="text-red-600 font-black text-xs uppercase tracking-widest leading-none">${c.usuario}</span>
-                            <span class="text-yellow-500 text-[10px] tracking-widest">${"★".repeat(c.rating)}</span>
+                snapshot.forEach((doc) => {
+                    const c = doc.data();
+                    // Usamos exactamente tu misma estructura estética
+                    contenedor.innerHTML += `
+                        <div class="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 shadow-xl fade-in mb-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <div class="flex items-center gap-2">
+                                    <img src="img/${c.avatar || 'avatar1.png'}" class="w-5 h-5 rounded-full border border-red-600/30">
+                                    <span class="text-red-600 font-black text-xs uppercase tracking-widest leading-none">${c.user}</span>
+                                </div>
+                                <span class="text-yellow-500 text-[10px] tracking-widest">${"★".repeat(c.rating)}</span>
+                            </div>
+                            <p class="text-zinc-400 text-sm leading-relaxed font-medium">${c.txt}</p>
                         </div>
-                        <p class="text-zinc-400 text-sm leading-relaxed font-medium">${c.comentario}</p>
-                    </div>
-                `).join('');
-            } catch (e) { console.error("Error cargando comentarios:", e); }
+                    `;
+                });
+            });
         }
 
         async function publicarComentario() {
             const txt = document.getElementById('comentarioTxt').value.trim();
-            const btn = document.getElementById('btnPublicar');
-            
-            if(!txt || currentRating === 0) return alert("Por favor, deja una valoración y escribe un comentario.");
+            if(!txt || currentRating === 0) return alert("Por favor, deja una valoración.");
 
-            btn.disabled = true;
-            btn.innerText = "ENVIANDO...";
+            const userActual = localStorage.getItem('usuarioMovieM') || 'Invitado';
+            const avatarActual = localStorage.getItem('movieM_avatar') || 'avatar1.png';
 
             try {
-                const res = await fetch(`${SB_URL}/rest/v1/comentarios`, {
-                    method: "POST",
-                    headers: { 
-                        "apikey": SB_KEY, 
-                        "Authorization": `Bearer ${SB_KEY}`,
-                        "Content-Type": "application/json",
-                        "Prefer": "return=minimal"
-                    },
-                    body: JSON.stringify({
-                        movie_id: movieID,
-                        usuario: "INVITADO",
-                        comentario: txt,
-                        rating: currentRating
-                    })
+                // Guardamos en la colección "comentarios" de Firebase
+                await window.addDoc(window.collection(window.db, "comentarios"), {
+                    movieID: movieID,
+                    user: userActual,
+                    avatar: avatarActual,
+                    txt: txt,
+                    rating: currentRating,
+                    fecha: Date.now()
                 });
 
-                if (res.ok) {
-                    document.getElementById('comentarioTxt').value = "";
-                    setRating(0);
-                    renderComentarios();
-                } else {
-                    alert("Error al enviar. Revisa la consola.");
-                }
-            } catch (e) { 
-                alert("Error de conexión con el servidor."); 
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "PUBLICAR EN MOVIEM";
+                document.getElementById('comentarioTxt').value = "";
+                setRating(0);
+            } catch (e) {
+                console.error("Error en Firebase: ", e);
+                alert("Error al conectar con la nube. Verifica tu configuración.");
             }
         }
 
-        // --- FUNCIONES DE INTERFAZ ---
+        // --- FUNCIONES DE INTERFAZ (TUS FUNCIONES ORIGINALES) ---
         window.verPelicula = () => {
             document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
             document.getElementById('playerOverlay').style.display = 'flex';
