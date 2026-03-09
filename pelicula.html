@@ -37,6 +37,11 @@
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden pt-24">
 
+    <div id="userHUD" class="fixed top-8 right-8 z-50 hidden flex items-center gap-4 bg-black/40 backdrop-blur-md p-2 pr-5 rounded-full border border-white/10 shadow-2xl">
+        <div class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center font-black text-white border-2 border-white/20" id="userInitial">?</div>
+        <span id="userNameHUD" class="text-xs font-bold uppercase tracking-widest">Usuario</span>
+    </div>
+
     <div id="playerOverlay">
         <div class="w-full flex justify-between items-center p-4 bg-zinc-950 border-b border-white/5">
             <span class="text-red-600 font-black tracking-tighter text-xl">MOVIE<span class="text-white font-light">M</span></span>
@@ -206,7 +211,20 @@
 
                 escucharComentariosNube(); 
                 checkStatus();
+                actualizarHUD(); // Nuevo: Actualiza el HUD al cargar
             } catch (error) { console.error(error); }
+        }
+
+        // --- HUD DE USUARIO ---
+        function actualizarHUD() {
+            const userActual = localStorage.getItem('usuarioMovieM');
+            const hud = document.getElementById('userHUD');
+            if (userActual && userActual !== 'undefined') {
+                document.getElementById('userNameHUD').innerText = userActual;
+                document.getElementById('userInitial').innerText = userActual.charAt(0).toUpperCase();
+                hud.classList.remove('hidden');
+                hud.classList.add('flex');
+            }
         }
 
         // --- FIREBASE LOGIC (COMENTARIOS) ---
@@ -226,11 +244,14 @@
                 }
                 snapshot.forEach((doc) => {
                     const c = doc.data();
+                    const fechaComentario = c.fecha ? new Date(c.fecha).toLocaleString() : "Reciente";
+                    
                     contenedor.innerHTML += `
                         <div class="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 shadow-xl fade-in mb-4">
                             <div class="flex justify-between items-center mb-3">
-                                <div class="flex items-center gap-2">
+                                <div class="flex flex-col gap-1">
                                     <span class="text-red-600 font-black text-xs uppercase tracking-widest leading-none">${c.user}</span>
+                                    <span class="text-[9px] text-zinc-600 font-bold uppercase tracking-tighter">${fechaComentario}</span>
                                 </div>
                                 <span class="text-yellow-500 text-[10px] tracking-widest">${"★".repeat(c.rating)}</span>
                             </div>
@@ -243,10 +264,15 @@
 
         window.publicarComentario = async () => {
             const txt = document.getElementById('comentarioTxt').value.trim();
-            if(!txt || currentRating === 0) return alert("Por favor, deja una valoración.");
             const userActual = localStorage.getItem('usuarioMovieM');
             
-            if (!userActual) return alert("Debes iniciar sesión para comentar.");
+            // Corrección: Validación de sesión primero
+            if (!userActual || userActual === 'undefined') {
+                return alert("Debes iniciar sesión para comentar.");
+            }
+            if(!txt || currentRating === 0) {
+                return alert("Por favor, escribe un comentario y selecciona una valoración.");
+            }
 
             try {
                 await window.addDoc(window.collection(window.db, "comentarios"), {
@@ -260,13 +286,14 @@
                 window.setRating(0);
             } catch (e) {
                 console.error("Error Firebase:", e);
+                alert("Error al publicar el comentario.");
             }
         };
 
         // --- SISTEMAS DE INTERACCIÓN (CORREGIDO) ---
         async function checkStatus() {
             const userActual = localStorage.getItem('usuarioMovieM');
-            if (!userActual) return;
+            if (!userActual || userActual === 'undefined') return;
 
             try {
                 const userRef = window.doc(window.db, "usuarios", userActual);
@@ -274,13 +301,11 @@
                 
                 if (userDoc.exists()) {
                     const data = userDoc.data();
-                    // Check Watchlist UI
                     if (data.watchlist && data.watchlist.includes(movieID)) {
                         const btn = document.getElementById('btnWatchlist');
                         btn.classList.add('bg-zinc-100', 'text-black', 'border-white');
                         btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
                     }
-                    // Check Like UI
                     if (data.likes && data.likes.includes(movieID)) {
                         const btn = document.getElementById('btnLike');
                         btn.classList.add('bg-red-600', 'border-red-600', 'text-white');
@@ -292,7 +317,6 @@
 
         window.toggleWatchlist = async () => {
             const userActual = localStorage.getItem('usuarioMovieM');
-            // Verificamos si existe el usuario en localStorage
             if (!userActual || userActual === 'undefined') {
                 return alert("Debes iniciar sesión para guardar películas.");
             }
@@ -302,7 +326,6 @@
             const isSaved = btn.classList.contains('bg-zinc-100');
 
             try {
-                // Usamos setDoc con {merge: true} para asegurar que el documento exista sin sobreescribir todo
                 await window.setDoc(userRef, { 
                     watchlist: isSaved ? window.arrayRemove(movieID) : window.arrayUnion(movieID) 
                 }, { merge: true });
@@ -314,10 +337,7 @@
                     btn.classList.remove('bg-zinc-100', 'text-black', 'border-white');
                     btn.classList.add('bg-zinc-900', 'text-zinc-400', 'border-white/5');
                 }
-            } catch (e) { 
-                console.error("Error en Watchlist:", e);
-                alert("Hubo un problema con la base de datos. Revisa tu API Key.");
-            }
+            } catch (e) { console.error("Error en Watchlist:", e); }
         };
 
         window.toggleLike = async () => {
