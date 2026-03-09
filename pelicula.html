@@ -4,32 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieM | Detalle</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="style.css">
+
     <style>
-        :root { --accent-color: #dc2626; }
-        .text-accent { color: var(--accent-color); }
-        .bg-accent { background-color: var(--accent-color); }
-        .border-accent { border-color: var(--accent-color); }
-
-        .star { cursor: pointer; transition: all 0.2s ease; color: #3f3f46; }
-        .star.active { color: #eab308; text-shadow: 0 0 10px rgba(234, 179, 8, 0.4); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        .glass-nav { 
-            background: rgba(0, 0, 0, 0.85); 
-            backdrop-filter: blur(15px); 
-            -webkit-backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(255,255,255,0.08); 
+        /* Aquí solo dejas cosas muy únicas de esta página si las hubiera */
+        #playerOverlay { 
+            display: none; 
+            background: #000; 
+            position: fixed; 
+            inset: 0; 
+            z-index: 200; 
+            flex-direction: column; 
         }
-
-        .skeleton { animation: pulse 1.5s infinite ease-in-out; background: #27272a; }
-        @keyframes pulse { 50% { opacity: 0.5; } }
-
-        .fade-in { animation: fadeIn 0.8s ease forwards; opacity: 0; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-        #playerOverlay { display: none; background: #000; position: fixed; inset: 0; z-index: 200; flex-direction: column; }
     </style>
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden">
@@ -246,3 +235,4 @@
     </script>
 </body>
 </html>
+
