@@ -2,91 +2,86 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MovieM | Detalle</title>
-    
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <link rel="stylesheet" href="style.css">
-
     <style>
-        /* Aquí solo dejas cosas muy únicas de esta página si las hubiera */
-        #playerOverlay { 
-            display: none; 
-            background: #000; 
-            position: fixed; 
-            inset: 0; 
-            z-index: 200; 
-            flex-direction: column; 
-        }
+        #playerOverlay, #bioOverlay { display: none; background: rgba(0,0,0,0.95); position: fixed; inset: 0; z-index: 500; flex-direction: column; backdrop-filter: blur(10px); }
+        .cast-scroll::-webkit-scrollbar { display: none; }
+        .cast-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .cast-card:active { scale: 0.95; }
+        .btn-action { transition: all 0.2s ease; }
+        .btn-action:active { transform: scale(0.9); }
+        .is-favorite { color: #ef4444 !important; fill: #ef4444; }
     </style>
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden">
 
     <nav class="fixed top-0 left-0 w-full z-[100] glass-nav px-4 md:px-10 py-4 flex items-center justify-between">
-        <div class="flex items-center gap-4 md:gap-8">
-            <a href="index.html" class="text-[10px] md:text-xs font-bold uppercase tracking-widest hover:text-accent transition">Inicio</a>
-            <a href="#" class="hidden sm:block text-[10px] md:text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition">Series</a>
-            <a href="milista.html" class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition">Mi Lista</a>
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-[10px] font-bold uppercase tracking-widest hover:text-accent transition">Inicio</a>
+            <a href="milista.html" class="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition">Mi Lista</a>
         </div>
-
         <div class="absolute left-1/2 -translate-x-1/2">
             <a href="index.html" class="text-xl md:text-2xl font-black tracking-tighter italic">MOVIE<span class="text-accent">M</span></a>
         </div>
-
-        <div class="flex items-center gap-3 md:gap-6">
-            <div id="authArea" class="flex items-center gap-4">
-                <button id="userBtn" onclick="toggleUserModal()" class="w-10 h-10 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:border-accent transition group overflow-hidden hidden">
-                    <div id="avatarNav" class="w-full h-full flex items-center justify-center font-black italic text-white text-sm">?</div>
-                </button>
-                <a id="loginBtn" href="index.html" class="text-[10px] font-black uppercase tracking-widest bg-accent px-4 py-2 rounded-lg hover:opacity-90 transition">Ingresar</a>
-            </div>
+        <div id="authArea">
+            <button id="userBtn" onclick="toggleUserModal()" class="w-10 h-10 rounded-full bg-zinc-800 border border-white/5 flex items-center justify-center hidden overflow-hidden">
+                <div id="avatarNav" class="w-full h-full flex items-center justify-center font-black italic text-white text-xs">?</div>
+            </button>
+            <a id="loginBtn" href="index.html" class="text-[10px] font-black uppercase bg-accent px-4 py-2 rounded-lg">Ingresar</a>
         </div>
     </nav>
-
-    <div id="userModal" class="fixed inset-0 z-[200] hidden items-center justify-center p-6">
-        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="toggleUserModal()"></div>
-        <div class="relative w-full max-w-[320px] bg-zinc-900/95 rounded-[35px] p-8 border border-white/10 text-center shadow-2xl">
-            <div class="h-1.5 w-24 bg-accent mx-auto mb-6 rounded-full"></div>
-            <div id="modalAvatar" class="w-20 h-20 rounded-full bg-zinc-800 mx-auto mb-4 flex items-center justify-center text-3xl font-black text-white shadow-lg border-2 border-accent overflow-hidden">?</div>
-            <h2 id="modalName" class="text-xl font-black italic uppercase tracking-tighter mb-6 text-white">Usuario</h2>
-            <div class="space-y-3">
-                <button onclick="window.location.href='perfil.html'" class="w-full bg-white/5 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border border-white/5 hover:bg-accent transition">Mi Perfil</button>
-                <button onclick="cerrarSesion()" class="w-full py-4 text-zinc-500 font-bold text-[10px] uppercase tracking-widest hover:text-white transition">Cerrar Sesión</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="playerOverlay">
-        <div class="w-full flex justify-between items-center p-4 bg-zinc-950 border-b border-white/5">
-            <span class="text-accent font-black tracking-tighter text-xl">MOVIE<span class="text-white font-light">M</span></span>
-            <button onclick="cerrarPelicula()" class="text-white/30 hover:text-white transition font-black uppercase text-[10px] tracking-widest bg-white/5 px-6 py-3 rounded-full">Cerrar ✕</button>
-        </div>
-        <div class="flex-1 bg-black">
-            <iframe id="movieFrame" src="" class="w-full h-full" allowfullscreen></iframe>
-        </div>
-    </div>
 
     <div id="backdrop" class="fixed inset-0 w-full h-full bg-cover bg-center opacity-20 blur-sm -z-10 scale-110"></div>
     <div class="fixed inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/90 to-transparent -z-10"></div>
 
-    <main class="container mx-auto px-4 md:px-10 pt-32">
-        <div class="flex flex-col md:flex-row gap-10 items-center md:items-start mb-16 fade-in">
-            <div class="w-full max-w-[280px] shrink-0">
-                <div id="posterSkeleton" class="w-full aspect-[2/3] rounded-2xl skeleton shadow-2xl"></div>
-                <img id="poster" src="" class="w-full rounded-2xl border border-white/10 shadow-2xl hidden" onload="this.classList.remove('hidden'); document.getElementById('posterSkeleton')?.remove()">
+    <main class="container mx-auto px-6 md:px-10 pt-28">
+        <div class="flex flex-col md:flex-row gap-8 md:gap-12 items-center md:items-start mb-16 fade-in">
+            <div class="w-56 md:w-80 shrink-0">
+                <img id="poster" src="" class="w-full rounded-3xl border border-white/10 shadow-2xl">
             </div>
+            
             <div class="flex-1 text-center md:text-left">
-                <h1 id="titulo" class="text-4xl md:text-7xl font-black mb-4 italic tracking-tighter uppercase leading-none"></h1>
-                <p id="sinopsis" class="text-base md:text-lg text-zinc-400 max-w-2xl leading-relaxed mb-8"></p>
-                <div class="flex gap-4 justify-center md:justify-start">
-                    <button onclick="verPelicula()" class="bg-accent text-white px-8 py-4 rounded-full font-black uppercase text-xs tracking-widest">Ver ahora</button>
+                <h1 id="titulo" class="text-4xl md:text-7xl font-black mb-4 italic tracking-tighter uppercase leading-tight"></h1>
+                
+                <div class="flex flex-wrap justify-center md:justify-start gap-4 mb-6 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                    <span id="anio" class="bg-white/5 px-3 py-1 rounded-full"></span>
+                    <span id="generos" class="text-accent"></span>
+                </div>
+
+                <p id="sinopsis" class="text-sm md:text-lg text-zinc-400 max-w-2xl leading-relaxed mb-8"></p>
+                
+                <div class="flex flex-wrap gap-4 justify-center md:justify-start">
+                    <button onclick="verPelicula()" class="bg-accent text-white px-8 py-4 rounded-full font-black uppercase text-[10px] tracking-widest shadow-lg shadow-red-600/20 active:scale-95 transition">Ver Película</button>
+                    <button onclick="verTrailer()" class="bg-white/5 border border-white/10 text-white px-8 py-4 rounded-full font-black uppercase text-[10px] tracking-widest hover:bg-white/10 transition">Trailer</button>
+                    
+                    <button id="favBtn" onclick="toggleFavorito()" class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-xl btn-action">
+                        <svg id="heartIcon" class="w-6 h-6 fill-none stroke-current" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                    </button>
                 </div>
             </div>
         </div>
 
+        <section class="mb-20">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h3 class="text-xs font-black uppercase tracking-[0.2em] text-zinc-500 mb-2">Protagonistas</h3>
+                    <h2 class="text-3xl font-black italic uppercase tracking-tighter">Reparto <span class="text-accent">Principal</span></h2>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="scrollCast(-200)" class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5">←</button>
+                    <button onclick="scrollCast(200)" class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5">→</button>
+                </div>
+            </div>
+            
+            <div id="castContainer" class="flex gap-4 overflow-x-auto no-scrollbar cast-scroll scroll-smooth pb-4">
+                </div>
+        </section>
+
         <section class="border-t border-white/5 pt-16 grid lg:grid-cols-5 gap-10 mb-20">
-            <div class="lg:col-span-2 bg-zinc-900/40 p-8 rounded-[30px] border border-white/5">
+            <div class="lg:col-span-2 bg-zinc-900/40 p-8 rounded-[30px] border border-white/5 h-fit">
                 <h3 class="text-2xl font-black mb-1 italic">Tu <span class="text-accent">Review</span></h3>
                 <div id="starRating" class="flex gap-2 my-6">
                     <span onclick="setRating(1)" class="star text-3xl">★</span>
@@ -95,8 +90,8 @@
                     <span onclick="setRating(4)" class="star text-3xl">★</span>
                     <span onclick="setRating(5)" class="star text-3xl">★</span>
                 </div>
-                <textarea id="comentarioTxt" placeholder="Escribe tu opinión..." class="w-full bg-black/40 border border-white/5 p-5 rounded-2xl text-white mb-4 h-32 outline-none focus:border-accent transition-all"></textarea>
-                <button onclick="publicarComentario()" class="w-full bg-accent py-4 rounded-xl font-black uppercase text-[10px] tracking-widest">Publicar</button>
+                <textarea id="comentarioTxt" placeholder="¿Qué te pareció?" class="w-full bg-black/40 border border-white/5 p-5 rounded-2xl text-white mb-4 h-32 outline-none focus:border-accent transition-all resize-none"></textarea>
+                <button onclick="publicarComentario()" class="w-full bg-accent py-4 rounded-xl font-black uppercase text-[10px] tracking-widest">Publicar Opinión</button>
             </div>
             <div class="lg:col-span-3">
                 <div id="listaComentarios" class="space-y-4"></div>
@@ -104,12 +99,35 @@
         </section>
     </main>
 
+    <div id="playerOverlay">
+        <div class="p-4 flex justify-between items-center bg-black border-b border-white/5">
+            <span class="text-accent font-black italic uppercase">Modo Cine</span>
+            <button onclick="cerrarPelicula()" class="bg-white/10 px-6 py-2 rounded-full text-[10px] font-black uppercase">Cerrar</button>
+        </div>
+        <div class="flex-1">
+            <iframe id="movieFrame" src="" class="w-full h-full" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <div id="bioOverlay" class="flex items-center justify-center p-6">
+        <div class="bg-zinc-900 w-full max-w-xl rounded-[40px] p-8 border border-white/10 relative shadow-2xl overflow-y-auto max-h-[80vh]">
+            <button onclick="closeBio()" class="absolute top-6 right-6 text-zinc-500 hover:text-white text-2xl">✕</button>
+            <div class="flex gap-6 items-center mb-6">
+                <img id="bioImg" src="" class="w-24 h-24 rounded-full object-cover border-2 border-accent">
+                <div>
+                    <h2 id="bioName" class="text-2xl font-black italic uppercase tracking-tighter text-white"></h2>
+                    <p id="bioDept" class="text-accent text-[10px] font-bold uppercase tracking-widest"></p>
+                </div>
+            </div>
+            <p id="bioText" class="text-zinc-400 text-sm leading-relaxed italic"></p>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, addDoc, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, deleteDoc, collection, addDoc, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // CONFIGURACIÓN FIREBASE (Usa la misma de tu index)
         const firebaseConfig = {
             apiKey: "AIzaSyAn5N7m7EhICK2aZG4Nx8DIW9RZd9kK1DA",
             authDomain: "moviem-5b73d.firebaseapp.com",
@@ -118,6 +136,7 @@
             messagingSenderId: "843796138544",
             appId: "1:843796138544:web:c2bde9b39d437b84d97bf5"
         };
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -127,58 +146,86 @@
         const movieID = urlParams.get('id');
         let currentRating = 0;
         let usuarioActual = null;
+        let isFav = false;
 
-        // --- GESTIÓN DE ESTADO DE SESIÓN ---
+        // Gestión de Sesión
         onAuthStateChanged(auth, async (user) => {
             const userBtn = document.getElementById('userBtn');
             const loginBtn = document.getElementById('loginBtn');
-            
             if (user) {
                 const docSnap = await getDoc(doc(db, "usuarios", user.uid));
                 if (docSnap.exists()) {
-                    usuarioActual = docSnap.data();
-                    // Actualizar UI
+                    usuarioActual = { ...docSnap.data(), uid: user.uid };
                     document.getElementById('modalName').innerText = usuarioActual.username;
-                    const content = usuarioActual.avatar 
-                        ? `<img src="${usuarioActual.avatar}" class="w-full h-full object-cover">`
-                        : `<span>${usuarioActual.username.charAt(0).toUpperCase()}</span>`;
-                    
-                    document.getElementById('avatarNav').innerHTML = content;
-                    document.getElementById('modalAvatar').innerHTML = content;
-                    
-                    if(usuarioActual.color) document.documentElement.style.setProperty('--accent-color', usuarioActual.color);
-                    
+                    document.getElementById('avatarNav').innerText = usuarioActual.username.charAt(0).toUpperCase();
                     userBtn.classList.remove('hidden');
                     loginBtn.classList.add('hidden');
+                    checkIfFavorite();
                 }
-            } else {
-                usuarioActual = null;
-                userBtn.classList.add('hidden');
-                loginBtn.classList.remove('hidden');
             }
         });
 
-        window.toggleUserModal = () => document.getElementById('userModal').classList.toggle('hidden');
-        
-        window.cerrarSesion = async () => {
-            await signOut(auth);
-            window.location.reload();
-        };
-
-        // --- LÓGICA DE LA PELÍCULA ---
-        async function cargarDetalles() {
+        // Cargar Datos TMDB
+        async function cargarPagina() {
             if(!movieID) return window.location.href = 'index.html';
+            
+            // Info Película
             const res = await fetch(`https://api.themoviedb.org/3/movie/${movieID}?api_key=${API_KEY}&language=es-ES`);
-            const peli = await res.json();
+            const data = await res.json();
+            
+            document.getElementById('titulo').innerText = data.title;
+            document.getElementById('sinopsis').innerText = data.overview;
+            document.getElementById('anio').innerText = data.release_date.split('-')[0];
+            document.getElementById('generos').innerText = data.genres.map(g => g.name).join(' • ');
+            document.getElementById('poster').src = `https://image.tmdb.org/t/p/w500${data.poster_path}`;
+            document.getElementById('backdrop').style.backgroundImage = `url('https://image.tmdb.org/t/p/original${data.backdrop_path}')`;
 
-            document.getElementById('titulo').innerText = peli.title;
-            document.getElementById('sinopsis').innerText = peli.overview;
-            document.getElementById('poster').src = 'https://image.tmdb.org/t/p/w500' + peli.poster_path;
-            document.getElementById('backdrop').style.backgroundImage = `url('https://image.tmdb.org/t/p/original${peli.backdrop_path}')`;
+            // Cargar Actores
+            const castRes = await fetch(`https://api.themoviedb.org/3/movie/${movieID}/credits?api_key=${API_KEY}&language=es-ES`);
+            const castData = await castRes.json();
+            const container = document.getElementById('castContainer');
+            
+            castData.cast.slice(0, 10).forEach(actor => {
+                const img = actor.profile_path ? `https://image.tmdb.org/t/p/w200${actor.profile_path}` : 'https://via.placeholder.com/200x300?text=No+Img';
+                container.innerHTML += `
+                    <div onclick="showBio(${actor.id})" class="cast-card min-w-[120px] md:min-w-[150px] cursor-pointer group">
+                        <div class="relative overflow-hidden rounded-2xl aspect-[3/4] mb-3">
+                            <img src="${img}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                        </div>
+                        <p class="text-[10px] font-black uppercase tracking-tighter truncate">${actor.name}</p>
+                        <p class="text-[9px] text-zinc-500 truncate italic">${actor.character}</p>
+                    </div>`;
+            });
             
             escucharComentarios();
         }
 
+        // Biografías
+        window.showBio = async (personId) => {
+            const res = await fetch(`https://api.themoviedb.org/3/person/${personId}?api_key=${API_KEY}&language=es-ES`);
+            const data = await res.json();
+            document.getElementById('bioName').innerText = data.name;
+            document.getElementById('bioDept').innerText = data.known_for_department;
+            document.getElementById('bioText').innerText = data.biography || "No hay biografía disponible en español.";
+            document.getElementById('bioImg').src = `https://image.tmdb.org/t/p/w200${data.profile_path}`;
+            document.getElementById('bioOverlay').style.display = 'flex';
+        };
+
+        window.closeBio = () => document.getElementById('bioOverlay').style.display = 'none';
+
+        // Trailer
+        window.verTrailer = async () => {
+            const res = await fetch(`https://api.themoviedb.org/3/movie/${movieID}/videos?api_key=${API_KEY}&language=es-ES`);
+            const data = await res.json();
+            const trailer = data.results.find(v => v.type === "Trailer") || data.results[0];
+            if(trailer) {
+                document.getElementById('movieFrame').src = `https://www.youtube.com/embed/${trailer.key}?autoplay=1`;
+                document.getElementById('playerOverlay').style.display = 'flex';
+            } else { alert("Trailer no disponible."); }
+        };
+
+        // Película y Favoritos
         window.verPelicula = () => {
             document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
             document.getElementById('playerOverlay').style.display = 'flex';
@@ -189,25 +236,43 @@
             document.getElementById('movieFrame').src = "";
         };
 
-        // --- REVIEWS ---
+        async function checkIfFavorite() {
+            if(!usuarioActual) return;
+            const favRef = doc(db, "usuarios", usuarioActual.uid, "miLista", movieID);
+            const snap = await getDoc(favRef);
+            if(snap.exists()) {
+                isFav = true;
+                document.getElementById('heartIcon').classList.add('is-favorite');
+            }
+        }
+
+        window.toggleFavorito = async () => {
+            if(!usuarioActual) return alert("Inicia sesión para guardar.");
+            const favRef = doc(db, "usuarios", usuarioActual.uid, "miLista", movieID);
+            if(isFav) {
+                await deleteDoc(favRef);
+                document.getElementById('heartIcon').classList.remove('is-favorite');
+                isFav = false;
+            } else {
+                const peliRes = await fetch(`https://api.themoviedb.org/3/movie/${movieID}?api_key=${API_KEY}`);
+                const peliData = await peliRes.json();
+                await setDoc(favRef, { id: movieID, title: peliData.title, poster: peliData.poster_path });
+                document.getElementById('heartIcon').classList.add('is-favorite');
+                isFav = true;
+            }
+        };
+
+        window.scrollCast = (val) => document.getElementById('castContainer').scrollLeft += val;
         window.setRating = (n) => {
             currentRating = n;
             document.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('active', i < n));
         };
 
         window.publicarComentario = async () => {
-            if(!usuarioActual) return alert("Debes iniciar sesión para comentar");
+            if(!usuarioActual) return alert("Inicia sesión.");
             const txt = document.getElementById('comentarioTxt').value;
-            if(!txt || currentRating === 0) return alert("Completa el comentario y las estrellas");
-
-            await addDoc(collection(db, "comentarios"), {
-                movieID,
-                user: usuarioActual.username,
-                txt,
-                rating: currentRating,
-                fecha: Date.now()
-            });
-            
+            if(!txt || currentRating === 0) return alert("Completa los datos.");
+            await addDoc(collection(db, "comentarios"), { movieID, user: usuarioActual.username, txt, rating: currentRating, fecha: Date.now() });
             document.getElementById('comentarioTxt').value = "";
             setRating(0);
         };
@@ -219,20 +284,13 @@
                 lista.innerHTML = "";
                 snap.forEach(doc => {
                     const c = doc.data();
-                    lista.innerHTML += `
-                        <div class="bg-white/5 p-6 rounded-2xl border border-white/5 fade-in">
-                            <div class="flex justify-between mb-2">
-                                <span class="text-accent font-black text-[10px] uppercase">${c.user}</span>
-                                <span class="text-yellow-500 text-[10px]">${"★".repeat(c.rating)}</span>
-                            </div>
-                            <p class="text-zinc-400 text-sm italic">"${c.txt}"</p>
-                        </div>`;
+                    lista.innerHTML += `<div class="bg-white/5 p-5 rounded-2xl border border-white/5 fade-in"><div class="flex justify-between mb-1"><span class="text-accent font-black text-[9px] uppercase tracking-tighter">${c.user}</span><span class="text-yellow-500 text-[10px]">${"★".repeat(c.rating)}</span></div><p class="text-zinc-400 text-sm italic">"${c.txt}"</p></div>`;
                 });
             });
         }
 
-        cargarDetalles();
+        window.toggleUserModal = () => document.getElementById('userModal').classList.toggle('hidden');
+        cargarPagina();
     </script>
 </body>
 </html>
-
