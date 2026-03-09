@@ -28,8 +28,18 @@
                 Subir desde mi PC
                 <input type="file" id="inputFileAvatar" accept="image/*" class="hidden" onchange="subirFotoLocal(event)">
             </label>
+            <button onclick="abrirBuscadorAvatar()" class="w-full bg-zinc-800 text-white font-black py-4 rounded-2xl text-[10px] uppercase tracking-widest hover:bg-zinc-700 transition">Buscar un personaje</button>
         </div>
         <button onclick="cerrarOpcionesAvatar()" class="mt-8 text-[9px] font-bold uppercase text-zinc-500 tracking-widest">Cerrar</button>
+    </div>
+</div>
+
+<div id="modalBusqueda" class="fixed inset-0 z-[350] flex items-center justify-center bg-black/80 hidden px-4">
+    <div class="bg-zinc-900 border border-white/10 w-full max-w-md rounded-3xl p-6 shadow-2xl">
+        <h4 id="tituloModalBusqueda" class="text-xs font-black uppercase tracking-widest mb-4 text-accent text-center">Buscar</h4>
+        <input type="text" id="inputBusquedaGral" placeholder="Escribe aquí..." class="w-full bg-zinc-800 border border-zinc-700 p-3 rounded-xl text-sm outline-none focus:border-accent mb-4 text-white">
+        <div id="resultadosGral" class="max-h-60 overflow-y-auto space-y-2 no-scrollbar"></div>
+        <button onclick="cerrarModalBusqueda()" class="w-full mt-4 text-[10px] font-bold uppercase tracking-widest text-zinc-500">Cancelar</button>
     </div>
 </div>
 
@@ -52,6 +62,15 @@
     <div class="bg-zinc-900/95 border border-white/10 w-72 rounded-2xl shadow-2xl p-6 text-center">
         <div class="w-16 h-16 bg-zinc-800 border-2 border-accent rounded-full mx-auto mb-3 flex items-center justify-center text-2xl font-black italic shadow-xl overflow-hidden" id="miniAvatar">M</div>
         <p class="text-zinc-200 font-black uppercase tracking-tighter text-lg mb-4" id="modalUserLabel">Usuario</p>
+        <div class="border-t border-white/5 pt-4">
+            <p class="text-[9px] text-zinc-500 font-bold uppercase mb-3 text-center">Color de Acento</p>
+            <div class="flex gap-3 justify-center mb-6">
+                <div onclick="cambiarColor('#dc2626')" class="w-5 h-5 rounded-full bg-red-600 cursor-pointer"></div>
+                <div onclick="cambiarColor('#2563eb')" class="w-5 h-5 rounded-full bg-blue-600 cursor-pointer"></div>
+                <div onclick="cambiarColor('#16a34a')" class="w-5 h-5 rounded-full bg-green-600 cursor-pointer"></div>
+                <div onclick="cambiarColor('#9333ea')" class="w-5 h-5 rounded-full bg-purple-600 cursor-pointer"></div>
+            </div>
+        </div>
         <button onclick="cerrarSesion()" class="w-full py-3 rounded-xl border border-zinc-800 text-[10px] font-bold text-zinc-500 hover:text-white transition">Cerrar Sesión</button>
     </div>
 </div>
@@ -64,21 +83,60 @@
                 <svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
             </div>
         </div>
-        <div class="flex-1 text-center md:text-left">
-            <h2 class="text-4xl font-black uppercase tracking-tighter mb-4" id="profileName">Cargando...</h2>
-            <div id="contenedorBio" class="group min-h-[80px]">
-                <p class="text-zinc-300 text-lg italic" id="userBio">Escribe algo sobre ti...</p>
+
+        <div class="flex-1 flex flex-col md:flex-row gap-8 w-full items-center md:items-start">
+            <div class="flex-1 text-center md:text-left w-full">
+                <div class="flex flex-col md:flex-row md:items-center gap-6 mb-4 justify-center md:justify-start">
+                    <h2 class="text-4xl font-black uppercase tracking-tighter" id="profileName">Usuario</h2>
+                    <div class="flex justify-center gap-6 h-full items-center border-l border-white/5 pl-6">
+                        <div class="text-center md:text-left"><span class="block text-xl font-bold leading-none" id="countSeguidores">0</span><span class="text-[8px] text-zinc-500 uppercase font-black tracking-widest mt-1">Seguidores</span></div>
+                        <div class="text-center md:text-left"><span class="block text-xl font-bold leading-none" id="countSiguiendo">0</span><span class="text-[8px] text-zinc-500 uppercase font-black tracking-widest mt-1">Siguiendo</span></div>
+                    </div>
+                </div>
+                
+                <div id="contenedorBio" class="mb-4 flex items-start gap-4 justify-center md:justify-start group min-h-[80px]">
+                    <p class="text-zinc-300 text-lg italic leading-relaxed max-w-xl" id="userBio">Cargando...</p>
+                    <button onclick="editarBio()" class="text-accent opacity-0 group-hover:opacity-100 transition-opacity mt-1.5 shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    </button>
+                </div>
+                <div class="flex flex-wrap justify-center md:justify-start gap-2" id="generosCont"></div>
+            </div>
+
+            <div class="w-full md:w-48 shrink-0 md:pt-2">
+                <div class="bg-zinc-900/30 p-5 rounded-3xl border border-white/5 text-center min-h-[120px] flex flex-col justify-center">
+                    <h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-4 italic">Siguiendo a</h3>
+                    <div class="flex flex-wrap justify-center gap-2.5" id="siguiendoAvatares">
+                        </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <section>
-        <h3 class="text-xs font-black uppercase tracking-[0.3em] text-zinc-500 mb-6 flex items-center gap-2">
-            <span class="w-8 h-px bg-accent"></span> Mis Favoritas
-        </h3>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="favContainer">
-            </div>
-    </section>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
+        <div class="lg:col-span-2 space-y-12 w-full">
+            <section class="w-full">
+                <h3 class="text-xs font-black uppercase tracking-[0.3em] text-zinc-500 mb-6 flex items-center gap-2"><span class="w-8 h-px bg-accent"></span> Películas Favoritas</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="favContainer"></div>
+            </section>
+            <section class="w-full">
+                <h3 class="text-xs font-black uppercase tracking-[0.3em] text-zinc-500 mb-6 flex items-center gap-2"><span class="w-8 h-px bg-accent"></span> Últimos Comentarios</h3>
+                <div class="space-y-4" id="contenedorComentarios">
+                    <p class="text-zinc-600 text-xs italic">Aún no has comentado nada.</p>
+                </div>
+            </section>
+        </div>
+
+        <aside class="space-y-8 w-full lg:pt-1">
+            <section class="bg-zinc-900/30 p-6 rounded-3xl border border-white/5 text-center relative overflow-hidden group shadow-lg min-h-[220px] flex flex-col">
+                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-4 italic">Actores Favoritos</h3>
+                <div class="relative overflow-hidden flex-1"><div id="actorCarousel" class="flex transition-transform duration-500 h-full"></div></div>
+                <button onclick="prevActor()" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+                <button onclick="nextActor()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
+                <button onclick="abrirBuscadorActor()" class="mt-4 text-[9px] font-black uppercase tracking-widest text-accent hover:underline">+ Agregar Actor</button>
+            </section>
+        </aside>
+    </div>
 </main>
 
 <div id="noSession" class="flex flex-col items-center justify-center min-h-[70vh] text-center px-6 hidden">
@@ -87,111 +145,203 @@
     </div>
     <h2 class="text-2xl font-black uppercase italic mb-2">Acceso Restringido</h2>
     <p class="text-zinc-500 max-w-xs mb-8">Debes iniciar sesión para ver y personalizar tu perfil de cinéfilo.</p>
-    <button onclick="window.location.href='index.html'" class="bg-white text-black px-8 py-3 rounded-full font-black uppercase text-xs tracking-widest hover:bg-red-600 hover:text-white transition">Ir al Inicio / Login</button>
+    <button onclick="window.location.href='index.html'" class="bg-white text-black px-8 py-3 rounded-full font-black uppercase text-xs tracking-widest hover:bg-red-600 hover:text-white transition shadow-xl">Ir al Inicio / Login</button>
 </div>
 
 <script type="module">
     import { auth, db } from './firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // --- INICIALIZACIÓN Y SEGURIDAD ---
-    document.addEventListener('DOMContentLoaded', () => {
-        onAuthStateChanged(auth, (user) => {
-            const mainContent = document.getElementById('mainContent');
-            const noSession = document.getElementById('noSession');
+    const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
+    let userEmail = null;
+    let userData = {
+        bio: "Escribe algo sobre ti...",
+        avatar: "",
+        color: "#dc2626",
+        favs: [null, null, null, null],
+        actores: [],
+        generos: [],
+        seguidores: 0,
+        siguiendo: 0
+    };
 
-            if (user) {
-                const userName = user.displayName || user.email.split('@')[0];
-                localStorage.setItem('usuarioMovieM', userName);
-                
-                if(mainContent) mainContent.classList.remove('hidden');
-                if(noSession) noSession.classList.add('hidden');
-                
-                document.getElementById('profileName').innerText = userName;
-                document.getElementById('modalUserLabel').innerText = userName;
+    let tipoBusqueda = 'peli', slotSeleccionado = null, actorIndex = 0;
 
-                cargarDatosUsuario(userName);
-            } else {
-                localStorage.removeItem('usuarioMovieM');
-                if(mainContent) mainContent.classList.add('hidden');
-                if(noSession) noSession.classList.remove('hidden');
-            }
-        });
-
-        // Botón Perfil
-        const btnUser = document.getElementById('btnUsuario');
-        if(btnUser) btnUser.onclick = () => document.getElementById('modalLogin').classList.toggle('hidden');
+    // --- SEGURIDAD Y CARGA ---
+    onAuthStateChanged(auth, async (user) => {
+        const main = document.getElementById('mainContent');
+        const noSession = document.getElementById('noSession');
+        
+        if (user) {
+            userEmail = user.email;
+            const userName = user.displayName || user.email.split('@')[0];
+            document.getElementById('profileName').innerText = userName;
+            document.getElementById('modalUserLabel').innerText = userName;
+            
+            await sincronizarDatos(userEmail);
+            
+            main.classList.remove('hidden');
+            noSession.classList.add('hidden');
+        } else {
+            main.classList.add('hidden');
+            noSession.classList.remove('hidden');
+        }
     });
 
-    // --- FUNCIONES GLOBALES ---
-    window.cerrarSesion = async () => {
-        await auth.signOut();
-        localStorage.removeItem('usuarioMovieM');
-        window.location.href = 'index.html';
+    async function sincronizarDatos(email) {
+        const userRef = doc(db, "usuarios", email);
+        const docSnap = await getDoc(userRef);
+
+        if (docSnap.exists()) {
+            userData = { ...userData, ...docSnap.data() };
+        } else {
+            await setDoc(userRef, userData);
+        }
+        renderizarTodo();
+    }
+
+    async function guardarEnNube() {
+        if (!userEmail) return;
+        try {
+            await updateDoc(doc(db, "usuarios", userEmail), userData);
+        } catch(e) { console.error("Error guardando:", e); }
+    }
+
+    function renderizarTodo() {
+        renderizarBio(userData.bio);
+        renderizarAvatar(userData.avatar);
+        renderizarFavs();
+        renderizarActores();
+        renderizarGeneros();
+        cambiarColor(userData.color);
+        document.getElementById('countSeguidores').innerText = userData.seguidores;
+        document.getElementById('countSiguiendo').innerText = userData.siguiendo;
+    }
+
+    // --- FUNCIONES DE UI ---
+    window.cambiarColor = (hex) => {
+        document.documentElement.style.setProperty('--accent-color', hex);
+        userData.color = hex;
+        guardarEnNube();
     };
 
+    window.cerrarSesion = () => auth.signOut().then(() => window.location.href = 'index.html');
+
+    // Avatar
     window.abrirOpcionesAvatar = () => document.getElementById('modalAvatarOpciones').classList.remove('hidden');
     window.cerrarOpcionesAvatar = () => document.getElementById('modalAvatarOpciones').classList.add('hidden');
-
-    window.editarBio = () => {
-        const p = document.getElementById('userBio');
-        const contenedor = document.getElementById('contenedorBio');
-        if(!p || !contenedor) return;
-        contenedor.innerHTML = `
-            <textarea id="editBioInput" class="w-full bg-zinc-900 border border-accent p-3 rounded-xl text-zinc-300 h-24 resize-none">${p.innerText}</textarea>
-            <div class="flex gap-2 mt-2">
-                <button onclick="guardarBio()" class="bg-accent px-4 py-1 rounded-lg text-[10px] font-bold">GUARDAR</button>
-                <button onclick="location.reload()" class="bg-zinc-800 px-4 py-1 rounded-lg text-[10px] font-bold">CANCELAR</button>
-            </div>`;
-    };
-
-    window.guardarBio = async () => {
-        const nuevaBio = document.getElementById('editBioInput').value;
-        const u = localStorage.getItem('usuarioMovieM');
-        if(u) {
-            localStorage.setItem(`bio_${u}`, nuevaBio);
-            renderizarBio(nuevaBio);
-            try { await updateDoc(doc(db, "usuarios", u), { bio: nuevaBio }); } catch(e){}
+    
+    window.subirFotoLocal = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => { 
+                userData.avatar = ev.target.result;
+                renderizarAvatar(userData.avatar);
+                guardarEnNube();
+                cerrarOpcionesAvatar();
+            };
+            reader.readAsDataURL(file);
         }
     };
 
-    // --- CARGA DE DATOS ---
-    async function cargarDatosUsuario(userName) {
-        renderizarBio(localStorage.getItem(`bio_${userName}`));
-        renderizarFavs(userName);
-        
-        try {
-            const docSnap = await getDoc(doc(db, "usuarios", userName));
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                if (data.bio) renderizarBio(data.bio);
-                // Aquí podrías cargar favoritos desde Firebase si los tienes guardados
-            }
-        } catch (e) { console.error(e); }
+    function renderizarAvatar(img) {
+        const html = img ? `<img src="${img}" class="w-full h-full object-cover">` : "M";
+        document.getElementById('userAvatarFrame').innerHTML = html;
+        document.getElementById('miniAvatar').innerHTML = html;
     }
 
+    // Bio
+    window.editarBio = () => {
+        const p = document.getElementById('userBio');
+        document.getElementById('contenedorBio').innerHTML = `
+            <div class="w-full">
+                <textarea id="editBioInput" class="w-full bg-zinc-900 border border-accent p-3 rounded-xl text-lg outline-none text-zinc-300 h-24 resize-none">${p.innerText}</textarea>
+                <div class="flex gap-2 mt-2">
+                    <button onclick="guardarBio()" class="text-[9px] font-black uppercase bg-accent px-3 py-1 rounded-lg">Guardar</button>
+                    <button onclick="renderizarTodo()" class="text-[9px] font-black uppercase bg-zinc-800 px-3 py-1 rounded-lg">Cancelar</button>
+                </div>
+            </div>`;
+    };
+
+    window.guardarBio = () => {
+        userData.bio = document.getElementById('editBioInput').value;
+        renderizarBio(userData.bio);
+        guardarEnNube();
+    };
+
     function renderizarBio(t) {
-        const cont = document.getElementById('contenedorBio');
-        if(!cont) return;
-        cont.innerHTML = `
-            <p class="text-zinc-300 text-lg italic inline-block" id="userBio">${t || "Escribe algo sobre ti..."}</p>
-            <button onclick="editarBio()" class="ml-2 text-accent opacity-50 hover:opacity-100 transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+        document.getElementById('contenedorBio').innerHTML = `
+            <p class="text-zinc-300 text-lg italic leading-relaxed" id="userBio">${t}</p>
+            <button onclick="editarBio()" class="text-accent opacity-0 group-hover:opacity-100 transition-opacity mt-1.5 shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
             </button>`;
     }
 
-    function renderizarFavs(userName) {
-        // Ejemplo de visualización de favoritos (usando LocalStorage por ahora)
-        const favs = JSON.parse(localStorage.getItem(`favs_${userName}`)) || [null, null, null, null];
-        const container = document.getElementById('favContainer');
-        if(!container) return;
-        container.innerHTML = favs.map(f => `
-            <div class="aspect-[2/3] bg-zinc-900 rounded-xl border border-white/5 flex items-center justify-center overflow-hidden hover:border-accent transition group relative">
-                ${f ? `<img src="https://image.tmdb.org/t/p/w500${f.poster}" class="w-full h-full object-cover">` : `<span class="text-zinc-800 text-4xl">+</span>`}
-            </div>
-        `).join('');
+    // Favoritas
+    function renderizarFavs() {
+        document.getElementById('favContainer').innerHTML = userData.favs.map((f, i) => `
+            <div class="aspect-[2/3] bg-zinc-900 rounded-xl border border-white/10 flex items-center justify-center overflow-hidden cursor-pointer hover:border-accent transition group relative">
+                ${f ? `<img src="https://image.tmdb.org/t/p/w500${f.poster}" class="w-full h-full object-cover"><div onclick="quitarFav(${i})" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-[9px] font-bold uppercase">Quitar</div>` : `<span class="text-zinc-700 text-3xl font-bold" onclick="abrirBuscadorFav(${i})">+</span>`}
+            </div>`).join('');
     }
+    window.abrirBuscadorFav = (i) => { tipoBusqueda = 'peli'; slotSeleccionado = i; mostrarModalBusqueda("Película Favorita"); };
+    window.quitarFav = (i) => { userData.favs[i] = null; renderizarFavs(); guardarEnNube(); };
+
+    // Actores
+    function renderizarActores() {
+        const container = document.getElementById('actorCarousel');
+        if (userData.actores.length === 0) { container.innerHTML = `<div class="min-w-full flex items-center justify-center text-zinc-600 text-[10px] font-bold uppercase italic">Sin actores</div>`; return; }
+        container.innerHTML = userData.actores.map(a => `<div class="min-w-full flex flex-col items-center justify-center h-full"><div class="w-24 h-24 rounded-full border-2 border-accent overflow-hidden mb-2 shadow-xl shrink-0"><img src="${a.foto.startsWith('http')?a.foto:'https://image.tmdb.org/t/p/w200'+a.foto}" class="w-full h-full object-cover"></div><p class="text-[10px] font-black text-white uppercase tracking-widest truncate w-full px-2">${a.nombre}</p><button onclick="eliminarActor()" class="text-[8px] text-zinc-600 mt-1 hover:text-red-500 uppercase font-bold">Quitar</button></div>`).join('');
+    }
+    window.abrirBuscadorActor = () => { tipoBusqueda = 'actor'; mostrarModalBusqueda("Agregar Actor"); };
+    window.eliminarActor = () => { userData.actores.splice(actorIndex, 1); actorIndex = 0; moverCarrusel(); renderizarActores(); guardarEnNube(); };
+    window.nextActor = () => { if(actorIndex < userData.actores.length - 1) actorIndex++; else actorIndex = 0; moverCarrusel(); };
+    window.prevActor = () => { if(actorIndex > 0) actorIndex--; else actorIndex = userData.actores.length - 1; moverCarrusel(); };
+    function moverCarrusel() { document.getElementById('actorCarousel').style.transform = `translateX(-${actorIndex * 100}%)`; }
+
+    // Géneros
+    function renderizarGeneros() {
+        document.getElementById('generosCont').innerHTML = userData.generos.map((g, i) => `
+            <span onclick="quitarGenero(${i})" class="px-3 py-1 bg-zinc-900 border border-white/10 rounded-full text-[10px] font-bold uppercase tracking-wider text-zinc-400 hover:border-accent hover:text-white transition cursor-pointer group">
+                ${g} <span class="hidden group-hover:inline ml-1 text-accent">×</span>
+            </span>`).join('') + `<button onclick="agregarGenero()" class="px-3 py-1 border border-dashed border-zinc-700 rounded-full text-[10px] font-bold uppercase text-zinc-600 hover:text-accent hover:border-accent transition">+</button>`;
+    }
+    window.agregarGenero = () => { const g = prompt("Género:"); if(g) { userData.generos.push(g); renderizarGeneros(); guardarEnNube(); } };
+    window.quitarGenero = (i) => { userData.generos.splice(i, 1); renderizarGeneros(); guardarEnNube(); };
+
+    // --- BUSCADOR LOGIC ---
+    window.abrirBuscadorAvatar = () => { tipoBusqueda = 'avatar'; mostrarModalBusqueda("Buscar Personaje"); cerrarOpcionesAvatar(); };
+    function mostrarModalBusqueda(t) { document.getElementById('tituloModalBusqueda').innerText = t; document.getElementById('modalBusqueda').classList.remove('hidden'); document.getElementById('inputBusquedaGral').focus(); }
+    window.cerrarModalBusqueda = () => { document.getElementById('modalBusqueda').classList.add('hidden'); document.getElementById('resultadosGral').innerHTML = ""; };
+
+    document.getElementById('inputBusquedaGral').addEventListener('input', async (e) => {
+        const q = e.target.value; if(q.length < 3) return;
+        const res = await fetch(`https://api.themoviedb.org/3/${tipoBusqueda==='peli'?'search/movie':'search/person'}?api_key=${API_KEY}&query=${q}&language=es-ES`);
+        const data = await res.json();
+        const resCont = document.getElementById('resultadosGral'); resCont.innerHTML = "";
+        data.results.slice(0, 5).forEach(item => {
+            const img = item.poster_path || item.profile_path;
+            if(!img) return;
+            const div = document.createElement('div'); div.className = "flex items-center gap-3 p-2 hover:bg-zinc-800 rounded-lg cursor-pointer";
+            div.innerHTML = `<img src="https://image.tmdb.org/t/p/w92${img}" class="w-8 h-12 rounded object-cover"><span class="text-xs font-bold text-white">${item.title || item.name}</span>`;
+            div.onclick = () => {
+                if(tipoBusqueda === 'peli') userData.favs[slotSeleccionado] = { poster: img, id: item.id };
+                else if(tipoBusqueda === 'actor') userData.actores.push({ nombre: item.name, foto: img });
+                else userData.avatar = `https://image.tmdb.org/t/p/w500${img}`;
+                
+                renderizarTodo();
+                guardarEnNube();
+                cerrarModalBusqueda();
+            };
+            resCont.appendChild(div);
+        });
+    });
+
+    // Control del botón de perfil
+    document.getElementById('btnUsuario').onclick = () => document.getElementById('modalLogin').classList.toggle('hidden');
+
 </script>
 </body>
 </html>
