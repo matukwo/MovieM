@@ -131,6 +131,30 @@
             <div id="accion" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div>
             <button onclick="scrollFila('accion',400)" class="absolute right-2 top-10 z-40 bg-black/80 p-2 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
         </section>
+        <section class="mb-10 relative group">
+            <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 text-zinc-100">Romance &amp; Drama</h2>
+            <button onclick="scrollFila('romance',-400)" class="absolute left-0 top-10 z-40 bg-black/80 p-2 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <div id="romance" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div>
+            <button onclick="scrollFila('romance',400)" class="absolute right-2 top-10 z-40 bg-black/80 p-2 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
+        </section>
+        <section class="mb-10 relative group">
+            <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 text-zinc-100">Clasicos de los 80s</h2>
+            <button onclick="scrollFila('ochenta',-400)" class="absolute left-0 top-10 z-40 bg-black/80 p-2 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <div id="ochenta" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div>
+            <button onclick="scrollFila('ochenta',400)" class="absolute right-2 top-10 z-40 bg-black/80 p-2 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
+        </section>
+        <section class="mb-10 relative group">
+            <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 text-zinc-100">Terror &amp; Suspenso</h2>
+            <button onclick="scrollFila('terror',-400)" class="absolute left-0 top-10 z-40 bg-black/80 p-2 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <div id="terror" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div>
+            <button onclick="scrollFila('terror',400)" class="absolute right-2 top-10 z-40 bg-black/80 p-2 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
+        </section>
+        <section class="mb-10 relative group">
+            <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 text-zinc-100">Sorprendeme</h2>
+            <button onclick="scrollFila('random',-400)" class="absolute left-0 top-10 z-40 bg-black/80 p-2 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <div id="random" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div>
+            <button onclick="scrollFila('random',400)" class="absolute right-2 top-10 z-40 bg-black/80 p-2 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
+        </section>
     </div>
 </main>
 
@@ -312,6 +336,14 @@ window.scrollFila=function(id,d){document.getElementById(id).scrollBy({left:d,be
 var colorG=localStorage.getItem('movieM_color');if(colorG)document.documentElement.style.setProperty('--accent-color',colorG);
 cargarSeccion('https://api.themoviedb.org/3/trending/movie/week?api_key='+API_KEY+'&language=es-ES','tendencias');
 cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&with_genres=28&language=es-ES','accion');
+// Romance & Drama (géneros 10749 + 18)
+cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&with_genres=10749&sort_by=vote_average.desc&vote_count.gte=500&language=es-ES','romance');
+// Clásicos de los 80s (1980-1989, bien calificadas)
+cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&primary_release_date.gte=1980-01-01&primary_release_date.lte=1989-12-31&sort_by=vote_average.desc&vote_count.gte=300&language=es-ES','ochenta');
+// Terror & Suspenso (géneros 27 + 53)
+cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&with_genres=27,53&sort_by=popularity.desc&language=es-ES','terror');
+// Sorprendeme — página aleatoria de discover
+(function(){var p=Math.floor(Math.random()*15)+1;cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&sort_by=vote_average.desc&vote_count.gte=1000&page='+p+'&language=es-ES','random');})();
 </script>
 </body>
 </html>
