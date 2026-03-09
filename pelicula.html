@@ -7,7 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module" src="firebase-config.js"></script>
     <style>
-        .star { cursor: pointer; transition: color 0.2s ease; }
+        /* Estrellas: Mejora de interactividad */
+        .star { cursor: pointer; transition: all 0.2s ease; color: #3f3f46; }
+        .star.active { color: #eab308; text-shadow: 0 0 10px rgba(234, 179, 8, 0.4); }
         #starRating:hover .star { color: #ca8a04; }
         #starRating .star:hover ~ .star { color: #3f3f46 !important; }
         
@@ -19,90 +21,86 @@
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8);
         }
 
         @keyframes pulse-bg {
-            0% { background-color: rgba(39, 39, 42, 0.5); }
+            0%, 100% { background-color: rgba(39, 39, 42, 0.5); }
             50% { background-color: rgba(63, 63, 70, 0.5); }
-            100% { background-color: rgba(39, 39, 42, 0.5); }
         }
         .skeleton { animation: pulse-bg 1.5s infinite ease-in-out; }
 
         .fade-in { animation: fadeIn 0.8s ease forwards; opacity: 0; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
         #playerOverlay { display: none; background: #000; position: fixed; inset: 0; z-index: 200; flex-direction: column; }
     </style>
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden pt-24">
 
-    <div id="userHUD" class="fixed top-8 right-8 z-50 hidden flex items-center gap-4 bg-black/40 backdrop-blur-md p-2 pr-5 rounded-full border border-white/10 shadow-2xl">
-        <div class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center font-black text-white border-2 border-white/20" id="userInitial">?</div>
-        <span id="userNameHUD" class="text-xs font-bold uppercase tracking-widest">Usuario</span>
+    <div id="userHUD" class="fixed top-8 right-8 z-50 hidden items-center gap-4 bg-black/60 backdrop-blur-xl p-2 pr-6 rounded-full border border-white/10 shadow-2xl transition-all duration-500">
+        <div class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center font-black text-white border-2 border-white/20 shadow-inner" id="userInitial">?</div>
+        <div class="flex flex-col">
+            <span class="text-[8px] text-zinc-500 uppercase font-black tracking-tighter">Sesión Activa</span>
+            <span id="userNameHUD" class="text-xs font-bold uppercase tracking-widest text-white">Usuario</span>
+        </div>
     </div>
 
     <div id="playerOverlay">
         <div class="w-full flex justify-between items-center p-4 bg-zinc-950 border-b border-white/5">
             <span class="text-red-600 font-black tracking-tighter text-xl">MOVIE<span class="text-white font-light">M</span></span>
-            <button onclick="cerrarPelicula()" class="text-white/30 hover:text-white transition font-black uppercase text-[10px] tracking-widest bg-white/5 px-5 py-2.5 rounded-full border border-white/5">Cerrar ✕</button>
+            <button onclick="cerrarPelicula()" class="text-white/30 hover:text-white transition font-black uppercase text-[10px] tracking-widest bg-white/5 px-6 py-3 rounded-full border border-white/5">Cerrar ✕</button>
         </div>
         <div class="flex-1 bg-black relative">
             <iframe id="movieFrame" src="" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media"></iframe>
         </div>
     </div>
 
-    <div id="backdrop" class="fixed inset-0 w-full h-full bg-cover bg-center opacity-30 blur-sm -z-10 transition-all duration-700"></div>
+    <div id="backdrop" class="fixed inset-0 w-full h-full bg-cover bg-center opacity-30 blur-sm -z-10 transition-all duration-1000 scale-110"></div>
     <div class="fixed inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent -z-10"></div>
 
-    <button onclick="window.location.href='index.html'" class="fixed top-8 left-8 bg-black/50 p-3 rounded-full hover:bg-red-600 transition z-50 border border-white/10 shadow-2xl">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+    <button onclick="window.location.href='index.html'" class="fixed top-8 left-8 bg-black/50 p-3 rounded-full hover:bg-red-600 transition z-50 border border-white/10 shadow-2xl group">
+        <svg class="w-6 h-6 transform group-hover:-translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
     </button>
 
-    <main class="container mx-auto px-8">
-        <div class="flex flex-col md:flex-row gap-12 items-start mb-16 relative z-0 fade-in">
-            <div class="w-full md:w-80 shrink-0">
-                <div id="posterSkeleton" class="w-full aspect-[2/3] rounded-2xl skeleton"></div>
-                <img id="poster" src="" class="w-full rounded-2xl border border-white/10 shadow-2xl transition-transform hover:scale-[1.02] duration-500 hidden" onload="this.classList.remove('hidden'); document.getElementById('posterSkeleton')?.remove()">
+    <main class="container mx-auto px-8 lg:px-20">
+        <div class="flex flex-col md:flex-row gap-12 items-center md:items-start mb-16 relative z-0 fade-in">
+            <div class="w-full max-w-[320px] shrink-0">
+                <div id="posterSkeleton" class="w-full aspect-[2/3] rounded-2xl skeleton shadow-2xl"></div>
+                <img id="poster" src="" class="w-full rounded-2xl border border-white/10 shadow-2xl transition-transform hover:scale-[1.03] duration-500 hidden" onload="this.classList.remove('hidden'); document.getElementById('posterSkeleton')?.remove()">
             </div>
             
-            <div class="flex-1 relative z-10 min-w-0">
-                <div id="badget-premios" class="hidden mb-4 inline-flex items-center gap-2.5 bg-yellow-600/20 border border-yellow-600/50 text-yellow-500 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-lg">
+            <div class="flex-1 relative z-10 min-w-0 text-center md:text-left">
+                <div id="badget-premios" class="hidden mb-6 inline-flex items-center gap-2.5 bg-yellow-600/20 border border-yellow-600/50 text-yellow-500 px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] shadow-lg animate-bounce">
                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z"/></svg>
-                    Nominada a Premios de la Academia
+                    Altamente Calificada
                 </div>
                 
-                <h1 id="titulo" class="text-5xl md:text-7xl font-black mb-4 italic tracking-tighter uppercase leading-none text-white truncate"></h1>
-                <div id="tituloSkeleton" class="h-16 w-3/4 skeleton rounded-xl mb-4"></div>
+                <h1 id="titulo" class="text-5xl md:text-8xl font-black mb-6 italic tracking-tighter uppercase leading-[0.9] text-white"></h1>
+                <div id="tituloSkeleton" class="h-20 w-3/4 skeleton rounded-xl mb-6"></div>
                 
-                <div class="flex items-center gap-4 mb-8 font-bold">
-                    <span id="anio" class="bg-zinc-800 px-3 py-1 rounded text-white text-sm"></span>
-                    <span class="text-yellow-500 flex items-center gap-1 text-lg">⭐ <span id="voto">0.0</span></span>
-                    <span id="director" class="text-zinc-400 border-l border-zinc-800 pl-4 font-semibold italic text-base"></span>
+                <div class="flex flex-wrap items-center justify-center md:justify-start gap-6 mb-8 font-bold">
+                    <span id="anio" class="bg-zinc-800/80 backdrop-blur px-4 py-1.5 rounded text-white text-sm border border-white/5"></span>
+                    <span class="text-yellow-500 flex items-center gap-2 text-xl font-black">⭐ <span id="voto" class="text-white">0.0</span></span>
+                    <span id="director" class="text-zinc-400 border-l border-zinc-800 pl-6 font-semibold italic text-base"></span>
                 </div>
                 
-                <div id="sinopsisSkeleton" class="space-y-3 mb-10 max-w-2xl">
-                    <div class="h-4 w-full skeleton rounded"></div>
-                    <div class="h-4 w-full skeleton rounded"></div>
-                    <div class="h-4 w-2/3 skeleton rounded"></div>
-                </div>
-                <p id="sinopsis" class="text-lg text-zinc-500 max-w-2xl leading-relaxed mb-10 hidden"></p>
+                <p id="sinopsis" class="text-lg text-zinc-400 max-w-2xl leading-relaxed mb-10 hidden font-medium"></p>
                 
-                <div class="flex flex-wrap items-center gap-4">
-                    <button onclick="verPelicula()" class="bg-red-600 text-white px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-700 transition-all shadow-xl shadow-red-600/20 active:scale-95 tracking-tight uppercase">
-                        <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> VER PELÍCULA
+                <div class="flex flex-wrap items-center justify-center md:justify-start gap-5">
+                    <button onclick="verPelicula()" class="bg-red-600 text-white px-10 py-5 rounded-full font-black flex items-center gap-3 hover:bg-red-700 transition-all shadow-[0_0_30px_rgba(220,38,38,0.3)] active:scale-95 tracking-widest uppercase text-sm">
+                        <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Ver ahora
                     </button>
 
-                    <button onclick="abrirTrailer()" class="bg-white text-black px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-600 hover:text-white transition-all shadow-xl active:scale-95 tracking-tight">
-                        <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6zM21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9 9-4.03 9-9zm-16.1 0c0-3.92 3.18-7.1 7.1-7.1s7.1 3.18 7.1 7.1-3.18 7.1-7.1 7.1-7.1-3.18-7.1-7.1z"/></svg> VER TRÁILER
+                    <button onclick="abrirTrailer()" class="bg-white/10 backdrop-blur text-white px-10 py-5 rounded-full font-black flex items-center gap-3 hover:bg-white hover:text-black transition-all shadow-xl active:scale-95 tracking-widest uppercase text-sm border border-white/10">
+                        <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6zM21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9 9-4.03 9-9zm-16.1 0c0-3.92 3.18-7.1 7.1-7.1s7.1 3.18 7.1 7.1-3.18 7.1-7.1 7.1-7.1-3.18-7.1-7.1z"/></svg> Trailer
                     </button>
                     
-                    <div class="flex gap-3 relative z-20">
-                        <button id="btnWatchlist" onclick="toggleWatchlist()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition shadow-lg">
+                    <div class="flex gap-4">
+                        <button id="btnWatchlist" onclick="toggleWatchlist()" class="w-14 h-14 rounded-full bg-zinc-900/80 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-all hover:scale-110">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
                         </button>
-                        <button id="btnLike" onclick="toggleLike()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-red-500 transition shadow-lg">
-                            <svg id="svgLike" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78v0z"></path></svg>
+                        <button id="btnLike" onclick="toggleLike()" class="w-14 h-14 rounded-full bg-zinc-900/80 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-red-500 transition-all hover:scale-110">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78v0z"></path></svg>
                         </button>
                     </div>
                 </div>
@@ -110,63 +108,67 @@
         </div>
 
         <section class="mb-20 fade-in" style="animation-delay: 0.2s">
-            <h3 class="text-2xl font-bold mb-8 text-zinc-200 flex items-center gap-3 uppercase tracking-widest text-sm relative z-0">
-                Reparto Principal <div class="h-px flex-1 bg-zinc-800/50"></div>
+            <h3 class="text-2xl font-black mb-10 text-zinc-400 flex items-center gap-4 uppercase tracking-[0.3em] text-xs">
+                Reparto Principal <div class="h-px flex-1 bg-gradient-to-r from-zinc-800 to-transparent"></div>
             </h3>
-            <div class="relative group z-0">
-                <button onclick="scrollReparto(-300)" class="absolute -left-5 top-10 -translate-y-1/2 bg-black/80 p-2.5 rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-all z-20 hover:bg-red-600 shadow-xl text-white">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            <div class="relative group">
+                <button onclick="scrollReparto(-400)" class="absolute -left-6 top-1/2 -translate-y-1/2 bg-black/80 p-3 rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-all z-20 hover:bg-red-600 text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 </button>
-                <div id="reparto" class="flex gap-8 overflow-x-auto no-scrollbar pb-6 px-4 pt-4 scroll-smooth">
-                    <div class="min-w-[110px] skeleton h-28 rounded-full"></div>
+                <div id="reparto" class="flex gap-10 overflow-x-auto no-scrollbar pb-10 px-4 pt-4 scroll-smooth">
+                    <div class="min-w-[120px] skeleton h-32 rounded-full"></div>
+                    <div class="min-w-[120px] skeleton h-32 rounded-full"></div>
                 </div>
-                <button onclick="scrollReparto(300)" class="absolute -right-5 top-10 -translate-y-1/2 bg-black/80 p-2.5 rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-all z-20 hover:bg-red-600 shadow-xl text-white">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <button onclick="scrollReparto(400)" class="absolute -right-6 top-1/2 -translate-y-1/2 bg-black/80 p-3 rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-all z-20 hover:bg-red-600 text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </button>
             </div>
         </section>
 
-        <section class="border-t border-white/5 pt-12 grid md:grid-cols-2 gap-16 mb-20 relative z-0 fade-in" style="animation-delay: 0.4s">
-            <div class="bg-zinc-900/40 p-10 rounded-3xl border border-white/5 shadow-2xl overflow-hidden">
-                <h3 class="text-2xl font-bold mb-6 italic">Tu reseña en <span class="text-red-600">MovieM</span></h3>
-                <div id="starRating" class="flex gap-2 mb-6 text-zinc-700">
+        <section class="border-t border-white/5 pt-16 grid lg:grid-cols-5 gap-16 mb-32 relative z-0 fade-in" style="animation-delay: 0.4s">
+            <div class="lg:col-span-2 bg-zinc-900/40 p-10 rounded-[40px] border border-white/5 shadow-2xl h-fit">
+                <h3 class="text-3xl font-black mb-2 italic">Tu <span class="text-red-600">Review</span></h3>
+                <p class="text-zinc-500 text-sm mb-8 font-medium">Comparte tu opinión con la comunidad de MovieM.</p>
+                
+                <div id="starRating" class="flex gap-3 mb-8">
                     <span onclick="setRating(1)" class="star text-4xl">★</span>
                     <span onclick="setRating(2)" class="star text-4xl">★</span>
                     <span onclick="setRating(3)" class="star text-4xl">★</span>
                     <span onclick="setRating(4)" class="star text-4xl">★</span>
                     <span onclick="setRating(5)" class="star text-4xl">★</span>
                 </div>
-                <textarea id="comentarioTxt" placeholder="¿Qué te pareció la película?" class="w-full bg-zinc-800/50 border-none p-5 rounded-2xl text-white mb-6 h-36 outline-none focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"></textarea>
-                <button onclick="publicarComentario()" class="w-full bg-red-600 py-4 rounded-2xl font-black hover:bg-red-700 transition tracking-widest uppercase text-sm shadow-xl active:scale-95">PUBLICAR EN MOVIEM</button>
+                
+                <textarea id="comentarioTxt" placeholder="¿Fue una obra maestra o una pérdida de tiempo?" class="w-full bg-zinc-950/50 border border-white/5 p-6 rounded-3xl text-white mb-6 h-40 outline-none focus:border-red-600 focus:ring-4 focus:ring-red-600/10 transition-all placeholder:text-zinc-700 font-medium"></textarea>
+                <button onclick="publicarComentario()" class="w-full bg-red-600 py-5 rounded-2xl font-black hover:bg-red-700 transition-all tracking-widest uppercase text-xs shadow-xl active:scale-[0.98]">Enviar Reseña</button>
             </div>
-            <div>
-                <h3 class="text-2xl font-bold mb-8 flex items-center gap-3">Opiniones de la Comunidad <span class="text-[10px] bg-red-600 px-2 py-1 rounded text-white font-black uppercase tracking-wider">GLOBAL</span></h3>
-                <div id="listaComentarios" class="space-y-4 max-h-[400px] overflow-y-auto no-scrollbar pr-2">
-                    <p class="text-zinc-600 text-xs animate-pulse">Sincronizando con la nube...</p>
-                </div>
+
+            <div class="lg:col-span-3">
+                <h3 class="text-2xl font-black mb-10 flex items-center gap-4">Opiniones Globales <span class="text-[9px] bg-red-600 px-3 py-1 rounded-full text-white font-black uppercase tracking-widest">LIVE</span></h3>
+                <div id="listaComentarios" class="space-y-6 max-h-[600px] overflow-y-auto no-scrollbar pr-4">
+                    </div>
             </div>
         </section>
     </main>
 
-    <div id="modalActor" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-6">
-        <div class="absolute inset-0 bg-black/70 backdrop-blur-md" onclick="cerrarActor()"></div>
-        <div class="relative glass-card px-10 py-10 rounded-[45px] max-w-4xl w-full max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl">
-            <button onclick="cerrarActor()" class="absolute top-8 right-10 text-white/30 hover:text-white transition-all text-2xl z-20">✕</button>
-            <div id="modalActorContent" class="flex flex-col md:flex-row gap-10 items-start relative z-10">
-                <img id="actorFoto" src="" class="w-48 h-auto object-cover rounded-[30px] shadow-2xl border border-white/10 shrink-0 sticky top-0">
-                <div class="flex-1 w-full min-w-0">
-                    <h2 id="actorNombre" class="text-4xl font-black mb-4 italic tracking-tighter uppercase text-white truncate"></h2>
-                    <div class="mb-10"><p id="actorInfo" class="text-zinc-300 text-sm leading-relaxed font-medium"></p></div>
-                    <h4 class="text-[10px] font-bold uppercase tracking-[0.2em] text-red-500 mb-4">Filmografía Destacada</h4>
-                    <div id="actorPelisContenedor" class="relative group w-full"></div>
+    <div id="modalActor" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-xl" onclick="cerrarActor()"></div>
+        <div class="relative glass-card p-8 md:p-12 rounded-[50px] max-w-5xl w-full max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl border-white/10">
+            <button onclick="cerrarActor()" class="absolute top-10 right-10 text-white/30 hover:text-white transition-all text-3xl">✕</button>
+            <div id="modalActorContent" class="flex flex-col md:flex-row gap-12 items-start">
+                <img id="actorFoto" src="" class="w-56 h-72 object-cover rounded-[35px] shadow-2xl border border-white/10 shrink-0 mx-auto">
+                <div class="flex-1">
+                    <h2 id="actorNombre" class="text-5xl font-black mb-6 italic tracking-tighter uppercase text-white"></h2>
+                    <p id="actorInfo" class="text-zinc-400 text-base leading-relaxed mb-10 font-medium"></p>
+                    <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-red-500 mb-6">Filmografía Relevante</h4>
+                    <div id="actorPelisContenedor" class="relative group"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="modalVideo" class="fixed inset-0 bg-black/95 z-[100] hidden flex items-center justify-center p-4">
-        <button onclick="cerrarTrailer()" class="absolute top-8 right-8 text-white text-4xl hover:text-red-600 transition">✕</button>
-        <div id="videoContainer" class="w-full max-w-5xl aspect-video rounded-3xl overflow-hidden shadow-2xl shadow-red-600/10"></div>
+    <div id="modalVideo" class="fixed inset-0 bg-black/98 z-[100] hidden flex items-center justify-center p-4">
+        <button onclick="cerrarTrailer()" class="absolute top-10 right-10 text-white/50 text-4xl hover:text-red-600 transition">✕</button>
+        <div id="videoContainer" class="w-full max-w-6xl aspect-video rounded-[40px] overflow-hidden shadow-[0_0_100px_rgba(220,38,38,0.15)] bg-black"></div>
     </div>
 
     <script type="module">
@@ -176,6 +178,7 @@
         let currentRating = 0;
 
         async function cargarPagina() {
+            if(!movieID) { window.location.href = 'index.html'; return; }
             try {
                 const [pRes, cRes] = await Promise.all([
                     fetch(`https://api.themoviedb.org/3/movie/${movieID}?api_key=${API_KEY}&language=es-ES`),
@@ -184,52 +187,57 @@
                 const peli = await pRes.json();
                 const credits = await cRes.json();
 
-                if(document.getElementById('tituloSkeleton')) document.getElementById('tituloSkeleton').remove();
-                if(document.getElementById('sinopsisSkeleton')) document.getElementById('sinopsisSkeleton').remove();
+                // Limpieza Skeletons
+                document.getElementById('tituloSkeleton')?.remove();
+                document.getElementById('sinopsisSkeleton')?.remove();
                 document.getElementById('sinopsis').classList.remove('hidden');
 
+                // Inyección de Datos
+                document.title = `${peli.title} | MovieM`;
                 document.getElementById('titulo').innerText = peli.title;
-                document.getElementById('sinopsis').innerText = peli.overview || "Sin descripción disponible.";
-                document.getElementById('anio').innerText = peli.release_date ? peli.release_date.split('-')[0] : "S/F";
+                document.getElementById('sinopsis').innerText = peli.overview || "Esta película aún no tiene una sinopsis disponible en español.";
+                document.getElementById('anio').innerText = peli.release_date ? peli.release_date.split('-')[0] : "N/A";
                 document.getElementById('voto').innerText = peli.vote_average.toFixed(1);
                 document.getElementById('poster').src = 'https://image.tmdb.org/t/p/w500' + peli.poster_path;
                 document.getElementById('backdrop').style.backgroundImage = `url('https://image.tmdb.org/t/p/original${peli.backdrop_path}')`;
                 
-                if(peli.vote_average > 7.4) document.getElementById('badget-premios').classList.remove('hidden');
+                if(peli.vote_average > 7.5) document.getElementById('badget-premios').classList.remove('hidden');
 
                 const dir = credits.crew.find(c => c.job === "Director");
-                if(dir) document.getElementById('director').innerText = `Director: ${dir.name}`;
+                if(dir) document.getElementById('director').innerText = `Dirigida por ${dir.name}`;
 
-                document.getElementById('reparto').innerHTML = credits.cast.slice(0, 15).map(actor => `
-                    <div onclick="verActor(${actor.id})" class="min-w-[110px] text-center cursor-pointer shrink-0 fade-in">
-                        <div class="w-20 h-20 mx-auto mb-4 overflow-hidden rounded-full border border-zinc-800 hover:border-red-600 transition-all transform hover:scale-110 duration-300">
-                            <img src="${actor.profile_path ? 'https://image.tmdb.org/t/p/w200' + actor.profile_path : 'https://via.placeholder.com/200'}" class="w-full h-full object-cover">
+                // Render Reparto
+                document.getElementById('reparto').innerHTML = credits.cast.slice(0, 12).map(actor => `
+                    <div onclick="verActor(${actor.id})" class="min-w-[130px] text-center cursor-pointer shrink-0 group transition-all duration-500">
+                        <div class="w-24 h-24 mx-auto mb-5 overflow-hidden rounded-full border-2 border-zinc-800 group-hover:border-red-600 transition-all shadow-xl group-hover:scale-110">
+                            <img src="${actor.profile_path ? 'https://image.tmdb.org/t/p/w200' + actor.profile_path : 'https://via.placeholder.com/200?text=Actor'}" class="w-full h-full object-cover">
                         </div>
-                        <p class="text-[10px] font-black text-zinc-200 truncate uppercase tracking-tighter px-1">${actor.name}</p>
-                        <p class="text-[8px] text-zinc-600 truncate italic px-1">${actor.character}</p>
+                        <p class="text-[10px] font-black text-white truncate uppercase tracking-tighter">${actor.name}</p>
+                        <p class="text-[8px] text-zinc-600 truncate italic mt-1">${actor.character}</p>
                     </div>`).join('');
 
                 escucharComentariosNube(); 
                 checkStatus();
-                actualizarHUD(); // Nuevo: Actualiza el HUD al cargar
-            } catch (error) { console.error(error); }
+                actualizarHUD();
+            } catch (error) { console.error("Error cargando película:", error); }
         }
 
-        // --- HUD DE USUARIO ---
+        // --- HUD ---
         function actualizarHUD() {
-            const userActual = localStorage.getItem('usuarioMovieM');
+            const user = localStorage.getItem('usuarioMovieM');
             const hud = document.getElementById('userHUD');
-            if (userActual && userActual !== 'undefined') {
-                document.getElementById('userNameHUD').innerText = userActual;
-                document.getElementById('userInitial').innerText = userActual.charAt(0).toUpperCase();
+            if (user && user !== 'undefined') {
+                document.getElementById('userNameHUD').innerText = user;
+                document.getElementById('userInitial').innerText = user.charAt(0).toUpperCase();
                 hud.classList.remove('hidden');
                 hud.classList.add('flex');
             }
         }
 
-        // --- FIREBASE LOGIC (COMENTARIOS) ---
+        // --- FIREBASE (RESEÑAS) ---
         function escucharComentariosNube() {
-            const contenedor = document.getElementById('listaComentarios');
+            const container = document.getElementById('listaComentarios');
+            if(!window.db) return; // Evita error si firebase-config no carga
             const q = window.query(
                 window.collection(window.db, "comentarios"),
                 window.where("movieID", "==", movieID),
@@ -237,212 +245,131 @@
             );
 
             window.onSnapshot(q, (snapshot) => {
-                contenedor.innerHTML = "";
+                container.innerHTML = "";
                 if (snapshot.empty) {
-                    contenedor.innerHTML = `<p class="text-zinc-600 text-sm italic">Nadie ha comentado aún. ¡Sé el primero!</p>`;
+                    container.innerHTML = `<p class="text-zinc-600 text-sm italic py-10">Sé el primero en escribir una reseña para esta película.</p>`;
                     return;
                 }
                 snapshot.forEach((doc) => {
                     const c = doc.data();
-                    const fechaComentario = c.fecha ? new Date(c.fecha).toLocaleString() : "Reciente";
-                    
-                    contenedor.innerHTML += `
-                        <div class="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 shadow-xl fade-in mb-4">
-                            <div class="flex justify-between items-center mb-3">
-                                <div class="flex flex-col gap-1">
-                                    <span class="text-red-600 font-black text-xs uppercase tracking-widest leading-none">${c.user}</span>
-                                    <span class="text-[9px] text-zinc-600 font-bold uppercase tracking-tighter">${fechaComentario}</span>
+                    const fecha = c.fecha ? new Date(c.fecha).toLocaleDateString() : "Reciente";
+                    container.innerHTML += `
+                        <div class="bg-zinc-900/30 p-8 rounded-[30px] border border-white/5 hover:border-white/10 transition-all fade-in">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <span class="text-red-600 font-black text-[10px] uppercase tracking-[0.2em] block mb-1">${c.user}</span>
+                                    <span class="text-[9px] text-zinc-600 font-bold uppercase">${fecha}</span>
                                 </div>
-                                <span class="text-yellow-500 text-[10px] tracking-widest">${"★".repeat(c.rating)}</span>
+                                <span class="text-yellow-500 text-[10px] tracking-widest bg-yellow-500/10 px-3 py-1 rounded-full">${"★".repeat(c.rating)}</span>
                             </div>
-                            <p class="text-zinc-400 text-sm leading-relaxed font-medium">${c.txt}</p>
-                        </div>
-                    `;
+                            <p class="text-zinc-400 text-sm leading-relaxed font-medium">"${c.txt}"</p>
+                        </div>`;
                 });
             });
         }
 
         window.publicarComentario = async () => {
             const txt = document.getElementById('comentarioTxt').value.trim();
-            const userActual = localStorage.getItem('usuarioMovieM');
-            
-            // Corrección: Validación de sesión primero
-            if (!userActual || userActual === 'undefined') {
-                return alert("Debes iniciar sesión para comentar.");
-            }
-            if(!txt || currentRating === 0) {
-                return alert("Por favor, escribe un comentario y selecciona una valoración.");
-            }
+            const user = localStorage.getItem('usuarioMovieM');
+            if (!user) return alert("Inicia sesión para comentar.");
+            if (!txt || currentRating === 0) return alert("Escribe un comentario y califica con estrellas.");
 
             try {
                 await window.addDoc(window.collection(window.db, "comentarios"), {
-                    movieID: movieID,
-                    user: userActual,
-                    txt: txt,
-                    rating: currentRating,
-                    fecha: Date.now()
+                    movieID, user, txt, rating: currentRating, fecha: Date.now()
                 });
                 document.getElementById('comentarioTxt').value = "";
                 window.setRating(0);
-            } catch (e) {
-                console.error("Error Firebase:", e);
-                alert("Error al publicar el comentario.");
-            }
+            } catch (e) { alert("Error al conectar con la base de datos."); }
         };
 
-        // --- SISTEMAS DE INTERACCIÓN (CORREGIDO) ---
+        // --- SISTEMAS DE LIKE / WATCHLIST ---
         async function checkStatus() {
-            const userActual = localStorage.getItem('usuarioMovieM');
-            if (!userActual || userActual === 'undefined') return;
-
-            try {
-                const userRef = window.doc(window.db, "usuarios", userActual);
-                const userDoc = await window.getDoc(userRef);
-                
-                if (userDoc.exists()) {
-                    const data = userDoc.data();
-                    if (data.watchlist && data.watchlist.includes(movieID)) {
-                        const btn = document.getElementById('btnWatchlist');
-                        btn.classList.add('bg-zinc-100', 'text-black', 'border-white');
-                        btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
-                    }
-                    if (data.likes && data.likes.includes(movieID)) {
-                        const btn = document.getElementById('btnLike');
-                        btn.classList.add('bg-red-600', 'border-red-600', 'text-white');
-                        btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
-                    }
+            const user = localStorage.getItem('usuarioMovieM');
+            if (!user) return;
+            const userDoc = await window.getDoc(window.doc(window.db, "usuarios", user));
+            if (userDoc.exists()) {
+                const data = userDoc.data();
+                if (data.watchlist?.includes(movieID)) {
+                    document.getElementById('btnWatchlist').classList.add('bg-white', 'text-black');
                 }
-            } catch (e) { console.error("Error al checkear status:", e); }
+                if (data.likes?.includes(movieID)) {
+                    document.getElementById('btnLike').classList.add('bg-red-600', 'text-white', 'border-red-600');
+                }
+            }
         }
 
         window.toggleWatchlist = async () => {
-            const userActual = localStorage.getItem('usuarioMovieM');
-            if (!userActual || userActual === 'undefined') {
-                return alert("Debes iniciar sesión para guardar películas.");
-            }
-
+            const user = localStorage.getItem('usuarioMovieM');
+            if (!user) return alert("Debes iniciar sesión.");
             const btn = document.getElementById('btnWatchlist');
-            const userRef = window.doc(window.db, "usuarios", userActual);
-            const isSaved = btn.classList.contains('bg-zinc-100');
-
-            try {
-                await window.setDoc(userRef, { 
-                    watchlist: isSaved ? window.arrayRemove(movieID) : window.arrayUnion(movieID) 
-                }, { merge: true });
-                
-                if(!isSaved) {
-                    btn.classList.add('bg-zinc-100', 'text-black', 'border-white');
-                    btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
-                } else {
-                    btn.classList.remove('bg-zinc-100', 'text-black', 'border-white');
-                    btn.classList.add('bg-zinc-900', 'text-zinc-400', 'border-white/5');
-                }
-            } catch (e) { console.error("Error en Watchlist:", e); }
+            const active = btn.classList.contains('bg-white');
+            await window.setDoc(window.doc(window.db, "usuarios", user), {
+                watchlist: active ? window.arrayRemove(movieID) : window.arrayUnion(movieID)
+            }, { merge: true });
+            btn.classList.toggle('bg-white'); btn.classList.toggle('text-black');
         };
 
         window.toggleLike = async () => {
-            const userActual = localStorage.getItem('usuarioMovieM');
-            if (!userActual || userActual === 'undefined') {
-                return alert("Debes iniciar sesión para dar like.");
-            }
-
+            const user = localStorage.getItem('usuarioMovieM');
+            if (!user) return alert("Debes iniciar sesión.");
             const btn = document.getElementById('btnLike');
-            const userRef = window.doc(window.db, "usuarios", userActual);
-            const isLiked = btn.classList.contains('bg-red-600');
-
-            try {
-                await window.setDoc(userRef, { 
-                    likes: isLiked ? window.arrayRemove(movieID) : window.arrayUnion(movieID) 
-                }, { merge: true });
-                
-                if(!isLiked) {
-                    btn.classList.add('bg-red-600', 'border-red-600', 'text-white');
-                    btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
-                } else {
-                    btn.classList.remove('bg-red-600', 'border-red-600', 'text-white');
-                    btn.classList.add('bg-zinc-900', 'text-zinc-400', 'border-white/5');
-                }
-            } catch (e) { console.error("Error en Like:", e); }
+            const active = btn.classList.contains('bg-red-600');
+            await window.setDoc(window.doc(window.db, "usuarios", user), {
+                likes: active ? window.arrayRemove(movieID) : window.arrayUnion(movieID)
+            }, { merge: true });
+            btn.classList.toggle('bg-red-600'); btn.classList.toggle('text-white'); btn.classList.toggle('border-red-600');
         };
 
-        // --- MODAL ACTORES & TRAILER ---
-        window.verActor = async (id) => {
-            try {
-                const [resBio, resPelis] = await Promise.all([
-                    fetch(`https://api.themoviedb.org/3/person/${id}?api_key=${API_KEY}&language=es-ES`),
-                    fetch(`https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=${API_KEY}&language=es-ES`)
-                ]);
-                const actor = await resBio.json();
-                const créditos = await resPelis.json();
-                
-                document.getElementById('actorNombre').innerText = actor.name;
-                document.getElementById('actorFoto').src = actor.profile_path ? 'https://image.tmdb.org/t/p/w500' + actor.profile_path : 'https://via.placeholder.com/500';
-                document.getElementById('actorInfo').innerText = actor.biography || "Biografía no disponible.";
-                
-                const pelisValidas = créditos.cast.filter(p => p.poster_path).sort((a, b) => b.popularity - a.popularity).slice(0, 15);
-                const isScrollable = pelisValidas.length > 5;
-                const contenedorPelis = document.getElementById('actorPelisContenedor');
-                
-                const pelisHTML = pelisValidas.map(p => `
-                    <div class="w-[85px] group/item cursor-pointer shrink-0" onclick="window.location.href='pelicula.html?id=${p.id}'">
-                        <div class="w-[85px] h-[125px] overflow-hidden rounded-xl border border-white/5 group-hover/item:border-red-600 transition-all duration-300 transform group-hover/item:scale-105">
-                            <img src="https://image.tmdb.org/t/p/w200${p.poster_path}" class="w-full h-full object-cover">
-                        </div>
-                        <p class="text-[7px] mt-2 text-zinc-500 truncate w-full text-center uppercase font-bold px-1">${p.title}</p>
-                    </div>`).join('');
-
-                contenedorPelis.innerHTML = `
-                    ${isScrollable ? `<button onclick="scrollPelis(-300)" class="absolute -left-6 top-[62px] -translate-y-1/2 bg-zinc-900/90 p-2 rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity z-20 hover:bg-red-600 text-white shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>` : ''}
-                    <div id="listaPelisActor" class="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-4 px-1">${pelisHTML}</div>
-                    ${isScrollable ? `<button onclick="scrollPelis(300)" class="absolute -right-6 top-[62px] -translate-y-1/2 bg-zinc-900/90 p-2 rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity z-20 hover:bg-red-600 text-white shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>` : ''}
-                `;
-                document.getElementById('modalActor').classList.remove('hidden');
-                document.body.style.overflow = "hidden";
-            } catch (error) { console.error(error); }
-        };
-
-        window.cerrarActor = () => { document.getElementById('modalActor').classList.add('hidden'); document.body.style.overflow = "auto"; };
-        window.scrollPelis = (distancia) => document.getElementById('listaPelisActor').scrollBy({ left: distancia, behavior: 'smooth' });
-        window.scrollReparto = (distancia) => document.getElementById('reparto').scrollBy({ left: distancia, behavior: 'smooth' });
-
-        window.abrirTrailer = async () => {
-            try {
-                const res = await fetch(`https://api.themoviedb.org/3/movie/${movieID}/videos?api_key=${API_KEY}`);
-                const data = await res.json();
-                const tr = data.results.find(v => v.type === "Trailer" && v.site === "YouTube");
-                if(tr) {
-                    document.getElementById('videoContainer').innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${tr.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>`;
-                    document.getElementById('modalVideo').classList.remove('hidden');
-                    document.body.style.overflow = "hidden";
-                }
-            } catch (error) { console.error(error); }
-        };
-
-        window.cerrarTrailer = () => { 
-            document.getElementById('modalVideo').classList.add('hidden'); 
-            document.getElementById('videoContainer').innerHTML = '';
-            document.body.style.overflow = "auto";
-        };
-
-        // --- OTROS HELPERS ---
+        // --- UTILS ---
         window.setRating = (n) => {
             currentRating = n;
             document.querySelectorAll('.star').forEach((s, i) => {
-                s.style.color = i < n ? '#eab308' : '#3f3f46';
+                s.classList.toggle('active', i < n);
             });
         };
 
+        window.verActor = async (id) => {
+            const [resBio, resPelis] = await Promise.all([
+                fetch(`https://api.themoviedb.org/3/person/${id}?api_key=${API_KEY}&language=es-ES`),
+                fetch(`https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=${API_KEY}&language=es-ES`)
+            ]);
+            const actor = await resBio.json();
+            const peliData = await resPelis.json();
+            
+            document.getElementById('actorNombre').innerText = actor.name;
+            document.getElementById('actorFoto').src = actor.profile_path ? 'https://image.tmdb.org/t/p/w500' + actor.profile_path : 'https://via.placeholder.com/500?text=No+Photo';
+            document.getElementById('actorInfo').innerText = actor.biography || "No hay biografía disponible.";
+            
+            const pelis = peliData.cast.filter(p => p.poster_path).sort((a,b) => b.popularity - a.popularity).slice(0, 10);
+            document.getElementById('actorPelisContenedor').innerHTML = `<div class="flex gap-4 overflow-x-auto no-scrollbar pb-4">
+                ${pelis.map(p => `<img onclick="window.location.href='pelicula.html?id=${p.id}'" src="https://image.tmdb.org/t/p/w200${p.poster_path}" class="w-20 h-28 rounded-xl cursor-pointer hover:scale-105 transition shadow-lg border border-white/10">`).join('')}
+            </div>`;
+            
+            document.getElementById('modalActor').classList.remove('hidden');
+            document.body.style.overflow = "hidden";
+        };
+
+        window.cerrarActor = () => { document.getElementById('modalActor').classList.add('hidden'); document.body.style.overflow = "auto"; };
+        window.abrirTrailer = async () => {
+            const res = await fetch(`https://api.themoviedb.org/3/movie/${movieID}/videos?api_key=${API_KEY}`);
+            const data = await res.json();
+            const tr = data.results.find(v => v.type === "Trailer" && v.site === "YouTube");
+            if(tr) {
+                document.getElementById('videoContainer').innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${tr.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>`;
+                document.getElementById('modalVideo').classList.remove('hidden');
+                document.body.style.overflow = "hidden";
+            } else { alert("Trailer no disponible."); }
+        };
+
+        window.cerrarTrailer = () => { document.getElementById('modalVideo').classList.add('hidden'); document.getElementById('videoContainer').innerHTML = ''; document.body.style.overflow = "auto"; };
         window.verPelicula = () => {
             document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
             document.getElementById('playerOverlay').style.display = 'flex';
             document.body.style.overflow = "hidden";
         };
-
-        window.cerrarPelicula = () => {
-            document.getElementById('playerOverlay').style.display = 'none';
-            document.getElementById('movieFrame').src = "";
-            document.body.style.overflow = "auto";
-        };
+        window.cerrarPelicula = () => { document.getElementById('playerOverlay').style.display = 'none'; document.getElementById('movieFrame').src = ""; document.body.style.overflow = "auto"; };
+        window.scrollReparto = (d) => document.getElementById('reparto').scrollBy({ left: d, behavior: 'smooth' });
 
         cargarPagina();
     </script>
