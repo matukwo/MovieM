@@ -3,177 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MovieM | Detalle Pro</title>
+    <title>MovieM | Detalle</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module" src="firebase-config.js"></script>
     <style>
-        /* Estrellas: Mejora de interactividad */
-        .star { cursor: pointer; transition: all 0.2s ease; color: #3f3f46; }
-        .star.active { color: #eab308; text-shadow: 0 0 10px rgba(234, 179, 8, 0.4); }
-        #starRating:hover .star { color: #ca8a04; }
-        #starRating .star:hover ~ .star { color: #3f3f46 !important; }
-        
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        .glass-card {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        @keyframes pulse-bg {
-            0%, 100% { background-color: rgba(39, 39, 42, 0.5); }
-            50% { background-color: rgba(63, 63, 70, 0.5); }
-        }
-        .skeleton { animation: pulse-bg 1.5s infinite ease-in-out; }
-
-        .fade-in { animation: fadeIn 0.8s ease forwards; opacity: 0; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
+        .glass-nav { background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05); }
         #playerOverlay { display: none; background: #000; position: fixed; inset: 0; z-index: 200; flex-direction: column; }
+        .skeleton { animation: pulse 1.5s infinite ease-in-out; background: #27272a; }
+        @keyframes pulse { 50% { opacity: 0.5; } }
     </style>
 </head>
-<body class="bg-zinc-950 text-white font-sans overflow-x-hidden pt-24">
+<body class="bg-zinc-950 text-white font-sans overflow-x-hidden">
 
-    <div id="userHUD" class="fixed top-8 right-8 z-[150] hidden items-center gap-4 bg-black/60 backdrop-blur-xl p-1.5 pr-6 rounded-full border border-white/10 shadow-2xl transition-all duration-500 cursor-pointer hover:scale-105" onclick="toggleUserModal()">
-        <div class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center font-black text-white border-2 border-white/20 shadow-inner overflow-hidden" id="userHUDVisual">
-            <span id="userInitialHUD">?</span>
+    <nav class="fixed top-0 left-0 w-full z-[100] glass-nav px-8 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-8">
+            <a href="index.html" class="text-xs font-bold uppercase tracking-widest hover:text-red-600 transition">Inicio</a>
+            <a href="#" class="text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition">Series</a>
+            <a href="perfil.html" class="text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition">Mi Lista</a>
         </div>
-        <div class="flex flex-col">
-            <span class="text-[8px] text-zinc-500 uppercase font-black tracking-tighter">Mi Cuenta</span>
-            <span id="userNameHUD" class="text-xs font-bold uppercase tracking-widest text-white">Usuario</span>
+
+        <div class="absolute left-1/2 -translate-x-1/2">
+            <a href="index.html" class="text-2xl font-black tracking-tighter italic">MOVIE<span class="text-red-600">M</span></a>
         </div>
-    </div>
+
+        <div class="flex items-center gap-6">
+            <div class="relative hidden md:block">
+                <input type="text" placeholder="Películas o usuarios" class="bg-zinc-900 border border-white/10 rounded-full py-2 px-10 text-xs outline-none focus:border-red-600 w-64 transition-all">
+                <svg class="w-4 h-4 absolute left-4 top-2.5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            
+            <button id="userBtn" onclick="toggleUserModal()" class="w-10 h-10 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center font-black text-sm hover:scale-110 transition hidden">
+                <span id="userInitialNav">?</span>
+            </button>
+            
+            <a id="loginBtn" href="login.html" class="text-[10px] font-black uppercase tracking-widest bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition">Ingresar</a>
+        </div>
+    </nav>
 
     <div id="userModal" class="fixed inset-0 z-[200] hidden items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="toggleUserModal()"></div>
-        <div class="relative w-full max-w-sm bg-[#121212] rounded-[40px] p-10 border border-white/5 text-center shadow-2xl">
-            <div class="w-24 h-24 rounded-full bg-red-600 mx-auto mb-6 flex items-center justify-center text-4xl font-black text-white border-4 border-red-600/20 shadow-lg" id="modalProfileCircle">
-                <span id="modalInitialLetter">M</span>
-            </div>
-            <h2 id="modalUserName" class="text-2xl font-black italic uppercase tracking-tighter mb-8 text-white">MATU</h2>
-            
-            <button onclick="window.location.href='perfil.html'" class="w-full bg-zinc-900 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest border border-white/5 hover:bg-zinc-800 transition mb-8">Ver Mi Perfil</button>
-            
-            <div class="h-px bg-white/5 w-full mb-8"></div>
-            
-            <p class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-6">Personalizar Acento</p>
-            <div class="flex justify-center gap-4 mb-10">
-                <div onclick="changeAccent('red')" class="w-8 h-8 rounded-full bg-red-600 cursor-pointer hover:scale-125 transition border-2 border-white/10"></div>
-                <div onclick="changeAccent('blue')" class="w-8 h-8 rounded-full bg-blue-600 cursor-pointer hover:scale-125 transition border-2 border-white/10"></div>
-                <div onclick="changeAccent('green')" class="w-8 h-8 rounded-full bg-green-600 cursor-pointer hover:scale-125 transition border-2 border-white/10"></div>
-                <div onclick="changeAccent('purple')" class="w-8 h-8 rounded-full bg-purple-600 cursor-pointer hover:scale-125 transition border-2 border-white/10"></div>
-            </div>
-
-            <button onclick="cerrarSesion()" class="w-full py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] text-zinc-500 hover:text-red-500 transition">Cerrar Sesión</button>
+        <div class="relative w-full max-w-sm bg-zinc-900 rounded-[40px] p-10 border border-white/5 text-center shadow-2xl">
+            <div id="modalAvatar" class="w-24 h-24 rounded-full bg-red-600 mx-auto mb-6 flex items-center justify-center text-4xl font-black text-white shadow-lg">M</div>
+            <h2 id="modalName" class="text-2xl font-black italic uppercase tracking-tighter mb-8">Usuario</h2>
+            <button onclick="window.location.href='perfil.html'" class="w-full bg-zinc-800 py-4 rounded-2xl font-black text-xs uppercase tracking-widest border border-white/5 hover:bg-zinc-700 transition mb-4">Ver Perfil</button>
+            <button onclick="cerrarSesion()" class="w-full py-4 text-zinc-500 font-bold text-xs uppercase tracking-widest hover:text-red-500 transition">Cerrar Sesión</button>
         </div>
     </div>
 
+    <main class="pt-32 container mx-auto px-8 lg:px-20">
+        </main>
+
     <script type="module">
+        // ... (Tu configuración de Firebase y constantes de API) ...
         const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
         const urlParams = new URLSearchParams(window.location.search);
         const movieID = urlParams.get('id');
-        let currentRating = 0;
 
-        async function cargarPagina() {
-            if(!movieID) { window.location.href = 'index.html'; return; }
-            
-            // Inicializar HUD de Usuario
-            actualizarHUD();
-
-            try {
-                const [pRes, cRes] = await Promise.all([
-                    fetch(`https://api.themoviedb.org/3/movie/${movieID}?api_key=${API_KEY}&language=es-ES`),
-                    fetch(`https://api.themoviedb.org/3/movie/${movieID}/credits?api_key=${API_KEY}&language=es-ES`)
-                ]);
-                const peli = await pRes.json();
-                const credits = await cRes.json();
-
-                // (Toda tu lógica existente de inyección de datos de la película)
-                document.getElementById('tituloSkeleton')?.remove();
-                document.getElementById('sinopsis').classList.remove('hidden');
-                document.title = `${peli.title} | MovieM`;
-                document.getElementById('titulo').innerText = peli.title;
-                document.getElementById('sinopsis').innerText = peli.overview || "Sinopsis no disponible.";
-                document.getElementById('anio').innerText = peli.release_date ? peli.release_date.split('-')[0] : "N/A";
-                document.getElementById('voto').innerText = peli.vote_average.toFixed(1);
-                document.getElementById('poster').src = 'https://image.tmdb.org/t/p/w500' + peli.poster_path;
-                document.getElementById('backdrop').style.backgroundImage = `url('https://image.tmdb.org/t/p/original${peli.backdrop_path}')`;
-                
-                if(peli.vote_average > 7.5) document.getElementById('badget-premios').classList.remove('hidden');
-                const dir = credits.crew.find(c => c.job === "Director");
-                if(dir) document.getElementById('director').innerText = `Dirigida por ${dir.name}`;
-
-                // (Render de reparto y comentarios)
-                // ...
-                
-            } catch (error) { console.error("Error:", error); }
-        }
-
-        // --- FUNCIONES DEL HUD Y GESTIÓN DE USUARIO ---
-        function actualizarHUD() {
+        function gestionarHUD() {
             const user = localStorage.getItem('usuarioMovieM');
-            const hud = document.getElementById('userHUD');
-            
+            const userBtn = document.getElementById('userBtn');
+            const loginBtn = document.getElementById('loginBtn');
+
             if (user && user !== 'undefined') {
                 const inicial = user.charAt(0).toUpperCase();
+                document.getElementById('userInitialNav').innerText = inicial;
+                document.getElementById('modalAvatar').innerText = inicial;
+                document.getElementById('modalName').innerText = user;
                 
-                // Actualizar elementos del HUD flotante
-                document.getElementById('userNameHUD').innerText = user;
-                document.getElementById('userInitialHUD').innerText = inicial;
-                hud.classList.remove('hidden');
-                hud.classList.add('flex');
-
-                // Actualizar elementos del Modal
-                document.getElementById('modalUserName').innerText = user;
-                document.getElementById('modalInitialLetter').innerText = inicial;
+                userBtn.classList.remove('hidden');
+                loginBtn.classList.add('hidden');
             } else {
-                // Si no hay sesión, puedes redirigir al login o mantener el HUD oculto
-                hud.classList.add('hidden');
+                userBtn.classList.add('hidden');
+                loginBtn.classList.remove('hidden');
             }
         }
 
         window.toggleUserModal = () => {
             const modal = document.getElementById('userModal');
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-                document.body.style.overflow = "hidden";
-            } else {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                document.body.style.overflow = "auto";
-            }
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
         };
 
         window.cerrarSesion = () => {
             localStorage.removeItem('usuarioMovieM');
-            window.location.href = 'index.html';
+            window.location.reload();
         };
 
-        window.changeAccent = (color) => {
-            const colors = {
-                red: '#dc2626',
-                blue: '#2563eb',
-                green: '#16a34a',
-                purple: '#9333ea'
-            };
-            const selectedColor = colors[color];
-            
-            // Aplicar a círculos de perfil
-            document.getElementById('userHUDVisual').style.backgroundColor = selectedColor;
-            document.getElementById('modalProfileCircle').style.backgroundColor = selectedColor;
-            document.getElementById('modalProfileCircle').style.borderColor = `${selectedColor}33`; // 20% opacidad
-            
-            // Guardar preferencia (opcional)
-            localStorage.setItem('movieMAccent', selectedColor);
-        };
-
-        // ... (Resto de tus funciones: toggleWatchlist, toggleLike, setRating, etc.) ...
-
-        cargarPagina();
+        // Al cargar la página
+        gestionarHUD();
+        // cargarPelicula(); ... (el resto de tu lógica de TMDB)
     </script>
 </body>
 </html>
