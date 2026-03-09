@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>MovieM | Mi Lista</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script type="module" src="firebase-config.js"></script>
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -27,74 +26,71 @@
     <main class="container mx-auto px-8 pt-32 pb-20">
         <header class="mb-12 fade-in">
             <h2 class="text-4xl font-black italic uppercase tracking-tighter mb-2">Mi Lista</h2>
-            <p id="subtituloUsuario" class="text-zinc-500 font-medium">Películas que guardaste para ver después.</p>
+            <p class="text-zinc-500 font-medium">Películas que guardaste para ver después.</p>
         </header>
 
         <div id="contenedorMiLista" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 fade-in" style="animation-delay: 0.2s">
-        </div>
+            </div>
 
         <div id="listaVacia" class="hidden flex flex-col items-center justify-center py-20 text-center fade-in">
             <div class="w-20 h-20 bg-zinc-900 rounded-full flex items-center justify-center mb-6 border border-white/5">
                 <svg class="w-8 h-8 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
             </div>
-            <h3 id="mensajeVacioTitulo" class="text-xl font-bold mb-2">Tu lista está vacía</h3>
-            <p id="mensajeVacioDesc" class="text-zinc-500 mb-8">Explora películas y haz clic en el icono de guardar para verlas aquí.</p>
+            <h3 class="text-xl font-bold mb-2">Tu lista está vacía</h3>
+            <p class="text-zinc-500 mb-8">Explora películas y haz clic en el icono de guardar para verlas aquí.</p>
             <button onclick="window.location.href='index.html'" class="bg-white text-black px-8 py-3 rounded-full font-black uppercase text-xs tracking-widest hover:bg-red-600 hover:text-white transition">Explorar Películas</button>
         </div>
     </main>
 
     <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAn5N7m7EhICK2aZG4Nx8DIW9RZd9kK1DA",
+            authDomain: "moviem-5b73d.firebaseapp.com",
+            projectId: "moviem-5b73d",
+            storageBucket: "moviem-5b73d.firebasestorage.app",
+            messagingSenderId: "843796138544",
+            appId: "1:843796138544:web:c2bde9b39d437b84d97bf5"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
         const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
 
-        async function cargarMiLista() {
+        async function cargarMiLista(user) {
             const contenedor = document.getElementById('contenedorMiLista');
             const emptyState = document.getElementById('listaVacia');
-            const subtitulo = document.getElementById('subtituloUsuario');
-            const userActual = localStorage.getItem('usuarioMovieM');
 
-            // 1. Limpieza total inmediata antes de verificar nada
-            contenedor.innerHTML = "";
-            emptyState.classList.add('hidden');
-
-            // 2. Verificar si hay usuario iniciado
-            if (!userActual) {
-                subtitulo.innerText = "Inicia sesión para ver tu lista personalizada.";
-                document.getElementById('mensajeVacioTitulo').innerText = "No has iniciado sesión";
-                document.getElementById('mensajeVacioDesc').innerText = "Debes ingresar con tu cuenta para ver tus películas guardadas.";
+            if (!user) {
                 emptyState.classList.remove('hidden');
                 return;
             }
 
-            subtitulo.innerText = `Hola ${userActual}, estas son tus películas guardadas.`;
-
             try {
-                // 3. Consultar Firebase
-                const userRef = window.doc(window.db, "usuarios", userActual);
-                const userDoc = await window.getDoc(userRef);
+                const userDoc = await getDoc(doc(db, "usuarios", user.uid));
+                const ids = userDoc.exists() && userDoc.data().watchlist ? userDoc.data().watchlist : [];
 
-                if (!userDoc.exists() || !userDoc.data().watchlist || userDoc.data().watchlist.length === 0) {
-                    document.getElementById('mensajeVacioTitulo').innerText = "Tu lista está vacía";
-                    document.getElementById('mensajeVacioDesc').innerText = "Explora películas y haz clic en el icono de guardar para verlas aquí.";
+                if (ids.length === 0) {
                     emptyState.classList.remove('hidden');
                     return;
                 }
 
-                const ids = userDoc.data().watchlist;
-
-                // 4. Obtener datos de TMDB
-                const promesas = ids.map(id => 
+                const promesas = ids.map(id =>
                     fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=es-ES`).then(res => res.json())
                 );
-                
+
                 const peliculas = await Promise.all(promesas);
 
-                // 5. Renderizar
                 contenedor.innerHTML = peliculas.map(p => `
                     <div onclick="window.location.href='pelicula.html?id=${p.id}'" class="group cursor-pointer">
                         <div class="relative aspect-[2/3] overflow-hidden rounded-2xl border border-white/5 group-hover:border-red-600 transition-all duration-500 shadow-2xl">
                             <img src="https://image.tmdb.org/t/p/w500${p.poster_path}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-                                <span class="text-yellow-500 text-xs font-bold">⭐ ${p.vote_average ? p.vote_average.toFixed(1) : '0.0'}</span>
+                                <span class="text-yellow-500 text-xs font-bold">⭐ ${p.vote_average.toFixed(1)}</span>
                             </div>
                         </div>
                         <h4 class="mt-3 text-sm font-bold truncate uppercase tracking-tighter group-hover:text-red-500 transition">${p.title}</h4>
@@ -104,12 +100,12 @@
 
             } catch (error) {
                 console.error("Error cargando la lista:", error);
-                emptyState.classList.remove('hidden');
             }
         }
 
-        // Ejecutar al cargar la página
-        cargarMiLista();
+        onAuthStateChanged(auth, (user) => {
+            cargarMiLista(user);
+        });
     </script>
 </body>
 </html>
