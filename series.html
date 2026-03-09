@@ -8,6 +8,7 @@
     <style>
         .no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
         .text-accent{color:var(--accent-color,#dc2626)}.bg-accent{background-color:var(--accent-color,#dc2626)}.border-accent{border-color:var(--accent-color,#dc2626)}
+        #searchDropdown,#searchDropdownMobile{max-height:70vh;overflow-y:auto}
         .genre-chip{transition:all .2s ease;border:1px solid rgba(255,255,255,0.08)}
         .genre-chip.active{background-color:var(--accent-color,#dc2626);border-color:var(--accent-color,#dc2626);color:white}
     </style>
@@ -26,17 +27,17 @@
     </div>
     <div class="flex items-center justify-end gap-3">
         <div class="relative">
-            <input type="text" id="buscador" placeholder="Buscar serie..." class="bg-zinc-900 border border-zinc-800 text-white text-xs rounded-full py-2.5 px-4 pl-10 focus:ring-1 focus:ring-red-600 w-52 transition-all focus:w-72 outline-none">
+            <input type="text" id="buscador" placeholder="Buscar serie o usuario..." class="bg-zinc-900 border border-zinc-800 text-white text-xs rounded-full py-2.5 px-4 pl-10 focus:ring-1 focus:ring-red-600 w-52 transition-all focus:w-72 outline-none">
             <svg class="absolute left-3 top-2.5 w-4 h-4 text-zinc-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            <div id="searchDropdown" class="absolute right-0 top-11 bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl w-80 hidden z-50 no-scrollbar max-h-[70vh] overflow-y-auto"></div>
+            <div id="searchDropdown" class="absolute right-0 top-11 bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl w-80 hidden z-50 no-scrollbar"></div>
         </div>
-        <button id="btnUsuario" onclick="location.href='perfil.html'" class="w-10 h-10 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:bg-red-600 transition group shadow-lg overflow-hidden shrink-0">
+        <button id="btnUsuario" class="w-10 h-10 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:bg-red-600 transition group shadow-lg overflow-hidden shrink-0">
             <svg class="h-5 w-5 text-zinc-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
         </button>
     </div>
 </nav>
 
-<!-- NAV MOBILE -->
+<!-- NAV MOBILE TOP -->
 <nav class="md:hidden flex items-center justify-between px-4 py-3 bg-zinc-950/90 backdrop-blur-md fixed top-0 w-full z-50 border-b border-white/5">
     <h1 class="text-2xl font-black text-accent tracking-tighter cursor-pointer" onclick="location.href='index.html'">MOVIE<span class="text-white font-light">M</span></h1>
     <div class="flex items-center gap-2">
@@ -50,7 +51,7 @@
 <div id="searchOverlayMobile" class="fixed inset-0 z-[200] bg-zinc-950 hidden flex-col">
     <div class="flex items-center gap-3 px-4 py-4 border-b border-white/5">
         <div class="relative flex-1">
-            <input type="text" id="buscadorMobile" placeholder="Buscar serie..." class="w-full bg-zinc-900 border border-zinc-800 text-white text-sm rounded-full py-3 px-4 pl-10 outline-none">
+            <input type="text" id="buscadorMobile" placeholder="Buscar serie o usuario..." class="w-full bg-zinc-900 border border-zinc-800 text-white text-sm rounded-full py-3 px-4 pl-10 outline-none">
             <svg class="absolute left-3 top-3.5 w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
         </div>
         <button id="btnCerrarBusqueda" class="text-zinc-400 font-bold text-sm px-2">Cerrar</button>
@@ -60,7 +61,6 @@
 
 <!-- MAIN -->
 <main class="pt-16 md:pt-24 pb-24 md:pb-8 px-4 md:pl-8 md:pr-4">
-
     <!-- Filtros -->
     <div class="flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-8 mt-2">
         <button onclick="filtrarGenero(null,this)" class="genre-chip active shrink-0 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest text-white">Todo</button>
@@ -72,6 +72,7 @@
         <button onclick="filtrarGenero(80,this)" class="genre-chip shrink-0 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest text-zinc-400">Crimen</button>
         <button onclick="filtrarGenero(9648,this)" class="genre-chip shrink-0 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest text-zinc-400">Misterio</button>
         <button onclick="filtrarGenero(10765,this)" class="genre-chip shrink-0 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest text-zinc-400">Fantasía</button>
+        <button onclick="filtrarGenero(10762,this)" class="genre-chip shrink-0 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest text-zinc-400">Animación</button>
     </div>
 
     <div id="contenidoPrincipal">
@@ -122,7 +123,13 @@
     </div>
 </nav>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+const FB = {apiKey:"AIzaSyAn5N7m7EhICK2aZG4Nx8DIW9RZd9kK1DA",authDomain:"moviem-5b73d.firebaseapp.com",projectId:"moviem-5b73d",storageBucket:"moviem-5b73d.firebasestorage.app",messagingSenderId:"843796138544",appId:"1:843796138544:web:c2bde9b39d437b84d97bf5"};
+const app = initializeApp(FB);
+const db = getFirestore(app);
+
 const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
 const BASE = 'https://image.tmdb.org/t/p/w500';
 let timer = null;
@@ -132,31 +139,34 @@ if (color) document.documentElement.style.setProperty('--accent-color', color);
 
 function crearCard(serie) {
     const rating = serie.vote_average ? serie.vote_average.toFixed(1) : 'S/R';
+    const anio = (serie.first_air_date || serie.release_date || '').split('-')[0] || '';
     const poster = serie.poster_path ? BASE + serie.poster_path : 'https://via.placeholder.com/500x750?text=?';
     const card = document.createElement('div');
     card.className = 'min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2';
-    card.innerHTML = `
-        <div class="relative">
-            <img src="${poster}" class="rounded-xl shadow-lg mb-1 border border-white/5 w-full" loading="lazy">
-            <div class="absolute top-1.5 right-1.5 bg-black/80 text-yellow-500 text-[9px] font-black px-1.5 py-0.5 rounded-lg">⭐ ${rating}</div>
-        </div>
-        <p class="text-[9px] md:text-[10px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 mt-1">${serie.name}</p>
-    `;
-    card.onclick = () => location.href = 'serie.html?id=' + serie.id;
+    const inner = document.createElement('div'); inner.className = 'relative';
+    const img = document.createElement('img'); img.src = poster; img.className = 'rounded-xl shadow-lg mb-1 border border-white/5 w-full'; img.loading = 'lazy';
+    img.onclick = () => location.href = 'serie.html?id=' + serie.id;
+    const badge = document.createElement('div');
+    badge.className = 'absolute top-1.5 right-1.5 flex flex-col items-end gap-1';
+    badge.innerHTML = '<div class="bg-black/80 text-yellow-500 text-[9px] font-black px-1.5 py-0.5 rounded-lg">⭐ '+rating+'</div>'
+        + (anio ? '<div class="bg-black/80 text-zinc-300 text-[9px] font-black px-1.5 py-0.5 rounded-lg">'+anio+'</div>' : '');
+    inner.appendChild(img); inner.appendChild(badge);
+    const title = document.createElement('p'); title.className = 'text-[9px] md:text-[10px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 mt-1'; title.textContent = serie.name || serie.title;
+    card.appendChild(inner); card.appendChild(title);
     return card;
 }
 
 async function cargarSeccion(url, id) {
     try {
         const r = await fetch(url), d = await r.json(), c = document.getElementById(id);
-        if (d.results) d.results.forEach(s => { if (s.poster_path) c.appendChild(crearCard(s)); });
+        if (d.results) d.results.forEach(s => { if(s.poster_path) c.appendChild(crearCard(s)); });
     } catch(e) { console.error(e); }
 }
 
 window.scrollFila = (id, d) => document.getElementById(id).scrollBy({ left: d, behavior: 'smooth' });
 
 window.filtrarGenero = async function(genreId, btn) {
-    document.querySelectorAll('.genre-chip').forEach(b => { b.classList.remove('active'); b.classList.add('text-zinc-400'); b.style.color = ''; });
+    document.querySelectorAll('.genre-chip').forEach(b => { b.classList.remove('active'); b.classList.add('text-zinc-400'); });
     btn.classList.add('active'); btn.classList.remove('text-zinc-400');
     const principal = document.getElementById('contenidoPrincipal');
     const filtrada = document.getElementById('seccionFiltrada');
@@ -167,40 +177,65 @@ window.filtrarGenero = async function(genreId, btn) {
     }
     principal.querySelectorAll('section:not(#seccionFiltrada)').forEach(s => s.classList.add('hidden'));
     filtrada.classList.remove('hidden');
-    const gNames = {10759:'Acción & Aventura',35:'Comedia',18:'Drama',27:'Terror',878:'Ciencia Ficción',80:'Crimen',9648:'Misterio',10765:'Fantasía'};
+    const gNames = {10759:'Acción & Aventura',35:'Comedia',18:'Drama',27:'Terror',878:'Ciencia Ficción',80:'Crimen',9648:'Misterio',10765:'Fantasía',10762:'Animación'};
     document.getElementById('tituloFiltrado').textContent = gNames[genreId] || 'Series';
     const grid = document.getElementById('gridFiltrado'); grid.innerHTML = '';
     const r = await fetch(`https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&with_genres=${genreId}&language=es-ES&sort_by=popularity.desc`);
     const d = await r.json();
     (d.results || []).filter(s => s.poster_path).forEach(s => {
+        const anio = (s.first_air_date||'').split('-')[0]||'';
         const div = document.createElement('div');
         div.className = 'cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group';
-        div.innerHTML = `<div class="relative"><img src="${BASE+s.poster_path}" class="rounded-xl shadow-lg border border-white/5 w-full" loading="lazy"><div class="absolute top-1.5 right-1.5 bg-black/80 text-yellow-500 text-[9px] font-black px-1.5 py-0.5 rounded-lg">⭐ ${s.vote_average?s.vote_average.toFixed(1):'S/R'}</div></div><p class="text-[9px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 mt-1">${s.name}</p>`;
+        div.innerHTML = `<div class="relative"><img src="${BASE+s.poster_path}" class="rounded-xl shadow-lg border border-white/5 w-full" loading="lazy">
+            <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-1">
+                <div class="bg-black/80 text-yellow-500 text-[9px] font-black px-1.5 py-0.5 rounded-lg">⭐ ${s.vote_average?s.vote_average.toFixed(1):'S/R'}</div>
+                ${anio?`<div class="bg-black/80 text-zinc-300 text-[9px] font-black px-1.5 py-0.5 rounded-lg">${anio}</div>`:''}
+            </div></div>
+            <p class="text-[9px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 mt-1">${s.name}</p>`;
         div.onclick = () => location.href = 'serie.html?id=' + s.id;
         grid.appendChild(div);
     });
 };
 
-async function buscarSeries(q, dropEl) {
+// ── BÚSQUEDA (series + usuarios) ──────────────────────────────────
+async function buscarTodo(q, dropEl) {
     dropEl.innerHTML = '<p class="text-zinc-600 text-xs p-4 text-center animate-pulse">Buscando...</p>';
-    const r = await fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(q)}`);
-    const d = await r.json();
-    const series = (d.results || []).slice(0, 5);
-    if (!series.length) { dropEl.innerHTML = '<p class="text-zinc-600 text-xs p-6 text-center italic">Sin resultados</p>'; return; }
-    let html = '<div class="px-4 pt-3 pb-1"><span class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500">Series</span></div>';
-    series.forEach(s => {
-        const poster = s.poster_path ? `https://image.tmdb.org/t/p/w92${s.poster_path}` : '';
-        const anio = s.first_air_date ? s.first_air_date.split('-')[0] : '';
-        html += `<div class="flex items-center gap-3 px-4 py-2.5 hover:bg-zinc-800 cursor-pointer transition" onclick="location.href='serie.html?id=${s.id}'">${poster?`<img src="${poster}" class="w-8 h-12 rounded-lg object-cover shrink-0">`:'<div class="w-8 h-12 bg-zinc-700 rounded-lg shrink-0"></div>'}<div class="flex-1 min-w-0"><p class="text-sm font-bold truncate">${s.name}</p><p class="text-[9px] text-zinc-500 uppercase font-bold">${anio}${s.vote_average?' · ⭐ '+s.vote_average.toFixed(1):''}</p></div></div>`;
-    });
-    dropEl.innerHTML = html;
+    try {
+        const [resSeries, snapU] = await Promise.all([
+            fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(q)}`).then(r => r.json()),
+            getDocs(collection(db, 'usuarios'))
+        ]);
+        const series = (resSeries.results || []).slice(0, 4);
+        let users = [];
+        snapU.forEach(d => { const u = d.data(); if(u.username && u.username.toLowerCase().indexOf(q.toLowerCase()) !== -1) users.push({uid: d.id, username: u.username, avatar: u.avatar || null}); });
+        users = users.slice(0, 3);
+        let html = '';
+        if (users.length) {
+            html += '<div class="px-4 pt-3 pb-1"><span class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500">Usuarios</span></div>';
+            users.forEach(u => {
+                const letra = u.username.charAt(0).toUpperCase();
+                const av = u.avatar ? `<img src="${u.avatar}" class="w-9 h-9 rounded-full object-cover shrink-0">` : `<div class="w-9 h-9 rounded-full bg-red-600 flex items-center justify-center text-white font-black text-xs shrink-0">${letra}</div>`;
+                html += `<div class="flex items-center gap-3 px-4 py-3 hover:bg-zinc-800 cursor-pointer transition" onclick="location.href='perfil.html?user=${encodeURIComponent(u.username)}'">${av}<div><p class="text-sm font-bold">${u.username}</p><p class="text-[9px] text-zinc-500 uppercase font-bold">Perfil</p></div></div>`;
+            });
+        }
+        if (series.length) {
+            html += `<div class="px-4 pt-3 pb-1${users.length?' border-t border-white/5 mt-1':''}"><span class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500">Series</span></div>`;
+            series.forEach(s => {
+                const poster = s.poster_path ? `https://image.tmdb.org/t/p/w92${s.poster_path}` : '';
+                const anio = s.first_air_date ? s.first_air_date.split('-')[0] : '';
+                html += `<div class="flex items-center gap-3 px-4 py-2.5 hover:bg-zinc-800 cursor-pointer transition" onclick="location.href='serie.html?id=${s.id}'">${poster ? `<img src="${poster}" class="w-8 h-12 rounded-lg object-cover shrink-0">` : '<div class="w-8 h-12 bg-zinc-700 rounded-lg shrink-0"></div>'}<div class="flex-1 min-w-0"><p class="text-sm font-bold truncate">${s.name}</p><p class="text-[9px] text-zinc-500 uppercase font-bold">${anio}${s.vote_average?' · ⭐ '+s.vote_average.toFixed(1):''}</p></div></div>`;
+            });
+        }
+        if (!series.length && !users.length) html = '<p class="text-zinc-600 text-xs p-6 text-center italic">Sin resultados</p>';
+        dropEl.innerHTML = html;
+    } catch(e) { dropEl.innerHTML = '<p class="text-zinc-600 text-xs p-4 text-center">Error</p>'; }
 }
 
 const buscador = document.getElementById('buscador'), dropdown = document.getElementById('searchDropdown');
 buscador.addEventListener('input', function() {
     clearTimeout(timer); const q = buscador.value.trim();
     if (q.length < 2) { dropdown.classList.add('hidden'); return; }
-    timer = setTimeout(() => { dropdown.classList.remove('hidden'); buscarSeries(q, dropdown); }, 350);
+    timer = setTimeout(() => { dropdown.classList.remove('hidden'); buscarTodo(q, dropdown); }, 350);
 });
 document.addEventListener('click', e => { if (!buscador.contains(e.target) && !dropdown.contains(e.target)) dropdown.classList.add('hidden'); });
 
@@ -210,8 +245,10 @@ document.getElementById('btnCerrarBusqueda').onclick = () => { overlay.classList
 buscMob.addEventListener('input', function() {
     clearTimeout(timer); const q = buscMob.value.trim();
     if (q.length < 2) { dropMob.innerHTML = ''; return; }
-    timer = setTimeout(() => buscarSeries(q, dropMob), 350);
+    timer = setTimeout(() => buscarTodo(q, dropMob), 350);
 });
+
+document.getElementById('btnUsuario').onclick = () => location.href = 'perfil.html';
 
 cargarSeccion(`https://api.themoviedb.org/3/trending/tv/week?api_key=${API_KEY}&language=es-ES`, 'tendencias');
 cargarSeccion(`https://api.themoviedb.org/3/tv/top_rated?api_key=${API_KEY}&language=es-ES`, 'topRated');
