@@ -192,6 +192,11 @@
         const movieID = urlParams.get('id');
         let currentRating = 0;
 
+        // ── Rangos de usuario ────────────────────────────────────
+        const ADMIN_UID = 'TU_UID_AQUI'; // Reemplazá con tu UID de Firebase
+        const VERIFIED_USERS = []; // Agregá UIDs verificados: ['uid1', 'uid2']
+        let miUID_pelicula = null; // UID del usuario logueado en esta página
+
         async function cargarPagina() {
             try {
                 const [pRes, cRes] = await Promise.all([
@@ -237,8 +242,13 @@
             } catch (error) { console.error(error); }
         }
 
-        // --- HUD DE USUARIO ---
+        // --- HUD DE USUARIO + captura UID ---
         function actualizarHUD() {
+            window.onAuthStateChanged(window.auth, function(user) {
+                if (user) {
+                    miUID_pelicula = user.uid;
+                }
+            });
             const userActual = localStorage.getItem('usuarioMovieM');
             const hud = document.getElementById('userHUD');
             if (userActual && userActual !== 'undefined') {
@@ -250,6 +260,13 @@
         }
 
         // --- FIREBASE LOGIC (COMENTARIOS) ---
+        // Badge SVGs por rango
+        function getBadge(uid) {
+            if (uid === ADMIN_UID) return '<svg title="Creador" class="w-3.5 h-3.5 text-blue-400 inline-block ml-1 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>';
+            if (VERIFIED_USERS.includes(uid)) return '<svg title="Verificado" class="w-3.5 h-3.5 text-yellow-400 inline-block ml-1 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.491 4.491 0 01-3.497-1.307 4.491 4.491 0 01-1.307-3.497A4.49 4.49 0 012.25 12a4.49 4.49 0 011.549-3.397 4.491 4.491 0 011.307-3.497 4.491 4.491 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd"/></svg>';
+            return '';
+        }
+
         function escucharComentariosNube() {
             const contenedor = document.getElementById('listaComentarios');
             const q = window.query(
@@ -258,31 +275,62 @@
                 window.orderBy("fecha", "desc")
             );
 
-            window.onSnapshot(q, (snapshot) => {
+            // Primero buscamos los UIDs de todos los usuarios para poder mostrar badges
+            window.onSnapshot(q, async (snapshot) => {
                 contenedor.innerHTML = "";
                 if (snapshot.empty) {
                     contenedor.innerHTML = `<p class="text-zinc-600 text-sm italic">Nadie ha comentado aún. ¡Sé el primero!</p>`;
                     return;
                 }
-                snapshot.forEach((doc) => {
-                    const c = doc.data();
+
+                // Recolectar usernames únicos y buscar sus UIDs
+                const usernames = [...new Set(snapshot.docs.map(d => d.data().user))];
+                const uidMap = {}; // username → uid
+                try {
+                    const usersSnap = await window.getDocs(
+                        window.query(window.collection(window.db, 'usuarios'), window.where('username', 'in', usernames.slice(0,10)))
+                    );
+                    usersSnap.forEach(d => { uidMap[d.data().username] = d.id; });
+                } catch(e) {}
+
+                snapshot.forEach((docSnap) => {
+                    const c = docSnap.data();
+                    const docId = docSnap.id;
                     const fechaComentario = c.fecha ? new Date(c.fecha).toLocaleString() : "Reciente";
+                    const uid = uidMap[c.user] || '';
+                    const badge = getBadge(uid);
+                    const esAdmin = miUID_pelicula === ADMIN_UID;
                     
-                    contenedor.innerHTML += `
-                        <div class="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 shadow-xl fade-in mb-4">
-                            <div class="flex justify-between items-center mb-3">
-                                <div class="flex flex-col gap-1">
-                                    <span class="text-red-600 font-black text-xs uppercase tracking-widest leading-none">${c.user}</span>
-                                    <span class="text-[9px] text-zinc-600 font-bold uppercase tracking-tighter">${fechaComentario}</span>
-                                </div>
-                                <span class="text-yellow-500 text-[10px] tracking-widest">${"★".repeat(c.rating)}</span>
+                    const div = document.createElement('div');
+                    div.className = 'bg-zinc-900/50 p-5 rounded-2xl border border-white/5 shadow-xl fade-in mb-4 group/comment';
+                    div.innerHTML = `
+                        <div class="flex justify-between items-start mb-3 gap-2">
+                            <div class="flex flex-col gap-1 min-w-0">
+                                <span class="text-red-600 font-black text-xs uppercase tracking-widest leading-none flex items-center gap-1">
+                                    <a href="perfil.html?user=${encodeURIComponent(c.user)}" class="hover:underline">${c.user}</a>${badge}
+                                </span>
+                                <span class="text-[9px] text-zinc-600 font-bold uppercase tracking-tighter">${fechaComentario}</span>
                             </div>
-                            <p class="text-zinc-400 text-sm leading-relaxed font-medium">${c.txt}</p>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="text-yellow-500 text-[10px] tracking-widest">${"★".repeat(c.rating)}</span>
+                                ${esAdmin ? `<button onclick="borrarComentarioPelicula('${docId}')" class="opacity-0 group-hover/comment:opacity-100 transition-opacity w-6 h-6 rounded-full bg-red-900/60 hover:bg-red-600 flex items-center justify-center" title="Borrar">
+                                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>` : ''}
+                            </div>
                         </div>
+                        <p class="text-zinc-400 text-sm leading-relaxed font-medium">${c.txt}</p>
                     `;
+                    contenedor.appendChild(div);
                 });
             });
         }
+
+        window.borrarComentarioPelicula = async function(docId) {
+            if (miUID_pelicula !== ADMIN_UID) return;
+            if (!confirm('¿Borrar este comentario?')) return;
+            try { await window.deleteDoc(window.doc(window.db, 'comentarios', docId)); }
+            catch(e) { alert('Error al borrar.'); }
+        };
 
         window.publicarComentario = async () => {
             const txt = document.getElementById('comentarioTxt').value.trim();
