@@ -2,14 +2,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Reemplaza estos datos con los de tu Consola de Firebase -> Configuración del proyecto
-const firebaseConfig = {
-  apiKey: "TU_API_KEY_REAL",
-  authDomain: "tu-proyecto.firebaseapp.com",
-  projectId: "tu-proyecto",
-  storageBucket: "tu-proyecto.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "tu-app-id"
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyAn5N7m7EhICK2aZG4Nx8DIW9RZd9kK1DA",
+    authDomain: "moviem-5b73d.firebaseapp.com",
+    projectId: "moviem-5b73d",
+    storageBucket: "moviem-5b73d.firebasestorage.app",
+    messagingSenderId: "843796138544",
+    appId: "1:843796138544:web:c2bde9b39d437b84d97bf5",
+    measurementId: "G-7FH2FMPYZT"
+  };
 
 // Inicializamos Firebase
 const app = initializeApp(firebaseConfig);
