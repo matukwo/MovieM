@@ -1,0 +1,95 @@
+/* --- VARIABLES GLOBALES --- */
+:root {
+    --accent-color: #dc2626; /* Rojo MovieM por defecto */
+    --bg-dark: #09090b;
+    --glass-bg: rgba(0, 0, 0, 0.85);
+}
+
+/* --- RESET Y BASE --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: white;
+    font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+    -webkit-tap-highlight-color: transparent; /* Evita el recuadro azul en móviles */
+    overflow-x: hidden;
+}
+
+/* --- NAVBAR CON EFECTO CRISTAL (GLASSMORPHISM) --- */
+.glass-nav { 
+    background: var(--glass-bg); 
+    backdrop-filter: blur(15px); 
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08); 
+}
+
+/* --- UTILIDADES DE COLOR DINÁMICO --- */
+.text-accent { color: var(--accent-color); }
+.bg-accent { background-color: var(--accent-color); }
+.border-accent { border-color: var(--accent-color); }
+
+/* --- COMPONENTES DE LA PÁGINA DE DETALLE --- */
+.star { 
+    cursor: pointer; 
+    transition: all 0.2s ease; 
+    color: #3f3f46; 
+}
+
+.star.active { 
+    color: #eab308; 
+    text-shadow: 0 0 10px rgba(234, 179, 8, 0.4); 
+}
+
+/* Ocultar barra de scroll pero mantener funcionalidad */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { 
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
+}
+
+/* --- ANIMACIONES --- */
+.skeleton { 
+    animation: pulse 1.5s infinite ease-in-out; 
+    background: #27272a; 
+}
+
+@keyframes pulse { 
+    50% { opacity: 0.5; } 
+}
+
+.fade-in { 
+    animation: fadeIn 0.8s ease forwards; 
+    opacity: 0; 
+}
+
+@keyframes fadeIn { 
+    from { opacity: 0; transform: translateY(15px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+
+/* --- AJUSTES ESPECÍFICOS PARA CELULARES --- */
+@media (max-width: 640px) {
+    .glass-nav {
+        padding: 0.75rem 1rem; /* Navbar más compacta */
+    }
+    
+    #titulo {
+        font-size: 2rem !important; /* Títulos que no se cortan */
+        line-height: 1.2;
+    }
+
+    .poster-shadow {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    }
+    
+    /* Ajuste de botones para que sean fáciles de tocar */
+    button, .btn-mobile {
+        min-height: 44px;
+        font-size: 0.7rem !important;
+    }
+}
