@@ -21,7 +21,7 @@
 <nav class="hidden md:grid p-5 grid-cols-3 items-center bg-zinc-950/90 backdrop-blur-md fixed top-0 w-full z-50 border-b border-white/5">
     <div class="flex space-x-6 text-xs font-bold uppercase tracking-widest text-zinc-400">
         <a href="index.html" class="hover:text-white transition">Inicio</a>
-        <a href="series.html" class="hover:text-white transition">Series</a>
+        <a href="#" class="hover:text-white transition">Series</a>
         <a href="mi_lista.html" class="hover:text-white transition">Mi Lista</a>
     </div>
     <div class="flex justify-center">
@@ -145,7 +145,7 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
             <span class="text-[9px] font-black uppercase tracking-widest">Mi Lista</span>
         </a>
-        <a href="series.html" class="flex flex-col items-center gap-1 text-zinc-500">
+        <a href="#" class="flex flex-col items-center gap-1 text-zinc-500">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.361a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
             <span class="text-[9px] font-black uppercase tracking-widest">Series</span>
         </a>
@@ -288,15 +288,19 @@ buscMob.addEventListener('input',function(){
 
 function crearCard(peli){
   var puntaje=peli.vote_average?peli.vote_average.toFixed(1):'S/R';
+  var anio=(peli.release_date||peli.first_air_date||'').split('-')[0]||'';
   var poster=peli.poster_path?BASE+peli.poster_path:'https://via.placeholder.com/500x750?text=?';
   var card=document.createElement('div');
   card.className='min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2';
   var inner=document.createElement('div');inner.className='relative';
   var img=document.createElement('img');img.src=poster;img.className='rounded-xl shadow-lg mb-1 border border-white/5 w-full';img.loading='lazy';
   img.onclick=function(){location.href='pelicula.html?id='+peli.id;};
-  var badge=document.createElement('div');badge.className='absolute top-1.5 right-1.5 bg-black/80 text-yellow-500 text-[9px] font-black px-1.5 py-0.5 rounded-lg';badge.textContent='⭐ '+puntaje;
+  var badge=document.createElement('div');
+  badge.className='absolute top-1.5 right-1.5 flex flex-col items-end gap-1';
+  badge.innerHTML='<div class="bg-black/80 text-yellow-500 text-[9px] font-black px-1.5 py-0.5 rounded-lg">⭐ '+puntaje+'</div>'
+    +(anio?'<div class="bg-black/80 text-zinc-300 text-[9px] font-black px-1.5 py-0.5 rounded-lg">'+anio+'</div>':'');
   inner.appendChild(img);inner.appendChild(badge);
-  var title=document.createElement('p');title.className='text-[9px] md:text-[10px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 mt-1';title.textContent=peli.title;
+  var title=document.createElement('p');title.className='text-[9px] md:text-[10px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 mt-1';title.textContent=peli.title||peli.name;
   card.appendChild(inner);card.appendChild(title);return card;
 }
 
