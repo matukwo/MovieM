@@ -12,7 +12,7 @@
         .shake{animation:shake .4s cubic-bezier(.36,.07,.19,.97) both}
         @keyframes shake{10%,90%{transform:translate3d(-1px,0,0)}20%,80%{transform:translate3d(2px,0,0)}30%,50%,70%{transform:translate3d(-4px,0,0)}40%,60%{transform:translate3d(4px,0,0)}}
         .text-accent{color:var(--accent-color,#dc2626)}.bg-accent{background-color:var(--accent-color,#dc2626)}.border-accent{border-color:var(--accent-color,#dc2626)}
-        #searchDropdown,#searchDropdownMobile{max-height:70vh;overflow-y:auto}
+        @keyframes skPulse{0%,100%{opacity:1}50%{opacity:.4}}
     </style>
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden">
@@ -79,7 +79,13 @@
         <div class="h-1.5 w-full bg-accent"></div>
         <div class="md:hidden w-12 h-1 bg-zinc-700 rounded-full mx-auto mt-3"></div>
         <div class="p-6 md:p-8">
-            <div id="contenidoLogin">
+            <!-- Skeleton mientras Firebase verifica sesión -->
+            <div id="authSkeleton" class="text-center py-2">
+                <div class="w-16 h-16 rounded-full bg-zinc-800 mx-auto mb-4" style="animation:skPulse 1.4s ease-in-out infinite"></div>
+                <div class="h-3 w-24 bg-zinc-800 rounded-full mx-auto mb-2" style="animation:skPulse 1.4s ease-in-out infinite"></div>
+                <div class="h-2.5 w-16 bg-zinc-800/60 rounded-full mx-auto" style="animation:skPulse 1.4s ease-in-out .15s infinite"></div>
+            </div>
+            <div id="contenidoLogin" class="hidden">
                 <h3 id="modalTitulo" class="text-xl font-black italic uppercase tracking-tighter mb-1">Bienvenido</h3>
                 <p id="modalSubtitulo" class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-5">Ingresa tus datos para continuar</p>
                 <div class="space-y-3">
@@ -254,6 +260,7 @@ function setAvatarUI(nombre,avatarSrc){
 window.cerrarSesion=async function(){await signOut(auth);notificar('Sesion cerrada');setTimeout(function(){location.reload();},1000);};
 
 onAuthStateChanged(auth,async function(user){
+  document.getElementById('authSkeleton').style.display='none';
   if(user){
     var snap=await getDoc(doc(db,'usuarios',user.uid)),data=snap.exists()?snap.data():{};
     var nombre=data.username||user.email.split('@')[0];
