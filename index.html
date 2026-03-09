@@ -27,6 +27,7 @@
         .text-accent { color: var(--accent-color, #dc2626); }
         .bg-accent { background-color: var(--accent-color, #dc2626); }
         .border-accent { border-color: var(--accent-color, #dc2626); }
+        #searchDropdown { max-height: 420px; overflow-y: auto; }
     </style>
 </head>
 <body class="bg-zinc-950 text-white font-sans">
@@ -43,19 +44,18 @@
         </h1>
     </div>
     <div class="flex items-center justify-end gap-3">
+        <!-- Barra de búsqueda unificada -->
         <div class="relative hidden md:block">
-            <input type="text" id="buscador" placeholder="Buscar..." class="bg-zinc-900 border border-zinc-800 text-white text-xs rounded-full py-2 px-4 pl-10 focus:ring-1 focus:ring-red-600 w-40 transition-all focus:w-52 outline-none">
-            <span class="absolute left-3 top-2 text-zinc-500 text-sm">&#128269;</span>
-        </div>
-        <div class="relative hidden md:block">
-            <input type="text" id="buscadorUsuarios" placeholder="Usuario..."
-                class="bg-zinc-900 border border-zinc-800 text-white text-xs rounded-full py-2 px-4 pl-9 focus:ring-1 focus:ring-red-600 w-28 transition-all focus:w-44 outline-none">
-            <svg class="absolute left-3 top-2.5 w-3.5 h-3.5 text-zinc-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            <input type="text" id="buscador" placeholder="Buscar película o usuario..."
+                class="bg-zinc-900 border border-zinc-800 text-white text-xs rounded-full py-2.5 px-4 pl-10 focus:ring-1 focus:ring-red-600 w-52 transition-all focus:w-72 outline-none">
+            <svg class="absolute left-3 top-2.5 w-4 h-4 text-zinc-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
-            <div id="dropdownUsuarios" class="absolute right-0 top-10 bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl w-56 hidden overflow-hidden z-50"></div>
+            <!-- Dropdown unificado -->
+            <div id="searchDropdown" class="absolute right-0 top-11 bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl w-80 hidden z-50 no-scrollbar"></div>
         </div>
-        <button id="btnUsuario" class="w-10 h-10 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:bg-red-600 transition group shadow-lg overflow-hidden">
+        <!-- Botón usuario -->
+        <button id="btnUsuario" class="w-10 h-10 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:bg-red-600 transition group shadow-lg overflow-hidden shrink-0">
             <span id="navAvatarInner" class="w-full h-full flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-zinc-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -67,6 +67,7 @@
 
 <div id="toastContainer" class="fixed bottom-6 right-6 z-[200] flex flex-col gap-3"></div>
 
+<!-- Modal login/perfil -->
 <div id="modalLogin" class="fixed top-24 right-6 z-[100] hidden">
     <div id="modalCard" class="bg-zinc-900/95 backdrop-blur-xl border border-white/10 w-80 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden relative transition-all">
         <div class="h-1.5 w-full bg-accent"></div>
@@ -77,19 +78,18 @@
                 <div class="space-y-4">
                     <input type="text" id="nicknameUsuario" placeholder="Usuario" class="w-full input-premium p-3 rounded-xl text-sm outline-none hidden">
                     <input type="text" id="nombreUsuario" placeholder="Email" class="w-full input-premium p-3 rounded-xl text-sm outline-none">
-                    <input type="password" id="passUsuario" placeholder="Contraseña" class="w-full input-premium p-3 rounded-xl text-sm outline-none text-white">
-                    <input type="password" id="confirmPass" placeholder="Confirmar contraseña" class="w-full input-premium p-3 rounded-xl text-sm outline-none hidden text-white">
+                    <input type="password" id="passUsuario" placeholder="Contrase&ntilde;a" class="w-full input-premium p-3 rounded-xl text-sm outline-none text-white">
+                    <input type="password" id="confirmPass" placeholder="Confirmar contrase&ntilde;a" class="w-full input-premium p-3 rounded-xl text-sm outline-none hidden text-white">
                     <button id="btnAccionPrincipal" onclick="procesarUsuario()" class="w-full bg-accent hover:opacity-90 text-white font-black py-4 rounded-xl text-xs uppercase tracking-[0.2em] transition-all active:scale-95 shadow-lg">
                         Entrar
                     </button>
                 </div>
                 <div class="mt-6 pt-6 border-t border-white/5 text-center">
                     <p id="textoToggle" class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
-                        &#191;No tienes cuenta? <button onclick="toggleModoRegistro(true)" class="text-accent hover:underline">Reg&#237;strate</button>
+                        &iquest;No tienes cuenta? <button onclick="toggleModoRegistro(true)" class="text-accent hover:underline">Reg&iacute;strate</button>
                     </p>
                 </div>
             </div>
-
             <div id="perfilActivo" class="hidden text-center">
                 <div class="relative w-20 h-20 mx-auto mb-4">
                     <div class="absolute inset-0 bg-accent rounded-full blur-md opacity-20"></div>
@@ -101,7 +101,7 @@
                 <button onclick="window.location.href='perfil.html'" class="w-full mt-4 bg-zinc-800/50 hover:bg-accent text-white text-[10px] font-bold py-3 rounded-xl uppercase tracking-widest transition border border-white/5">
                     Mi Perfil
                 </button>
-                <div class="mt-6 space-y-4 text-left border-t border-white/5 pt-4">
+                <div class="mt-6 space-y-3 text-left border-t border-white/5 pt-4">
                     <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">Color de Acento</p>
                     <div class="flex gap-3 justify-center">
                         <div onclick="cambiarColor('#dc2626')" class="w-6 h-6 rounded-full bg-red-600 cursor-pointer hover:scale-110 transition"></div>
@@ -110,8 +110,8 @@
                         <div onclick="cambiarColor('#9333ea')" class="w-6 h-6 rounded-full bg-purple-600 cursor-pointer hover:scale-110 transition"></div>
                     </div>
                 </div>
-                <button onclick="cerrarSesion()" class="w-full mt-8 py-3 rounded-xl border border-zinc-800 text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-white hover:bg-zinc-800 transition">
-                    Cerrar Sesi&#243;n
+                <button onclick="cerrarSesion()" class="w-full mt-6 py-3 rounded-xl border border-zinc-800 text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-white hover:bg-zinc-800 transition">
+                    Cerrar Sesi&oacute;n
                 </button>
             </div>
         </div>
@@ -119,11 +119,6 @@
 </div>
 
 <main class="pt-28 pl-8">
-    <section id="seccionResultados" class="mb-10 hidden pr-8">
-        <h2 class="text-2xl font-semibold mb-6 text-accent italic uppercase tracking-tighter">Resultados de b&#250;squeda</h2>
-        <div id="resultadosBusqueda" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6"></div>
-        <div class="h-px w-full bg-zinc-800 my-10"></div>
-    </section>
     <div id="contenidoPrincipal" class="transition-opacity duration-500">
         <section class="mb-14 relative group">
             <h2 class="text-2xl font-black italic uppercase tracking-tighter mb-6 text-zinc-100">Tendencias Ahora</h2>
@@ -136,7 +131,7 @@
             </button>
         </section>
         <section class="mb-14 relative group">
-            <h2 class="text-2xl font-black italic uppercase tracking-tighter mb-6 text-zinc-100">Pura Acci&#243;n</h2>
+            <h2 class="text-2xl font-black italic uppercase tracking-tighter mb-6 text-zinc-100">Pura Acci&oacute;n</h2>
             <button onclick="scrollFila('accion', -500)" class="absolute left-0 top-1/2 z-40 bg-black/80 backdrop-blur-md p-3 -translate-y-1/2 rounded-full hidden group-hover:block border border-white/10 hover:bg-accent transition shadow-2xl">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
             </button>
@@ -159,22 +154,21 @@
         projectId: "moviem-5b73d",
         storageBucket: "moviem-5b73d.firebasestorage.app",
         messagingSenderId: "843796138544",
-        appId: "1:843796138544:web:c2bde9b39d437b84d97bf5",
-        measurementId: "G-7FH2FMPYZT"
+        appId: "1:843796138544:web:c2bde9b39d437b84d97bf5"
     };
-
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
     const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
     const BASE_IMAGE = 'https://image.tmdb.org/t/p/w500';
     let esModoRegistro = false;
+    let searchTimer = null;
 
     // ── TOAST ─────────────────────────────────────────────────────
     window.notificar = function(msg, tipo) {
         tipo = tipo || 'success';
-        const c = document.getElementById('toastContainer');
-        const t = document.createElement('div');
+        var c = document.getElementById('toastContainer');
+        var t = document.createElement('div');
         t.className = 'flex items-center gap-3 bg-zinc-900 border border-white/10 px-6 py-4 rounded-2xl shadow-2xl translate-x-10 opacity-0 transition-all duration-500 border-l-4 ' + (tipo === 'success' ? 'border-l-green-500' : 'border-l-red-600');
         t.innerHTML = '<span class="text-xs font-bold uppercase tracking-widest">' + msg + '</span>';
         c.appendChild(t);
@@ -182,14 +176,13 @@
         setTimeout(function() { t.classList.add('translate-x-10', 'opacity-0'); setTimeout(function() { t.remove(); }, 500); }, 3000);
     };
 
-    // ── COLOR ─────────────────────────────────────────────────────
     window.cambiarColor = function(hex) {
         document.documentElement.style.setProperty('--accent-color', hex);
         localStorage.setItem('movieM_color', hex);
         notificar('Color actualizado');
     };
 
-    // ── LOGIN/REGISTRO ────────────────────────────────────────────
+    // ── LOGIN / REGISTRO ──────────────────────────────────────────
     window.toggleModoRegistro = function(modo) {
         esModoRegistro = modo;
         if (modo) {
@@ -210,11 +203,11 @@
     };
 
     window.procesarUsuario = async function() {
-        const email = document.getElementById('nombreUsuario').value;
-        const nickname = document.getElementById('nicknameUsuario').value;
-        const p = document.getElementById('passUsuario').value;
-        const cp = document.getElementById('confirmPass').value;
-        const card = document.getElementById('modalCard');
+        var email = document.getElementById('nombreUsuario').value;
+        var nickname = document.getElementById('nicknameUsuario').value;
+        var p = document.getElementById('passUsuario').value;
+        var cp = document.getElementById('confirmPass').value;
+        var card = document.getElementById('modalCard');
         if (!email || !p || (esModoRegistro && !nickname)) {
             card.classList.add('shake'); setTimeout(function() { card.classList.remove('shake'); }, 400);
             notificar('Completa todos los campos', 'error'); return;
@@ -225,7 +218,7 @@
                     card.classList.add('shake'); setTimeout(function() { card.classList.remove('shake'); }, 400);
                     notificar('Las contrasenas no coinciden', 'error'); return;
                 }
-                const res = await createUserWithEmailAndPassword(auth, email, p);
+                var res = await createUserWithEmailAndPassword(auth, email, p);
                 await setDoc(doc(db, 'usuarios', res.user.uid), { username: nickname, email: email, color: '#dc2626' });
                 notificar('Cuenta creada!');
             } else {
@@ -238,13 +231,12 @@
         }
     };
 
-    // ── MOSTRAR PERFIL ACTIVO ─────────────────────────────────────
     function mostrarPerfilActivo(username, avatarSrc) {
         document.getElementById('contenidoLogin').classList.add('hidden');
         document.getElementById('perfilActivo').classList.remove('hidden');
         document.getElementById('saludoUsuario').innerText = username;
-        const inner = document.getElementById('navAvatarInner');
-        const circulo = document.getElementById('avatarCirculo');
+        var inner = document.getElementById('navAvatarInner');
+        var circulo = document.getElementById('avatarCirculo');
         if (avatarSrc) {
             inner.innerHTML = '<img src="' + avatarSrc + '" class="w-full h-full object-cover">';
             circulo.innerHTML = '<img src="' + avatarSrc + '" class="w-full h-full object-cover">';
@@ -262,19 +254,16 @@
         setTimeout(function() { location.reload(); }, 1000);
     };
 
-    // ── AUTH STATE ────────────────────────────────────────────────
     onAuthStateChanged(auth, async function(user) {
         if (user) {
-            const snap = await getDoc(doc(db, 'usuarios', user.uid));
-            const data = snap.exists() ? snap.data() : {};
-            const nombre = data.username || user.email.split('@')[0];
-            const storedUID = localStorage.getItem('movieM_uid');
-            if (storedUID && storedUID !== user.uid) {
-                localStorage.removeItem('movieM_avatar');
-            }
+            var snap = await getDoc(doc(db, 'usuarios', user.uid));
+            var data = snap.exists() ? snap.data() : {};
+            var nombre = data.username || user.email.split('@')[0];
+            var storedUID = localStorage.getItem('movieM_uid');
+            if (storedUID && storedUID !== user.uid) localStorage.removeItem('movieM_avatar');
             localStorage.setItem('movieM_uid', user.uid);
             localStorage.setItem('usuarioMovieM', nombre);
-            const color = data.color || localStorage.getItem('movieM_color') || '#dc2626';
+            var color = data.color || localStorage.getItem('movieM_color') || '#dc2626';
             document.documentElement.style.setProperty('--accent-color', color);
             mostrarPerfilActivo(nombre, data.avatar || null);
         } else {
@@ -283,46 +272,101 @@
         }
     });
 
-    // ── BÚSQUEDA DE USUARIOS ──────────────────────────────────────
-    var buscadorUsr = document.getElementById('buscadorUsuarios');
-    var dropdownUsr = document.getElementById('dropdownUsuarios');
+    // ── BÚSQUEDA UNIFICADA ────────────────────────────────────────
+    var buscador = document.getElementById('buscador');
+    var dropdown = document.getElementById('searchDropdown');
 
-    buscadorUsr.addEventListener('input', async function() {
-        var q = buscadorUsr.value.trim();
-        if (q.length < 2) { dropdownUsr.classList.add('hidden'); return; }
-        try {
-            var snap = await getDocs(collection(db, 'usuarios'));
-            var results = [];
-            snap.forEach(function(d) {
-                var u = d.data();
-                if (u.username && u.username.toLowerCase().indexOf(q.toLowerCase()) !== -1) {
-                    results.push({ uid: d.id, username: u.username, avatar: u.avatar || null });
-                }
-            });
-            var html = '';
-            if (results.length === 0) {
-                html = '<p class="text-zinc-600 text-xs p-4 text-center italic">Sin resultados</p>';
-            } else {
-                results.slice(0, 6).forEach(function(u) {
-                    var letra = u.username.charAt(0).toUpperCase();
-                    var av = u.avatar
-                        ? '<img src="' + u.avatar + '" class="w-8 h-8 rounded-full object-cover shrink-0">'
-                        : '<div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white font-black text-xs shrink-0">' + letra + '</div>';
-                    html += '<div class="flex items-center gap-3 px-4 py-3 hover:bg-zinc-800 cursor-pointer transition border-b border-white/5 last:border-0" onclick="location.href=\'perfil.html?user=' + encodeURIComponent(u.username) + '\'">' + av + '<span class="text-sm font-bold">' + u.username + '</span></div>';
-                });
-            }
-            dropdownUsr.innerHTML = html;
-            dropdownUsr.classList.remove('hidden');
-        } catch(e) { console.error(e); }
+    buscador.addEventListener('input', function() {
+        clearTimeout(searchTimer);
+        var q = buscador.value.trim();
+        if (q.length < 2) { dropdown.classList.add('hidden'); return; }
+        searchTimer = setTimeout(function() { buscarTodo(q); }, 350);
     });
 
+    async function buscarTodo(q) {
+        dropdown.innerHTML = '<p class="text-zinc-600 text-xs p-4 text-center animate-pulse">Buscando...</p>';
+        dropdown.classList.remove('hidden');
+
+        // Buscar películas y usuarios en paralelo
+        try {
+            var [resPelis, snapUsers] = await Promise.all([
+                fetch('https://api.themoviedb.org/3/search/movie?api_key=' + API_KEY + '&language=es-ES&query=' + encodeURIComponent(q)).then(function(r) { return r.json(); }),
+                getDocs(collection(db, 'usuarios'))
+            ]);
+
+            var peliculas = (resPelis.results || []).slice(0, 4);
+            var usuarios = [];
+            snapUsers.forEach(function(d) {
+                var u = d.data();
+                if (u.username && u.username.toLowerCase().indexOf(q.toLowerCase()) !== -1) {
+                    usuarios.push({ uid: d.id, username: u.username, avatar: u.avatar || null });
+                }
+            });
+            usuarios = usuarios.slice(0, 3);
+
+            var html = '';
+
+            // Sección usuarios
+            if (usuarios.length > 0) {
+                html += '<div class="px-4 pt-3 pb-1"><span class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500">Usuarios</span></div>';
+                usuarios.forEach(function(u) {
+                    var letra = u.username.charAt(0).toUpperCase();
+                    var av = u.avatar
+                        ? '<img src="' + u.avatar + '" class="w-9 h-9 rounded-full object-cover shrink-0 border border-white/10">'
+                        : '<div class="w-9 h-9 rounded-full bg-red-600 flex items-center justify-center text-white font-black text-xs shrink-0">' + letra + '</div>';
+                    html += '<div class="flex items-center gap-3 px-4 py-2.5 hover:bg-zinc-800/70 cursor-pointer transition" onclick="location.href=\'perfil.html?user=' + encodeURIComponent(u.username) + '\'">' + av + '<div><p class="text-sm font-bold leading-tight">' + u.username + '</p><p class="text-[9px] text-zinc-500 font-bold uppercase">Perfil</p></div></div>';
+                });
+            }
+
+            // Sección películas
+            if (peliculas.length > 0) {
+                html += '<div class="px-4 pt-3 pb-1 ' + (usuarios.length > 0 ? 'border-t border-white/5 mt-1' : '') + '"><span class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500">Pel&iacute;culas</span></div>';
+                peliculas.forEach(function(p) {
+                    var poster = p.poster_path ? 'https://image.tmdb.org/t/p/w92' + p.poster_path : 'https://via.placeholder.com/46x69?text=?';
+                    var anio = p.release_date ? p.release_date.split('-')[0] : 'S/F';
+                    var nota = p.vote_average ? p.vote_average.toFixed(1) : '-';
+                    html += '<div class="flex items-center gap-3 px-4 py-2 hover:bg-zinc-800/70 cursor-pointer transition" onclick="location.href=\'pelicula.html?id=' + p.id + '\'">'
+                        + '<img src="' + poster + '" class="w-8 h-12 rounded-lg object-cover shrink-0 border border-white/5">'
+                        + '<div class="flex-1 min-w-0"><p class="text-sm font-bold truncate leading-tight">' + p.title + '</p>'
+                        + '<p class="text-[9px] text-zinc-500 font-bold uppercase">' + anio + ' &nbsp;&middot;&nbsp; &#11088; ' + nota + '</p></div></div>';
+                });
+            }
+
+            if (peliculas.length === 0 && usuarios.length === 0) {
+                html = '<p class="text-zinc-600 text-xs p-4 text-center italic">Sin resultados para "' + q + '"</p>';
+            } else {
+                html += '<div class="p-2 border-t border-white/5 mt-1"><button onclick="verTodosResultados(\'' + encodeURIComponent(q) + '\')" class="w-full text-[9px] font-black uppercase tracking-widest text-accent py-2 hover:bg-zinc-800 rounded-xl transition">Ver todos los resultados</button></div>';
+            }
+
+            dropdown.innerHTML = html;
+        } catch(e) {
+            console.error(e);
+            dropdown.innerHTML = '<p class="text-zinc-600 text-xs p-4 text-center">Error al buscar</p>';
+        }
+    }
+
+    window.verTodosResultados = function(q) {
+        buscador.value = decodeURIComponent(q);
+        dropdown.classList.add('hidden');
+        mostrarResultadosCompletos(decodeURIComponent(q));
+    };
+
+    async function mostrarResultadosCompletos(q) {
+        var main = document.getElementById('contenidoPrincipal');
+        main.innerHTML = '<div class="pr-8"><h2 class="text-2xl font-black italic uppercase tracking-tighter mb-8 text-zinc-100">Resultados para "<span class="text-accent">' + q + '</span>"</h2><div id="gridResultados" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6"></div></div>';
+        var res = await fetch('https://api.themoviedb.org/3/search/movie?api_key=' + API_KEY + '&language=es-ES&query=' + encodeURIComponent(q));
+        var data = await res.json();
+        var grid = document.getElementById('gridResultados');
+        if (data.results) data.results.forEach(function(p) { grid.appendChild(crearCard(p)); });
+    }
+
     document.addEventListener('click', function(e) {
-        if (!buscadorUsr.contains(e.target) && !dropdownUsr.contains(e.target)) {
-            dropdownUsr.classList.add('hidden');
+        if (!buscador.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.add('hidden');
         }
     });
 
-    // ── CARDS DE PELÍCULAS ────────────────────────────────────────
+    // ── CARDS ─────────────────────────────────────────────────────
     function crearCard(peli) {
         var puntaje = peli.vote_average ? peli.vote_average.toFixed(1) : 'S/R';
         var poster = peli.poster_path ? BASE_IMAGE + peli.poster_path : 'https://via.placeholder.com/500x750?text=Sin+Poster';
@@ -336,14 +380,12 @@
         img.onclick = function() { window.location.href = 'pelicula.html?id=' + peli.id; };
         var badge = document.createElement('div');
         badge.className = 'absolute top-2 right-2 bg-black/80 backdrop-blur-md text-yellow-500 text-[10px] font-black px-2 py-1 rounded-lg border border-white/10 flex items-center gap-1 shadow-lg';
-        badge.textContent = '⭐ ' + puntaje;
-        inner.appendChild(img);
-        inner.appendChild(badge);
+        badge.textContent = '\u2B50 ' + puntaje;
+        inner.appendChild(img); inner.appendChild(badge);
         var title = document.createElement('p');
         title.className = 'text-[10px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 group-hover:text-accent transition mt-2';
         title.textContent = peli.title;
-        card.appendChild(inner);
-        card.appendChild(title);
+        card.appendChild(inner); card.appendChild(title);
         return card;
     }
 
@@ -352,30 +394,9 @@
             var res = await fetch(url);
             var data = await res.json();
             var contenedor = document.getElementById(contenedorId);
-            if (data.results) {
-                data.results.forEach(function(peli) { contenedor.appendChild(crearCard(peli)); });
-            }
-        } catch(e) { console.error('Error cargando seccion:', e); }
+            if (data.results) data.results.forEach(function(p) { contenedor.appendChild(crearCard(p)); });
+        } catch(e) { console.error('Error:', e); }
     }
-
-    // ── BUSCADOR DE PELÍCULAS ─────────────────────────────────────
-    document.getElementById('buscador').addEventListener('input', async function() {
-        var query = this.value.trim();
-        var secRes = document.getElementById('seccionResultados');
-        var contRes = document.getElementById('resultadosBusqueda');
-        var contPrinc = document.getElementById('contenidoPrincipal');
-        if (query.length > 2) {
-            var res = await fetch('https://api.themoviedb.org/3/search/movie?api_key=' + API_KEY + '&language=es-ES&query=' + encodeURIComponent(query));
-            var data = await res.json();
-            contRes.innerHTML = '';
-            secRes.classList.remove('hidden');
-            contPrinc.classList.add('opacity-20');
-            if (data.results) data.results.forEach(function(p) { contRes.appendChild(crearCard(p)); });
-        } else {
-            secRes.classList.add('hidden');
-            contPrinc.classList.remove('opacity-20');
-        }
-    });
 
     // ── INIT ──────────────────────────────────────────────────────
     window.scrollFila = function(id, d) { document.getElementById(id).scrollBy({ left: d, behavior: 'smooth' }); };
