@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieM | Serie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="firebase-config.js"></script>
+    <style>
+        .star{cursor:pointer;transition:color .2s ease}
+        #starRating:hover .star{color:#ca8a04}
+        #starRating .star:hover~.star{color:#3f3f46!important}
+        .no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
+        .glass-card{background:rgba(255,255,255,.04);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 60px -15px rgba(0,0,0,.8)}
+        @keyframes pulse-bg{0%{background-color:rgba(39,39,42,.5)}50%{background-color:rgba(63,63,70,.5)}100%{background-color:rgba(39,39,42,.5)}}
+        .skeleton{animation:pulse-bg 1.5s infinite ease-in-out}
+        .fade-in{animation:fadeIn .8s ease forwards;opacity:0}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        #playerOverlay{display:none;background:#000;position:fixed;inset:0;z-index:200;flex-direction:column}
+        /* Temporadas tabs */
+        .temp-tab{transition:all .2s;border-bottom:2px solid transparent;color:#71717a}
+        .temp-tab.active{color:white;border-bottom-color:var(--accent-color,#dc2626)}
+        /* Card episodio */
+        .ep-card{transition:all .2s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+        .ep-card:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.12);transform:translateY(-1px)}
+        .ep-card:active{transform:scale(.98)}
+        /* Thumb episodio skeleton */
+        .ep-thumb-skeleton{animation:pulse-bg 1.5s infinite ease-in-out}
+    </style>
+</head>
+<body class="bg-zinc-950 text-white font-sans overflow-x-hidden">
+
+<!-- Player overlay -->
+<div id="playerOverlay">
+    <div class="w-full flex justify-between items-center p-3 md:p-4 bg-zinc-950 border-b border-white/5">
+        <div class="flex items-center gap-3">
+            <span class="text-red-600 font-black tracking-tighter text-lg md:text-xl">MOVIE<span class="text-white font-light">M</span></span>
+            <span id="playerLabel" class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest hidden md:block"></span>
+        </div>
+        <button onclick="cerrarPlayer()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/5">Cerrar ×</button>
+    </div>
+    <div class="flex-1 bg-black">
+        <iframe id="serieFrame" src="" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media; fullscreen; picture-in-picture" playsinline></iframe>
+    </div>
+</div>
+
+<!-- Backdrop -->
+<div id="backdrop" class="fixed inset-0 w-full h-full bg-cover bg-center opacity-20 md:opacity-30 blur-sm -z-10 transition-all duration-700"></div>
+<div class="fixed inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent -z-10"></div>
+
+<!-- Botón volver -->
+<button onclick="location.href='series.html'" class="fixed top-4 left-4 md:top-8 md:left-8 bg-black/50 p-2.5 md:p-3 rounded-full hover:bg-red-600 transition z-50 border border-white/10 shadow-2xl">
+    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+</button>
+
+<!-- HUD usuario -->
+<div id="userHUD" class="fixed top-4 right-4 md:top-8 md:right-8 z-50 hidden items-center gap-3 bg-black/40 backdrop-blur-md p-1.5 pr-4 rounded-full border border-white/10 shadow-2xl">
+    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-600 flex items-center justify-center font-black text-white border-2 border-white/20 text-sm" id="userInitial">?</div>
+    <span id="userNameHUD" class="text-xs font-bold uppercase tracking-widest hidden md:inline">Usuario</span>
+</div>
+
+<main class="px-4 md:px-8 pt-16 md:pt-20 pb-8">
+
+    <!-- Info principal — idéntica a pelicula.html -->
+    <div class="flex flex-col md:flex-row gap-6 md:gap-12 items-start mb-10 md:mb-16 relative z-0 fade-in">
+
+        <!-- Poster -->
+        <div class="flex gap-4 md:block w-full md:w-80 md:shrink-0">
+            <div class="w-28 md:w-full shrink-0">
+                <div id="posterSkeleton" class="w-full aspect-[2/3] rounded-xl md:rounded-2xl skeleton"></div>
+                <img id="poster" src="" class="w-full rounded-xl md:rounded-2xl border border-white/10 shadow-2xl hidden" onload="this.classList.remove('hidden');document.getElementById('posterSkeleton')?.remove()">
+            </div>
+            <!-- Info inline mobile -->
+            <div class="flex-1 md:hidden pt-1">
+                <div id="badget-mobile" class="hidden mb-2 inline-flex items-center gap-1.5 bg-yellow-600/20 border border-yellow-600/50 text-yellow-500 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest">
+                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z"/></svg>
+                    Top Rated
+                </div>
+                <h1 id="tituloMobile" class="text-2xl font-black italic tracking-tighter uppercase leading-none text-white mb-2"></h1>
+                <div class="flex items-center gap-2 mb-3 flex-wrap">
+                    <span id="anioMobile" class="bg-zinc-800 px-2 py-0.5 rounded text-white text-xs font-bold"></span>
+                    <span class="text-yellow-500 text-sm font-bold">&#11088; <span id="votoMobile">0.0</span></span>
+                    <span id="temporadasMobile" class="text-zinc-500 text-xs font-bold"></span>
+                </div>
+                <span id="creadorMobile" class="text-zinc-500 text-xs italic block mb-3"></span>
+                <div class="flex gap-2 flex-wrap">
+                    <button onclick="verPrimerEpisodio()" class="bg-red-600 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95 shadow-lg">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Ver
+                    </button>
+                    <button onclick="abrirTrailer()" class="bg-zinc-800 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6zM21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9 9-4.03 9-9zm-16.1 0c0-3.92 3.18-7.1 7.1-7.1s7.1 3.18 7.1 7.1-3.18 7.1-7.1 7.1-7.1-3.18-7.1-7.1z"/></svg> Trailer
+                    </button>
+                    <button id="btnWatchlist" onclick="toggleWatchlist()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                    </button>
+                    <button id="btnLike" onclick="toggleLike()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info desktop -->
+        <div class="flex-1 relative z-10 min-w-0 hidden md:block">
+            <div id="badget-top" class="hidden mb-4 inline-flex items-center gap-2.5 bg-yellow-600/20 border border-yellow-600/50 text-yellow-500 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-lg">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z"/></svg>
+                Serie Altamente Valorada
+            </div>
+            <h1 id="titulo" class="text-5xl md:text-7xl font-black mb-4 italic tracking-tighter uppercase leading-none text-white truncate"></h1>
+            <div id="tituloSkeleton" class="h-16 w-3/4 skeleton rounded-xl mb-4"></div>
+            <div class="flex items-center gap-4 mb-6 font-bold flex-wrap">
+                <span id="anio" class="bg-zinc-800 px-3 py-1 rounded text-white text-sm"></span>
+                <span class="text-yellow-500 flex items-center gap-1 text-lg">&#11088; <span id="voto">0.0</span></span>
+                <span id="temporadas" class="text-zinc-400 border-l border-zinc-800 pl-4 text-sm font-bold"></span>
+                <span id="creador" class="text-zinc-400 border-l border-zinc-800 pl-4 font-semibold italic text-base"></span>
+            </div>
+            <div id="sinopsisSkeleton" class="space-y-3 mb-8 max-w-2xl">
+                <div class="h-4 w-full skeleton rounded"></div>
+                <div class="h-4 w-full skeleton rounded"></div>
+                <div class="h-4 w-2/3 skeleton rounded"></div>
+            </div>
+            <p id="sinopsis" class="text-lg text-zinc-500 max-w-2xl leading-relaxed mb-10 hidden"></p>
+            <div class="flex flex-wrap items-center gap-4">
+                <button onclick="verPrimerEpisodio()" class="bg-red-600 text-white px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-700 transition-all shadow-xl shadow-red-600/20 active:scale-95 tracking-tight uppercase">
+                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> VER SERIE
+                </button>
+                <button onclick="abrirTrailer()" class="bg-white text-black px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-600 hover:text-white transition-all shadow-xl active:scale-95">
+                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6zM21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9 9-4.03 9-9zm-16.1 0c0-3.92 3.18-7.1 7.1-7.1s7.1 3.18 7.1 7.1-3.18 7.1-7.1 7.1-7.1-3.18-7.1-7.1z"/></svg> VER TRAILER
+                </button>
+                <button id="btnWatchlistDesktop" onclick="toggleWatchlist()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                </button>
+                <button id="btnLikeDesktop" onclick="toggleLike()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sinopsis mobile -->
+    <div class="md:hidden mb-8 fade-in">
+        <p id="sinopsisMobile" class="text-sm text-zinc-400 leading-relaxed hidden"></p>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- TEMPORADAS Y EPISODIOS — estilo Netflix/Prime             -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <section class="mb-12 md:mb-16 fade-in" style="animation-delay:.15s">
+        <div class="flex items-center gap-3 mb-6">
+            <h3 class="text-xs md:text-sm font-black uppercase tracking-widest text-zinc-400">Episodios</h3>
+            <div class="h-px flex-1 bg-zinc-800/50"></div>
+        </div>
+
+        <!-- Tabs de temporadas -->
+        <div id="tabsTemporadas" class="flex gap-1 overflow-x-auto no-scrollbar pb-1 mb-6 border-b border-zinc-800/60"></div>
+
+        <!-- Grid de episodios -->
+        <div id="gridEpisodios" class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+            <!-- Skeletons mientras carga -->
+            <div class="ep-card rounded-2xl overflow-hidden flex gap-0 h-28"><div class="w-44 skeleton shrink-0"></div><div class="flex-1 p-4 space-y-2"><div class="h-3 w-1/2 skeleton rounded"></div><div class="h-2 w-full skeleton rounded"></div><div class="h-2 w-2/3 skeleton rounded"></div></div></div>
+            <div class="ep-card rounded-2xl overflow-hidden flex gap-0 h-28"><div class="w-44 skeleton shrink-0"></div><div class="flex-1 p-4 space-y-2"><div class="h-3 w-1/2 skeleton rounded"></div><div class="h-2 w-full skeleton rounded"></div><div class="h-2 w-2/3 skeleton rounded"></div></div></div>
+            <div class="ep-card rounded-2xl overflow-hidden flex gap-0 h-28 md:hidden"><div class="w-44 skeleton shrink-0"></div><div class="flex-1 p-4 space-y-2"><div class="h-3 w-1/2 skeleton rounded"></div><div class="h-2 w-full skeleton rounded"></div></div></div>
+        </div>
+    </section>
+
+    <!-- Reparto -->
+    <section class="mb-12 md:mb-20 fade-in" style="animation-delay:.3s">
+        <h3 class="text-xs md:text-sm font-black uppercase tracking-widest mb-4 md:mb-8 text-zinc-400 flex items-center gap-3">
+            Reparto Principal <div class="h-px flex-1 bg-zinc-800/50"></div>
+        </h3>
+        <div id="reparto" class="flex gap-5 md:gap-8 overflow-x-auto no-scrollbar pb-4 scroll-smooth">
+            <div class="min-w-[80px] skeleton h-20 rounded-full"></div>
+        </div>
+    </section>
+
+    <!-- Comentarios -->
+    <section class="border-t border-white/5 pt-8 md:pt-12 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 mb-16 fade-in" style="animation-delay:.4s">
+        <div class="bg-zinc-900/40 p-6 md:p-10 rounded-2xl md:rounded-3xl border border-white/5 shadow-2xl">
+            <h3 class="text-lg md:text-2xl font-bold mb-5 italic">Tu resena en <span class="text-red-600">MovieM</span></h3>
+            <div id="starRating" class="flex gap-2 mb-5 text-zinc-700">
+                <span onclick="setRating(1)" class="star text-3xl md:text-4xl">&#9733;</span>
+                <span onclick="setRating(2)" class="star text-3xl md:text-4xl">&#9733;</span>
+                <span onclick="setRating(3)" class="star text-3xl md:text-4xl">&#9733;</span>
+                <span onclick="setRating(4)" class="star text-3xl md:text-4xl">&#9733;</span>
+                <span onclick="setRating(5)" class="star text-3xl md:text-4xl">&#9733;</span>
+            </div>
+            <textarea id="comentarioTxt" placeholder="Que te parecio la serie?" class="w-full bg-zinc-800/50 p-4 rounded-2xl text-white mb-5 h-28 outline-none focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600 text-sm resize-none border-none"></textarea>
+            <button onclick="publicarComentario()" class="w-full bg-red-600 py-3.5 rounded-2xl font-black hover:bg-red-700 transition tracking-widest uppercase text-sm shadow-xl active:scale-95">PUBLICAR</button>
+        </div>
+        <div>
+            <h3 class="text-lg md:text-2xl font-bold mb-5 flex items-center gap-2 md:gap-3">
+                Opiniones <span class="text-[9px] md:text-[10px] bg-red-600 px-2 py-1 rounded text-white font-black uppercase">GLOBAL</span>
+            </h3>
+            <div id="listaComentarios" class="space-y-3 md:space-y-4 max-h-[350px] md:max-h-[400px] overflow-y-auto no-scrollbar pr-1">
+                <p class="text-zinc-600 text-xs animate-pulse">Sincronizando...</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Modal Actor -->
+<div id="modalActor" class="fixed inset-0 z-[110] hidden flex items-end md:items-center justify-center p-0 md:p-6">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-md" onclick="cerrarActor()"></div>
+    <div class="relative glass-card px-5 py-6 md:px-10 md:py-10 rounded-t-3xl md:rounded-[45px] w-full max-w-4xl max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl">
+        <button onclick="cerrarActor()" class="absolute top-5 right-5 md:top-8 md:right-10 text-white/30 hover:text-white transition-all text-2xl z-20">×</button>
+        <div class="flex flex-col md:flex-row gap-6 md:gap-10 items-start relative z-10">
+            <img id="actorFoto" src="" class="w-24 md:w-48 h-auto object-cover rounded-2xl md:rounded-[30px] shadow-2xl border border-white/10 shrink-0">
+            <div class="flex-1 w-full min-w-0">
+                <h2 id="actorNombre" class="text-2xl md:text-4xl font-black mb-3 italic tracking-tighter uppercase text-white"></h2>
+                <p id="actorInfo" class="text-zinc-300 text-sm leading-relaxed mb-6"></p>
+                <h4 class="text-[10px] font-bold uppercase tracking-[0.2em] text-red-500 mb-3">Filmografía</h4>
+                <div id="actorPelisContenedor" class="relative group w-full"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Trailer -->
+<div id="modalVideo" class="fixed inset-0 bg-black/95 z-[100] hidden flex items-center justify-center p-2 md:p-4">
+    <button onclick="cerrarTrailer()" class="absolute top-4 right-4 md:top-8 md:right-8 text-white text-3xl hover:text-red-600 transition z-10">×</button>
+    <div id="videoContainer" class="w-full max-w-5xl aspect-video rounded-xl md:rounded-3xl overflow-hidden shadow-2xl"></div>
+</div>
+
+<script type="module">
+    const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
+    const serieID = new URLSearchParams(window.location.search).get('id');
+    let currentRating = 0;
+    let serieData = null;
+    let temporadaActiva = 1;
+
+    // ── CARGAR PÁGINA ─────────────────────────────────────────────
+    async function cargarPagina() {
+        try {
+            const [pRes, cRes] = await Promise.all([
+                fetch(`https://api.themoviedb.org/3/tv/${serieID}?api_key=${API_KEY}&language=es-ES`),
+                fetch(`https://api.themoviedb.org/3/tv/${serieID}/credits?api_key=${API_KEY}&language=es-ES`)
+            ]);
+            serieData = await pRes.json();
+            const credits = await cRes.json();
+
+            // Quitar skeletons
+            document.getElementById('tituloSkeleton')?.remove();
+            document.getElementById('sinopsisSkeleton')?.remove();
+            document.getElementById('sinopsis').classList.remove('hidden');
+
+            // Rellenar info
+            const titulo = serieData.name;
+            const anio = serieData.first_air_date ? serieData.first_air_date.split('-')[0] : 'S/F';
+            const voto = serieData.vote_average ? serieData.vote_average.toFixed(1) : '?';
+            const numTemps = serieData.number_of_seasons;
+            const overview = serieData.overview || 'Sin descripción disponible.';
+            const creador = serieData.created_by && serieData.created_by.length ? serieData.created_by[0].name : '';
+
+            document.getElementById('titulo').innerText = titulo;
+            document.getElementById('tituloMobile').innerText = titulo;
+            document.getElementById('anio').innerText = anio;
+            document.getElementById('anioMobile').innerText = anio;
+            document.getElementById('voto').innerText = voto;
+            document.getElementById('votoMobile').innerText = voto;
+            document.getElementById('temporadas').innerText = `${numTemps} Temporada${numTemps > 1 ? 's' : ''}`;
+            document.getElementById('temporadasMobile').innerText = `${numTemps} Temp.`;
+            document.getElementById('sinopsis').innerText = overview;
+            document.getElementById('sinopsisMobile').innerText = overview;
+            document.getElementById('sinopsisMobile').classList.remove('hidden');
+            document.getElementById('poster').src = `https://image.tmdb.org/t/p/w500${serieData.poster_path}`;
+            document.getElementById('backdrop').style.backgroundImage = `url('https://image.tmdb.org/t/p/original${serieData.backdrop_path}')`;
+            document.title = `MovieM | ${titulo}`;
+
+            if (creador) {
+                document.getElementById('creador').innerText = `Creador: ${creador}`;
+                document.getElementById('creadorMobile').innerText = `Creador: ${creador}`;
+            }
+            if (serieData.vote_average >= 8) {
+                document.getElementById('badget-top').classList.remove('hidden');
+                document.getElementById('badget-mobile').classList.remove('hidden');
+            }
+
+            // Temporadas tabs
+            const seasons = (serieData.seasons || []).filter(s => s.season_number > 0);
+            const tabsEl = document.getElementById('tabsTemporadas');
+            tabsEl.innerHTML = '';
+            seasons.forEach(s => {
+                const btn = document.createElement('button');
+                btn.className = `temp-tab shrink-0 px-4 py-2 text-xs font-black uppercase tracking-widest ${s.season_number === 1 ? 'active' : ''}`;
+                btn.textContent = `T${s.season_number}`;
+                btn.title = s.name;
+                btn.onclick = () => seleccionarTemporada(s.season_number);
+                tabsEl.appendChild(btn);
+            });
+
+            // Cargar T1 por defecto
+            await cargarEpisodios(1);
+
+            // Reparto
+            document.getElementById('reparto').innerHTML = credits.cast.slice(0, 15).map(actor => `
+                <div onclick="verActor(${actor.id})" class="min-w-[110px] text-center cursor-pointer shrink-0 fade-in">
+                    <div class="w-20 h-20 mx-auto mb-4 overflow-hidden rounded-full border border-zinc-800 hover:border-red-600 transition-all transform hover:scale-110 duration-300">
+                        <img src="${actor.profile_path ? 'https://image.tmdb.org/t/p/w200' + actor.profile_path : 'https://via.placeholder.com/200'}" class="w-full h-full object-cover">
+                    </div>
+                    <p class="text-[10px] font-black text-zinc-200 truncate uppercase tracking-tighter px-1">${actor.name}</p>
+                    <p class="text-[8px] text-zinc-600 truncate italic px-1">${actor.character}</p>
+                </div>`).join('');
+
+            escucharComentarios();
+            actualizarHUD();
+            checkStatus();
+
+        } catch (e) { console.error(e); }
+    }
+
+    // ── TEMPORADAS Y EPISODIOS ────────────────────────────────────
+    window.seleccionarTemporada = async function(num) {
+        temporadaActiva = num;
+        document.querySelectorAll('.temp-tab').forEach(t => {
+            t.classList.toggle('active', t.textContent === `T${num}`);
+        });
+        await cargarEpisodios(num);
+    };
+
+    async function cargarEpisodios(numTemp) {
+        const grid = document.getElementById('gridEpisodios');
+        // Skeleton mientras carga
+        grid.innerHTML = Array(4).fill(`
+            <div class="ep-card rounded-2xl overflow-hidden flex h-28">
+                <div class="w-44 ep-thumb-skeleton shrink-0"></div>
+                <div class="flex-1 p-4 space-y-2">
+                    <div class="h-3 w-1/3 skeleton rounded"></div>
+                    <div class="h-2.5 w-2/3 skeleton rounded"></div>
+                    <div class="h-2 w-full skeleton rounded"></div>
+                    <div class="h-2 w-3/4 skeleton rounded"></div>
+                </div>
+            </div>`).join('');
+
+        try {
+            const r = await fetch(`https://api.themoviedb.org/3/tv/${serieID}/season/${numTemp}?api_key=${API_KEY}&language=es-ES`);
+            const data = await r.json();
+            const eps = data.episodes || [];
+
+            grid.innerHTML = '';
+            eps.forEach(ep => {
+                const thumb = ep.still_path
+                    ? `https://image.tmdb.org/t/p/w300${ep.still_path}`
+                    : `https://image.tmdb.org/t/p/w300${serieData.backdrop_path}`;
+                const duracion = ep.runtime ? `${ep.runtime} min` : '';
+                const rating = ep.vote_average && ep.vote_average > 0 ? `⭐ ${ep.vote_average.toFixed(1)}` : '';
+                const fecha = ep.air_date ? ep.air_date.split('-')[0] : '';
+
+                const div = document.createElement('div');
+                div.className = 'ep-card rounded-2xl overflow-hidden flex cursor-pointer group';
+                div.innerHTML = `
+                    <!-- Miniatura -->
+                    <div class="relative w-44 md:w-52 shrink-0 overflow-hidden bg-zinc-900">
+                        <img src="${thumb}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy">
+                        <!-- Overlay play -->
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <div class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center shadow-lg">
+                                <svg class="w-5 h-5 fill-white ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            </div>
+                        </div>
+                        <!-- Número de episodio -->
+                        <div class="absolute bottom-2 left-2 bg-black/80 text-white text-[9px] font-black px-1.5 py-0.5 rounded">
+                            E${ep.episode_number}
+                        </div>
+                    </div>
+                    <!-- Info -->
+                    <div class="flex-1 p-3 md:p-4 flex flex-col justify-center min-w-0">
+                        <div class="flex items-start justify-between gap-2 mb-1">
+                            <p class="text-xs md:text-sm font-black uppercase tracking-tight leading-tight group-hover:text-red-500 transition line-clamp-2 flex-1">${ep.name || 'Episodio ' + ep.episode_number}</p>
+                            ${rating ? `<span class="text-yellow-500 text-[9px] font-bold shrink-0">${rating}</span>` : ''}
+                        </div>
+                        <div class="flex items-center gap-2 mb-2">
+                            ${duracion ? `<span class="text-[9px] text-zinc-500 font-bold uppercase">${duracion}</span>` : ''}
+                            ${fecha ? `<span class="text-[9px] text-zinc-600 font-bold">${fecha}</span>` : ''}
+                        </div>
+                        <p class="text-[10px] md:text-xs text-zinc-500 leading-relaxed line-clamp-2">${ep.overview || 'Sin descripción disponible.'}</p>
+                    </div>
+                `;
+                div.onclick = () => reproducirEpisodio(numTemp, ep.episode_number, ep.name);
+                grid.appendChild(div);
+            });
+        } catch(e) { console.error(e); }
+    }
+
+    // ── PLAYER ────────────────────────────────────────────────────
+    function reproducirEpisodio(temp, ep, nombre) {
+        document.getElementById('serieFrame').src = `https://vidsrc.cc/v3/embed/tv/${serieID}/${temp}/${ep}?auto_lang=es`;
+        document.getElementById('playerLabel').innerText = `T${temp} · E${ep} — ${nombre || ''}`;
+        document.getElementById('playerOverlay').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    window.verPrimerEpisodio = () => reproducirEpisodio(1, 1, 'Episodio 1');
+
+    window.cerrarPlayer = () => {
+        document.getElementById('playerOverlay').style.display = 'none';
+        document.getElementById('serieFrame').src = '';
+        document.body.style.overflow = 'auto';
+    };
+
+    // ── HUD ───────────────────────────────────────────────────────
+    function actualizarHUD() {
+        const userActual = localStorage.getItem('usuarioMovieM');
+        if (userActual && userActual !== 'undefined') {
+            document.getElementById('userNameHUD').innerText = userActual;
+            document.getElementById('userInitial').innerText = userActual.charAt(0).toUpperCase();
+            const hud = document.getElementById('userHUD');
+            hud.classList.remove('hidden'); hud.classList.add('flex');
+        }
+    }
+
+    // ── COMENTARIOS ───────────────────────────────────────────────
+    function escucharComentarios() {
+        const contenedor = document.getElementById('listaComentarios');
+        const q = window.query(
+            window.collection(window.db, 'comentarios'),
+            window.where('movieID', '==', 'tv-' + serieID),
+            window.orderBy('fecha', 'desc')
+        );
+        window.onSnapshot(q, snapshot => {
+            contenedor.innerHTML = '';
+            if (snapshot.empty) {
+                contenedor.innerHTML = '<p class="text-zinc-600 text-sm italic">Nadie comentó aún. ¡Sé el primero!</p>';
+                return;
+            }
+            snapshot.forEach(d => {
+                const c = d.data();
+                const fecha = c.fecha ? new Date(c.fecha).toLocaleString() : 'Reciente';
+                contenedor.innerHTML += `
+                    <div class="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 shadow-xl fade-in mb-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-red-600 font-black text-xs uppercase tracking-widest">${c.user}</span>
+                                <span class="text-[9px] text-zinc-600 font-bold uppercase">${fecha}</span>
+                            </div>
+                            <span class="text-yellow-500 text-[10px]">${'★'.repeat(c.rating)}</span>
+                        </div>
+                        <p class="text-zinc-400 text-sm leading-relaxed">${c.txt}</p>
+                    </div>`;
+            });
+        });
+    }
+
+    window.publicarComentario = async () => {
+        const txt = document.getElementById('comentarioTxt').value.trim();
+        const userActual = localStorage.getItem('usuarioMovieM');
+        if (!userActual || userActual === 'undefined') return alert('Debes iniciar sesión para comentar.');
+        if (!txt || currentRating === 0) return alert('Por favor escribí un comentario y seleccioná una valoración.');
+        try {
+            await window.addDoc(window.collection(window.db, 'comentarios'), {
+                movieID: 'tv-' + serieID,
+                user: userActual, txt, rating: currentRating, fecha: Date.now()
+            });
+            document.getElementById('comentarioTxt').value = '';
+            window.setRating(0);
+        } catch(e) { alert('Error al publicar.'); }
+    };
+
+    // ── WATCHLIST / LIKE ──────────────────────────────────────────
+    async function checkStatus() {
+        const userActual = localStorage.getItem('usuarioMovieM');
+        if (!userActual || userActual === 'undefined') return;
+        try {
+            const userRef = window.doc(window.db, 'usuarios', userActual);
+            const snap = await window.getDoc(userRef);
+            if (!snap.exists()) return;
+            const data = snap.data();
+            const wl = data.seriesWatchlist || [];
+            const lk = data.seriesLikes || [];
+            if (wl.includes(serieID)) {
+                ['btnWatchlist','btnWatchlistDesktop'].forEach(id => {
+                    const b = document.getElementById(id);
+                    if(b){ b.classList.add('bg-zinc-100','text-black','border-white'); b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5'); }
+                });
+            }
+            if (lk.includes(serieID)) {
+                ['btnLike','btnLikeDesktop'].forEach(id => {
+                    const b = document.getElementById(id);
+                    if(b){ b.classList.add('bg-red-600','border-red-600','text-white'); b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5'); }
+                });
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    window.toggleWatchlist = async () => {
+        const userActual = localStorage.getItem('usuarioMovieM');
+        if (!userActual || userActual === 'undefined') return alert('Debes iniciar sesión.');
+        const btn = document.getElementById('btnWatchlist');
+        const isSaved = btn.classList.contains('bg-zinc-100');
+        const userRef = window.doc(window.db, 'usuarios', userActual);
+        await window.setDoc(userRef, { seriesWatchlist: isSaved ? window.arrayRemove(serieID) : window.arrayUnion(serieID) }, { merge: true });
+        ['btnWatchlist','btnWatchlistDesktop'].forEach(id => {
+            const b = document.getElementById(id);
+            if(!b) return;
+            if (!isSaved) { b.classList.add('bg-zinc-100','text-black','border-white'); b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5'); }
+            else { b.classList.remove('bg-zinc-100','text-black','border-white'); b.classList.add('bg-zinc-900','text-zinc-400','border-white/5'); }
+        });
+    };
+
+    window.toggleLike = async () => {
+        const userActual = localStorage.getItem('usuarioMovieM');
+        if (!userActual || userActual === 'undefined') return alert('Debes iniciar sesión.');
+        const btn = document.getElementById('btnLike');
+        const isLiked = btn.classList.contains('bg-red-600');
+        const userRef = window.doc(window.db, 'usuarios', userActual);
+        await window.setDoc(userRef, { seriesLikes: isLiked ? window.arrayRemove(serieID) : window.arrayUnion(serieID) }, { merge: true });
+        ['btnLike','btnLikeDesktop'].forEach(id => {
+            const b = document.getElementById(id);
+            if(!b) return;
+            if (!isLiked) { b.classList.add('bg-red-600','border-red-600','text-white'); b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5'); }
+            else { b.classList.remove('bg-red-600','border-red-600','text-white'); b.classList.add('bg-zinc-900','text-zinc-400','border-white/5'); }
+        });
+    };
+
+    // ── MODAL ACTORES ─────────────────────────────────────────────
+    window.verActor = async (id) => {
+        try {
+            const [resBio, resPelis] = await Promise.all([
+                fetch(`https://api.themoviedb.org/3/person/${id}?api_key=${API_KEY}&language=es-ES`),
+                fetch(`https://api.themoviedb.org/3/person/${id}/combined_credits?api_key=${API_KEY}&language=es-ES`)
+            ]);
+            const actor = await resBio.json();
+            const creditos = await resPelis.json();
+            document.getElementById('actorNombre').innerText = actor.name;
+            document.getElementById('actorFoto').src = actor.profile_path ? `https://image.tmdb.org/t/p/w500${actor.profile_path}` : 'https://via.placeholder.com/500';
+            document.getElementById('actorInfo').innerText = actor.biography || 'Biografía no disponible.';
+            const obras = (creditos.cast || []).filter(p => p.poster_path).sort((a,b) => b.popularity - a.popularity).slice(0,15);
+            document.getElementById('actorPelisContenedor').innerHTML = `
+                <div class="flex gap-4 overflow-x-auto no-scrollbar pb-4 px-1">
+                    ${obras.map(p => `
+                        <div class="w-[85px] group/item cursor-pointer shrink-0" onclick="location.href='${p.media_type==='tv'?'serie':'pelicula'}.html?id=${p.id}'">
+                            <div class="w-[85px] h-[125px] overflow-hidden rounded-xl border border-white/5 group-hover/item:border-red-600 transition-all duration-300 transform group-hover/item:scale-105">
+                                <img src="https://image.tmdb.org/t/p/w200${p.poster_path}" class="w-full h-full object-cover">
+                            </div>
+                            <p class="text-[7px] mt-2 text-zinc-500 truncate uppercase font-bold px-1">${p.title||p.name}</p>
+                        </div>`).join('')}
+                </div>`;
+            document.getElementById('modalActor').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        } catch(e) { console.error(e); }
+    };
+    window.cerrarActor = () => { document.getElementById('modalActor').classList.add('hidden'); document.body.style.overflow = 'auto'; };
+
+    // ── TRAILER ───────────────────────────────────────────────────
+    window.abrirTrailer = async () => {
+        try {
+            const res = await fetch(`https://api.themoviedb.org/3/tv/${serieID}/videos?api_key=${API_KEY}`);
+            const data = await res.json();
+            const tr = data.results.find(v => v.type === 'Trailer' && v.site === 'YouTube') || data.results[0];
+            if (tr) {
+                document.getElementById('videoContainer').innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${tr.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>`;
+                document.getElementById('modalVideo').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        } catch(e) { console.error(e); }
+    };
+    window.cerrarTrailer = () => {
+        document.getElementById('modalVideo').classList.add('hidden');
+        document.getElementById('videoContainer').innerHTML = '';
+        document.body.style.overflow = 'auto';
+    };
+
+    // ── RATING ────────────────────────────────────────────────────
+    window.setRating = (n) => {
+        currentRating = n;
+        document.querySelectorAll('.star').forEach((s, i) => { s.style.color = i < n ? '#eab308' : '#3f3f46'; });
+    };
+
+    cargarPagina();
+</script>
+</body>
+</html>
