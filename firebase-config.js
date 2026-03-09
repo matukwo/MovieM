@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, doc, setDoc, getDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, doc, setDoc, getDoc, arrayUnion, arrayRemove, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -12,12 +12,11 @@ const firebaseConfig = {
     measurementId: "G-7FH2FMPYZT"
 };
 
-// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Exportar Firestore
+// Firestore
 window.db = db;
 window.addDoc = addDoc;
 window.collection = collection;
@@ -28,9 +27,11 @@ window.onSnapshot = onSnapshot;
 window.doc = doc;
 window.setDoc = setDoc;
 window.getDoc = getDoc;
+window.getDocs = getDocs;
 window.arrayUnion = arrayUnion;
 window.arrayRemove = arrayRemove;
+window.deleteDoc = deleteDoc;
 
-// Exportar Auth
+// Auth
 window.auth = auth;
 window.onAuthStateChanged = onAuthStateChanged;
