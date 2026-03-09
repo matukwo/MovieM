@@ -36,7 +36,7 @@
 
 <nav class="p-6 grid grid-cols-3 items-center bg-zinc-950/80 backdrop-blur-md fixed top-0 w-full z-50 border-b border-white/5">
     <div class="flex space-x-6 text-xs font-bold uppercase tracking-widest text-zinc-400">
-        <a href="index.html" class="hover:text-white transition">Inicio</a>
+        <a href="index.html" class="hover:text-white transition text-accent">Inicio</a>
         <a href="#" class="hover:text-white transition">Series</a>
         <a href="milista.html" class="hover:text-white transition">Mi Lista</a>
     </div>
@@ -47,13 +47,15 @@
     </div>
     <div class="flex items-center justify-end gap-4">
         <div class="relative hidden md:block">
-            <input type="text" id="buscador" placeholder="Buscar..." class="bg-zinc-900 border border-zinc-800 text-white text-xs rounded-full py-2 px-4 pl-10 focus:ring-1 focus:ring-red-600 w-40 transition-all focus:w-52">
+            <input type="text" id="buscador" placeholder="Películas o usuarios..." class="bg-zinc-900 border border-zinc-800 text-white text-xs rounded-full py-2 px-4 pl-10 focus:ring-1 focus:ring-red-600 w-40 transition-all focus:w-64">
             <span class="absolute left-3 top-2 text-zinc-500 text-sm">🔍</span>
         </div>
-        <button id="btnUsuario" class="w-10 h-10 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:bg-accent transition group shadow-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-zinc-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
+        <button id="btnUsuario" class="w-10 h-10 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:border-accent transition group shadow-lg overflow-hidden">
+            <div id="avatarNav" class="w-full h-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-zinc-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+            </div>
         </button>
     </div>
 </nav>
@@ -70,8 +72,7 @@
                 <p id="modalSubtitulo" class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-6">Ingresa tus datos para continuar</p>
                 
                 <div class="space-y-4">
-                    <input type="text" id="nicknameUsuario" placeholder="Usuario" class="w-full input-premium p-3 rounded-xl text-sm outline-none hidden">
-                    
+                    <input type="text" id="nicknameUsuario" placeholder="Nickname (p.ej. Matu)" class="w-full input-premium p-3 rounded-xl text-sm outline-none hidden">
                     <input type="text" id="nombreUsuario" placeholder="Email" class="w-full input-premium p-3 rounded-xl text-sm outline-none">
                     <input type="password" id="passUsuario" placeholder="Contraseña" class="w-full input-premium p-3 rounded-xl text-sm outline-none text-white">
                     <input type="password" id="confirmPass" placeholder="Confirmar contraseña" class="w-full input-premium p-3 rounded-xl text-sm outline-none hidden text-white">
@@ -80,7 +81,6 @@
                         Entrar
                     </button>
                 </div>
-
                 <div class="mt-6 pt-6 border-t border-white/5 text-center">
                     <p id="textoToggle" class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
                         ¿No tienes cuenta? <button onclick="toggleModoRegistro(true)" class="text-accent hover:underline">Regístrate</button>
@@ -91,18 +91,17 @@
             <div id="perfilActivo" class="hidden text-center">
                 <div class="relative w-20 h-20 mx-auto mb-4">
                     <div class="absolute inset-0 bg-accent rounded-full blur-md opacity-20"></div>
-                    <div id="avatarCirculo" class="relative w-20 h-20 bg-zinc-800 border-2 border-accent rounded-full flex items-center justify-center text-4xl font-black italic shadow-2xl text-white">
+                    <div id="avatarCirculo" class="relative w-20 h-20 bg-zinc-800 border-2 border-accent rounded-full flex items-center justify-center text-4xl font-black italic shadow-2xl text-white overflow-hidden">
                         <span id="inicialUsuario">M</span>
                     </div>
                 </div>
                 <p class="text-zinc-200 font-black uppercase tracking-tighter text-lg mb-1" id="saludoUsuario">Hola</p>
-                
                 <button onclick="window.location.href='perfil.html'" class="w-full mt-4 bg-zinc-800/50 hover:bg-accent text-white text-[10px] font-bold py-3 rounded-xl uppercase tracking-widest transition border border-white/5">
                     Mi Perfil
                 </button>
                 
                 <div class="mt-6 space-y-4 text-left border-t border-white/5 pt-4">
-                    <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">Color de Acento</p>
+                    <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-widest text-center">Color de Acento</p>
                     <div class="flex gap-3 justify-center">
                         <div onclick="cambiarColor('#dc2626')" class="w-6 h-6 rounded-full bg-red-600 cursor-pointer border-2 border-transparent hover:scale-110 transition"></div>
                         <div onclick="cambiarColor('#2563eb')" class="w-6 h-6 rounded-full bg-blue-600 cursor-pointer border-2 border-transparent hover:scale-110 transition"></div>
@@ -121,7 +120,13 @@
 
 <main class="pt-28 pl-8">
     <section id="seccionResultados" class="mb-10 hidden pr-8">
-        <h2 class="text-2xl font-semibold mb-6 text-accent italic uppercase tracking-tighter">Resultados de búsqueda</h2>
+        <div class="flex items-baseline gap-4 mb-6">
+            <h2 class="text-2xl font-black italic uppercase tracking-tighter text-accent">Resultados</h2>
+            <span id="contadorResultados" class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest"></span>
+        </div>
+        
+        <div id="resultadosUsuarios" class="flex flex-wrap gap-4 mb-8"></div>
+        
         <div id="resultadosBusqueda" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6"></div>
         <div class="h-px w-full bg-zinc-800 my-10"></div>
     </section>
@@ -154,7 +159,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAn5N7m7EhICK2aZG4Nx8DIW9RZd9kK1DA",
@@ -244,6 +249,7 @@
                 await setDoc(doc(db, "usuarios", res.user.uid), {
                     username: nickname,
                     email: email,
+                    avatar: "", // Por defecto vacío
                     color: localStorage.getItem('movieM_color') || '#dc2626'
                 });
                 notificar("¡Cuenta creada!");
@@ -258,11 +264,22 @@
         }
     }
 
-    window.mostrarPerfil = function(n) {
-        document.getElementById('contenidoLogin').classList.add('hidden');
-        document.getElementById('perfilActivo').classList.remove('hidden');
-        document.getElementById('saludoUsuario').innerText = n;
-        document.getElementById('inicialUsuario').innerText = n.charAt(0).toUpperCase();
+    // --- NUEVA FUNCIÓN: ACTUALIZAR AVATARS EN LA UI ---
+    window.actualizarUIUsuario = function(datos) {
+        const avatarNav = document.getElementById('avatarNav');
+        const avatarCirculo = document.getElementById('avatarCirculo');
+        const inicial = document.getElementById('inicialUsuario');
+        
+        const avatarContent = datos.avatar 
+            ? `<img src="${datos.avatar}" class="w-full h-full object-cover">`
+            : `<span class="text-xl font-black italic">${datos.username.charAt(0).toUpperCase()}</span>`;
+
+        avatarNav.innerHTML = avatarContent;
+        avatarCirculo.innerHTML = datos.avatar 
+            ? `<img src="${datos.avatar}" class="w-full h-full object-cover">`
+            : `<span id="inicialUsuario">${datos.username.charAt(0).toUpperCase()}</span>`;
+            
+        document.getElementById('saludoUsuario').innerText = `Hola, ${datos.username}`;
     }
 
     window.cerrarSesion = async function() { 
@@ -274,8 +291,13 @@
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             const docSnap = await getDoc(doc(db, "usuarios", user.uid));
-            const nombre = docSnap.exists() ? docSnap.data().username : user.email.split('@')[0];
-            mostrarPerfil(nombre);
+            if (docSnap.exists()) {
+                const datos = docSnap.data();
+                actualizarUIUsuario(datos);
+                document.getElementById('contenidoLogin').classList.add('hidden');
+                document.getElementById('perfilActivo').classList.remove('hidden');
+                if(datos.color) document.documentElement.style.setProperty('--accent-color', datos.color);
+            }
         } else {
             document.getElementById('contenidoLogin').classList.remove('hidden');
             document.getElementById('perfilActivo').classList.add('hidden');
@@ -299,32 +321,66 @@
         return card;
     }
 
+    // --- BUSCADOR HÍBRIDO (PELIS + USUARIOS) ---
+    const inputBuscador = document.getElementById('buscador');
+    inputBuscador.addEventListener('input', async (e) => {
+        const queryText = e.target.value.trim();
+        const seccionResultados = document.getElementById('seccionResultados');
+        const contenedorPelis = document.getElementById('resultadosBusqueda');
+        const contenedorUsers = document.getElementById('resultadosUsuarios');
+        const contenidoPrincipal = document.getElementById('contenidoPrincipal');
+
+        if (queryText.length > 2) {
+            seccionResultados.classList.remove('hidden');
+            contenidoPrincipal.classList.add('opacity-20');
+            contenedorPelis.innerHTML = "";
+            contenedorUsers.innerHTML = "";
+
+            // 1. Buscar Películas (API)
+            const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=es-ES&query=${queryText}`);
+            const data = await res.json();
+            data.results.forEach(peli => { contenedorPelis.appendChild(crearCard(peli)); });
+
+            // 2. Buscar Usuarios (Firestore)
+            // Nota: Esta búsqueda es sencilla (case-sensitive). 
+            const q = query(
+                collection(db, "usuarios"), 
+                where("username", ">=", queryText), 
+                where("username", "<=", queryText + "\uf8ff"),
+                limit(5)
+            );
+            const querySnapshot = await getDocs(q);
+            
+            if(!querySnapshot.empty) {
+                querySnapshot.forEach((doc) => {
+                    const u = doc.data();
+                    const userCard = document.createElement('div');
+                    userCard.className = "flex items-center gap-3 bg-zinc-900/50 border border-white/5 p-3 rounded-2xl hover:border-accent cursor-pointer transition min-w-[180px]";
+                    userCard.innerHTML = `
+                        <div class="w-10 h-10 rounded-full bg-zinc-800 overflow-hidden border border-white/10">
+                            ${u.avatar ? `<img src="${u.avatar}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center font-black italic text-accent">${u.username.charAt(0)}</div>`}
+                        </div>
+                        <div>
+                            <p class="text-xs font-black uppercase tracking-tighter">${u.username}</p>
+                            <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">Cinéfilo</p>
+                        </div>
+                    `;
+                    userCard.onclick = () => window.location.href = `perfil.html?uid=${doc.id}`;
+                    contenedorUsers.appendChild(userCard);
+                });
+            }
+        } else {
+            seccionResultados.classList.add('hidden');
+            contenidoPrincipal.classList.remove('opacity-20');
+        }
+    });
+
     async function cargarSeccion(url, contenedorId) {
         const res = await fetch(url);
         const data = await res.json();
         const contenedor = document.getElementById(contenedorId);
         data.results.forEach(peli => { contenedor.appendChild(crearCard(peli)); });
     }
-
-    const inputBuscador = document.getElementById('buscador');
-    inputBuscador.addEventListener('input', async (e) => {
-        const query = e.target.value.trim();
-        const seccionResultados = document.getElementById('seccionResultados');
-        const contenedorResultados = document.getElementById('resultadosBusqueda');
-        const contenidoPrincipal = document.getElementById('contenidoPrincipal');
-
-        if (query.length > 2) {
-            const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=es-ES&query=${query}`);
-            const data = await res.json();
-            contenedorResultados.innerHTML = "";
-            seccionResultados.classList.remove('hidden');
-            contenidoPrincipal.classList.add('opacity-20');
-            data.results.forEach(peli => { contenedorResultados.appendChild(crearCard(peli)); });
-        } else {
-            seccionResultados.classList.add('hidden');
-            contenidoPrincipal.classList.remove('opacity-20');
-        }
-    });
 
     cargarSeccion(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=es-ES`, 'tendencias');
     cargarSeccion(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28&language=es-ES`, 'accion');
