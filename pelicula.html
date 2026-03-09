@@ -54,10 +54,6 @@
             </div>
             
             <div class="flex-1 relative z-10 min-w-0">
-                <div id="badget-premios" class="hidden mb-4 inline-flex items-center gap-2.5 bg-yellow-600/20 border border-yellow-600/50 text-yellow-500 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-lg">
-                    ⭐ Recomendada por MovieM
-                </div>
-                
                 <h1 id="titulo" class="text-5xl md:text-7xl font-black mb-4 italic tracking-tighter uppercase leading-none text-white truncate">Cargando...</h1>
                 <div id="tituloSkeleton" class="h-16 w-3/4 skeleton rounded-xl mb-4"></div>
                 
@@ -98,7 +94,7 @@
                     <span onclick="setRating(5)" class="star text-4xl">★</span>
                 </div>
                 <textarea id="comentarioTxt" placeholder="¿Qué te pareció la película?" class="w-full bg-zinc-800/50 border-none p-5 rounded-2xl text-white mb-6 h-36 outline-none focus:ring-1 focus:ring-red-600 transition-all"></textarea>
-                <button onclick="publicarComentario()" class="w-full bg-red-600 py-4 rounded-2xl font-black hover:bg-red-700 transition tracking-widest uppercase text-sm">PUBLICAR COMENTARIO</button>
+                <button id="btnPublicar" onclick="publicarComentario()" class="w-full bg-red-600 py-4 rounded-2xl font-black hover:bg-red-700 transition tracking-widest uppercase text-sm">PUBLICAR COMENTARIO</button>
             </div>
             <div>
                 <h3 class="text-2xl font-bold mb-8 flex items-center gap-3">Opiniones de la Comunidad</h3>
@@ -122,10 +118,10 @@
             apiKey: "AIzaSyAn5N7mEhICK2aZG4Nx8DIW9RZd9kK1DA",
             authDomain: "moviem-5b73d.firebaseapp.com",
             projectId: "moviem-5b73d",
+            databaseURL: "https://moviem-5b73d-default-rtdb.firebaseio.com",
             storageBucket: "moviem-5b73d.firebasestorage.app",
             messagingSenderId: "843796138544",
-            appId: "1:843796138544:web:c2bde9b39d437b84d97bf5",
-            measurementId: "G-7FH2FMPYZT"
+            appId: "1:843796138544:web:c2bde9b39d437b84d97bf5"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -137,10 +133,7 @@
         let currentRating = 0;
 
         async function cargarPagina() {
-            if(!movieID) {
-                alert("No se encontró el ID de la película.");
-                return;
-            }
+            if(!movieID) return;
             try {
                 const [pRes, cRes] = await Promise.all([
                     fetch(`https://api.themoviedb.org/3/movie/${movieID}?api_key=${API_KEY}&language=es-ES`),
@@ -170,50 +163,44 @@
                     </div>`).join('');
 
                 cargarComentariosRealtime();
-            } catch (e) { console.error("Error TMDB:", e); }
+            } catch (e) { console.error("Error cargando peli:", e); }
         }
 
         function cargarComentariosRealtime() {
             const q = query(collection(db, "peliculas", movieID, "comentarios"));
-            
             onSnapshot(q, (snapshot) => {
                 const lista = document.getElementById('listaComentarios');
                 lista.innerHTML = "";
-                
                 if (snapshot.empty) {
-                    lista.innerHTML = `<p class="text-zinc-600 italic">Nadie comentó todavía. ¡Sé el primero!</p>`;
+                    lista.innerHTML = `<p class="text-zinc-600 italic">No hay comentarios aún.</p>`;
                     return;
                 }
-
                 let items = [];
-                snapshot.forEach(doc => {
-                    items.push(doc.data());
-                });
-
-                // Ordenamos por fecha manualmente para no depender de índices de Firebase
+                snapshot.forEach(doc => items.push(doc.data()));
                 items.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
-
                 items.forEach(c => {
                     lista.innerHTML += `
-                        <div class="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 fade-in mb-3">
+                        <div class="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 mb-3">
                             <div class="flex justify-between items-center mb-2">
-                                <span class="text-red-600 font-black text-xs uppercase italic">@Invitado</span>
+                                <span class="text-red-600 font-black text-xs italic">@Invitado</span>
                                 <span class="text-yellow-500 text-[10px]">${"★".repeat(c.rating)}</span>
                             </div>
                             <p class="text-zinc-400 text-sm">${c.txt}</p>
                         </div>`;
                 });
-            }, (error) => {
-                console.error("Error Firebase:", error);
-                document.getElementById('listaComentarios').innerHTML = `<p class="text-red-500 text-xs">Error de conexión con la base de datos.</p>`;
-            });
+            }, (err) => console.error("Error Firebase Live:", err));
         }
 
         window.publicarComentario = async () => {
             const txt = document.getElementById('comentarioTxt').value.trim();
             if(!txt || currentRating === 0) return alert("Escribí algo y marcá las estrellas.");
             
+            const btn = document.getElementById('btnPublicar');
+            btn.disabled = true;
+            btn.innerText = "ENVIANDO...";
+
             try {
+                console.log("Intentando guardar comentario...");
                 await addDoc(collection(db, "peliculas", movieID, "comentarios"), {
                     user: "Invitado",
                     txt: txt,
@@ -222,17 +209,20 @@
                 });
                 document.getElementById('comentarioTxt').value = "";
                 setRating(0);
-                // No hace falta alert, aparece solo por el Realtime
+                alert("¡Comentario publicado!");
             } catch (e) { 
-                alert("Error al enviar: " + e.message);
+                console.error("Error detallado:", e);
+                alert("Error al publicar: " + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "PUBLICAR COMENTARIO";
             }
         };
 
         window.setRating = (n) => {
             currentRating = n;
             document.querySelectorAll('.star').forEach((s, i) => {
-                s.classList.toggle('text-yellow-500', i < n);
-                s.classList.toggle('text-zinc-700', i >= n);
+                s.style.color = i < n ? '#eab308' : '#3f3f46';
             });
         };
 
@@ -253,9 +243,7 @@
             if(tr) {
                 document.getElementById('videoContainer').innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${tr.key}?autoplay=1" allowfullscreen></iframe>`;
                 document.getElementById('modalVideo').classList.remove('hidden');
-            } else {
-                alert("No hay tráiler disponible.");
-            }
+            } else alert("Tráiler no disponible.");
         };
 
         window.cerrarTrailer = () => {
