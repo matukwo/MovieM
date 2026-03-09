@@ -153,15 +153,15 @@
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyAn5N7M7EhICK2aZG4Nx8DIW9RZd9kK1DA",
-        authDomain: "moviem-5b73d.firebaseapp.com",
-        projectId: "moviem-5b73d",
-        storageBucket: "moviem-5b73d.firebasestorage.app",
-        messagingSenderId: "843796138544",
-        appId: "1:843796138544:web:c2bde9b39d437b84d97bf5"
-    };
-
+  const firebaseConfig = {
+    apiKey: "AIzaSyAn5N7m7EhICK2aZG4Nx8DIW9RZd9kK1DA",
+    authDomain: "moviem-5b73d.firebaseapp.com",
+    projectId: "moviem-5b73d",
+    storageBucket: "moviem-5b73d.firebasestorage.app",
+    messagingSenderId: "843796138544",
+    appId: "1:843796138544:web:c2bde9b39d437b84d97bf5",
+    measurementId: "G-7FH2FMPYZT"
+  };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -335,3 +335,4 @@
 </script>
 </body>
 </html>
+
