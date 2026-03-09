@@ -2,26 +2,18 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieM | Detalle Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .star { cursor: pointer; transition: color 0.2s ease; }
-        #starRating:hover .star { color: #ca8a04; }
-        #starRating .star:hover ~ .star { color: #3f3f46 !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8);
-        }
-        @keyframes pulse-bg {
-            0% { background-color: rgba(39, 39, 42, 0.5); }
-            50% { background-color: rgba(63, 63, 70, 0.5); }
-            100% { background-color: rgba(39, 39, 42, 0.5); }
-        }
         .skeleton { animation: pulse-bg 1.5s infinite ease-in-out; }
+        @keyframes pulse-bg {
+            0%, 100% { background-color: rgba(39, 39, 42, 0.5); }
+            50% { background-color: rgba(63, 63, 70, 0.5); }
+        }
         .fade-in { animation: fadeIn 0.8s ease forwards; opacity: 0; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         #playerOverlay { display: none; background: #000; position: fixed; inset: 0; z-index: 200; flex-direction: column; }
@@ -50,7 +42,7 @@
         <div class="flex flex-col md:flex-row gap-12 items-start mb-16 relative z-0 fade-in">
             <div class="w-full md:w-80 shrink-0">
                 <div id="posterSkeleton" class="w-full aspect-[2/3] rounded-2xl skeleton"></div>
-                <img id="poster" src="" class="w-full rounded-2xl border border-white/10 shadow-2xl transition-transform hover:scale-[1.02] duration-500 hidden" onload="this.classList.remove('hidden'); document.getElementById('posterSkeleton').remove()">
+                <img id="poster" src="" class="w-full rounded-2xl border border-white/10 shadow-2xl transition-transform hover:scale-[1.02] duration-500 hidden" onload="this.classList.remove('hidden'); document.getElementById('posterSkeleton')?.remove()">
             </div>
             
             <div class="flex-1 relative z-10 min-w-0">
@@ -149,8 +141,8 @@
                 document.getElementById('poster').src = 'https://image.tmdb.org/t/p/w500' + peli.poster_path;
                 document.getElementById('backdrop').style.backgroundImage = `url('https://image.tmdb.org/t/p/original${peli.backdrop_path}')`;
                 
-                if(document.getElementById('tituloSkeleton')) document.getElementById('tituloSkeleton').remove();
-                if(document.getElementById('sinopsisSkeleton')) document.getElementById('sinopsisSkeleton').remove();
+                document.getElementById('tituloSkeleton')?.remove();
+                document.getElementById('sinopsisSkeleton')?.remove();
                 document.getElementById('sinopsis').classList.remove('hidden');
 
                 const dir = credits.crew.find(c => c.job === "Director");
@@ -167,20 +159,22 @@
         }
 
         function cargarComentariosRealtime() {
+            // Consulta simple para evitar problemas de índices en el dominio de Workers
             const q = query(collection(db, "peliculas", movieID, "comentarios"));
             onSnapshot(q, (snapshot) => {
                 const lista = document.getElementById('listaComentarios');
                 lista.innerHTML = "";
                 if (snapshot.empty) {
-                    lista.innerHTML = `<p class="text-zinc-600 italic">No hay comentarios aún.</p>`;
+                    lista.innerHTML = `<p class="text-zinc-600 italic">Sé el primero en comentar.</p>`;
                     return;
                 }
                 let items = [];
                 snapshot.forEach(doc => items.push(doc.data()));
+                // Ordenamos manualmente por fecha para máxima compatibilidad
                 items.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
                 items.forEach(c => {
                     lista.innerHTML += `
-                        <div class="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 mb-3">
+                        <div class="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 mb-3 fade-in">
                             <div class="flex justify-between items-center mb-2">
                                 <span class="text-red-600 font-black text-xs italic">@Invitado</span>
                                 <span class="text-yellow-500 text-[10px]">${"★".repeat(c.rating)}</span>
@@ -188,7 +182,10 @@
                             <p class="text-zinc-400 text-sm">${c.txt}</p>
                         </div>`;
                 });
-            }, (err) => console.error("Error Firebase Live:", err));
+            }, (err) => {
+                console.error("Error Firebase Live:", err);
+                document.getElementById('listaComentarios').innerHTML = `<p class="text-red-500 text-xs italic">Error de conexión. Revisa la consola (F12).</p>`;
+            });
         }
 
         window.publicarComentario = async () => {
@@ -200,7 +197,6 @@
             btn.innerText = "ENVIANDO...";
 
             try {
-                console.log("Intentando guardar comentario...");
                 await addDoc(collection(db, "peliculas", movieID, "comentarios"), {
                     user: "Invitado",
                     txt: txt,
@@ -209,10 +205,10 @@
                 });
                 document.getElementById('comentarioTxt').value = "";
                 setRating(0);
-                alert("¡Comentario publicado!");
+                alert("¡Comentario enviado!");
             } catch (e) { 
-                console.error("Error detallado:", e);
-                alert("Error al publicar: " + e.message);
+                console.error("Error al guardar:", e);
+                alert("Fallo el envío. Asegúrate de habilitar la API en Google Cloud y autorizar el dominio workers.dev.");
             } finally {
                 btn.disabled = false;
                 btn.innerText = "PUBLICAR COMENTARIO";
