@@ -10,13 +10,18 @@ import {
     doc, 
     getDoc, 
     setDoc, 
-    updateDoc, // Añadido para actualizar bios
+    updateDoc, 
     arrayUnion, 
     arrayRemove 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// IMPORTANTE: Añadimos el módulo de Autenticación
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { 
+    getAuth, 
+    onAuthStateChanged, 
+    signOut,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAn5N7m7EhICK2aZG4Nx8DIW9RZd9kK1DA",
@@ -28,25 +33,35 @@ const firebaseConfig = {
     measurementId: "G-7FH2FMPYZT"
 };
 
+// Inicialización
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app); // Inicializamos Auth
+const auth = getAuth(app);
 
-// Exportamos al objeto window para compatibilidad con tus scripts actuales
+// --- EXPOSICIÓN GLOBAL (El "Puente" para tus otros HTML) ---
+
+// Auth
+window.auth = auth;
+window.onAuthStateChanged = onAuthStateChanged;
+window.signOut = signOut;
+window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+
+// Firestore
 window.db = db;
-window.auth = auth; // Ahora el perfil podrá ver quién está conectado
+window.doc = doc;
+window.getDoc = getDoc;
+window.setDoc = setDoc;
 window.addDoc = addDoc;
+window.updateDoc = updateDoc;
 window.collection = collection;
 window.query = query;
 window.where = where;
 window.orderBy = orderBy;
 window.onSnapshot = onSnapshot;
-window.doc = doc;
-window.getDoc = getDoc;
-window.setDoc = setDoc;
-window.updateDoc = updateDoc;
 window.arrayUnion = arrayUnion;
 window.arrayRemove = arrayRemove;
 
-// Exportación para scripts de tipo 'module'
+console.log("🔥 Firebase: Sistema Global Activado");
+
 export { app, db, auth };
