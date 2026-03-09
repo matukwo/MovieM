@@ -65,11 +65,14 @@
         <div class="flex-1 min-w-0 fade-in">
             <div id="playerBox" class="mb-4">
                 <div id="overlay">
-                    <svg class="spin w-10 h-10 text-accent mb-4" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                    </svg>
-                    <p id="overlayTxt" class="text-zinc-400 text-sm font-bold uppercase tracking-widest">Conectando...</p>
+                    <div id="overlaySpinner">
+                        <svg class="spin w-10 h-10 text-accent mb-4" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                        </svg>
+                        <p id="overlayTxt" class="text-zinc-400 text-sm font-bold uppercase tracking-widest">Conectando...</p>
+                    </div>
+                    <div id="overlayNoEmbed" class="hidden flex-col items-center justify-center text-center px-6"></div>
                 </div>
                 <iframe id="ytFrame" allow="autoplay; encrypted-media; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe>
             </div>
@@ -138,22 +141,46 @@ var saved = localStorage.getItem('movieM_color');
 if (saved) document.documentElement.style.setProperty('--accent-color', saved);
 
 var CANALES = [
-    { id:'tn',       nombre:'TN · Todo Noticias', logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Todo_Noticias_2016.svg/300px-Todo_Noticias_2016.svg.png',                                                                           categoria:'Noticias',       ytId:'UCba3hpU7EFBSk817y9qZkiA' },
-    { id:'c5n',      nombre:'C5N',                logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/C5N_logo_2015.svg/300px-C5N_logo_2015.svg.png',                                                                                      categoria:'Noticias',       ytId:'UCFgk2Q2mVO1BklRQhSv6p0w' },
-    { id:'cronica',  nombre:'Crónica TV',          logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Cr%C3%B3nica_TV_logo_2017.svg/300px-Cr%C3%B3nica_TV_logo_2017.svg.png',                                                             categoria:'Noticias',       ytId:'UCpMq9_BtSwFBIJxAdgJAIjQ' },
-    { id:'canal26',  nombre:'Canal 26',            logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Canal_26_Logo_2023.png/300px-Canal_26_Logo_2023.png',                                                                                categoria:'Noticias',       ytId:'UCrpMfcQNog595v5gAS-oUsQ' },
-    { id:'a24',      nombre:'A24',                 logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/A24_television_argentina_logo.svg/300px-A24_television_argentina_logo.svg.png',                                                      categoria:'Noticias',       ytId:'UCcpnN-HVGKMPiXHnmLGKt_Q' },
-    { id:'lnmas',    nombre:'LN+',                 logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/LN%2B_logo.svg/300px-LN%2B_logo.svg.png',                                                                                           categoria:'Noticias',       ytId:'UCCifSIBrAAg7Bh7AXvEhzgA' },
-    { id:'eltrece',  nombre:'El Trece',            logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Logo_El_Trece_2019.svg/300px-Logo_El_Trece_2019.svg.png',                                                                           categoria:'Entretenimiento',ytId:'UC8LQiFBCHlpwzKdM8yGEuZQ' },
-    { id:'america',  nombre:'América TV',          logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Am%C3%A9rica_TV_logo_2019.svg/300px-Am%C3%A9rica_TV_logo_2019.svg.png',                                                             categoria:'Entretenimiento',ytId:'UCHnyfMqiRRG1u-2MsSQLbXA' },
-    { id:'tvpublica',nombre:'TV Pública',          logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Televisi%C3%B3n_P%C3%BAblica_Argentina_-_Logo_2021.svg/200px-Televisi%C3%B3n_P%C3%BAblica_Argentina_-_Logo_2021.svg.png',           categoria:'General',        ytId:'UCD8bmPdWUEOWFhMaQlSfqEw' },
-    { id:'nettv',    nombre:'Net TV',              logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Logo_Net_TV.png/300px-Logo_Net_TV.png',                                                                                              categoria:'Entretenimiento',ytId:'UCpqHygxQDdxTCWQHK03TuOQ' },
+    { id:'tn',       nombre:'TN · Todo Noticias', ytHandle:'todonoticias',
+      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Todo_Noticias_2016.svg/300px-Todo_Noticias_2016.svg.png',
+      categoria:'Noticias',        videoId:'cb12KmMMDJA' },
+    { id:'c5n',      nombre:'C5N',                ytHandle:'c5n',
+      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/C5N_logo_2015.svg/300px-C5N_logo_2015.svg.png',
+      categoria:'Noticias',        videoId:'1fC0B2UhSx4' },
+    { id:'cronica',  nombre:'Crónica TV',          ytHandle:'cronicatv',
+      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Cr%C3%B3nica_TV_logo_2017.svg/300px-Cr%C3%B3nica_TV_logo_2017.svg.png',
+      categoria:'Noticias',        videoId:'Vy5O-dxSaXY' },
+    { id:'a24',      nombre:'A24',                 ytHandle:'a24noticias',
+      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/A24_television_argentina_logo.svg/300px-A24_television_argentina_logo.svg.png',
+      categoria:'Noticias',        videoId:'6Nx-R3KND0Y' },
+    { id:'lnmas',    nombre:'LN+',                 ytHandle:'lanacion',
+      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/LN%2B_logo.svg/300px-LN%2B_logo.svg.png',
+      categoria:'Noticias',        videoId:'Y30dM3oT9_s' },
+    { id:'canal26',  nombre:'Canal 26',            ytHandle:'canal26argentina',
+      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Canal_26_Logo_2023.png/300px-Canal_26_Logo_2023.png',
+      categoria:'Noticias',        videoId:null },
+    { id:'america',  nombre:'América TV',          ytHandle:'americatv',
+      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Am%C3%A9rica_TV_logo_2019.svg/300px-Am%C3%A9rica_TV_logo_2019.svg.png',
+      categoria:'Entretenimiento', videoId:'s8CJLE7EHSA' },
+    { id:'eltrece',  nombre:'El Trece',            ytHandle:'eltrece',
+      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Logo_El_Trece_2019.svg/300px-Logo_El_Trece_2019.svg.png',
+      categoria:'Entretenimiento', videoId:null },
+    { id:'tvpublica',nombre:'TV Pública',          ytHandle:'tvpublicaargentina',
+      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Televisi%C3%B3n_P%C3%BAblica_Argentina_-_Logo_2021.svg/200px-Televisi%C3%B3n_P%C3%BAblica_Argentina_-_Logo_2021.svg.png',
+      categoria:'General',         videoId:'MPJuR6z7kpI' },
+    { id:'nettv',    nombre:'Net TV',              ytHandle:'nettvargentina',
+      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Logo_Net_TV.png/300px-Logo_Net_TV.png',
+      categoria:'Entretenimiento', videoId:null },
 ];
 
 var canalActual = null;
 
 function showOverlay(txt) {
-    document.getElementById('overlayTxt').innerText = txt || 'Conectando...';
+    // Modo spinner
+    document.getElementById('overlaySpinner').style.display = '';
+    document.getElementById('overlayNoEmbed').classList.add('hidden');
+    document.getElementById('overlayNoEmbed').classList.remove('flex');
+    if (txt) document.getElementById('overlayTxt').innerText = txt;
     document.getElementById('overlay').classList.remove('oculto');
 }
 function hideOverlay() {
@@ -171,18 +198,32 @@ function cargarCanal(canal) {
         el.classList.toggle('activo', el.dataset.id === canal.id);
     });
 
-    showOverlay('Conectando con ' + canal.nombre + '...');
-
-    var src = 'https://www.youtube.com/embed/live_stream'
-        + '?channel=' + canal.ytId
-        + '&autoplay=1&rel=0&modestbranding=1';
-
     var frame = document.getElementById('ytFrame');
     frame.src = 'about:blank';
-    setTimeout(function() {
-        frame.src = src;
-        frame.onload = function() { setTimeout(hideOverlay, 900); };
-    }, 100);
+
+    // Usar el video ID del live permanente del canal
+    if (canal.videoId) {
+        showOverlay('Conectando con ' + canal.nombre + '...');
+        var src = 'https://www.youtube-nocookie.com/embed/' + canal.videoId
+            + '?autoplay=1&rel=0&modestbranding=1&controls=1';
+        setTimeout(function() {
+            frame.src = src;
+            frame.onload = function() { setTimeout(hideOverlay, 900); };
+        }, 120);
+    } else {
+        // Sin videoId: mostrar overlay con botón directo a YouTube
+        document.getElementById('overlaySpinner').style.display = 'none';
+        var noEmbed = document.getElementById('overlayNoEmbed');
+        noEmbed.innerHTML =
+            '<svg class="w-12 h-12 text-zinc-700 mb-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a2.994 2.994 0 00-2.107-2.117C19.379 3.5 12 3.5 12 3.5s-7.379 0-9.391.569A2.994 2.994 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a2.994 2.994 0 002.107 2.117C4.621 20.5 12 20.5 12 20.5s7.379 0 9.391-.569a2.994 2.994 0 002.107-2.117C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>'
+            + '<p class="text-zinc-400 text-sm mb-5 text-center">Este canal no permite embed.<br>Tocá el botón para verlo en vivo en YouTube.</p>'
+            + '<a href="https://www.youtube.com/@' + (canal.ytHandle||'') + '/live" target="_blank" '
+            + '   class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full font-black text-xs uppercase tracking-widest transition">'
+            + '   Ver en YouTube ↗</a>';
+        noEmbed.classList.remove('hidden');
+        noEmbed.classList.add('flex');
+        document.getElementById('overlay').classList.remove('oculto');
+    }
 }
 
 function fullscreen() {
