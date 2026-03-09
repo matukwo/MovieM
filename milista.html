@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>MovieM | Mi Lista</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="firebase-config.js"></script>
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -26,7 +27,7 @@
     <main class="container mx-auto px-8 pt-32 pb-20">
         <header class="mb-12 fade-in">
             <h2 class="text-4xl font-black italic uppercase tracking-tighter mb-2">Mi Lista</h2>
-            <p class="text-zinc-500 font-medium">Películas que guardaste para ver después.</p>
+            <p id="subtituloUsuario" class="text-zinc-500 font-medium">Películas que guardaste para ver después.</p>
         </header>
 
         <div id="contenedorMiLista" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 fade-in" style="animation-delay: 0.2s">
@@ -42,37 +43,48 @@
         </div>
     </main>
 
-    <script>
+    <script type="module">
         const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
 
         async function cargarMiLista() {
             const contenedor = document.getElementById('contenedorMiLista');
             const emptyState = document.getElementById('listaVacia');
-            
-            // 1. Obtener todas las claves de localStorage que empiecen con 'watchlist_'
-            const ids = Object.keys(localStorage)
-                .filter(key => key.startsWith('watchlist_'))
-                .map(key => key.replace('watchlist_', ''));
+            const userActual = localStorage.getItem('usuarioMovieM');
 
-            if (ids.length === 0) {
+            if (!userActual) {
+                document.getElementById('subtituloUsuario').innerText = "Inicia sesión para ver tu lista personalizada.";
                 emptyState.classList.remove('hidden');
                 return;
             }
 
-            // 2. Traer los detalles de cada película guardada
+            document.getElementById('subtituloUsuario').innerText = `Hola ${userActual}, estas son tus películas guardadas.`;
+
             try {
+                // 1. Obtener el documento del usuario desde Firebase
+                const userRef = window.doc(window.db, "usuarios", userActual);
+                const userDoc = await window.getDoc(userRef);
+
+                if (!userDoc.exists() || !userDoc.data().watchlist || userDoc.data().watchlist.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                const ids = userDoc.data().watchlist;
+
+                // 2. Traer los detalles de cada película desde la API de TMDB
                 const promesas = ids.map(id => 
                     fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=es-ES`).then(res => res.json())
                 );
                 
                 const peliculas = await Promise.all(promesas);
 
+                // 3. Renderizar las películas
                 contenedor.innerHTML = peliculas.map(p => `
                     <div onclick="window.location.href='pelicula.html?id=${p.id}'" class="group cursor-pointer">
                         <div class="relative aspect-[2/3] overflow-hidden rounded-2xl border border-white/5 group-hover:border-red-600 transition-all duration-500 shadow-2xl">
                             <img src="https://image.tmdb.org/t/p/w500${p.poster_path}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-                                <span class="text-yellow-500 text-xs font-bold">⭐ ${p.vote_average.toFixed(1)}</span>
+                                <span class="text-yellow-500 text-xs font-bold">⭐ ${p.vote_average ? p.vote_average.toFixed(1) : '0.0'}</span>
                             </div>
                         </div>
                         <h4 class="mt-3 text-sm font-bold truncate uppercase tracking-tighter group-hover:text-red-500 transition">${p.title}</h4>
@@ -81,10 +93,11 @@
                 `).join('');
 
             } catch (error) {
-                console.error("Error cargando la lista:", error);
+                console.error("Error cargando la lista desde Firebase:", error);
             }
         }
 
+        // Ejecutar al cargar la página
         cargarMiLista();
     </script>
 </body>
