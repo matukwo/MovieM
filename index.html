@@ -97,12 +97,6 @@
                 </div>
                 <p class="text-zinc-200 font-black uppercase tracking-tighter text-lg mb-1" id="saludoUsuario">Hola</p>
                 
-                <div class="mt-4 flex flex-col gap-2" id="contenedorBotonesPerfil">
-                    <button onclick="window.location.href='perfil.html'" class="w-full py-3 rounded-xl bg-zinc-800 text-[10px] font-bold uppercase tracking-widest text-white hover:bg-accent transition">
-                        Ver mi perfil
-                    </button>
-                </div>
-
                 <div class="mt-6 space-y-4 text-left border-t border-white/5 pt-4">
                     <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">Color de Acento</p>
                     <div class="flex gap-3 justify-center">
@@ -163,7 +157,9 @@
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
         toast.className = `flex items-center gap-3 bg-zinc-900 border border-white/10 px-6 py-4 rounded-2xl shadow-2xl translate-x-10 opacity-0 transition-all duration-500 border-l-4 ${tipo === 'success' ? 'border-l-green-500' : 'border-l-red-600'}`;
-        toast.innerHTML = `<span class="text-xs font-bold uppercase tracking-widest">${mensaje}</span>`;
+        toast.innerHTML = `
+            <span class="text-xs font-bold uppercase tracking-widest">${mensaje}</span>
+        `;
         container.appendChild(toast);
         setTimeout(() => { toast.classList.remove('translate-x-10', 'opacity-0'); }, 100);
         setTimeout(() => { 
@@ -240,6 +236,7 @@
         setTimeout(() => location.reload(), 1000);
     }
 
+    // --- CARGA DE DATOS (MANTENIDO) ---
     function crearCard(peli) {
         const puntaje = peli.vote_average ? peli.vote_average.toFixed(1) : 'S/R';
         const card = document.createElement('div');
