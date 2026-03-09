@@ -82,6 +82,15 @@
                 <div class="flex flex-wrap items-center gap-4">
                     <button onclick="verPelicula()" class="bg-red-600 text-white px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-700 transition-all shadow-xl shadow-red-600/20 active:scale-95 tracking-tight uppercase">VER PELÍCULA</button>
                     <button onclick="abrirTrailer()" class="bg-white text-black px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-600 hover:text-white transition-all shadow-xl active:scale-95 tracking-tight">VER TRÁILER</button>
+                    
+                    <div class="flex gap-3 relative z-20">
+                        <button id="btnWatchlist" onclick="toggleWatchlist()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition shadow-lg">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+                        </button>
+                        <button id="btnLike" onclick="toggleLike()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-red-500 transition shadow-lg">
+                            <svg id="svgLike" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78v0z"></path></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -104,7 +113,7 @@
                     <span onclick="setRating(5)" class="star text-4xl">★</span>
                 </div>
                 <textarea id="comentarioTxt" placeholder="¿Qué te pareció la película?" class="w-full bg-zinc-800/50 border-none p-5 rounded-2xl text-white mb-6 h-36 outline-none focus:ring-1 focus:ring-red-600 transition-all"></textarea>
-                <button onclick="publicarComentario()" class="w-full bg-red-600 py-4 rounded-2xl font-black hover:bg-red-700 transition tracking-widest uppercase text-sm">PUBLICAR</button>
+                <button onclick="publicarComentario()" class="w-full bg-red-600 py-4 rounded-2xl font-black hover:bg-red-700 transition tracking-widest uppercase text-sm">PUBLICAR EN MOVIEM</button>
             </div>
             <div>
                 <h3 class="text-2xl font-bold mb-8 flex items-center gap-3">Opiniones de la Comunidad</h3>
@@ -112,6 +121,22 @@
             </div>
         </section>
     </main>
+
+    <div id="modalActor" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-6">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-md" onclick="cerrarActor()"></div>
+        <div class="relative glass-card px-10 py-10 rounded-[45px] max-w-4xl w-full max-h-[90vh] overflow-y-auto no-scrollbar">
+            <button onclick="cerrarActor()" class="absolute top-8 right-10 text-white/30 hover:text-white transition-all text-2xl z-20">✕</button>
+            <div id="modalActorContent" class="flex flex-col md:flex-row gap-10 items-start relative z-10">
+                <img id="actorFoto" src="" class="w-48 h-auto object-cover rounded-[30px] shrink-0">
+                <div class="flex-1 w-full min-w-0">
+                    <h2 id="actorNombre" class="text-4xl font-black mb-4 italic tracking-tighter uppercase text-white truncate"></h2>
+                    <p id="actorInfo" class="text-zinc-300 text-sm leading-relaxed mb-6"></p>
+                    <h4 class="text-[10px] font-bold uppercase tracking-widest text-red-500 mb-4">Filmografía Destacada</h4>
+                    <div id="actorPelisContenedor" class="flex gap-4 overflow-x-auto no-scrollbar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="modalVideo" class="fixed inset-0 bg-black/95 z-[100] hidden flex items-center justify-center p-4">
         <button onclick="cerrarTrailer()" class="absolute top-8 right-8 text-white text-4xl hover:text-red-600 transition">✕</button>
@@ -122,6 +147,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
         import { getFirestore, collection, addDoc, query, onSnapshot, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
 
+        // CONFIGURACIÓN DE TUS CAPTURAS
         const firebaseConfig = {
             apiKey: "AIzaSyAn5N7mEhICK2aZG4Nx8DIW9RZd9kK1DA",
             authDomain: "moviem-5b73d.firebaseapp.com",
@@ -152,7 +178,7 @@
 
                 document.getElementById('titulo').innerText = peli.title;
                 document.getElementById('sinopsis').innerText = peli.overview || "Sin descripción.";
-                document.getElementById('anio').innerText = peli.release_date?.split('-')[0] || "";
+                document.getElementById('anio').innerText = peli.release_date?.split('-')[0] || "S/F";
                 document.getElementById('voto').innerText = peli.vote_average.toFixed(1);
                 document.getElementById('poster').src = 'https://image.tmdb.org/t/p/w500' + peli.poster_path;
                 document.getElementById('backdrop').style.backgroundImage = `url('https://image.tmdb.org/t/p/original${peli.backdrop_path}')`;
@@ -161,21 +187,30 @@
                 document.getElementById('sinopsisSkeleton').remove();
                 document.getElementById('sinopsis').classList.remove('hidden');
 
-                document.getElementById('reparto').innerHTML = credits.cast.slice(0, 10).map(actor => `
-                    <div class="min-w-[110px] text-center">
-                        <img src="https://image.tmdb.org/t/p/w200${actor.profile_path}" class="w-20 h-20 mx-auto rounded-full object-cover mb-2 border border-zinc-800">
-                        <p class="text-[10px] font-bold uppercase truncate">${actor.name}</p>
+                const dir = credits.crew.find(c => c.job === "Director");
+                if(dir) document.getElementById('director').innerText = `Director: ${dir.name}`;
+
+                document.getElementById('reparto').innerHTML = credits.cast.slice(0, 15).map(actor => `
+                    <div onclick="verActor(${actor.id})" class="min-w-[110px] text-center cursor-pointer shrink-0">
+                        <img src="${actor.profile_path ? 'https://image.tmdb.org/t/p/w200'+actor.profile_path : 'https://via.placeholder.com/200'}" class="w-20 h-20 mx-auto rounded-full object-cover mb-2 border border-zinc-800">
+                        <p class="text-[10px] font-bold uppercase truncate px-1">${actor.name}</p>
                     </div>`).join('');
 
                 cargarComentariosRealtime();
+                checkStatus();
             } catch (e) { console.error(e); }
         }
 
         function cargarComentariosRealtime() {
+            // Nota: Si esto falla, recuerda habilitar el índice en la consola F12
             const q = query(collection(db, "peliculas", movieID, "comentarios"), orderBy("timestamp", "desc"));
             onSnapshot(q, (snapshot) => {
                 const lista = document.getElementById('listaComentarios');
                 lista.innerHTML = "";
+                if (snapshot.empty) {
+                    lista.innerHTML = `<p class="text-zinc-600 text-sm italic text-center">No hay comentarios todavía.</p>`;
+                    return;
+                }
                 snapshot.forEach(doc => {
                     const c = doc.data();
                     lista.innerHTML += `
@@ -202,7 +237,10 @@
                 });
                 document.getElementById('comentarioTxt').value = "";
                 setRating(0);
-            } catch (e) { alert("Error al guardar."); }
+            } catch (e) { 
+                console.error(e);
+                alert("Error al guardar en Firebase."); 
+            }
         };
 
         window.setRating = (n) => {
@@ -213,16 +251,34 @@
             });
         };
 
+        window.verActor = async (id) => {
+            const [resBio, resPelis] = await Promise.all([
+                fetch(`https://api.themoviedb.org/3/person/${id}?api_key=${API_KEY}&language=es-ES`),
+                fetch(`https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=${API_KEY}&language=es-ES`)
+            ]);
+            const actor = await resBio.json();
+            const peliCreds = await resPelis.json();
+            
+            document.getElementById('actorNombre').innerText = actor.name;
+            document.getElementById('actorFoto').src = 'https://image.tmdb.org/t/p/w500' + actor.profile_path;
+            document.getElementById('actorInfo').innerText = actor.biography || "Sin biografía.";
+            document.getElementById('actorPelisContenedor').innerHTML = peliCreds.cast.slice(0, 10).map(p => `
+                <div class="min-w-[80px] cursor-pointer" onclick="window.location.href='pelicula.html?id=${p.id}'">
+                    <img src="https://image.tmdb.org/t/p/w200${p.poster_path}" class="rounded-lg mb-1">
+                </div>
+            `).join('');
+            document.getElementById('modalActor').classList.remove('hidden');
+        };
+
+        window.cerrarActor = () => document.getElementById('modalActor').classList.add('hidden');
         window.verPelicula = () => {
             document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
             document.getElementById('playerOverlay').style.display = 'flex';
         };
-
         window.cerrarPelicula = () => {
             document.getElementById('playerOverlay').style.display = 'none';
             document.getElementById('movieFrame').src = "";
         };
-
         window.abrirTrailer = async () => {
             const res = await fetch(`https://api.themoviedb.org/3/movie/${movieID}/videos?api_key=${API_KEY}`);
             const data = await res.json();
@@ -232,11 +288,37 @@
                 document.getElementById('modalVideo').classList.remove('hidden');
             }
         };
-
         window.cerrarTrailer = () => {
             document.getElementById('modalVideo').classList.add('hidden');
             document.getElementById('videoContainer').innerHTML = "";
         };
+
+        window.toggleWatchlist = () => {
+            const key = `watchlist_${movieID}`;
+            localStorage.getItem(key) ? localStorage.removeItem(key) : localStorage.setItem(key, 'true');
+            checkStatus();
+        };
+
+        window.toggleLike = () => {
+            const key = `like_${movieID}`;
+            localStorage.getItem(key) ? localStorage.removeItem(key) : localStorage.setItem(key, 'true');
+            checkStatus();
+        };
+
+        function checkStatus() {
+            const wBtn = document.getElementById('btnWatchlist');
+            const lBtn = document.getElementById('btnLike');
+            if(localStorage.getItem(`watchlist_${movieID}`)) {
+                wBtn.classList.add('bg-zinc-100', 'text-black');
+            } else {
+                wBtn.classList.remove('bg-zinc-100', 'text-black');
+            }
+            if(localStorage.getItem(`like_${movieID}`)) {
+                lBtn.classList.add('bg-red-600', 'text-white');
+            } else {
+                lBtn.classList.remove('bg-red-600', 'text-white');
+            }
+        }
 
         cargarPagina();
     </script>
