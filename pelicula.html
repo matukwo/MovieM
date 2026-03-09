@@ -129,12 +129,20 @@
     </div>
 
     <!-- Reparto -->
-    <section class="mb-12 md:mb-20 fade-in" style="animation-delay:.2s">
+    <section class="mb-12 md:mb-20 fade-in group/reparto" style="animation-delay:.2s">
         <h3 class="text-xs md:text-sm font-black uppercase tracking-widest mb-4 md:mb-8 text-zinc-400 flex items-center gap-3">
             Reparto Principal <div class="h-px flex-1 bg-zinc-800/50"></div>
         </h3>
-        <div id="reparto" class="flex gap-5 md:gap-8 overflow-x-auto no-scrollbar pb-4 scroll-smooth">
-            <div class="min-w-[80px] skeleton h-20 rounded-full"></div>
+        <div class="relative">
+            <button onclick="document.getElementById('reparto').scrollBy({left:-320,behavior:'smooth'})" class="absolute left-0 top-1/2 -translate-y-6 z-20 bg-black/80 p-2.5 rounded-full hidden md:group-hover/reparto:flex border border-white/10 hover:bg-red-600 transition shadow-xl">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <div id="reparto" class="flex gap-5 md:gap-8 overflow-x-auto no-scrollbar pb-4 scroll-smooth px-2">
+                <div class="min-w-[80px] skeleton h-20 rounded-full"></div>
+            </div>
+            <button onclick="document.getElementById('reparto').scrollBy({left:320,behavior:'smooth'})" class="absolute right-0 top-1/2 -translate-y-6 z-20 bg-black/80 p-2.5 rounded-full hidden md:group-hover/reparto:flex border border-white/10 hover:bg-red-600 transition shadow-xl">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg>
+            </button>
         </div>
     </section>
 
@@ -243,12 +251,15 @@
         }
 
         // --- HUD DE USUARIO + captura UID ---
+        // Cargar el UID real del usuario logueado lo antes posible
+        window.onAuthStateChanged(window.auth, function(user) {
+            if (user) {
+                miUID_pelicula = user.uid;
+                checkStatus(); // re-check con UID real
+            }
+        });
+
         function actualizarHUD() {
-            window.onAuthStateChanged(window.auth, function(user) {
-                if (user) {
-                    miUID_pelicula = user.uid;
-                }
-            });
             const userActual = localStorage.getItem('usuarioMovieM');
             const hud = document.getElementById('userHUD');
             if (userActual && userActual !== 'undefined') {
@@ -360,13 +371,12 @@
             }
         };
 
-        // --- SISTEMAS DE INTERACCIÓN (CORREGIDO) ---
+        // --- SISTEMAS DE INTERACCIÓN ---
         async function checkStatus() {
-            const userActual = localStorage.getItem('usuarioMovieM');
-            if (!userActual || userActual === 'undefined') return;
+            if (!miUID_pelicula) return; // esperar a que onAuthStateChanged entregue el UID
 
             try {
-                const userRef = window.doc(window.db, "usuarios", userActual);
+                const userRef = window.doc(window.db, "usuarios", miUID_pelicula);
                 const userDoc = await window.getDoc(userRef);
                 
                 if (userDoc.exists()) {
@@ -386,13 +396,10 @@
         }
 
         window.toggleWatchlist = async () => {
-            const userActual = localStorage.getItem('usuarioMovieM');
-            if (!userActual || userActual === 'undefined') {
-                return alert("Debes iniciar sesión para guardar películas.");
-            }
+            if (!miUID_pelicula) return alert("Debes iniciar sesión para guardar películas.");
 
             const btn = document.getElementById('btnWatchlist');
-            const userRef = window.doc(window.db, "usuarios", userActual);
+            const userRef = window.doc(window.db, "usuarios", miUID_pelicula);
             const isSaved = btn.classList.contains('bg-zinc-100');
 
             try {
@@ -411,13 +418,10 @@
         };
 
         window.toggleLike = async () => {
-            const userActual = localStorage.getItem('usuarioMovieM');
-            if (!userActual || userActual === 'undefined') {
-                return alert("Debes iniciar sesión para dar like.");
-            }
+            if (!miUID_pelicula) return alert("Debes iniciar sesión para dar like.");
 
             const btn = document.getElementById('btnLike');
-            const userRef = window.doc(window.db, "usuarios", userActual);
+            const userRef = window.doc(window.db, "usuarios", miUID_pelicula);
             const isLiked = btn.classList.contains('bg-red-600');
 
             try {
