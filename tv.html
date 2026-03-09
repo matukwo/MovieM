@@ -149,8 +149,27 @@ var saved = localStorage.getItem('movieM_color');
 if (saved) document.documentElement.style.setProperty('--accent-color', saved);
 
 // ─── CANALES ─────────────────────────────────────────────────────────────────
-// Streams HLS públicos de iptv-org y fuentes abiertas
-var CANALES = [{"nombre":"El Nueve","logo":"https://files.catbox.moe/k3fp5s.png","cat":"General","pais":"🇦🇷","stream":"http://107.152.39.199:8030/hls/canal7.m3u8"}];
+var CANALES = [
+    {"nombre":"El Nueve","logo":"https://files.catbox.moe/k3fp5s.png","cat":"General","pais":"🇦🇷","stream":"http://107.152.39.199:8030/hls/canal7.m3u8"},
+    {"nombre":"TV Pública","logo":"https://files.catbox.moe/3yz8zs.png","cat":"General","pais":"🇦🇷","stream":"https://g5.vxral-hor.transport.edge-access.net/b16/ngrp:c7_vivo01_dai_source-20001_all/playlist.m3u8"},
+    {"nombre":"El Trece","logo":"https://files.catbox.moe/finwuj.png","cat":"General","pais":"🇦🇷","stream":"https://livetrx01.vodgc.net/eltrecetv/index.m3u8"},
+    {"nombre":"Telefe","logo":"https://upload.wikimedia.org/wikipedia/commons/c/cc/Telefe_%28nuevo_logo%29.png","cat":"General","pais":"🇦🇷","stream":"https://telefeappmitelefe1.akamaized.net/hls/live/2037985/appmitelefe/TOK/master.m3u8"},
+    {"nombre":"América TV","logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Logotipo_de_America_TV.svg/1933px-Logotipo_de_America_TV.svg.png","cat":"General","pais":"🇦🇷","stream":"https://prepublish.f.qaotic.net/a07/americahls-100056/playlist_720p.m3u8"},
+    {"nombre":"TN","logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/TN_todo_noticias_logo.svg/2560px-TN_todo_noticias_logo.svg.png","cat":"Noticias","pais":"🇦🇷","stream":"https://live-01-01-tn.vodgc.net/TN24/index_TN24_1080.m3u8"},
+    {"nombre":"Canal 26","logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Canal_26_logo_%282022%29.svg/2048px-Canal_26_logo_%282022%29.svg.png","cat":"Noticias","pais":"🇦🇷","stream":"https://stream-gtlc.telecentro.net.ar/hls/canal26hls/main.m3u8"},
+    {"nombre":"A24","logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/A24_%282025%29.svg/2560px-A24_%282025%29.svg.png","cat":"Noticias","pais":"🇦🇷","stream":"https://g5.vxral-slo.transport.edge-access.net/a12/ngrp:a24-100056_all/playlist.m3u8?sense=true"},
+    {"nombre":"Crónica TV","logo":"https://upload.wikimedia.org/wikipedia/commons/f/fb/Cr%C3%B3nica_TV_logotipo_%282016%29.png","cat":"Noticias","pais":"🇦🇷","stream":"https://g5.vxral-slo.transport.edge-access.net/a09/ngrp:cronicatv_video1-100044_all/Playlist.m3u8?sense=true"},
+    {"nombre":"DW","logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Deutsche_Welle_symbol_2012.svg/2560px-Deutsche_Welle_symbol_2012.svg.png","cat":"Internacional","pais":"🌍","stream":"https://dwamdstream104.akamaized.net/hls/live/2015530/dwstream104/master.m3u8"},
+    {"nombre":"France 24 Español","logo":"https://upload.wikimedia.org/wikipedia/commons/8/8a/France24.png","cat":"Internacional","pais":"🌍","stream":"https://live.france24.com/hls/live/2037220-b/F24_ES_HI_HLS/master_5000.m3u8"},
+    {"nombre":"RT en Español","logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Russia-today-logo.svg/2048px-Russia-today-logo.svg.png","cat":"Internacional","pais":"🌍","stream":"https://rt-esp.rttv.com/live/rtesp/playlist.m3u8"}
+];
+
+// ─── PROXIES CORS (reintentos automáticos si el stream directo falla) ─────────
+var CORS_PROXIES = [
+    function(url){ return 'https://corsproxy.io/?' + encodeURIComponent(url); },
+    function(url){ return 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url); },
+    function(url){ return 'https://thingproxy.freeboard.io/fetch/' + url; }
+];
 
 var categorias = [...new Set(CANALES.map(function(c){ return c.cat; }))];
 var catActiva  = 'Todos';
@@ -229,13 +248,9 @@ function showError(canal) {
         '<svg class="w-12 h-12 text-zinc-700 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">'
       + '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>'
       + '</svg>'
-      + '<p class="text-zinc-300 text-sm mb-1 font-bold">Stream no disponible</p>'
-      + '<p class="text-zinc-600 text-xs mb-5 max-w-xs">El canal puede estar offline, fuera de horario, o bloqueado por CORS desde el navegador.</p>';
-    if (canal && canal.backup) {
-        html += '<a href="' + canal.backup + '" target="_blank"'
-              + ' class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full font-black text-xs uppercase tracking-widest transition">'
-              + 'Ver en YouTube ↗</a>';
-    }
+      + '<p class="text-zinc-300 text-sm mb-1 font-bold">Sin señal</p>'
+      + '<p class="text-zinc-600 text-xs mb-5 max-w-xs text-center">El canal está offline o bloqueado por CORS.<br>Se probaron el stream directo y 3 proxies.</p>'
+      + '<button onclick="cargarCanal(canalActual)" class="bg-zinc-800 hover:bg-accent border border-white/10 text-white px-6 py-2.5 rounded-full font-black text-xs uppercase tracking-widest transition">↺ Reintentar</button>';
     document.getElementById('overlayContent').innerHTML = html;
     document.getElementById('playerOverlayBox').classList.remove('oculto');
 }
@@ -244,7 +259,7 @@ function hideOverlay() {
     document.getElementById('playerOverlayBox').classList.add('oculto');
 }
 
-// ─── CARGAR CANAL ─────────────────────────────────────────────────────────────
+// ─── CARGAR CANAL con reintentos via proxy CORS ───────────────────────────────
 function cargarCanal(canal) {
     canalActual = canal;
 
@@ -260,42 +275,60 @@ function cargarCanal(canal) {
         el.classList.toggle('activo', el.dataset.id === canal.id);
     });
 
-    showSpinner('Conectando con ' + canal.nombre + '...');
+    if (!canal.stream) { showError(canal); return; }
 
-    // Destruir HLS anterior
+    // Intentar primero directo, luego cada proxy CORS
+    var intentos = [canal.stream].concat(CORS_PROXIES.map(function(fn){ return fn(canal.stream); }));
+    intentarStream(canal, intentos, 0);
+}
+
+function intentarStream(canal, intentos, idx) {
+    if (idx >= intentos.length) { showError(canal); return; }
+
+    var url = intentos[idx];
+    var intento = idx + 1;
+    var label = idx === 0 ? 'Conectando...' : 'Reintentando vía proxy ' + idx + '...';
+    showSpinner(label);
+
+    // Destruir instancia anterior
     if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
     var video = document.getElementById('hlsVideo');
     video.pause();
     video.removeAttribute('src');
     video.load();
 
-    if (!canal.stream) { showError(canal); return; }
+    function onFail() {
+        // Espera un momento antes del siguiente intento
+        setTimeout(function(){ intentarStream(canal, intentos, idx + 1); }, 800);
+    }
 
-    // HLS.js para Chrome/Firefox/Android
     if (Hls.isSupported()) {
-        hlsInstance = new Hls({ enableWorker:true, lowLatencyMode:true, backBufferLength:30 });
-        hlsInstance.loadSource(canal.stream);
+        hlsInstance = new Hls({
+            enableWorker: true,
+            lowLatencyMode: true,
+            backBufferLength: 30,
+            manifestLoadingTimeOut: 8000,
+            manifestLoadingMaxRetry: 1
+        });
+        hlsInstance.loadSource(url);
         hlsInstance.attachMedia(video);
         hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
             video.play().then(hideOverlay).catch(function(){ hideOverlay(); });
         });
         hlsInstance.on(Hls.Events.ERROR, function(ev, data) {
-            if (data.fatal) { showError(canal); }
+            if (data.fatal) { onFail(); }
         });
-    }
-    // Native HLS para Safari/iOS
-    else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = canal.stream;
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = url;
         video.addEventListener('loadedmetadata', function onMeta() {
             video.removeEventListener('loadedmetadata', onMeta);
             video.play().then(hideOverlay).catch(function(){ hideOverlay(); });
         });
         video.addEventListener('error', function onErr() {
             video.removeEventListener('error', onErr);
-            showError(canal);
+            onFail();
         });
-    }
-    else {
+    } else {
         showError(canal);
     }
 }
