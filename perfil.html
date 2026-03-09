@@ -19,6 +19,24 @@
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden pb-24 md:pb-0">
 
+<!-- Modal: Seguidores / Siguiendo -->
+<div id="modalSeguidos" class="fixed inset-0 z-[400] flex items-end md:items-center justify-center bg-black/80 hidden px-0 md:px-4">
+    <div class="bg-zinc-900 border border-white/10 w-full max-w-sm rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-white/5">
+            <div class="flex gap-1 bg-zinc-800 rounded-full p-1">
+                <button id="tabSeguidores" onclick="cambiarTabSeguidos('seguidores')" class="tab-seg px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all bg-accent text-white">Seguidores</button>
+                <button id="tabSiguiendo" onclick="cambiarTabSeguidos('siguiendo')" class="tab-seg px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all text-zinc-400">Siguiendo</button>
+            </div>
+            <button onclick="cerrarModalSeguidos()" class="text-zinc-500 hover:text-white transition p-1">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div id="listaSeguidos" class="overflow-y-auto no-scrollbar flex-1 p-3 space-y-1">
+            <p class="text-zinc-600 text-xs text-center py-8 italic animate-pulse">Cargando...</p>
+        </div>
+    </div>
+</div>
+
 <!-- Modal: opciones avatar -->
 <div id="modalAvatarOpciones" class="fixed inset-0 z-[300] flex items-end md:items-center justify-center bg-black/90 hidden px-4 pb-4 md:pb-0">
     <div class="bg-zinc-900 border border-white/10 w-full max-w-sm rounded-3xl p-7 shadow-2xl text-center">
@@ -93,14 +111,14 @@
                 <h2 class="text-2xl md:text-4xl font-black uppercase tracking-tighter flex items-center gap-2" id="profileName">...</h2>
                 <!-- Contadores -->
                 <div class="flex gap-5 items-center justify-center sm:justify-start border-t sm:border-t-0 sm:border-l border-white/10 pt-3 sm:pt-0 sm:pl-5">
-                    <div class="text-center">
+                    <button onclick="abrirModalSeguidos('seguidores')" class="text-center hover:opacity-70 active:scale-95 transition-all">
                         <span class="block text-lg md:text-xl font-bold leading-none" id="contSeguidores">0</span>
                         <span class="text-[8px] text-zinc-500 uppercase font-black tracking-widest">Seguidores</span>
-                    </div>
-                    <div class="text-center">
+                    </button>
+                    <button onclick="abrirModalSeguidos('siguiendo')" class="text-center hover:opacity-70 active:scale-95 transition-all">
                         <span class="block text-lg md:text-xl font-bold leading-none" id="contSiguiendo">0</span>
                         <span class="text-[8px] text-zinc-500 uppercase font-black tracking-widest">Siguiendo</span>
-                    </div>
+                    </button>
                 </div>
                 <!-- Botón seguir + te sigue -->
                 <div class="flex items-center gap-2">
@@ -537,6 +555,94 @@
         await guardarDato('color', hex);
     };
     window.cerrarSesion = async function(){ await signOut(auth); location.href='index.html'; };
+
+    // ── Modal Seguidores / Siguiendo ──────────────────────────────
+    var tabActualSeg = 'seguidores';
+
+    window.abrirModalSeguidos = async function(tab) {
+        tabActualSeg = tab || 'seguidores';
+        document.getElementById('modalSeguidos').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        await renderizarListaSeguidos(tabActualSeg);
+    };
+
+    window.cerrarModalSeguidos = function() {
+        document.getElementById('modalSeguidos').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    };
+
+    window.cambiarTabSeguidos = async function(tab) {
+        tabActualSeg = tab;
+        // Actualizar estilos de tabs
+        ['seguidores','siguiendo'].forEach(function(t) {
+            var btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+            if (t === tab) {
+                btn.classList.add('bg-accent','text-white');
+                btn.classList.remove('text-zinc-400');
+            } else {
+                btn.classList.remove('bg-accent','text-white');
+                btn.classList.add('text-zinc-400');
+            }
+        });
+        await renderizarListaSeguidos(tab);
+    };
+
+    async function renderizarListaSeguidos(tab) {
+        var lista = document.getElementById('listaSeguidos');
+        lista.innerHTML = '<p class="text-zinc-600 text-xs text-center py-8 italic animate-pulse">Cargando...</p>';
+
+        try {
+            var snap = await getDoc(doc(db,'usuarios',perfilUID));
+            var data = snap.exists() ? snap.data() : {};
+            var uids = tab === 'seguidores' ? (data.seguidores||[]) : (data.siguiendo||[]);
+
+            if (!uids.length) {
+                lista.innerHTML = '<p class="text-zinc-600 text-xs text-center py-10 italic">'
+                    + (tab === 'seguidores' ? 'Sin seguidores aún.' : 'No sigue a nadie aún.')
+                    + '</p>';
+                return;
+            }
+
+            // Traer datos de cada usuario
+            var usuarios = await Promise.all(uids.map(async function(uid) {
+                try {
+                    var s = await getDoc(doc(db,'usuarios',uid));
+                    return s.exists() ? { uid: uid, ...s.data() } : null;
+                } catch(e) { return null; }
+            }));
+
+            lista.innerHTML = '';
+            usuarios.filter(Boolean).forEach(function(u) {
+                var nombre = u.username || 'Usuario';
+                var letra = nombre.charAt(0).toUpperCase();
+                var avatarHTML = u.avatar
+                    ? '<img src="'+u.avatar+'" class="w-10 h-10 rounded-full object-cover shrink-0 border-2 border-white/10">'
+                    : '<div class="w-10 h-10 rounded-full shrink-0 flex items-center justify-center font-black text-white text-sm border-2 border-white/10" style="background-color:var(--accent)">'+letra+'</div>';
+
+                var div = document.createElement('div');
+                div.className = 'flex items-center gap-3 p-3 rounded-2xl hover:bg-zinc-800 active:bg-zinc-800 cursor-pointer transition-all';
+                div.onclick = function() {
+                    cerrarModalSeguidos();
+                    location.href = 'perfil.html?user=' + encodeURIComponent(nombre);
+                };
+                div.innerHTML = avatarHTML
+                    + '<div class="flex-1 min-w-0">'
+                    + '<p class="font-black text-sm uppercase tracking-tight truncate">'+nombre+'</p>'
+                    + (u.bio ? '<p class="text-zinc-500 text-[10px] truncate italic">'+u.bio+'</p>' : '')
+                    + '</div>'
+                    + '<svg class="w-4 h-4 text-zinc-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>';
+                lista.appendChild(div);
+            });
+
+        } catch(e) {
+            lista.innerHTML = '<p class="text-zinc-600 text-xs text-center py-8 italic">Error al cargar.</p>';
+        }
+    }
+
+    // Cerrar modal al tocar el fondo
+    document.getElementById('modalSeguidos').addEventListener('click', function(e) {
+        if (e.target === this) cerrarModalSeguidos();
+    });
 </script>
 
 <!-- Bottom nav mobile -->
