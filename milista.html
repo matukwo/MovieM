@@ -31,14 +31,14 @@
         </header>
 
         <div id="contenedorMiLista" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 fade-in" style="animation-delay: 0.2s">
-            </div>
+        </div>
 
         <div id="listaVacia" class="hidden flex flex-col items-center justify-center py-20 text-center fade-in">
             <div class="w-20 h-20 bg-zinc-900 rounded-full flex items-center justify-center mb-6 border border-white/5">
                 <svg class="w-8 h-8 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
             </div>
-            <h3 class="text-xl font-bold mb-2">Tu lista está vacía</h3>
-            <p class="text-zinc-500 mb-8">Explora películas y haz clic en el icono de guardar para verlas aquí.</p>
+            <h3 id="mensajeVacioTitulo" class="text-xl font-bold mb-2">Tu lista está vacía</h3>
+            <p id="mensajeVacioDesc" class="text-zinc-500 mb-8">Explora películas y haz clic en el icono de guardar para verlas aquí.</p>
             <button onclick="window.location.href='index.html'" class="bg-white text-black px-8 py-3 rounded-full font-black uppercase text-xs tracking-widest hover:bg-red-600 hover:text-white transition">Explorar Películas</button>
         </div>
     </main>
@@ -49,36 +49,46 @@
         async function cargarMiLista() {
             const contenedor = document.getElementById('contenedorMiLista');
             const emptyState = document.getElementById('listaVacia');
+            const subtitulo = document.getElementById('subtituloUsuario');
             const userActual = localStorage.getItem('usuarioMovieM');
 
+            // 1. Limpieza total inmediata antes de verificar nada
+            contenedor.innerHTML = "";
+            emptyState.classList.add('hidden');
+
+            // 2. Verificar si hay usuario iniciado
             if (!userActual) {
-                document.getElementById('subtituloUsuario').innerText = "Inicia sesión para ver tu lista personalizada.";
+                subtitulo.innerText = "Inicia sesión para ver tu lista personalizada.";
+                document.getElementById('mensajeVacioTitulo').innerText = "No has iniciado sesión";
+                document.getElementById('mensajeVacioDesc').innerText = "Debes ingresar con tu cuenta para ver tus películas guardadas.";
                 emptyState.classList.remove('hidden');
                 return;
             }
 
-            document.getElementById('subtituloUsuario').innerText = `Hola ${userActual}, estas son tus películas guardadas.`;
+            subtitulo.innerText = `Hola ${userActual}, estas son tus películas guardadas.`;
 
             try {
-                // 1. Obtener el documento del usuario desde Firebase
+                // 3. Consultar Firebase
                 const userRef = window.doc(window.db, "usuarios", userActual);
                 const userDoc = await window.getDoc(userRef);
 
                 if (!userDoc.exists() || !userDoc.data().watchlist || userDoc.data().watchlist.length === 0) {
+                    document.getElementById('mensajeVacioTitulo').innerText = "Tu lista está vacía";
+                    document.getElementById('mensajeVacioDesc').innerText = "Explora películas y haz clic en el icono de guardar para verlas aquí.";
                     emptyState.classList.remove('hidden');
                     return;
                 }
 
                 const ids = userDoc.data().watchlist;
 
-                // 2. Traer los detalles de cada película desde la API de TMDB
+                // 4. Obtener datos de TMDB
                 const promesas = ids.map(id => 
                     fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=es-ES`).then(res => res.json())
                 );
                 
                 const peliculas = await Promise.all(promesas);
 
-                // 3. Renderizar las películas
+                // 5. Renderizar
                 contenedor.innerHTML = peliculas.map(p => `
                     <div onclick="window.location.href='pelicula.html?id=${p.id}'" class="group cursor-pointer">
                         <div class="relative aspect-[2/3] overflow-hidden rounded-2xl border border-white/5 group-hover:border-red-600 transition-all duration-500 shadow-2xl">
@@ -93,7 +103,8 @@
                 `).join('');
 
             } catch (error) {
-                console.error("Error cargando la lista desde Firebase:", error);
+                console.error("Error cargando la lista:", error);
+                emptyState.classList.remove('hidden');
             }
         }
 
