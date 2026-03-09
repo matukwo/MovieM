@@ -10,9 +10,13 @@ import {
     doc, 
     getDoc, 
     setDoc, 
+    updateDoc, // Añadido para actualizar bios
     arrayUnion, 
     arrayRemove 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// IMPORTANTE: Añadimos el módulo de Autenticación
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAn5N7m7EhICK2aZG4Nx8DIW9RZd9kK1DA",
@@ -26,19 +30,23 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app); // Inicializamos Auth
 
-// Exportamos todo al objeto window para que pelicula.html pueda usarlo
+// Exportamos al objeto window para compatibilidad con tus scripts actuales
 window.db = db;
+window.auth = auth; // Ahora el perfil podrá ver quién está conectado
 window.addDoc = addDoc;
 window.collection = collection;
 window.query = query;
 window.where = where;
 window.orderBy = orderBy;
 window.onSnapshot = onSnapshot;
-
-// --- NUEVAS FUNCIONES PARA LISTAS PERSONALIZADAS ---
 window.doc = doc;
 window.getDoc = getDoc;
 window.setDoc = setDoc;
+window.updateDoc = updateDoc;
 window.arrayUnion = arrayUnion;
 window.arrayRemove = arrayRemove;
+
+// Exportación para scripts de tipo 'module'
+export { app, db, auth };
