@@ -16,7 +16,9 @@
         .skeleton{animation:pulse-bg 1.5s infinite ease-in-out}
         .fade-in{animation:fadeIn .8s ease forwards;opacity:0}
         @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-        #playerOverlay{display:none;background:#000;position:fixed;inset:0;z-index:200;flex-direction:column}
+        #playerOverlay{display:none;background:#000;position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;z-index:200;flex-direction:column;-webkit-overflow-scrolling:touch}
+        #playerOverlay .player-wrap{position:relative;flex:1;width:100%;overflow:hidden;-webkit-transform:translateZ(0);transform:translateZ(0)}
+        #serieFrame{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
         /* Temporadas tabs */
         .temp-tab{transition:all .2s;border-bottom:2px solid transparent;color:#71717a}
         .temp-tab.active{color:white;border-bottom-color:var(--accent-color,#dc2626)}
@@ -31,16 +33,16 @@
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden">
 
 <!-- Player overlay -->
-<div id="playerOverlay">
-    <div class="w-full flex justify-between items-center p-3 md:p-4 bg-zinc-950 border-b border-white/5">
+<div id="playerOverlay" style="display:none">
+    <div class="w-full flex justify-between items-center p-3 md:p-4 bg-zinc-950 border-b border-white/5" style="flex-shrink:0">
         <div class="flex items-center gap-3">
             <span class="text-red-600 font-black tracking-tighter text-lg md:text-xl">MOVIE<span class="text-white font-light">M</span></span>
             <span id="playerLabel" class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest hidden md:block"></span>
         </div>
         <button onclick="cerrarPlayer()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/5">Cerrar ×</button>
     </div>
-    <div class="flex-1 bg-black">
-        <iframe id="serieFrame" src="" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media; fullscreen; picture-in-picture" playsinline></iframe>
+    <div class="player-wrap bg-black">
+        <iframe id="serieFrame" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" playsinline webkit-playsinline></iframe>
     </div>
 </div>
 
@@ -228,7 +230,7 @@
     let serieData = null;
     let temporadaActiva = 1;
     let miUID_serie = null;
-    let episodiosVistos = new Set(); // Set de strings "serieID-T-E"
+    let episodiosVistos = new Set();
 
     // ── CARGAR PÁGINA ─────────────────────────────────────────────
     async function cargarPagina() {
@@ -321,7 +323,6 @@
 
     async function cargarEpisodios(numTemp) {
         const grid = document.getElementById('gridEpisodios');
-        // Skeleton mientras carga
         grid.innerHTML = Array(4).fill(`
             <div class="ep-card rounded-2xl overflow-hidden flex h-28">
                 <div class="w-44 ep-thumb-skeleton shrink-0"></div>
@@ -353,23 +354,18 @@
                 div.id = `ep-card-${epKey}`;
                 div.className = `ep-card rounded-2xl overflow-hidden flex cursor-pointer group${visto ? ' opacity-60' : ''}`;
                 div.innerHTML = `
-                    <!-- Miniatura -->
                     <div class="relative w-44 md:w-52 shrink-0 overflow-hidden bg-zinc-900">
                         <img src="${thumb}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy">
-                        <!-- Overlay play -->
                         <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <div class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center shadow-lg">
                                 <svg class="w-5 h-5 fill-white ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                             </div>
                         </div>
-                        <!-- Número de episodio -->
-                        <div class="absolute bottom-2 left-2 bg-black/80 text-white text-[9px] font-black px-1.5 py-0.5 rounded">
-                            E${ep.episode_number}
+                        <div class="absolute bottom-2 left-2 bg-black/80 text-white text-[9px] font-black px-1.5 py-0.5 rounded">E${ep.episode_number}</div>
+                        <div id="badge-visto-${epKey}" class="${visto ? 'flex' : 'hidden'} absolute top-2 right-2 bg-green-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full items-center gap-0.5">
+                            <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>VISTO
                         </div>
-                        <!-- Badge visto -->
-                        ${visto ? `<div id="badge-visto-${epKey}" class="absolute top-2 right-2 bg-green-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full flex items-center gap-0.5"><svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>VISTO</div>` : `<div id="badge-visto-${epKey}" class="hidden absolute top-2 right-2 bg-green-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full flex items-center gap-0.5"><svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>VISTO</div>`}
                     </div>
-                    <!-- Info -->
                     <div class="flex-1 p-3 md:p-4 flex flex-col justify-center min-w-0">
                         <div class="flex items-start justify-between gap-2 mb-1">
                             <p class="text-xs md:text-sm font-black uppercase tracking-tight leading-tight group-hover:text-red-500 transition line-clamp-2 flex-1">${ep.name || 'Episodio ' + ep.episode_number}</p>
@@ -380,8 +376,7 @@
                             ${fecha ? `<span class="text-[9px] text-zinc-600 font-bold">${fecha}</span>` : ''}
                         </div>
                         <p class="text-[10px] md:text-xs text-zinc-500 leading-relaxed line-clamp-2 mb-2">${ep.overview || 'Sin descripción disponible.'}</p>
-                        <!-- Botón marcar como visto -->
-                        <button id="btn-visto-${epKey}" onclick="event.stopPropagation();toggleVisto('${epKey}', ${numTemp}, ${ep.episode_number})" class="self-start flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border transition-all active:scale-95 ${visto ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-zinc-800 border-zinc-700 text-zinc-500 hover:border-zinc-500 hover:text-zinc-300'}">
+                        <button id="btn-visto-${epKey}" onclick="event.stopPropagation();toggleVisto('${epKey}')" class="self-start flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border transition-all active:scale-95 ${visto ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-zinc-800 border-zinc-700 text-zinc-500 hover:border-zinc-500 hover:text-zinc-300'}">
                             <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                             ${visto ? 'Visto' : 'Marcar visto'}
                         </button>
@@ -398,12 +393,10 @@
         document.getElementById('serieFrame').src = `https://vidsrc.cc/v3/embed/tv/${serieID}/${temp}/${ep}?auto_lang=es`;
         document.getElementById('playerLabel').innerText = `T${temp} · E${ep} — ${nombre || ''}`;
         document.getElementById('playerOverlay').style.display = 'flex';
+        // iOS Safari scroll lock
         document.body.style.overflow = 'hidden';
-        // Auto-marcar como visto al reproducir
-        const epKey = `${serieID}-${temp}-${ep}`;
-        if (!episodiosVistos.has(epKey)) {
-            marcarVistoEnFirebase(epKey, true);
-        }
+        document.body.style.position = 'fixed';
+        document.body.style.width = '100%';
     }
 
     window.verPrimerEpisodio = () => reproducirEpisodio(1, 1, 'Episodio 1');
@@ -411,60 +404,9 @@
     window.cerrarPlayer = () => {
         document.getElementById('playerOverlay').style.display = 'none';
         document.getElementById('serieFrame').src = '';
-        document.body.style.overflow = 'auto';
-    };
-
-    // ── EPISODIOS VISTOS ──────────────────────────────────────────
-    async function cargarEpisodiosVistos() {
-        if (!miUID_serie) return;
-        try {
-            const snap = await window.getDoc(window.doc(window.db, 'usuarios', miUID_serie));
-            if (!snap.exists()) return;
-            const data = snap.data();
-            const vistos = data.episodiosVistos || [];
-            episodiosVistos = new Set(vistos.filter(k => k.startsWith(serieID + '-')));
-        } catch(e) { console.error(e); }
-    }
-
-    async function marcarVistoEnFirebase(epKey, visto) {
-        if (!miUID_serie) return;
-        episodiosVistos[visto ? 'add' : 'delete'](epKey);
-        try {
-            await window.setDoc(window.doc(window.db, 'usuarios', miUID_serie), {
-                episodiosVistos: visto ? window.arrayUnion(epKey) : window.arrayRemove(epKey)
-            }, { merge: true });
-            actualizarUIVisto(epKey, visto);
-        } catch(e) { console.error(e); }
-    }
-
-    function actualizarUIVisto(epKey, visto) {
-        const card = document.getElementById(`ep-card-${epKey}`);
-        const badge = document.getElementById(`badge-visto-${epKey}`);
-        const btn = document.getElementById(`btn-visto-${epKey}`);
-        if (card) {
-            if (visto) card.classList.add('opacity-60');
-            else card.classList.remove('opacity-60');
-        }
-        if (badge) {
-            if (visto) badge.classList.remove('hidden');
-            else badge.classList.add('hidden');
-        }
-        if (btn) {
-            if (visto) {
-                btn.classList.add('bg-green-500/20','border-green-500/50','text-green-400');
-                btn.classList.remove('bg-zinc-800','border-zinc-700','text-zinc-500','hover:border-zinc-500','hover:text-zinc-300');
-                btn.innerHTML = `<svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Visto`;
-            } else {
-                btn.classList.remove('bg-green-500/20','border-green-500/50','text-green-400');
-                btn.classList.add('bg-zinc-800','border-zinc-700','text-zinc-500','hover:border-zinc-500','hover:text-zinc-300');
-                btn.innerHTML = `<svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Marcar visto`;
-            }
-        }
-    }
-
-    window.toggleVisto = async (epKey, temp, epNum) => {
-        const estaVisto = episodiosVistos.has(epKey);
-        await marcarVistoEnFirebase(epKey, !estaVisto);
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.width = '';
     };
 
     // ── HUD ───────────────────────────────────────────────────────
@@ -582,7 +524,63 @@
         } catch(e) { console.error('Error en Like:', e); }
     };
 
-    // ── MODAL ACTORES ─────────────────────────────────────────────
+    // ── EPISODIOS VISTOS ──────────────────────────────────────────
+    async function cargarEpisodiosVistos() {
+        if (!miUID_serie) return;
+        try {
+            const snap = await window.getDoc(window.doc(window.db, 'usuarios', miUID_serie));
+            if (!snap.exists()) return;
+            const data = snap.data();
+            const vistos = data.episodiosVistos || [];
+            episodiosVistos = new Set(vistos.filter(k => k.startsWith(serieID + '-')));
+        } catch(e) { console.error(e); }
+    }
+
+    async function marcarVistoEnFirebase(epKey, visto) {
+        if (!miUID_serie) return;
+        if (visto) episodiosVistos.add(epKey); else episodiosVistos.delete(epKey);
+        try {
+            await window.setDoc(window.doc(window.db, 'usuarios', miUID_serie), {
+                episodiosVistos: visto ? window.arrayUnion(epKey) : window.arrayRemove(epKey)
+            }, { merge: true });
+            actualizarUIVisto(epKey, visto);
+        } catch(e) { console.error(e); }
+    }
+
+    function actualizarUIVisto(epKey, visto) {
+        const card = document.getElementById(`ep-card-${epKey}`);
+        const badge = document.getElementById(`badge-visto-${epKey}`);
+        const btn = document.getElementById(`btn-visto-${epKey}`);
+        if (card) { if (visto) card.classList.add('opacity-60'); else card.classList.remove('opacity-60'); }
+        if (badge) { if (visto) { badge.classList.remove('hidden'); badge.classList.add('flex'); } else { badge.classList.add('hidden'); badge.classList.remove('flex'); } }
+        if (btn) {
+            if (visto) {
+                btn.classList.add('bg-green-500/20','border-green-500/50','text-green-400');
+                btn.classList.remove('bg-zinc-800','border-zinc-700','text-zinc-500');
+                btn.innerHTML = `<svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Visto`;
+            } else {
+                btn.classList.remove('bg-green-500/20','border-green-500/50','text-green-400');
+                btn.classList.add('bg-zinc-800','border-zinc-700','text-zinc-500');
+                btn.innerHTML = `<svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Marcar visto`;
+            }
+        }
+    }
+
+    window.toggleVisto = async (epKey) => {
+        await marcarVistoEnFirebase(epKey, !episodiosVistos.has(epKey));
+    };
+
+    // ── AUTH ──────────────────────────────────────────────────────
+    window.onAuthStateChanged(window.auth, async function(user) {
+        if (user) {
+            miUID_serie = user.uid;
+            await cargarEpisodiosVistos();
+            checkStatus();
+            cargarEpisodios(temporadaActiva);
+        }
+    });
+
+    cargarPagina();
     window.verActor = async (id) => {
         try {
             const [resBio, resPelis] = await Promise.all([
@@ -635,17 +633,6 @@
         currentRating = n;
         document.querySelectorAll('.star').forEach((s, i) => { s.style.color = i < n ? '#eab308' : '#3f3f46'; });
     };
-
-    // ── AUTH ──────────────────────────────────────────────────────
-    window.onAuthStateChanged(window.auth, async function(user) {
-        if (user) {
-            miUID_serie = user.uid;
-            await cargarEpisodiosVistos();
-            checkStatus();
-            // Re-render episodios si ya cargaron para mostrar estado visto
-            if (temporadaActiva) cargarEpisodios(temporadaActiva);
-        }
-    });
 
     cargarPagina();
 </script>
