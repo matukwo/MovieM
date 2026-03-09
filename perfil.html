@@ -462,7 +462,9 @@
     // ── Comentarios ───────────────────────────────────────────────
     async function cargarComentarios() {
         var cont = document.getElementById('contenedorComentarios');
-        var esAdmin = (miUID === ADMIN_UID);
+        // Nota: miUID puede estar disponible o no según el timing de onAuthStateChanged
+        // Se compara con ADMIN_UID directamente; si miUID es null, no es admin
+        var esAdmin = miUID !== null && miUID === ADMIN_UID;
         try {
             var snap = await getDocs(query(collection(db,'comentarios'), where('user','==',perfilUsername)));
             if (snap.empty) { cont.innerHTML='<p class="text-zinc-600 text-xs italic">Sin comentarios aún.</p>'; return; }
@@ -556,4 +558,3 @@
 </nav>
 </body>
 </html>
-
