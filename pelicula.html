@@ -31,16 +31,18 @@
         #playerOverlay { display: none; background: #000; position: fixed; inset: 0; z-index: 500; flex-direction: column; }
     </style>
 </head>
-<body class="bg-zinc-950 text-white font-sans overflow-x-hidden pt-24">
+<body class="bg-zinc-950 text-white font-sans overflow-x-hidden pt-32">
 
-    <div id="userHUD" class="fixed top-8 right-8 z-50 hidden flex items-center gap-4 bg-black/40 backdrop-blur-md p-2 pr-5 rounded-full border border-white/10 shadow-2xl">
-        <div class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center font-black text-white border-2 border-white/20" id="userInitial">?</div>
-        <span id="userNameHUD" class="text-xs font-bold uppercase tracking-widest text-white"></span>
-    </div>
+    <nav class="fixed top-0 left-0 w-full z-[100] px-8 py-6 flex justify-between items-center bg-gradient-to-b from-zinc-950 to-transparent">
+        <a href="index.html" class="text-red-600 font-black tracking-tighter text-3xl italic hover:scale-105 transition-transform">
+            MOVIE<span class="text-white font-light">M</span>
+        </a>
 
-    <button onclick="window.location.href='index.html'" class="fixed top-8 left-8 bg-black/50 p-3 rounded-full hover:bg-red-600 transition z-50 border border-white/10 shadow-2xl text-white">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-    </button>
+        <div id="userHUD" class="hidden items-center gap-4 bg-black/40 backdrop-blur-md p-1.5 pr-5 rounded-full border border-white/10 shadow-2xl">
+            <div class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center font-black text-white border-2 border-white/20" id="userInitial">?</div>
+            <span id="userNameHUD" class="text-xs font-bold uppercase tracking-widest text-white"></span>
+        </div>
+    </nav>
 
     <div id="playerOverlay">
         <div class="w-full flex justify-between items-center p-4 bg-zinc-950 border-b border-white/5 text-white">
@@ -90,7 +92,7 @@
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
                         </button>
                         <button id="btnLike" onclick="toggleLike()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-red-500 transition">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78v0z"></path></svg>
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78v0z" fill="currentColor"></path></svg>
                         </button>
                     </div>
                 </div>
@@ -103,8 +105,7 @@
             </h3>
             <div class="relative group">
                 <button onclick="scrollReparto(-400)" class="absolute -left-6 top-1/2 -translate-y-1/2 bg-black/80 p-3 rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-all z-20 hover:bg-red-600 text-white">←</button>
-                <div id="reparto" class="flex gap-8 overflow-x-auto no-scrollbar scroll-smooth pb-6">
-                    </div>
+                <div id="reparto" class="flex gap-8 overflow-x-auto no-scrollbar scroll-smooth pb-6"></div>
                 <button onclick="scrollReparto(400)" class="absolute -right-6 top-1/2 -translate-y-1/2 bg-black/80 p-3 rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-all z-20 hover:bg-red-600 text-white">→</button>
             </div>
         </section>
@@ -162,12 +163,10 @@
                 const peli = await pRes.json();
                 const credits = await cRes.json();
 
-                // Quitar Skeletons
                 document.getElementById('tituloSkeleton')?.remove();
                 document.getElementById('sinopsisSkeleton')?.remove();
                 document.getElementById('sinopsis').classList.remove('hidden');
 
-                // Llenar datos
                 document.getElementById('titulo').innerText = peli.title;
                 document.getElementById('sinopsis').innerText = peli.overview || "Sin descripción.";
                 document.getElementById('anio').innerText = peli.release_date?.split('-')[0] || "S/F";
@@ -180,7 +179,6 @@
                 const dir = credits.crew.find(c => c.job === "Director");
                 if(dir) document.getElementById('director').innerText = `Dirigida por ${dir.name}`;
 
-                // Reparto
                 document.getElementById('reparto').innerHTML = credits.cast.slice(0, 15).map(actor => `
                     <div onclick="verActor(${actor.id})" class="min-w-[120px] text-center cursor-pointer shrink-0 transition-transform hover:scale-105">
                         <div class="w-24 h-24 mx-auto mb-4 overflow-hidden rounded-full border border-zinc-800 hover:border-red-600 transition-all">
@@ -196,7 +194,6 @@
             } catch (e) { console.error(e); }
         }
 
-        // --- SISTEMAS DE INTERACCIÓN (FIREBASE) ---
         function actualizarHUD() {
             const user = localStorage.getItem('usuarioMovieM');
             if (user && user !== 'undefined') {
@@ -214,7 +211,10 @@
             if (userDoc.exists()) {
                 const data = userDoc.data();
                 if (data.watchlist?.includes(movieID)) document.getElementById('btnWatchlist').classList.add('bg-white', 'text-black');
-                if (data.likes?.includes(movieID)) document.getElementById('btnLike').classList.add('bg-red-600', 'text-white');
+                if (data.likes?.includes(movieID)) {
+                    document.getElementById('btnLike').classList.add('bg-red-600', 'text-white');
+                    document.getElementById('btnLike').querySelector('svg').setAttribute('fill', 'white');
+                }
             }
         }
 
@@ -240,7 +240,6 @@
             btn.classList.toggle('bg-red-600'); btn.classList.toggle('text-white');
         };
 
-        // --- TRAILER Y ACTORES ---
         window.abrirTrailer = async () => {
             const res = await fetch(`https://api.themoviedb.org/3/movie/${movieID}/videos?api_key=${API_KEY}`);
             const data = await res.json();
@@ -259,7 +258,6 @@
             ]);
             const actor = await resBio.json();
             const pelis = await resPelis.json();
-            
             document.getElementById('actorNombre').innerText = actor.name;
             document.getElementById('actorFoto').src = 'https://image.tmdb.org/t/p/w500' + actor.profile_path;
             document.getElementById('actorInfo').innerText = actor.biography || "Sin biografía.";
@@ -274,7 +272,6 @@
         window.cerrarActor = () => document.getElementById('modalActor').classList.add('hidden');
         window.scrollReparto = (d) => document.getElementById('reparto').scrollBy({ left: d, behavior: 'smooth' });
 
-        // --- REVIEWS ---
         function escucharComentarios() {
             const q = window.query(window.collection(window.db, "comentarios"), window.where("movieID", "==", movieID), window.orderBy("fecha", "desc"));
             window.onSnapshot(q, (snap) => {
