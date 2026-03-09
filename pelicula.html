@@ -19,15 +19,28 @@
         #playerOverlay{display:none;background:#000;position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;z-index:200;flex-direction:column;-webkit-overflow-scrolling:touch}
         #playerOverlay .player-wrap{position:relative;flex:1;width:100%;overflow:hidden;-webkit-transform:translateZ(0);transform:translateZ(0)}
         #movieFrame{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+        .server-btn{transition:all .2s;border:1px solid rgba(255,255,255,.1);color:#71717a}
+        .server-btn.active{background:#dc2626;border-color:#dc2626;color:#fff}
     </style>
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden">
 
 <!-- Player overlay -->
 <div id="playerOverlay" style="display:none">
-    <div class="w-full flex justify-between items-center p-3 md:p-4 bg-zinc-950 border-b border-white/5" style="flex-shrink:0">
-        <span class="text-red-600 font-black tracking-tighter text-lg md:text-xl">MOVIE<span class="text-white font-light">M</span></span>
-        <button onclick="cerrarPelicula()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/5">Cerrar ×</button>
+    <div class="w-full flex justify-between items-center px-3 py-2 md:px-4 md:py-3 bg-zinc-950 border-b border-white/5" style="flex-shrink:0">
+        <div class="flex items-center gap-2 md:gap-4">
+            <span class="text-red-600 font-black tracking-tighter text-base md:text-xl">MOVIE<span class="text-white font-light">M</span></span>
+            <!-- Selector de servidor -->
+            <div class="flex items-center gap-1.5">
+                <span class="text-[9px] text-zinc-600 font-black uppercase tracking-widest hidden sm:block">Servidor</span>
+                <button id="btnServer1" onclick="cambiarServidor(1)" class="server-btn active text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">S1</button>
+                <button id="btnServer2" onclick="cambiarServidor(2)" class="server-btn text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full flex items-center gap-1">
+                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                    S2 Mobile
+                </button>
+            </div>
+        </div>
+        <button onclick="cerrarPelicula()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-3 py-1.5 rounded-full border border-white/5">Cerrar ×</button>
     </div>
     <div class="player-wrap bg-black">
         <iframe id="movieFrame" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" playsinline webkit-playsinline></iframe>
@@ -74,8 +87,11 @@
                 <span id="directorMobile" class="text-zinc-500 text-xs italic block mb-3"></span>
                 <!-- Botones mobile compactos -->
                 <div class="flex gap-2 flex-wrap">
-                    <button onclick="verPelicula()" class="bg-red-600 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95 shadow-lg">
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Ver
+                    <button onclick="verPelicula(1)" class="bg-red-600 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95 shadow-lg">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Ver S1
+                    </button>
+                    <button onclick="verPelicula(2)" class="bg-zinc-700 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95 shadow-lg">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg> S2 📱
                     </button>
                     <button onclick="abrirTrailer()" class="bg-zinc-800 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95">
                         <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6zM21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9 9-4.03 9-9zm-16.1 0c0-3.92 3.18-7.1 7.1-7.1s7.1 3.18 7.1 7.1-3.18 7.1-7.1 7.1-7.1-3.18-7.1-7.1z"/></svg> Trailer
@@ -110,11 +126,20 @@
             </div>
             <p id="sinopsis" class="text-lg text-zinc-500 max-w-2xl leading-relaxed mb-10 hidden"></p>
             <div class="flex flex-wrap items-center gap-4">
-                <button onclick="verPelicula()" class="bg-red-600 text-white px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-700 transition-all shadow-xl shadow-red-600/20 active:scale-95 tracking-tight uppercase">
+                <button onclick="verPelicula(1)" class="bg-red-600 text-white px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-700 transition-all shadow-xl shadow-red-600/20 active:scale-95 tracking-tight uppercase">
                     <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> VER PELICULA
+                </button>
+                <button onclick="verPelicula(2)" class="bg-zinc-800 text-white px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-zinc-700 transition-all shadow-xl active:scale-95 tracking-tight uppercase border border-white/10">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg> S2 📱 MOBILE
                 </button>
                 <button onclick="abrirTrailer()" class="bg-white text-black px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-600 hover:text-white transition-all shadow-xl active:scale-95">
                     <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6zM21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9 9-4.03 9-9zm-16.1 0c0-3.92 3.18-7.1 7.1-7.1s7.1 3.18 7.1 7.1-3.18 7.1-7.1 7.1-7.1-3.18-7.1-7.1z"/></svg> VER TRAILER
+                </button>
+                <button id="btnWatchlistDesktop" onclick="toggleWatchlist()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                </button>
+                <button id="btnLikeDesktop" onclick="toggleLike()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78v0z"/></svg>
                 </button>
             </div>
         </div>
@@ -508,19 +533,34 @@
             });
         };
 
-        window.verPelicula = () => {
-            const overlay = document.getElementById('playerOverlay');
-            document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
-            overlay.style.display = 'flex';
-            // iOS Safari scroll lock
+        let servidorActivo = 1;
+
+        function getUrlPelicula(servidor) {
+            if (servidor === 2) return `https://multiembed.mov/?video_id=${movieID}&tmdb=1`;
+            return `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
+        }
+
+        window.verPelicula = (servidor = 1) => {
+            servidorActivo = servidor;
+            document.getElementById('movieFrame').src = getUrlPelicula(servidor);
+            document.getElementById('playerOverlay').style.display = 'flex';
             document.body.style.overflow = 'hidden';
             document.body.style.position = 'fixed';
             document.body.style.width = '100%';
+            // Actualizar botones servidor
+            document.getElementById('btnServer1').classList.toggle('active', servidor === 1);
+            document.getElementById('btnServer2').classList.toggle('active', servidor === 2);
+        };
+
+        window.cambiarServidor = (servidor) => {
+            servidorActivo = servidor;
+            document.getElementById('movieFrame').src = getUrlPelicula(servidor);
+            document.getElementById('btnServer1').classList.toggle('active', servidor === 1);
+            document.getElementById('btnServer2').classList.toggle('active', servidor === 2);
         };
 
         window.cerrarPelicula = () => {
-            const overlay = document.getElementById('playerOverlay');
-            overlay.style.display = 'none';
+            document.getElementById('playerOverlay').style.display = 'none';
             document.getElementById('movieFrame').src = '';
             document.body.style.overflow = '';
             document.body.style.position = '';
