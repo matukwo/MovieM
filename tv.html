@@ -3,51 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MovieM | TV Argentina en Vivo</title>
+    <title>MovieM | TV en Vivo</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js"></script>
     <style>
         :root { --accent-color: #dc2626; }
-        .text-accent  { color: var(--accent-color); }
-        .bg-accent    { background-color: var(--accent-color); }
-        .border-accent{ border-color: var(--accent-color); }
+        .text-accent { color: var(--accent-color); }
+        .bg-accent { background-color: var(--accent-color); }
         .no-scrollbar::-webkit-scrollbar { display:none }
         .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none }
         .live-dot { animation: livepulse 1.5s infinite; }
-        @keyframes livepulse {
-            0%,100%{ opacity:1; transform:scale(1)   }
-            50%    { opacity:.4; transform:scale(1.3) }
-        }
-        .card-mini { transition: all .18s ease; cursor:pointer; }
-        .card-mini:hover  { background:rgba(39,39,42,.9)!important; }
-        .card-mini.activo { border-color:var(--accent-color)!important; background:rgba(220,38,38,.08)!important; }
+        @keyframes livepulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.3)} }
         .fade-in { animation: fi .5s ease forwards; opacity:0; }
         @keyframes fi { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-        #playerBox {
-            position:relative;
+        .card-canal { transition:all .18s; cursor:pointer; }
+        .card-canal:hover { background:rgba(39,39,42,.9)!important; transform:translateY(-1px); }
+        .card-canal:active { transform:scale(.97); }
+        /* Skeleton */
+        @keyframes pulse-bg{0%{background-color:rgba(39,39,42,.5)}50%{background-color:rgba(63,63,70,.5)}100%{background-color:rgba(39,39,42,.5)}}
+        .skeleton{animation:pulse-bg 1.5s infinite ease-in-out}
+        /* Player overlay fullscreen */
+        #playerOverlay {
+            display:none;
             background:#000;
-            border-radius:16px;
-            overflow:hidden;
-            border:1px solid rgba(255,255,255,.06);
-            box-shadow:0 25px 60px rgba(0,0,0,.7);
+            position:fixed;
+            top:0; left:0; right:0; bottom:0;
+            width:100%; height:100%;
+            z-index:200;
+            flex-direction:column;
+            -webkit-overflow-scrolling:touch;
         }
-        #playerBox::before { content:''; display:block; padding-top:56.25%; }
-        #playerBox iframe, #playerBox #overlay {
-            position:absolute; inset:0; width:100%; height:100%;
+        #playerOverlay .player-wrap {
+            position:relative; flex:1; width:100%; overflow:hidden;
+            -webkit-transform:translateZ(0); transform:translateZ(0);
+            background:#000;
         }
-        #playerBox iframe { border:none; }
-        #overlay {
+        #hlsVideo {
+            position:absolute; top:0; left:0; width:100%; height:100%;
+            background:#000;
+        }
+        #ytFrameOverlay {
+            position:absolute; top:0; left:0; width:100%; height:100%;
+            border:none;
+        }
+        /* Loading spinner inside player */
+        #playerLoading {
+            position:absolute; inset:0;
             display:flex; flex-direction:column;
             align-items:center; justify-content:center;
-            background:#09090b; z-index:10;
-            transition: opacity .4s ease;
+            background:#000; z-index:5;
+            transition:opacity .4s;
         }
-        #overlay.oculto { opacity:0; pointer-events:none; }
+        #playerLoading.hidden { opacity:0; pointer-events:none; }
         .spin { animation: spinA 1s linear infinite; }
         @keyframes spinA { to{ transform:rotate(360deg) } }
+        /* Error state */
+        #playerError {
+            position:absolute; inset:0;
+            display:none; flex-direction:column;
+            align-items:center; justify-content:center;
+            background:#09090b; z-index:6; text-align:center; padding:2rem;
+        }
+        /* Tab buttons */
+        .tab-btn { transition:all .2s; border-bottom:2px solid transparent; color:#71717a; }
+        .tab-btn.active { color:#fff; border-bottom-color:var(--accent-color); }
+        /* Country flag filter */
+        .filter-btn { transition:all .15s; }
+        .filter-btn.active { background:var(--accent-color); color:#fff; border-color:var(--accent-color); }
     </style>
 </head>
 <body class="bg-zinc-950 text-white font-sans min-h-screen overflow-x-hidden">
 
+<!-- Player Overlay (fullscreen, como pelicula.html) -->
+<div id="playerOverlay" style="display:none">
+    <div class="w-full flex justify-between items-center px-3 py-2 md:px-4 md:py-3 bg-zinc-950 border-b border-white/5" style="flex-shrink:0">
+        <div class="flex items-center gap-3">
+            <span class="text-red-600 font-black tracking-tighter text-base md:text-xl">MOVIE<span class="text-white font-light">M</span></span>
+            <div class="flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-red-500 live-dot"></span>
+                <span id="overlayNombre" class="text-[11px] font-black uppercase tracking-widest text-white truncate max-w-[200px] md:max-w-xs"></span>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="fullscreenPlayer()" class="text-white/40 hover:text-white transition p-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+            </button>
+            <button onclick="cerrarPlayer()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-3 py-1.5 rounded-full border border-white/5">Cerrar ×</button>
+        </div>
+    </div>
+    <div class="player-wrap">
+        <!-- HLS video (para streams m3u8) -->
+        <video id="hlsVideo" controls playsinline webkit-playsinline autoplay style="display:none"></video>
+        <!-- YouTube iframe (para canales argentinos) -->
+        <iframe id="ytFrameOverlay" src="" allowfullscreen allow="autoplay; encrypted-media; fullscreen" style="display:none"></iframe>
+        <!-- Loading -->
+        <div id="playerLoading">
+            <svg class="spin w-10 h-10 text-red-600 mb-3" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+            <p class="text-zinc-500 text-[10px] font-black uppercase tracking-widest">Conectando...</p>
+        </div>
+        <!-- Error -->
+        <div id="playerError">
+            <svg class="w-14 h-14 text-zinc-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <p class="text-white font-black uppercase tracking-widest text-sm mb-2">Stream no disponible</p>
+            <p class="text-zinc-500 text-xs mb-5">Este canal está temporalmente fuera de línea.<br>Probá otro canal.</p>
+            <button onclick="cerrarPlayer()" class="bg-zinc-800 hover:bg-zinc-700 text-white px-6 py-2.5 rounded-full font-black text-xs uppercase tracking-widest transition">Volver</button>
+        </div>
+    </div>
+</div>
+
+<!-- NAV -->
 <nav class="px-4 md:px-6 py-3 flex items-center justify-between bg-zinc-950/90 backdrop-blur-md sticky top-0 w-full z-50 border-b border-white/5">
     <h1 onclick="location.href='index.html'" class="text-lg md:text-xl font-black italic tracking-tighter cursor-pointer">MOVIE<span class="text-accent">M</span></h1>
     <div class="flex items-center gap-3">
@@ -55,66 +122,54 @@
             <span class="w-2 h-2 rounded-full bg-red-500 live-dot"></span>
             <span class="text-[10px] font-black uppercase tracking-widest text-red-400">En Vivo</span>
         </div>
-        <button onclick="location.href='canales.html'" class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-white transition">← Canales</button>
     </div>
 </nav>
 
 <main class="max-w-7xl mx-auto px-3 md:px-6 pt-5 pb-28 md:pb-8">
-    <div class="flex flex-col lg:flex-row gap-5 md:gap-6">
 
-        <div class="flex-1 min-w-0 fade-in">
-            <div id="playerBox" class="mb-4">
-                <div id="overlay">
-                    <div id="overlaySpinner">
-                        <svg class="spin w-10 h-10 text-accent mb-4" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                        </svg>
-                        <p id="overlayTxt" class="text-zinc-400 text-sm font-bold uppercase tracking-widest">Conectando...</p>
-                    </div>
-                    <div id="overlayNoEmbed" class="hidden flex-col items-center justify-center text-center px-6"></div>
-                </div>
-                <iframe id="ytFrame" allow="autoplay; encrypted-media; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe>
-            </div>
+    <!-- Tabs -->
+    <div class="flex items-center gap-6 border-b border-white/5 mb-6">
+        <button onclick="mostrarTab('argentina')" id="tab-argentina" class="tab-btn active pb-3 text-xs font-black uppercase tracking-widest">🇦🇷 Argentina</button>
+        <button onclick="mostrarTab('iptv')" id="tab-iptv" class="tab-btn pb-3 text-xs font-black uppercase tracking-widest">🌍 Internacional IPTV</button>
+    </div>
 
-            <div class="flex items-center gap-4 mb-5">
-                <div class="w-14 h-14 rounded-2xl overflow-hidden bg-white flex items-center justify-center p-1.5 shrink-0 shadow-lg">
-                    <img id="logoImg" src="" alt="" class="max-w-full max-h-full object-contain">
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2 mb-0.5 flex-wrap">
-                        <h2 id="nombreCanal" class="text-xl font-black uppercase tracking-tighter"></h2>
-                        <div class="flex items-center gap-1 bg-red-600/10 border border-red-600/30 px-2 py-0.5 rounded-full shrink-0">
-                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 live-dot"></span>
-                            <span class="text-[8px] font-black uppercase text-red-400">Live</span>
-                        </div>
-                    </div>
-                    <p id="categoriaCanal" class="text-zinc-500 text-xs font-bold uppercase tracking-widest"></p>
-                </div>
-                <button onclick="fullscreen()" title="Pantalla completa" class="shrink-0 bg-zinc-800 hover:bg-accent p-2.5 rounded-xl transition border border-white/5 active:scale-95">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
-                    </svg>
-                </button>
-            </div>
+    <!-- ══ TAB: ARGENTINA ══ -->
+    <div id="seccion-argentina">
+        <div id="gridArgentina" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3"></div>
+    </div>
 
-            <div class="bg-zinc-900/40 border border-white/5 rounded-xl px-4 py-3 flex gap-3 text-xs text-zinc-500 items-start">
-                <svg class="w-4 h-4 shrink-0 mt-0.5 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span>Transmisión vía YouTube Live oficial de cada canal. Si el player muestra un error de YouTube, hacé clic en <b>"Ver en YouTube"</b> que aparece dentro del player.</span>
+    <!-- ══ TAB: IPTV INTERNACIONAL ══ -->
+    <div id="seccion-iptv" class="hidden">
+        <!-- Buscador + filtros -->
+        <div class="flex flex-col sm:flex-row gap-3 mb-5">
+            <div class="relative flex-1">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <input id="buscadorIPTV" type="text" placeholder="Buscar canal..." oninput="filtrarIPTV()" class="w-full bg-zinc-900 border border-white/5 rounded-full pl-9 pr-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-red-600/50 transition">
             </div>
+            <select id="filtroPais" onchange="filtrarIPTV()" class="bg-zinc-900 border border-white/5 rounded-full px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-600/50 transition cursor-pointer">
+                <option value="">🌍 Todos los países</option>
+            </select>
+            <select id="filtroCategoria" onchange="filtrarIPTV()" class="bg-zinc-900 border border-white/5 rounded-full px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-600/50 transition cursor-pointer">
+                <option value="">📺 Todas las categorías</option>
+            </select>
         </div>
 
-        <aside class="w-full lg:w-72 shrink-0 fade-in" style="animation-delay:.12s">
-            <p class="text-[10px] font-black uppercase tracking-[.25em] text-zinc-500 mb-3 flex items-center gap-2">
-                <span class="w-4 h-px bg-accent"></span> Canales Argentinos
-            </p>
-            <div id="sidebar" class="space-y-2 lg:overflow-y-auto no-scrollbar lg:max-h-[calc(100vh-220px)]"></div>
-        </aside>
+        <!-- Estado de carga -->
+        <div id="iptvStatus" class="text-center py-12">
+            <svg class="spin w-8 h-8 text-red-600 mx-auto mb-3" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            </svg>
+            <p class="text-zinc-500 text-sm">Cargando canales internacionales...</p>
+        </div>
+
+        <p id="contadorIPTV" class="text-[10px] text-zinc-600 font-bold uppercase tracking-widest mb-4 hidden"></p>
+        <div id="gridIPTV" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3"></div>
     </div>
+
 </main>
 
+<!-- Bottom nav -->
 <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-zinc-950/95 backdrop-blur-xl border-t border-white/5">
     <div class="flex items-center justify-around py-3 px-2">
         <a href="index.html" class="flex flex-col items-center gap-1 text-zinc-500">
@@ -125,7 +180,7 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
             <span class="text-[9px] font-black uppercase tracking-widest">Mi Lista</span>
         </a>
-        <a href="canales.html" class="flex flex-col items-center gap-1 text-accent">
+        <a href="tv.html" class="flex flex-col items-center gap-1 text-accent">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.361a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
             <span class="text-[9px] font-black uppercase tracking-widest">TV</span>
         </a>
@@ -137,128 +192,292 @@
 </nav>
 
 <script>
+// ── ACCENT COLOR ─────────────────────────────────────────────────
 var saved = localStorage.getItem('movieM_color');
 if (saved) document.documentElement.style.setProperty('--accent-color', saved);
 
-var CANALES = [
-    { id:'tn',       nombre:'TN · Todo Noticias', ytHandle:'todonoticias',
-      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Todo_Noticias_2016.svg/300px-Todo_Noticias_2016.svg.png',
-      categoria:'Noticias',        videoId:'cb12KmMMDJA' },
-    { id:'c5n',      nombre:'C5N',                ytHandle:'c5n',
-      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/C5N_logo_2015.svg/300px-C5N_logo_2015.svg.png',
-      categoria:'Noticias',        videoId:'1fC0B2UhSx4' },
-    { id:'cronica',  nombre:'Crónica TV',          ytHandle:'cronicatv',
-      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Cr%C3%B3nica_TV_logo_2017.svg/300px-Cr%C3%B3nica_TV_logo_2017.svg.png',
-      categoria:'Noticias',        videoId:'Vy5O-dxSaXY' },
-    { id:'a24',      nombre:'A24',                 ytHandle:'a24noticias',
-      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/A24_television_argentina_logo.svg/300px-A24_television_argentina_logo.svg.png',
-      categoria:'Noticias',        videoId:'6Nx-R3KND0Y' },
-    { id:'lnmas',    nombre:'LN+',                 ytHandle:'lanacion',
-      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/LN%2B_logo.svg/300px-LN%2B_logo.svg.png',
-      categoria:'Noticias',        videoId:'Y30dM3oT9_s' },
-    { id:'canal26',  nombre:'Canal 26',            ytHandle:'canal26argentina',
-      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Canal_26_Logo_2023.png/300px-Canal_26_Logo_2023.png',
-      categoria:'Noticias',        videoId:null },
-    { id:'america',  nombre:'América TV',          ytHandle:'americatv',
-      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Am%C3%A9rica_TV_logo_2019.svg/300px-Am%C3%A9rica_TV_logo_2019.svg.png',
-      categoria:'Entretenimiento', videoId:'s8CJLE7EHSA' },
-    { id:'eltrece',  nombre:'El Trece',            ytHandle:'eltrece',
-      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Logo_El_Trece_2019.svg/300px-Logo_El_Trece_2019.svg.png',
-      categoria:'Entretenimiento', videoId:null },
-    { id:'tvpublica',nombre:'TV Pública',          ytHandle:'tvpublicaargentina',
-      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Televisi%C3%B3n_P%C3%BAblica_Argentina_-_Logo_2021.svg/200px-Televisi%C3%B3n_P%C3%BAblica_Argentina_-_Logo_2021.svg.png',
-      categoria:'General',         videoId:'MPJuR6z7kpI' },
-    { id:'nettv',    nombre:'Net TV',              ytHandle:'nettvargentina',
-      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Logo_Net_TV.png/300px-Logo_Net_TV.png',
-      categoria:'Entretenimiento', videoId:null },
+// ── CANALES ARGENTINA (YouTube) ──────────────────────────────────
+var CANALES_AR = [
+    { id:'tn',        nombre:'TN',          logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Todo_Noticias_2016.svg/300px-Todo_Noticias_2016.svg.png',       categoria:'Noticias',        videoId:'cb12KmMMDJA' },
+    { id:'c5n',       nombre:'C5N',          logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/C5N_logo_2015.svg/300px-C5N_logo_2015.svg.png',               categoria:'Noticias',        videoId:'1fC0B2UhSx4' },
+    { id:'cronica',   nombre:'Crónica TV',   logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Cr%C3%B3nica_TV_logo_2017.svg/300px-Cr%C3%B3nica_TV_logo_2017.svg.png', categoria:'Noticias', videoId:'Vy5O-dxSaXY' },
+    { id:'a24',       nombre:'A24',           logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/A24_television_argentina_logo.svg/300px-A24_television_argentina_logo.svg.png', categoria:'Noticias', videoId:'6Nx-R3KND0Y' },
+    { id:'lnmas',     nombre:'LN+',           logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/LN%2B_logo.svg/300px-LN%2B_logo.svg.png',                     categoria:'Noticias',        videoId:'Y30dM3oT9_s' },
+    { id:'america',   nombre:'América TV',    logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Am%C3%A9rica_TV_logo_2019.svg/300px-Am%C3%A9rica_TV_logo_2019.svg.png', categoria:'General', videoId:'s8CJLE7EHSA' },
+    { id:'tvpublica', nombre:'TV Pública',    logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Televisi%C3%B3n_P%C3%BAblica_Argentina_-_Logo_2021.svg/200px-Televisi%C3%B3n_P%C3%BAblica_Argentina_-_Logo_2021.svg.png', categoria:'General', videoId:'MPJuR6z7kpI' },
+    { id:'canal26',   nombre:'Canal 26',      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Canal_26_Logo_2023.png/300px-Canal_26_Logo_2023.png',         categoria:'Noticias',        videoId:null, ytHandle:'canal26argentina' },
+    { id:'eltrece',   nombre:'El Trece',      logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Logo_El_Trece_2019.svg/300px-Logo_El_Trece_2019.svg.png',    categoria:'General',         videoId:null, ytHandle:'eltrece' },
+    { id:'nettv',     nombre:'Net TV',        logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Logo_Net_TV.png/300px-Logo_Net_TV.png',                       categoria:'General',         videoId:null, ytHandle:'nettvargentina' },
 ];
 
-var canalActual = null;
-
-function showOverlay(txt) {
-    // Modo spinner
-    document.getElementById('overlaySpinner').style.display = '';
-    document.getElementById('overlayNoEmbed').classList.add('hidden');
-    document.getElementById('overlayNoEmbed').classList.remove('flex');
-    if (txt) document.getElementById('overlayTxt').innerText = txt;
-    document.getElementById('overlay').classList.remove('oculto');
-}
-function hideOverlay() {
-    document.getElementById('overlay').classList.add('oculto');
-}
-
-function cargarCanal(canal) {
-    canalActual = canal;
-    document.getElementById('nombreCanal').innerText    = canal.nombre;
-    document.getElementById('categoriaCanal').innerText = canal.categoria + ' · 🇦🇷 Argentina';
-    document.getElementById('logoImg').src              = canal.logo;
-    document.title = 'MovieM | ' + canal.nombre;
-
-    document.querySelectorAll('.card-mini').forEach(function(el) {
-        el.classList.toggle('activo', el.dataset.id === canal.id);
+function renderArgentina() {
+    var grid = document.getElementById('gridArgentina');
+    CANALES_AR.forEach(function(c) {
+        var div = document.createElement('div');
+        div.className = 'card-canal bg-zinc-900/60 border border-white/5 rounded-2xl p-3 flex flex-col items-center gap-2.5 fade-in';
+        div.innerHTML =
+            '<div class="w-16 h-16 rounded-xl overflow-hidden bg-white flex items-center justify-center p-2 shadow-lg">'
+          +   '<img src="' + c.logo + '" class="max-w-full max-h-full object-contain" loading="lazy" onerror="this.src=\'https://via.placeholder.com/64/09090b/dc2626?text=TV\'">'
+          + '</div>'
+          + '<div class="text-center">'
+          +   '<p class="text-xs font-black uppercase tracking-tight leading-tight">' + c.nombre + '</p>'
+          +   '<p class="text-[9px] text-zinc-600 font-bold mt-0.5">' + c.categoria + '</p>'
+          + '</div>'
+          + '<div class="flex items-center gap-1 bg-red-600/10 border border-red-600/20 px-2 py-0.5 rounded-full">'
+          +   '<span class="w-1.5 h-1.5 rounded-full bg-red-500 live-dot"></span>'
+          +   '<span class="text-[8px] font-black uppercase text-red-400">Live</span>'
+          + '</div>';
+        div.onclick = function() { abrirCanalYT(c); };
+        grid.appendChild(div);
     });
+}
 
-    var frame = document.getElementById('ytFrame');
-    frame.src = 'about:blank';
+// ── PLAYER OVERLAY ───────────────────────────────────────────────
+var hlsInstance = null;
 
-    // Usar el video ID del live permanente del canal
+function mostrarLoading() {
+    document.getElementById('playerLoading').classList.remove('hidden');
+    document.getElementById('playerError').style.display = 'none';
+}
+function ocultarLoading() {
+    document.getElementById('playerLoading').classList.add('hidden');
+}
+function mostrarError() {
+    document.getElementById('playerLoading').classList.add('hidden');
+    document.getElementById('playerError').style.display = 'flex';
+}
+
+function abrirOverlay(nombre) {
+    document.getElementById('overlayNombre').innerText = nombre;
+    document.getElementById('playerOverlay').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    mostrarLoading();
+}
+
+// Abrir canal YouTube (Argentina)
+function abrirCanalYT(canal) {
+    // Limpiar HLS si estaba
+    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+    document.getElementById('hlsVideo').style.display = 'none';
+    document.getElementById('hlsVideo').src = '';
+
+    abrirOverlay(canal.nombre);
+
+    var yt = document.getElementById('ytFrameOverlay');
+    yt.style.display = 'block';
+
     if (canal.videoId) {
-        showOverlay('Conectando con ' + canal.nombre + '...');
-        var src = 'https://www.youtube-nocookie.com/embed/' + canal.videoId
-            + '?autoplay=1&rel=0&modestbranding=1&controls=1';
-        setTimeout(function() {
-            frame.src = src;
-            frame.onload = function() { setTimeout(hideOverlay, 900); };
-        }, 120);
+        yt.src = 'https://www.youtube-nocookie.com/embed/' + canal.videoId + '?autoplay=1&rel=0&modestbranding=1&controls=1';
+        yt.onload = function() { setTimeout(ocultarLoading, 800); };
     } else {
-        // Sin videoId: mostrar overlay con botón directo a YouTube
-        document.getElementById('overlaySpinner').style.display = 'none';
-        var noEmbed = document.getElementById('overlayNoEmbed');
-        noEmbed.innerHTML =
-            '<svg class="w-12 h-12 text-zinc-700 mb-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a2.994 2.994 0 00-2.107-2.117C19.379 3.5 12 3.5 12 3.5s-7.379 0-9.391.569A2.994 2.994 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a2.994 2.994 0 002.107 2.117C4.621 20.5 12 20.5 12 20.5s7.379 0 9.391-.569a2.994 2.994 0 002.107-2.117C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>'
-            + '<p class="text-zinc-400 text-sm mb-5 text-center">Este canal no permite embed.<br>Tocá el botón para verlo en vivo en YouTube.</p>'
-            + '<a href="https://www.youtube.com/@' + (canal.ytHandle||'') + '/live" target="_blank" '
-            + '   class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full font-black text-xs uppercase tracking-widest transition">'
-            + '   Ver en YouTube ↗</a>';
-        noEmbed.classList.remove('hidden');
-        noEmbed.classList.add('flex');
-        document.getElementById('overlay').classList.remove('oculto');
+        // Sin video ID — mostrar error con link a YT
+        ocultarLoading();
+        document.getElementById('playerError').style.display = 'flex';
+        document.getElementById('playerError').innerHTML =
+            '<svg class="w-14 h-14 text-zinc-700 mb-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a2.994 2.994 0 00-2.107-2.117C19.379 3.5 12 3.5 12 3.5s-7.379 0-9.391.569A2.994 2.994 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a2.994 2.994 0 002.107 2.117C4.621 20.5 12 20.5 12 20.5s7.379 0 9.391-.569a2.994 2.994 0 002.107-2.117C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>'
+          + '<p class="text-white font-black text-sm mb-1">No disponible como embed</p>'
+          + '<p class="text-zinc-500 text-xs mb-5">Este canal no permite reproducción en la app.</p>'
+          + '<a href="https://www.youtube.com/@' + (canal.ytHandle||'') + '/live" target="_blank" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-full font-black text-xs uppercase tracking-widest transition mb-3">Ver en YouTube ↗</a>'
+          + '<button onclick="cerrarPlayer()" class="text-zinc-500 text-xs mt-1">Volver</button>';
     }
 }
 
-function fullscreen() {
-    var box = document.getElementById('playerBox');
-    if (box.requestFullscreen)            box.requestFullscreen();
-    else if (box.webkitRequestFullscreen) box.webkitRequestFullscreen();
-}
-window.fullscreen = fullscreen;
+// Abrir canal IPTV con HLS.js
+function abrirCanalIPTV(canal) {
+    // Limpiar YouTube
+    var yt = document.getElementById('ytFrameOverlay');
+    yt.style.display = 'none';
+    yt.src = '';
 
-function renderSidebar() {
-    var sb = document.getElementById('sidebar');
-    sb.innerHTML = '';
-    CANALES.forEach(function(c) {
-        var div = document.createElement('div');
-        div.className = 'card-mini flex items-center gap-3 bg-zinc-900/50 border border-white/5 rounded-2xl p-3 active:scale-95';
-        div.dataset.id = c.id;
-        div.onclick = function() { cargarCanal(c); };
-        div.innerHTML =
-            '<div class="w-10 h-10 rounded-xl overflow-hidden bg-white flex items-center justify-center p-1 shrink-0">'
-          +   '<img src="' + c.logo + '" class="max-w-full max-h-full object-contain" loading="lazy">'
-          + '</div>'
-          + '<div class="flex-1 min-w-0">'
-          +   '<p class="text-xs font-black uppercase tracking-tight truncate">' + c.nombre + '</p>'
-          +   '<p class="text-[9px] text-zinc-600 uppercase font-bold">' + c.categoria + '</p>'
-          + '</div>'
-          + '<span class="w-1.5 h-1.5 rounded-full bg-red-500 live-dot shrink-0"></span>';
-        sb.appendChild(div);
+    abrirOverlay(canal.nombre);
+
+    var video = document.getElementById('hlsVideo');
+    video.style.display = 'block';
+
+    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+
+    if (Hls.isSupported()) {
+        hlsInstance = new Hls({
+            enableWorker: true,
+            lowLatencyMode: true,
+            backBufferLength: 90,
+        });
+        hlsInstance.loadSource(canal.url);
+        hlsInstance.attachMedia(video);
+        hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
+            video.play().catch(function(){});
+            setTimeout(ocultarLoading, 600);
+        });
+        hlsInstance.on(Hls.Events.ERROR, function(event, data) {
+            if (data.fatal) mostrarError();
+        });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Safari nativo
+        video.src = canal.url;
+        video.addEventListener('loadedmetadata', function() {
+            video.play().catch(function(){});
+            ocultarLoading();
+        });
+        video.addEventListener('error', mostrarError);
+    } else {
+        mostrarError();
+    }
+}
+
+window.cerrarPlayer = function() {
+    document.getElementById('playerOverlay').style.display = 'none';
+    // Limpiar video
+    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+    var video = document.getElementById('hlsVideo');
+    video.pause(); video.src = ''; video.style.display = 'none';
+    var yt = document.getElementById('ytFrameOverlay');
+    yt.src = ''; yt.style.display = 'none';
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+};
+
+window.fullscreenPlayer = function() {
+    var el = document.getElementById('playerOverlay');
+    if (el.requestFullscreen) el.requestFullscreen();
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+};
+
+// ── TABS ─────────────────────────────────────────────────────────
+var iptvCargado = false;
+window.mostrarTab = function(tab) {
+    document.getElementById('seccion-argentina').classList.toggle('hidden', tab !== 'argentina');
+    document.getElementById('seccion-iptv').classList.toggle('hidden', tab !== 'iptv');
+    document.getElementById('tab-argentina').classList.toggle('active', tab === 'argentina');
+    document.getElementById('tab-iptv').classList.toggle('active', tab === 'iptv');
+    if (tab === 'iptv' && !iptvCargado) { cargarIPTV(); iptvCargado = true; }
+};
+
+// ── IPTV — cargar y parsear m3u ───────────────────────────────────
+var todosCanalesIPTV = [];
+var canalesFiltrados = [];
+
+function parsearM3U(texto) {
+    var canales = [];
+    var lineas = texto.split('\n');
+    var actual = null;
+    for (var i = 0; i < lineas.length; i++) {
+        var linea = lineas[i].trim();
+        if (linea.startsWith('#EXTINF')) {
+            actual = {};
+            // nombre
+            var partes = linea.split(',');
+            actual.nombre = partes.length > 1 ? partes[partes.length-1].trim() : 'Canal';
+            // atributos
+            var attrMatch = linea.match(/tvg-logo="([^"]*)"/);
+            actual.logo = attrMatch ? attrMatch[1] : '';
+            var paisMatch = linea.match(/tvg-country="([^"]*)"/);
+            actual.pais = paisMatch ? paisMatch[1] : '';
+            var catMatch = linea.match(/group-title="([^"]*)"/);
+            actual.categoria = catMatch ? catMatch[1] : 'General';
+        } else if (linea && !linea.startsWith('#') && actual) {
+            actual.url = linea;
+            if (actual.nombre && actual.url) canales.push(actual);
+            actual = null;
+        }
+    }
+    return canales;
+}
+
+function cargarIPTV() {
+    // Usar proxy CORS para evitar bloqueo
+    var url = 'https://corsproxy.io/?' + encodeURIComponent('https://iptv-org.github.io/iptv/index.m3u');
+    fetch(url)
+        .then(function(r) { return r.text(); })
+        .then(function(texto) {
+            todosCanalesIPTV = parsearM3U(texto);
+            // Limitar a 2000 canales para performance
+            if (todosCanalesIPTV.length > 2000) todosCanalesIPTV = todosCanalesIPTV.slice(0, 2000);
+            poblarFiltros();
+            canalesFiltrados = todosCanalesIPTV;
+            renderGridIPTV();
+            document.getElementById('iptvStatus').style.display = 'none';
+        })
+        .catch(function(err) {
+            console.error(err);
+            document.getElementById('iptvStatus').innerHTML =
+                '<p class="text-zinc-500 text-sm">No se pudo cargar la lista. Intentá de nuevo.</p>'
+              + '<button onclick="cargarIPTV()" class="mt-3 bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest transition">Reintentar</button>';
+        });
+}
+
+function poblarFiltros() {
+    var paises = [...new Set(todosCanalesIPTV.map(function(c){ return c.pais; }).filter(Boolean))].sort();
+    var cats   = [...new Set(todosCanalesIPTV.map(function(c){ return c.categoria; }).filter(Boolean))].sort();
+
+    var selPais = document.getElementById('filtroPais');
+    paises.forEach(function(p) {
+        var o = document.createElement('option'); o.value = p; o.textContent = p;
+        selPais.appendChild(o);
+    });
+    var selCat = document.getElementById('filtroCategoria');
+    cats.forEach(function(c) {
+        var o = document.createElement('option'); o.value = c; o.textContent = c;
+        selCat.appendChild(o);
     });
 }
 
-var params  = new URLSearchParams(location.search);
-var initId  = params.get('id') || 'tn';
-var init    = CANALES.find(function(c){ return c.id === initId; }) || CANALES[0];
-renderSidebar();
-cargarCanal(init);
+window.filtrarIPTV = function() {
+    var busq  = document.getElementById('buscadorIPTV').value.toLowerCase();
+    var pais  = document.getElementById('filtroPais').value;
+    var cat   = document.getElementById('filtroCategoria').value;
+    canalesFiltrados = todosCanalesIPTV.filter(function(c) {
+        return (!busq || c.nombre.toLowerCase().includes(busq))
+            && (!pais || c.pais === pais)
+            && (!cat  || c.categoria === cat);
+    });
+    renderGridIPTV();
+};
+
+function renderGridIPTV() {
+    var grid = document.getElementById('gridIPTV');
+    var contador = document.getElementById('contadorIPTV');
+    grid.innerHTML = '';
+    contador.classList.remove('hidden');
+    contador.innerText = canalesFiltrados.length + ' canales';
+
+    // Mostrar máx 300 a la vez para no trabar el browser
+    var visible = canalesFiltrados.slice(0, 300);
+    visible.forEach(function(c) {
+        var div = document.createElement('div');
+        div.className = 'card-canal bg-zinc-900/60 border border-white/5 rounded-2xl p-3 flex flex-col items-center gap-2 fade-in';
+        var logoHtml = c.logo
+            ? '<img src="' + c.logo + '" class="max-w-full max-h-full object-contain" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+              + '<span style="display:none" class="text-red-600 font-black text-lg">▶</span>'
+            : '<span class="text-red-600 font-black text-xl">▶</span>';
+        div.innerHTML =
+            '<div class="w-14 h-14 rounded-xl overflow-hidden bg-zinc-800 flex items-center justify-center p-1.5 shadow">'
+          +   logoHtml
+          + '</div>'
+          + '<div class="text-center w-full">'
+          +   '<p class="text-[10px] font-black uppercase tracking-tight leading-tight line-clamp-2">' + c.nombre + '</p>'
+          +   (c.pais ? '<p class="text-[8px] text-zinc-600 font-bold mt-0.5">' + c.pais + (c.categoria ? ' · ' + c.categoria : '') + '</p>' : '')
+          + '</div>'
+          + '<div class="flex items-center gap-1 bg-red-600/10 border border-red-600/20 px-2 py-0.5 rounded-full">'
+          +   '<span class="w-1.5 h-1.5 rounded-full bg-red-500 live-dot"></span>'
+          +   '<span class="text-[8px] font-black uppercase text-red-400">Live</span>'
+          + '</div>';
+        div.onclick = (function(canal){ return function(){ abrirCanalIPTV(canal); }; })(c);
+        grid.appendChild(div);
+    });
+
+    if (canalesFiltrados.length > 300) {
+        var msg = document.createElement('p');
+        msg.className = 'col-span-full text-center text-zinc-600 text-xs py-4';
+        msg.innerText = 'Mostrando 300 de ' + canalesFiltrados.length + '. Usá los filtros para refinar.';
+        grid.appendChild(msg);
+    }
+}
+
+// ── INIT ─────────────────────────────────────────────────────────
+renderArgentina();
 </script>
 </body>
 </html>
