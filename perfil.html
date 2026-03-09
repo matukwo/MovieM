@@ -13,9 +13,10 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .avatar-container:hover .overlay-edit { opacity: 1; }
         #actorCarousel { transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-
         .fade-in { animation: fadeIn 0.6s ease forwards; opacity: 0; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        .genre-chip { transition: all 0.15s ease; cursor: pointer; }
+        .genre-chip.selected { background-color: var(--accent-color) !important; border-color: var(--accent-color) !important; color: white !important; }
     </style>
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden">
@@ -39,6 +40,17 @@
     </div>
 </div>
 
+<!-- MODAL GÉNEROS -->
+<div id="modalGeneros" class="fixed inset-0 z-[350] flex items-center justify-center bg-black/80 hidden px-4">
+    <div class="bg-zinc-900 border border-white/10 w-full max-w-md rounded-3xl p-8 shadow-2xl">
+        <h4 class="text-xs font-black uppercase tracking-widest mb-1 text-accent text-center">Géneros Favoritos</h4>
+        <p class="text-[9px] text-zinc-500 uppercase tracking-widest text-center mb-6">Elegí hasta 5 géneros</p>
+        <div id="listaGenerosDisponibles" class="flex flex-wrap gap-2 justify-center max-h-64 overflow-y-auto no-scrollbar py-2"></div>
+        <button onclick="guardarGeneros()" class="w-full mt-6 bg-accent py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition">Guardar</button>
+        <button onclick="cerrarModalGeneros()" class="w-full mt-2 text-[9px] font-bold uppercase text-zinc-500 tracking-widest py-2">Cancelar</button>
+    </div>
+</div>
+
 <!-- MODAL BÚSQUEDA GENERAL -->
 <div id="modalBusqueda" class="fixed inset-0 z-[350] flex items-center justify-center bg-black/80 hidden px-4">
     <div class="bg-zinc-900 border border-white/10 w-full max-w-md rounded-3xl p-6 shadow-2xl">
@@ -59,14 +71,14 @@
         <h1 class="text-3xl font-black text-accent tracking-tighter cursor-pointer" onclick="window.location.href='index.html'">MOVIE<span class="text-white font-light">M</span></h1>
     </div>
     <div class="flex items-center justify-end">
-        <button id="btnCerrarSesion" onclick="cerrarSesion()" class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition px-4 py-2 border border-zinc-800 rounded-full">
+        <button onclick="cerrarSesion()" class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition px-4 py-2 border border-zinc-800 rounded-full">
             Cerrar Sesión
         </button>
     </div>
 </nav>
 
 <!-- ESTADO: NO LOGUEADO -->
-<div id="estadoNoLogueado" class="hidden flex flex-col items-center justify-center min-h-[60vh] text-center px-6">
+<div id="estadoNoLogueado" class="hidden flex-col items-center justify-center min-h-[60vh] text-center px-6">
     <div class="w-20 h-20 bg-zinc-900 rounded-full flex items-center justify-center mb-6 border border-white/5">
         <svg class="w-8 h-8 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -82,9 +94,9 @@
 
     <section class="flex flex-col md:flex-row items-center md:items-start gap-10 mb-16 border-b border-white/5 pb-12 w-full fade-in">
         <div class="relative avatar-container cursor-pointer shrink-0" onclick="abrirOpcionesAvatar()">
-            <div class="w-32 h-32 bg-zinc-900 border-4 border-accent rounded-full flex items-center justify-center text-6xl font-black italic shadow-2xl overflow-hidden" id="userAvatarFrame">M</div>
+            <div class="w-32 h-32 bg-zinc-900 border-4 border-accent rounded-full flex items-center justify-center text-5xl font-black italic shadow-2xl overflow-hidden" id="userAvatarFrame">M</div>
             <div class="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 overlay-edit transition-opacity">
-                <svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
             </div>
         </div>
 
@@ -93,37 +105,45 @@
                 <div class="flex flex-col md:flex-row md:items-center gap-6 mb-4 justify-center md:justify-start">
                     <h2 class="text-4xl font-black uppercase tracking-tighter" id="profileName">...</h2>
                     <div class="flex justify-center gap-6 h-full items-center border-l border-white/5 pl-6">
-                        <div class="text-center md:text-left h-full flex flex-col justify-between">
-                            <span class="block text-xl font-bold leading-none">452</span>
+                        <div class="text-center md:text-left">
+                            <span class="block text-xl font-bold leading-none">0</span>
                             <span class="text-[8px] text-zinc-500 uppercase font-black tracking-widest mt-1">Seguidores</span>
                         </div>
-                        <div class="text-center md:text-left h-full flex flex-col justify-between">
-                            <span class="block text-xl font-bold leading-none">128</span>
+                        <div class="text-center md:text-left">
+                            <span class="block text-xl font-bold leading-none">0</span>
                             <span class="text-[8px] text-zinc-500 uppercase font-black tracking-widest mt-1">Siguiendo</span>
                         </div>
                     </div>
                 </div>
 
-                <div id="contenedorBio" class="mb-4 flex items-start gap-4 justify-center md:justify-start group min-h-[80px]">
+                <div id="contenedorBio" class="mb-4 flex items-start gap-4 justify-center md:justify-start group min-h-[60px]">
                     <p class="text-zinc-300 text-lg italic leading-relaxed max-w-xl" id="userBio">Escribe algo sobre ti...</p>
                     <button onclick="editarBio()" class="text-accent opacity-0 group-hover:opacity-100 transition-opacity mt-1.5 shrink-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                     </button>
                 </div>
-                <div class="flex flex-wrap justify-center md:justify-start gap-2" id="generosCont"></div>
+
+                <!-- Géneros -->
+                <div class="flex flex-wrap justify-center md:justify-start gap-2 items-center mb-2" id="generosCont"></div>
+                <button onclick="abrirModalGeneros()" class="text-[9px] font-black uppercase tracking-widest text-accent hover:underline">✎ Editar géneros</button>
             </div>
 
-            <div class="w-full md:w-48 shrink-0 md:pt-2">
-                <div class="bg-zinc-900/30 p-5 rounded-3xl border border-white/5 text-center min-h-[120px] flex flex-col justify-center">
+            <div class="w-full md:w-52 shrink-0 md:pt-2 space-y-4">
+                <div class="bg-zinc-900/30 p-5 rounded-3xl border border-white/5 text-center">
                     <h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-4 italic">Color de Acento</h3>
                     <div class="flex flex-wrap justify-center gap-3">
-                        <div onclick="cambiarColor('#dc2626')" class="w-6 h-6 rounded-full bg-red-600 cursor-pointer hover:scale-110 transition border-2 border-transparent"></div>
-                        <div onclick="cambiarColor('#2563eb')" class="w-6 h-6 rounded-full bg-blue-600 cursor-pointer hover:scale-110 transition border-2 border-transparent"></div>
-                        <div onclick="cambiarColor('#16a34a')" class="w-6 h-6 rounded-full bg-green-600 cursor-pointer hover:scale-110 transition border-2 border-transparent"></div>
-                        <div onclick="cambiarColor('#9333ea')" class="w-6 h-6 rounded-full bg-purple-600 cursor-pointer hover:scale-110 transition border-2 border-transparent"></div>
-                        <div onclick="cambiarColor('#ea580c')" class="w-6 h-6 rounded-full bg-orange-600 cursor-pointer hover:scale-110 transition border-2 border-transparent"></div>
-                        <div onclick="cambiarColor('#0891b2')" class="w-6 h-6 rounded-full bg-cyan-600 cursor-pointer hover:scale-110 transition border-2 border-transparent"></div>
+                        <div onclick="cambiarColor('#dc2626')" class="w-6 h-6 rounded-full bg-red-600 cursor-pointer hover:scale-110 transition"></div>
+                        <div onclick="cambiarColor('#2563eb')" class="w-6 h-6 rounded-full bg-blue-600 cursor-pointer hover:scale-110 transition"></div>
+                        <div onclick="cambiarColor('#16a34a')" class="w-6 h-6 rounded-full bg-green-600 cursor-pointer hover:scale-110 transition"></div>
+                        <div onclick="cambiarColor('#9333ea')" class="w-6 h-6 rounded-full bg-purple-600 cursor-pointer hover:scale-110 transition"></div>
+                        <div onclick="cambiarColor('#ea580c')" class="w-6 h-6 rounded-full bg-orange-600 cursor-pointer hover:scale-110 transition"></div>
+                        <div onclick="cambiarColor('#0891b2')" class="w-6 h-6 rounded-full bg-cyan-600 cursor-pointer hover:scale-110 transition"></div>
                     </div>
+                </div>
+                <div class="bg-zinc-900/30 p-5 rounded-3xl border border-white/5 text-center">
+                    <h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-3 italic">Membresía</h3>
+                    <span class="text-xl font-black uppercase tracking-tighter text-zinc-400 block mb-3">Estándar</span>
+                    <a href="membresias.html" class="block w-full text-center py-2.5 bg-accent rounded-xl text-[9px] font-black uppercase tracking-widest text-white hover:opacity-90 transition">Subir de Rango</a>
                 </div>
             </div>
         </div>
@@ -137,23 +157,29 @@
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="favContainer"></div>
             </section>
 
-            <section class="w-full fade-in" style="animation-delay:0.2s">
+            <section class="w-full fade-in" style="animation-delay:0.15s">
                 <h3 class="text-xs font-black uppercase tracking-[0.3em] text-zinc-500 mb-6 flex items-center gap-2"><span class="w-8 h-px bg-accent inline-block"></span> Películas Guardadas</h3>
                 <div id="watchlistPreview" class="grid grid-cols-3 sm:grid-cols-6 gap-3">
                     <p class="text-zinc-600 text-xs col-span-6 italic">Cargando...</p>
                 </div>
             </section>
 
-            <section class="w-full fade-in" style="animation-delay:0.3s">
-                <h3 class="text-xs font-black uppercase tracking-[0.3em] text-zinc-500 mb-6 flex items-center gap-2"><span class="w-8 h-px bg-accent inline-block"></span> Últimos Comentarios</h3>
+            <section class="w-full fade-in" style="animation-delay:0.2s">
+                <h3 class="text-xs font-black uppercase tracking-[0.3em] text-zinc-500 mb-6 flex items-center gap-2">
+                    <span class="w-8 h-px bg-accent inline-block"></span> Últimos Comentarios
+                    <span id="contComentarios" class="text-[8px] bg-zinc-800 px-2 py-0.5 rounded font-black text-zinc-400 ml-1"></span>
+                </h3>
                 <div id="contenedorComentarios" class="space-y-4">
-                    <p class="text-zinc-600 text-xs italic">Cargando comentarios...</p>
+                    <div class="flex items-center gap-3 text-zinc-600">
+                        <div class="w-4 h-4 border-2 border-zinc-700 border-t-accent rounded-full animate-spin"></div>
+                        <span class="text-xs italic">Cargando comentarios...</span>
+                    </div>
                 </div>
             </section>
         </div>
 
-        <aside class="space-y-8 w-full lg:pt-1 fade-in" style="animation-delay:0.15s">
-            <section class="bg-zinc-900/30 p-6 rounded-3xl border border-white/5 text-center relative overflow-hidden group shadow-lg min-h-[220px] flex flex-col">
+        <aside class="space-y-8 w-full lg:pt-1">
+            <section class="bg-zinc-900/30 p-6 rounded-3xl border border-white/5 text-center relative overflow-hidden group shadow-lg min-h-[220px] flex flex-col fade-in">
                 <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-4 italic">Actores Favoritos</h3>
                 <div class="relative overflow-hidden flex-1">
                     <div id="actorCarousel" class="flex transition-transform duration-500 h-full"></div>
@@ -166,14 +192,6 @@
                 </button>
                 <button onclick="abrirBuscadorActor()" class="mt-4 text-[9px] font-black uppercase tracking-widest text-accent hover:underline">+ Agregar Actor</button>
             </section>
-
-            <section class="bg-zinc-900/30 p-6 rounded-3xl border border-white/5 fade-in" style="animation-delay:0.25s">
-                <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-4 italic">Membresía</h3>
-                <div id="planBadge" class="flex flex-col items-center gap-3">
-                    <span class="text-2xl font-black uppercase tracking-tighter text-zinc-400">Estándar</span>
-                    <a href="membresias.html" class="w-full text-center py-3 bg-accent rounded-xl text-[9px] font-black uppercase tracking-widest text-white hover:opacity-90 transition">Subir de Rango</a>
-                </div>
-            </section>
         </aside>
     </div>
 </main>
@@ -181,7 +199,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, collection, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAn5N7m7EhICK2aZG4Nx8DIW9RZd9kK1DA",
@@ -197,137 +215,192 @@
     const db = getFirestore(app);
     const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
 
-    // ── FIREBASE AUTH LISTENER ──────────────────────────────────
+    const GENEROS_TMDB = [
+        { id: 28, name: "Acción" }, { id: 12, name: "Aventura" }, { id: 16, name: "Animación" },
+        { id: 35, name: "Comedia" }, { id: 80, name: "Crimen" }, { id: 99, name: "Documental" },
+        { id: 18, name: "Drama" }, { id: 10751, name: "Familia" }, { id: 14, name: "Fantasía" },
+        { id: 36, name: "Historia" }, { id: 27, name: "Terror" }, { id: 10402, name: "Música" },
+        { id: 9648, name: "Misterio" }, { id: 10749, name: "Romance" }, { id: 878, name: "Ciencia ficción" },
+        { id: 53, name: "Thriller" }, { id: 10752, name: "Bélica" }, { id: 37, name: "Western" }
+    ];
+
+    let generosSeleccionados = JSON.parse(localStorage.getItem('movieM_generos_ids')) || [];
+
+    // ── AUTH ──────────────────────────────────────────────────────
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
-            document.getElementById('estadoNoLogueado').classList.remove('hidden');
-            document.getElementById('estadoNoLogueado').classList.add('flex');
+            const el = document.getElementById('estadoNoLogueado');
+            el.classList.remove('hidden');
+            el.classList.add('flex');
             return;
         }
 
-        // Mostrar contenido
         document.getElementById('contenidoPerfil').classList.remove('hidden');
 
-        // Obtener datos de Firestore
         const userDoc = await getDoc(doc(db, "usuarios", user.uid));
         const username = userDoc.exists() ? userDoc.data().username : user.email.split('@')[0];
-
-        // Guardar en localStorage para compatibilidad con pelicula.html
         localStorage.setItem('usuarioMovieM', username);
-
         document.getElementById('profileName').innerText = username;
 
-        // Cargar color guardado
-        const savedColor = userDoc.exists() && userDoc.data().color ? userDoc.data().color : localStorage.getItem('movieM_color');
-        if (savedColor) {
-            document.documentElement.style.setProperty('--accent-color', savedColor);
-        }
+        const savedColor = (userDoc.exists() && userDoc.data().color) || localStorage.getItem('movieM_color');
+        if (savedColor) document.documentElement.style.setProperty('--accent-color', savedColor);
 
-        // Cargar watchlist desde Firestore
-        if (userDoc.exists() && userDoc.data().watchlist) {
-            cargarWatchlistPreview(userDoc.data().watchlist);
-        } else {
-            document.getElementById('watchlistPreview').innerHTML = `<p class="text-zinc-600 text-xs col-span-6 italic">Sin películas guardadas aún.</p>`;
-        }
-
-        // Cargar comentarios del usuario desde Firestore
-        cargarComentariosUsuario(username);
-
-        // Inicializar todo lo demás
-        inicializarPerfil();
+        const watchlist = (userDoc.exists() && userDoc.data().watchlist) || [];
+        cargarWatchlistPreview(watchlist);
+        await cargarComentariosUsuario(username);
+        inicializarPerfil(username);
     });
 
-    // ── WATCHLIST PREVIEW ───────────────────────────────────────
+    // ── WATCHLIST ─────────────────────────────────────────────────
     async function cargarWatchlistPreview(ids) {
         const cont = document.getElementById('watchlistPreview');
         if (!ids || ids.length === 0) {
-            cont.innerHTML = `<p class="text-zinc-600 text-xs col-span-6 italic">Sin películas guardadas.</p>`;
+            cont.innerHTML = `<p class="text-zinc-600 text-xs col-span-6 italic">Sin películas guardadas aún.</p>`;
             return;
         }
         try {
-            const slice = ids.slice(0, 6);
             const pelis = await Promise.all(
-                slice.map(id => fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=es-ES`).then(r => r.json()))
+                ids.slice(0, 6).map(id =>
+                    fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=es-ES`).then(r => r.json())
+                )
             );
-            cont.innerHTML = pelis.map(p => `
+            cont.innerHTML = pelis.filter(p => p.poster_path).map(p => `
                 <div onclick="window.location.href='pelicula.html?id=${p.id}'" class="cursor-pointer group">
                     <div class="aspect-[2/3] overflow-hidden rounded-xl border border-white/5 group-hover:border-accent transition">
-                        <img src="https://image.tmdb.org/t/p/w200${p.poster_path}" class="w-full h-full object-cover">
+                        <img src="https://image.tmdb.org/t/p/w200${p.poster_path}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                     </div>
-                </div>
-            `).join('');
+                </div>`).join('');
             if (ids.length > 6) {
                 cont.innerHTML += `<a href="mi_lista.html" class="col-span-6 text-[9px] font-black uppercase tracking-widest text-accent hover:underline mt-2 block">Ver toda la lista (${ids.length}) →</a>`;
             }
         } catch(e) { console.error(e); }
     }
 
-    // ── COMENTARIOS USUARIO ──────────────────────────────────────
+    // ── COMENTARIOS ───────────────────────────────────────────────
     async function cargarComentariosUsuario(username) {
         const cont = document.getElementById('contenedorComentarios');
         try {
-            const q = query(
-                collection(db, "comentarios"),
-                where("user", "==", username),
-                orderBy("fecha", "desc")
-            );
+            // Sin orderBy compuesto: evita necesidad de índice en Firestore
+            const q = query(collection(db, "comentarios"), where("user", "==", username));
             const snapshot = await getDocs(q);
+
             if (snapshot.empty) {
                 cont.innerHTML = `<p class="text-zinc-600 text-sm italic">Todavía no escribiste ningún comentario.</p>`;
                 return;
             }
-            cont.innerHTML = "";
-            for (const docSnap of snapshot.docs) {
-                const c = docSnap.data();
-                const fecha = c.fecha ? new Date(c.fecha).toLocaleDateString('es-ES') : "Reciente";
-                // Intentar traer poster de la peli
-                let posterHTML = '';
-                try {
-                    const pRes = await fetch(`https://api.themoviedb.org/3/movie/${c.movieID}?api_key=${API_KEY}&language=es-ES`);
-                    const pData = await pRes.json();
-                    posterHTML = `<img src="https://image.tmdb.org/t/p/w200${pData.poster_path}" class="w-12 rounded-lg shadow-lg shrink-0" onclick="window.location.href='pelicula.html?id=${c.movieID}'" style="cursor:pointer">`;
-                } catch(e) {}
 
-                cont.innerHTML += `
-                    <div class="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 flex items-start gap-4 shadow-lg">
-                        ${posterHTML}
-                        <div class="min-w-0">
-                            <div class="flex items-center gap-3 mb-1">
-                                <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-tighter">${fecha}</p>
-                                <span class="text-yellow-500 text-[9px]">${"★".repeat(c.rating)}</span>
-                            </div>
-                            <p class="text-zinc-300 italic text-sm leading-relaxed">"${c.txt}"</p>
+            // Ordenar localmente por fecha desc
+            const comentarios = [];
+            snapshot.forEach(d => comentarios.push({ ...d.data() }));
+            comentarios.sort((a, b) => (b.fecha || 0) - (a.fecha || 0));
+
+            document.getElementById('contComentarios').innerText = comentarios.length;
+
+            // Traer datos de películas en paralelo (sin duplicados)
+            const movieIds = [...new Set(comentarios.map(c => c.movieID))];
+            const movieMap = {};
+            await Promise.all(movieIds.map(async id => {
+                try {
+                    const r = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=es-ES`);
+                    movieMap[id] = await r.json();
+                } catch(e) {}
+            }));
+
+            cont.innerHTML = comentarios.map(c => {
+                const fecha = c.fecha
+                    ? new Date(c.fecha).toLocaleDateString('es-ES', { day:'2-digit', month:'short', year:'numeric' })
+                    : 'Reciente';
+                const peli = movieMap[c.movieID];
+                const posterHTML = (peli && peli.poster_path)
+                    ? `<img src="https://image.tmdb.org/t/p/w200${peli.poster_path}"
+                            class="w-14 h-20 rounded-xl object-cover shrink-0 cursor-pointer hover:opacity-80 transition border border-white/5"
+                            onclick="window.location.href='pelicula.html?id=${c.movieID}'">`
+                    : `<div class="w-14 h-20 rounded-xl bg-zinc-800 shrink-0 border border-white/5 flex items-center justify-center text-zinc-600 text-xl">🎬</div>`;
+                const titulo = peli ? peli.title : `Película #${c.movieID}`;
+                const estrellas = '★'.repeat(c.rating || 0) + '<span class="text-zinc-700">' + '★'.repeat(5 - (c.rating || 0)) + '</span>';
+
+                return `<div class="bg-zinc-900/50 p-5 rounded-2xl border border-white/5 flex items-start gap-4 shadow-lg">
+                    ${posterHTML}
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-start justify-between gap-2 mb-1 flex-wrap">
+                            <p class="text-[10px] text-zinc-400 font-bold uppercase tracking-tighter cursor-pointer hover:text-white transition leading-snug"
+                               onclick="window.location.href='pelicula.html?id=${c.movieID}'">${titulo}</p>
+                            <span class="text-[9px] text-zinc-600 shrink-0">${fecha}</span>
                         </div>
+                        <div class="text-yellow-500 text-xs mb-2">${estrellas}</div>
+                        <p class="text-zinc-300 italic text-sm leading-relaxed">"${c.txt}"</p>
                     </div>
-                `;
-            }
+                </div>`;
+            }).join('');
+
         } catch(e) {
-            cont.innerHTML = `<p class="text-zinc-600 text-xs italic">No se pudieron cargar los comentarios.</p>`;
-            console.error(e);
+            cont.innerHTML = `<p class="text-zinc-600 text-xs italic">Error al cargar comentarios: ${e.message}</p>`;
+            console.error("Error comentarios:", e);
         }
     }
 
-    // ── CERRAR SESIÓN ─────────────────────────────────────────────
+    // ── GÉNEROS ───────────────────────────────────────────────────
+    window.abrirModalGeneros = () => {
+        const lista = document.getElementById('listaGenerosDisponibles');
+        lista.innerHTML = GENEROS_TMDB.map(g => {
+            const sel = generosSeleccionados.includes(g.id);
+            return `<button onclick="toggleGenero(${g.id}, this)"
+                class="genre-chip px-4 py-2 border border-zinc-700 rounded-full text-[10px] font-bold uppercase tracking-wider text-zinc-400 ${sel ? 'selected' : ''}"
+            >${g.name}</button>`;
+        }).join('');
+        document.getElementById('modalGeneros').classList.remove('hidden');
+    };
+
+    window.toggleGenero = (id, btn) => {
+        if (generosSeleccionados.includes(id)) {
+            generosSeleccionados = generosSeleccionados.filter(g => g !== id);
+            btn.classList.remove('selected');
+        } else {
+            if (generosSeleccionados.length >= 5) return;
+            generosSeleccionados.push(id);
+            btn.classList.add('selected');
+        }
+    };
+
+    window.guardarGeneros = () => {
+        localStorage.setItem('movieM_generos_ids', JSON.stringify(generosSeleccionados));
+        renderizarGeneros();
+        cerrarModalGeneros();
+    };
+
+    window.cerrarModalGeneros = () => document.getElementById('modalGeneros').classList.add('hidden');
+
+    function renderizarGeneros() {
+        const cont = document.getElementById('generosCont');
+        if (generosSeleccionados.length === 0) {
+            cont.innerHTML = `<span class="text-zinc-600 text-xs italic">Sin géneros seleccionados</span>`;
+            return;
+        }
+        cont.innerHTML = generosSeleccionados.map(id => {
+            const g = GENEROS_TMDB.find(x => x.id === id);
+            return g ? `<span class="px-3 py-1 bg-zinc-900 border border-white/10 rounded-full text-[10px] font-bold uppercase tracking-wider text-zinc-300">${g.name}</span>` : '';
+        }).join('');
+    }
+
+    // ── AUTH HELPERS ──────────────────────────────────────────────
     window.cerrarSesion = async () => {
         await signOut(auth);
         localStorage.removeItem('usuarioMovieM');
         window.location.href = 'index.html';
     };
-
-    // ── COLOR ACENTO ──────────────────────────────────────────────
     window.cambiarColor = (hex) => {
         document.documentElement.style.setProperty('--accent-color', hex);
         localStorage.setItem('movieM_color', hex);
     };
 
-    // ── INICIALIZAR PERFIL (localStorage-based features) ──────────
-    function inicializarPerfil() {
+    // ── INICIALIZAR ───────────────────────────────────────────────
+    function inicializarPerfil(username) {
         const savedColor = localStorage.getItem('movieM_color');
         if (savedColor) document.documentElement.style.setProperty('--accent-color', savedColor);
         renderizarBio(localStorage.getItem('movieM_bio'));
         renderizarFavs();
         renderizarActores();
-        renderizarAvatar();
+        renderizarAvatar(username);
         renderizarGeneros();
     }
 
@@ -336,73 +409,57 @@
     window.cerrarOpcionesAvatar = () => document.getElementById('modalAvatarOpciones').classList.add('hidden');
     window.subirFotoLocal = (e) => {
         const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                localStorage.setItem('movieM_avatar', ev.target.result);
-                renderizarAvatar();
-                window.cerrarOpcionesAvatar();
-            };
-            reader.readAsDataURL(file);
-        }
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            localStorage.setItem('movieM_avatar', ev.target.result);
+            renderizarAvatar();
+            window.cerrarOpcionesAvatar();
+        };
+        reader.readAsDataURL(file);
     };
-    function renderizarAvatar() {
+    function renderizarAvatar(username) {
         const f = localStorage.getItem('movieM_avatar');
+        const frame = document.getElementById('userAvatarFrame');
         if (f) {
-            document.getElementById('userAvatarFrame').innerHTML = `<img src="${f}" class="w-full h-full object-cover">`;
+            frame.innerHTML = `<img src="${f}" class="w-full h-full object-cover">`;
+        } else if (username) {
+            frame.innerHTML = username.charAt(0).toUpperCase();
         }
     }
 
-    // ── BIO ────────────────────────────────────────────────────────
+    // ── BIO ───────────────────────────────────────────────────────
     window.editarBio = () => {
         const p = document.getElementById('userBio');
-        const contenedor = document.getElementById('contenedorBio');
-        contenedor.innerHTML = `<div class="w-full">
-            <textarea id="editBioInput" class="w-full bg-zinc-900 border border-accent p-3 rounded-xl text-lg outline-none text-zinc-300 h-24 resize-none">${p ? p.innerText : ''}</textarea>
+        document.getElementById('contenedorBio').innerHTML = `<div class="w-full">
+            <textarea id="editBioInput" class="w-full bg-zinc-900 border border-accent p-3 rounded-xl text-base outline-none text-zinc-300 h-24 resize-none">${p ? p.innerText : ''}</textarea>
             <div class="flex gap-2 mt-2">
-                <button onclick="guardarBio()" class="text-[9px] font-black uppercase bg-accent px-3 py-1 rounded-lg">Guardar</button>
-                <button onclick="cancelarBio()" class="text-[9px] font-black uppercase bg-zinc-800 px-3 py-1 rounded-lg">Cancelar</button>
+                <button onclick="guardarBio()" class="text-[9px] font-black uppercase bg-accent px-4 py-2 rounded-lg">Guardar</button>
+                <button onclick="cancelarBio()" class="text-[9px] font-black uppercase bg-zinc-800 px-4 py-2 rounded-lg">Cancelar</button>
             </div></div>`;
     };
-    window.guardarBio = () => {
-        const val = document.getElementById('editBioInput').value;
-        localStorage.setItem('movieM_bio', val);
-        renderizarBio(val);
-    };
+    window.guardarBio = () => { const val = document.getElementById('editBioInput').value; localStorage.setItem('movieM_bio', val); renderizarBio(val); };
     window.cancelarBio = () => renderizarBio(localStorage.getItem('movieM_bio'));
     function renderizarBio(t) {
         document.getElementById('contenedorBio').innerHTML = `
-            <p class="text-zinc-300 text-lg italic leading-relaxed" id="userBio">${t || "Escribe algo sobre ti..."}</p>
+            <p class="text-zinc-300 text-lg italic leading-relaxed" id="userBio">${t || 'Escribe algo sobre ti...'}</p>
             <button onclick="editarBio()" class="text-accent opacity-0 group-hover:opacity-100 transition-opacity mt-1.5 shrink-0">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
             </button>`;
     }
 
-    // ── GÉNEROS ────────────────────────────────────────────────────
-    let generos = JSON.parse(localStorage.getItem('movieM_generos')) || ['Sci-Fi', 'Terror'];
-    function renderizarGeneros() {
-        document.getElementById('generosCont').innerHTML = generos.map((g, i) =>
-            `<span onclick="quitarGenero(${i})" class="px-3 py-1 bg-zinc-900 border border-white/10 rounded-full text-[10px] font-bold uppercase tracking-wider text-zinc-400 hover:border-accent hover:text-white transition cursor-pointer group">${g} <span class="hidden group-hover:inline ml-1 text-accent">×</span></span>`
-        ).join('') +
-        `<button onclick="agregarGenero()" class="px-3 py-1 border border-dashed border-zinc-700 rounded-full text-[10px] font-bold uppercase text-zinc-600 hover:text-accent hover:border-accent transition">+</button>`;
-    }
-    window.agregarGenero = () => {
-        const g = prompt("Género:");
-        if (g) { generos.push(g.trim()); localStorage.setItem('movieM_generos', JSON.stringify(generos)); renderizarGeneros(); }
-    };
-    window.quitarGenero = (i) => { generos.splice(i, 1); localStorage.setItem('movieM_generos', JSON.stringify(generos)); renderizarGeneros(); };
-
-    // ── BÚSQUEDAS ──────────────────────────────────────────────────
+    // ── BÚSQUEDAS ─────────────────────────────────────────────────
     let tipoBusqueda = 'peli', slotSeleccionado = null;
     window.abrirBuscadorFav = (i) => { tipoBusqueda = 'peli'; slotSeleccionado = i; mostrarModalBusqueda("Película Favorita"); };
     window.abrirBuscadorActor = () => { tipoBusqueda = 'actor'; mostrarModalBusqueda("Agregar Actor"); };
     window.abrirBuscadorAvatar = () => { tipoBusqueda = 'avatar'; mostrarModalBusqueda("Buscar Personaje"); window.cerrarOpcionesAvatar(); };
+
     function mostrarModalBusqueda(t) {
         document.getElementById('tituloModalBusqueda').innerText = t;
         document.getElementById('modalBusqueda').classList.remove('hidden');
         document.getElementById('inputBusquedaGral').value = '';
         document.getElementById('resultadosGral').innerHTML = '';
-        document.getElementById('inputBusquedaGral').focus();
+        setTimeout(() => document.getElementById('inputBusquedaGral').focus(), 100);
     }
     window.cerrarModalBusqueda = () => {
         document.getElementById('modalBusqueda').classList.add('hidden');
@@ -410,7 +467,8 @@
     };
 
     document.getElementById('inputBusquedaGral').addEventListener('input', async (e) => {
-        const q = e.target.value; if (q.length < 3) return;
+        const q = e.target.value;
+        if (q.length < 2) return;
         const tipo = tipoBusqueda === 'peli' ? 'search/movie' : 'search/person';
         const res = await fetch(`https://api.themoviedb.org/3/${tipo}?api_key=${API_KEY}&query=${encodeURIComponent(q)}&language=es-ES`);
         const data = await res.json();
@@ -420,7 +478,7 @@
             const img = item.poster_path || item.profile_path;
             const div = document.createElement('div');
             div.className = "flex items-center gap-3 p-2 hover:bg-zinc-800 rounded-lg cursor-pointer";
-            div.innerHTML = `<img src="https://image.tmdb.org/t/p/w92${img}" class="w-8 h-12 rounded object-cover"><span class="text-xs font-bold text-white">${item.title || item.name}</span>`;
+            div.innerHTML = `${img ? `<img src="https://image.tmdb.org/t/p/w92${img}" class="w-8 h-12 rounded object-cover shrink-0">` : '<div class="w-8 h-12 rounded bg-zinc-700 shrink-0"></div>'}<span class="text-xs font-bold text-white">${item.title || item.name}</span>`;
             div.onclick = () => {
                 if (tipoBusqueda === 'peli') seleccionarPeli(img, item.id);
                 else if (tipoBusqueda === 'actor') agregarActor(item.name, img);
@@ -431,7 +489,7 @@
         });
     });
 
-    // ── ACTORES CARROUSEL ─────────────────────────────────────────
+    // ── ACTORES ───────────────────────────────────────────────────
     let actores = JSON.parse(localStorage.getItem('movieM_actores')) || [];
     let actorIndex = 0;
 
@@ -445,7 +503,7 @@
     function renderizarActores() {
         const container = document.getElementById('actorCarousel');
         if (actores.length === 0) {
-            container.innerHTML = `<div class="min-w-full h-full flex items-center justify-center text-zinc-600 text-[10px] font-bold uppercase italic border border-dashed border-white/5 rounded-2xl">Sin actores</div>`;
+            container.innerHTML = `<div class="min-w-full h-full flex items-center justify-center text-zinc-600 text-[10px] font-bold uppercase italic px-4">Sin actores favoritos</div>`;
             return;
         }
         container.innerHTML = actores.map((a, idx) => `
@@ -457,24 +515,20 @@
                 <button onclick="eliminarActor(${idx})" class="text-[8px] text-zinc-600 mt-1 hover:text-red-500 uppercase font-bold">Quitar</button>
             </div>`).join('');
     }
-    window.nextActor = () => { actorIndex = (actorIndex + 1) % actores.length; moverCarrusel(); };
-    window.prevActor = () => { actorIndex = (actorIndex - 1 + actores.length) % actores.length; moverCarrusel(); };
+    window.nextActor = () => { if (!actores.length) return; actorIndex = (actorIndex + 1) % actores.length; moverCarrusel(); };
+    window.prevActor = () => { if (!actores.length) return; actorIndex = (actorIndex - 1 + actores.length) % actores.length; moverCarrusel(); };
     function moverCarrusel() { document.getElementById('actorCarousel').style.transform = `translateX(-${actorIndex * 100}%)`; }
     window.eliminarActor = (idx) => { actores.splice(idx, 1); actorIndex = 0; localStorage.setItem('movieM_actores', JSON.stringify(actores)); renderizarActores(); moverCarrusel(); };
 
     // ── FAVORITAS ─────────────────────────────────────────────────
     let favoritas = JSON.parse(localStorage.getItem('movieM_favs')) || [null, null, null, null];
-    function seleccionarPeli(p, id) {
-        favoritas[slotSeleccionado] = { poster: p, id };
-        localStorage.setItem('movieM_favs', JSON.stringify(favoritas));
-        renderizarFavs();
-    }
+    function seleccionarPeli(p, id) { favoritas[slotSeleccionado] = { poster: p, id }; localStorage.setItem('movieM_favs', JSON.stringify(favoritas)); renderizarFavs(); }
     function renderizarFavs() {
         document.getElementById('favContainer').innerHTML = favoritas.map((f, i) =>
             `<div class="aspect-[2/3] bg-zinc-900 rounded-xl border border-white/10 flex items-center justify-center overflow-hidden cursor-pointer hover:border-accent transition group relative">
                 ${f
                     ? `<img src="https://image.tmdb.org/t/p/w500${f.poster}" class="w-full h-full object-cover" onclick="window.location.href='pelicula.html?id=${f.id}'">
-                       <div onclick="quitarFav(${i})" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-[9px] font-bold uppercase">Quitar</div>`
+                       <div onclick="quitarFav(${i})" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-[9px] font-bold uppercase tracking-widest">Quitar</div>`
                     : `<span class="text-zinc-700 text-3xl font-bold" onclick="abrirBuscadorFav(${i})">+</span>`}
             </div>`
         ).join('');
