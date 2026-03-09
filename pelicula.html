@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieM | Detalle</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script type="module" src="firebase-config.js"></script>
     <style>
+        :root { --accent-color: #dc2626; }
+        .text-accent { color: var(--accent-color); }
+        .bg-accent { background-color: var(--accent-color); }
+        .border-accent { border-color: var(--accent-color); }
+
         .star { cursor: pointer; transition: all 0.2s ease; color: #3f3f46; }
         .star.active { color: #eab308; text-shadow: 0 0 10px rgba(234, 179, 8, 0.4); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -32,105 +36,69 @@
 
     <nav class="fixed top-0 left-0 w-full z-[100] glass-nav px-4 md:px-10 py-4 flex items-center justify-between">
         <div class="flex items-center gap-4 md:gap-8">
-            <a href="index.html" class="text-[10px] md:text-xs font-bold uppercase tracking-widest hover:text-red-600 transition">Inicio</a>
+            <a href="index.html" class="text-[10px] md:text-xs font-bold uppercase tracking-widest hover:text-accent transition">Inicio</a>
             <a href="#" class="hidden sm:block text-[10px] md:text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition">Series</a>
-            <a href="perfil.html" class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition">Mi Lista</a>
+            <a href="milista.html" class="text-[10px] md:text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition">Mi Lista</a>
         </div>
 
         <div class="absolute left-1/2 -translate-x-1/2">
-            <a href="index.html" class="text-xl md:text-2xl font-black tracking-tighter italic">MOVIE<span class="text-red-600">M</span></a>
+            <a href="index.html" class="text-xl md:text-2xl font-black tracking-tighter italic">MOVIE<span class="text-accent">M</span></a>
         </div>
 
         <div class="flex items-center gap-3 md:gap-6">
-            <div class="relative hidden lg:block">
-                <input type="text" placeholder="Buscar..." class="bg-zinc-900 border border-white/10 rounded-full py-2 px-10 text-xs outline-none focus:border-red-600 w-48 transition-all">
-                <svg class="w-4 h-4 absolute left-4 top-2.5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            </div>
-            
-            <div id="authArea">
-                <button id="userBtn" onclick="toggleUserModal()" class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-red-600 border border-white/20 flex items-center justify-center font-black text-sm hidden hover:scale-105 transition">
-                    <span id="userInitialNav">?</span>
+            <div id="authArea" class="flex items-center gap-4">
+                <button id="userBtn" onclick="toggleUserModal()" class="w-10 h-10 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:border-accent transition group overflow-hidden hidden">
+                    <div id="avatarNav" class="w-full h-full flex items-center justify-center font-black italic text-white text-sm">?</div>
                 </button>
-                <a id="loginBtn" href="login.html" class="text-[9px] md:text-[10px] font-black uppercase tracking-widest bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition">Ingresar</a>
+                <a id="loginBtn" href="index.html" class="text-[10px] font-black uppercase tracking-widest bg-accent px-4 py-2 rounded-lg hover:opacity-90 transition">Ingresar</a>
             </div>
         </div>
     </nav>
 
     <div id="userModal" class="fixed inset-0 z-[200] hidden items-center justify-center p-6">
         <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="toggleUserModal()"></div>
-        <div class="relative w-full max-w-[340px] bg-zinc-900 rounded-[35px] p-8 border border-white/10 text-center shadow-2xl">
-            <div id="modalAvatar" class="w-20 h-20 rounded-full bg-red-600 mx-auto mb-4 flex items-center justify-center text-3xl font-black text-white shadow-lg border-4 border-white/5">?</div>
+        <div class="relative w-full max-w-[320px] bg-zinc-900/95 rounded-[35px] p-8 border border-white/10 text-center shadow-2xl">
+            <div class="h-1.5 w-24 bg-accent mx-auto mb-6 rounded-full"></div>
+            <div id="modalAvatar" class="w-20 h-20 rounded-full bg-zinc-800 mx-auto mb-4 flex items-center justify-center text-3xl font-black text-white shadow-lg border-2 border-accent overflow-hidden">?</div>
             <h2 id="modalName" class="text-xl font-black italic uppercase tracking-tighter mb-6 text-white">Usuario</h2>
             <div class="space-y-3">
-                <button onclick="window.location.href='perfil.html'" class="w-full bg-white/5 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border border-white/5 hover:bg-white/10 transition">Mi Perfil</button>
-                <div class="py-4">
-                    <p class="text-[9px] font-bold uppercase tracking-widest text-zinc-500 mb-3">Acento Visual</p>
-                    <div class="flex justify-center gap-3">
-                        <div onclick="changeAccent('#dc2626')" class="w-6 h-6 rounded-full bg-red-600 cursor-pointer border border-white/20"></div>
-                        <div onclick="changeAccent('#2563eb')" class="w-6 h-6 rounded-full bg-blue-600 cursor-pointer border border-white/20"></div>
-                        <div onclick="changeAccent('#9333ea')" class="w-6 h-6 rounded-full bg-purple-600 cursor-pointer border border-white/20"></div>
-                    </div>
-                </div>
-                <button onclick="cerrarSesion()" class="w-full py-2 text-zinc-500 font-bold text-[10px] uppercase tracking-widest hover:text-red-500 transition">Cerrar Sesión</button>
+                <button onclick="window.location.href='perfil.html'" class="w-full bg-white/5 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest border border-white/5 hover:bg-accent transition">Mi Perfil</button>
+                <button onclick="cerrarSesion()" class="w-full py-4 text-zinc-500 font-bold text-[10px] uppercase tracking-widest hover:text-white transition">Cerrar Sesión</button>
             </div>
         </div>
     </div>
 
     <div id="playerOverlay">
         <div class="w-full flex justify-between items-center p-4 bg-zinc-950 border-b border-white/5">
-            <span class="text-red-600 font-black tracking-tighter text-xl">MOVIE<span class="text-white font-light">M</span></span>
+            <span class="text-accent font-black tracking-tighter text-xl">MOVIE<span class="text-white font-light">M</span></span>
             <button onclick="cerrarPelicula()" class="text-white/30 hover:text-white transition font-black uppercase text-[10px] tracking-widest bg-white/5 px-6 py-3 rounded-full">Cerrar ✕</button>
         </div>
         <div class="flex-1 bg-black">
-            <iframe id="movieFrame" src="" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+            <iframe id="movieFrame" src="" class="w-full h-full" allowfullscreen></iframe>
         </div>
     </div>
 
-    <div id="backdrop" class="fixed inset-0 w-full h-full bg-cover bg-center opacity-20 blur-sm -z-10 scale-110 transition-all duration-1000"></div>
+    <div id="backdrop" class="fixed inset-0 w-full h-full bg-cover bg-center opacity-20 blur-sm -z-10 scale-110"></div>
     <div class="fixed inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/90 to-transparent -z-10"></div>
 
-    <main class="container mx-auto px-4 md:px-10 pt-24 md:pt-32">
+    <main class="container mx-auto px-4 md:px-10 pt-32">
         <div class="flex flex-col md:flex-row gap-10 items-center md:items-start mb-16 fade-in">
-            <div class="w-full max-w-[280px] md:max-w-[320px] shrink-0">
+            <div class="w-full max-w-[280px] shrink-0">
                 <div id="posterSkeleton" class="w-full aspect-[2/3] rounded-2xl skeleton shadow-2xl"></div>
                 <img id="poster" src="" class="w-full rounded-2xl border border-white/10 shadow-2xl hidden" onload="this.classList.remove('hidden'); document.getElementById('posterSkeleton')?.remove()">
             </div>
-            
             <div class="flex-1 text-center md:text-left">
-                <div id="badget-premios" class="hidden mb-4 inline-flex items-center gap-2 bg-yellow-600/20 border border-yellow-600/50 text-yellow-500 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest">⭐ Altamente Calificada</div>
                 <h1 id="titulo" class="text-4xl md:text-7xl font-black mb-4 italic tracking-tighter uppercase leading-none"></h1>
-                <div id="tituloSkeleton" class="h-16 w-3/4 skeleton rounded-xl mb-4 mx-auto md:mx-0"></div>
-                
-                <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 mb-6 font-bold text-sm">
-                    <span id="anio" class="bg-zinc-800 px-3 py-1 rounded border border-white/5"></span>
-                    <span class="text-yellow-500">⭐ <span id="voto" class="text-white">0.0</span></span>
-                    <span id="director" class="text-zinc-500 italic border-l border-zinc-800 pl-4"></span>
-                </div>
-                
-                <p id="sinopsis" class="text-base md:text-lg text-zinc-400 max-w-2xl leading-relaxed mb-8 hidden"></p>
-                
-                <div class="flex flex-wrap items-center justify-center md:justify-start gap-4">
-                    <button onclick="verPelicula()" class="bg-red-600 text-white px-8 py-4 rounded-full font-black flex items-center gap-2 hover:bg-red-700 transition active:scale-95 uppercase text-xs tracking-widest shadow-lg shadow-red-600/20">
-                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Ver ahora
-                    </button>
-                    <button onclick="abrirTrailer()" class="bg-white/10 px-8 py-4 rounded-full font-black hover:bg-white hover:text-black transition uppercase text-xs tracking-widest border border-white/10">Trailer</button>
-                    <div class="flex gap-3">
-                        <button id="btnWatchlist" onclick="toggleWatchlist()" class="w-12 h-12 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg></button>
-                        <button id="btnLike" onclick="toggleLike()" class="w-12 h-12 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-red-500 transition"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"></path></svg></button>
-                    </div>
+                <p id="sinopsis" class="text-base md:text-lg text-zinc-400 max-w-2xl leading-relaxed mb-8"></p>
+                <div class="flex gap-4 justify-center md:justify-start">
+                    <button onclick="verPelicula()" class="bg-accent text-white px-8 py-4 rounded-full font-black uppercase text-xs tracking-widest">Ver ahora</button>
                 </div>
             </div>
         </div>
 
-        <section class="mb-16 fade-in" style="animation-delay: 0.2s">
-            <h3 class="text-[10px] font-black mb-6 text-zinc-500 uppercase tracking-[0.3em] flex items-center gap-4">Reparto <div class="h-px flex-1 bg-zinc-900"></div></h3>
-            <div id="reparto" class="flex gap-6 overflow-x-auto no-scrollbar pb-6 scroll-smooth">
-                </div>
-        </section>
-
-        <section class="border-t border-white/5 pt-16 grid lg:grid-cols-5 gap-10 mb-20 fade-in" style="animation-delay: 0.3s">
-            <div class="lg:col-span-2 bg-zinc-900/40 p-8 rounded-[30px] border border-white/5 h-fit">
-                <h3 class="text-2xl font-black mb-1 italic">Tu <span class="text-red-600">Review</span></h3>
+        <section class="border-t border-white/5 pt-16 grid lg:grid-cols-5 gap-10 mb-20">
+            <div class="lg:col-span-2 bg-zinc-900/40 p-8 rounded-[30px] border border-white/5">
+                <h3 class="text-2xl font-black mb-1 italic">Tu <span class="text-accent">Review</span></h3>
                 <div id="starRating" class="flex gap-2 my-6">
                     <span onclick="setRating(1)" class="star text-3xl">★</span>
                     <span onclick="setRating(2)" class="star text-3xl">★</span>
@@ -138,145 +106,134 @@
                     <span onclick="setRating(4)" class="star text-3xl">★</span>
                     <span onclick="setRating(5)" class="star text-3xl">★</span>
                 </div>
-                <textarea id="comentarioTxt" placeholder="Escribe tu opinión..." class="w-full bg-black/40 border border-white/5 p-5 rounded-2xl text-white mb-4 h-32 outline-none focus:border-red-600 transition-all"></textarea>
-                <button onclick="publicarComentario()" class="w-full bg-red-600 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg active:scale-95">Publicar</button>
+                <textarea id="comentarioTxt" placeholder="Escribe tu opinión..." class="w-full bg-black/40 border border-white/5 p-5 rounded-2xl text-white mb-4 h-32 outline-none focus:border-accent transition-all"></textarea>
+                <button onclick="publicarComentario()" class="w-full bg-accent py-4 rounded-xl font-black uppercase text-[10px] tracking-widest">Publicar</button>
             </div>
-
             <div class="lg:col-span-3">
-                <h3 class="text-xl font-black mb-8 flex items-center gap-3 uppercase text-xs tracking-widest">Opiniones Globales <span class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span></h3>
-                <div id="listaComentarios" class="space-y-4 max-h-[500px] overflow-y-auto no-scrollbar pr-2"></div>
+                <div id="listaComentarios" class="space-y-4"></div>
             </div>
         </section>
     </main>
 
     <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, addDoc, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // CONFIGURACIÓN FIREBASE (Usa la misma de tu index)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAn5N7m7EhICK2aZG4Nx8DIW9RZd9kK1DA",
+            authDomain: "moviem-5b73d.firebaseapp.com",
+            projectId: "moviem-5b73d",
+            storageBucket: "moviem-5b73d.firebasestorage.app",
+            messagingSenderId: "843796138544",
+            appId: "1:843796138544:web:c2bde9b39d437b84d97bf5"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
         const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
         const urlParams = new URLSearchParams(window.location.search);
         const movieID = urlParams.get('id');
         let currentRating = 0;
+        let usuarioActual = null;
 
-        async function cargarPagina() {
-            if(!movieID) { window.location.href = 'index.html'; return; }
-            actualizarHUD();
-            
-            try {
-                const [pRes, cRes] = await Promise.all([
-                    fetch(`https://api.themoviedb.org/3/movie/${movieID}?api_key=${API_KEY}&language=es-ES`),
-                    fetch(`https://api.themoviedb.org/3/movie/${movieID}/credits?api_key=${API_KEY}&language=es-ES`)
-                ]);
-                const peli = await pRes.json();
-                const credits = await cRes.json();
-
-                document.getElementById('tituloSkeleton')?.remove();
-                document.getElementById('sinopsis').classList.remove('hidden');
-                document.getElementById('titulo').innerText = peli.title;
-                document.getElementById('sinopsis').innerText = peli.overview || "Sinopsis no disponible.";
-                document.getElementById('anio').innerText = peli.release_date?.split('-')[0] || "N/A";
-                document.getElementById('voto').innerText = peli.vote_average.toFixed(1);
-                document.getElementById('poster').src = 'https://image.tmdb.org/t/p/w500' + peli.poster_path;
-                document.getElementById('backdrop').style.backgroundImage = `url('https://image.tmdb.org/t/p/original${peli.backdrop_path}')`;
-                
-                if(peli.vote_average > 7.5) document.getElementById('badget-premios').classList.remove('hidden');
-                const dir = credits.crew.find(c => c.job === "Director");
-                if(dir) document.getElementById('director').innerText = `Dirigida por ${dir.name}`;
-
-                document.getElementById('reparto').innerHTML = credits.cast.slice(0, 10).map(actor => `
-                    <div class="min-w-[100px] md:min-w-[120px] text-center shrink-0">
-                        <div class="w-20 h-20 md:w-24 md:h-24 mx-auto mb-3 overflow-hidden rounded-full border border-zinc-800">
-                            <img src="${actor.profile_path ? 'https://image.tmdb.org/t/p/w200' + actor.profile_path : 'https://via.placeholder.com/200'}" class="w-full h-full object-cover">
-                        </div>
-                        <p class="text-[10px] font-bold truncate">${actor.name}</p>
-                    </div>`).join('');
-
-                if(window.db) {
-                    escucharComentariosNube();
-                    checkStatus();
-                }
-            } catch (error) { console.error(error); }
-        }
-
-        // --- LÓGICA DE USUARIO Y HUD ---
-        function actualizarHUD() {
-            const user = localStorage.getItem('usuarioMovieM');
+        // --- GESTIÓN DE ESTADO DE SESIÓN ---
+        onAuthStateChanged(auth, async (user) => {
             const userBtn = document.getElementById('userBtn');
             const loginBtn = document.getElementById('loginBtn');
             
-            if (user && user !== 'undefined') {
-                const inicial = user.charAt(0).toUpperCase();
-                document.getElementById('userInitialNav').innerText = inicial;
-                document.getElementById('modalAvatar').innerText = inicial;
-                document.getElementById('modalName').innerText = user;
-                userBtn.classList.remove('hidden');
-                loginBtn.classList.add('hidden');
-                
-                const accent = localStorage.getItem('movieMAccent');
-                if(accent) applyColor(accent);
+            if (user) {
+                const docSnap = await getDoc(doc(db, "usuarios", user.uid));
+                if (docSnap.exists()) {
+                    usuarioActual = docSnap.data();
+                    // Actualizar UI
+                    document.getElementById('modalName').innerText = usuarioActual.username;
+                    const content = usuarioActual.avatar 
+                        ? `<img src="${usuarioActual.avatar}" class="w-full h-full object-cover">`
+                        : `<span>${usuarioActual.username.charAt(0).toUpperCase()}</span>`;
+                    
+                    document.getElementById('avatarNav').innerHTML = content;
+                    document.getElementById('modalAvatar').innerHTML = content;
+                    
+                    if(usuarioActual.color) document.documentElement.style.setProperty('--accent-color', usuarioActual.color);
+                    
+                    userBtn.classList.remove('hidden');
+                    loginBtn.classList.add('hidden');
+                }
             } else {
+                usuarioActual = null;
                 userBtn.classList.add('hidden');
                 loginBtn.classList.remove('hidden');
             }
-        }
+        });
 
-        window.toggleUserModal = () => {
-            const m = document.getElementById('userModal');
-            m.classList.toggle('hidden');
-            m.classList.toggle('flex');
-        };
-
-        window.changeAccent = (color) => {
-            applyColor(color);
-            localStorage.setItem('movieMAccent', color);
-        };
-
-        function applyColor(color) {
-            document.getElementById('modalAvatar').style.backgroundColor = color;
-            document.getElementById('userBtn').style.backgroundColor = color;
-        }
-
-        window.cerrarSesion = () => {
-            localStorage.removeItem('usuarioMovieM');
+        window.toggleUserModal = () => document.getElementById('userModal').classList.toggle('hidden');
+        
+        window.cerrarSesion = async () => {
+            await signOut(auth);
             window.location.reload();
         };
 
-        // --- INTERACCIONES ---
+        // --- LÓGICA DE LA PELÍCULA ---
+        async function cargarDetalles() {
+            if(!movieID) return window.location.href = 'index.html';
+            const res = await fetch(`https://api.themoviedb.org/3/movie/${movieID}?api_key=${API_KEY}&language=es-ES`);
+            const peli = await res.json();
+
+            document.getElementById('titulo').innerText = peli.title;
+            document.getElementById('sinopsis').innerText = peli.overview;
+            document.getElementById('poster').src = 'https://image.tmdb.org/t/p/w500' + peli.poster_path;
+            document.getElementById('backdrop').style.backgroundImage = `url('https://image.tmdb.org/t/p/original${peli.backdrop_path}')`;
+            
+            escucharComentarios();
+        }
+
         window.verPelicula = () => {
             document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
             document.getElementById('playerOverlay').style.display = 'flex';
         };
+
         window.cerrarPelicula = () => {
             document.getElementById('playerOverlay').style.display = 'none';
             document.getElementById('movieFrame').src = "";
         };
 
+        // --- REVIEWS ---
         window.setRating = (n) => {
             currentRating = n;
             document.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('active', i < n));
         };
 
         window.publicarComentario = async () => {
-            const user = localStorage.getItem('usuarioMovieM');
+            if(!usuarioActual) return alert("Debes iniciar sesión para comentar");
             const txt = document.getElementById('comentarioTxt').value;
-            if(!user) return alert("Inicia sesión para comentar.");
-            if(!txt || currentRating === 0) return alert("Agrega un comentario y estrellas.");
-            
-            await window.addDoc(window.collection(window.db, "comentarios"), {
-                movieID, user, txt, rating: currentRating, fecha: Date.now()
+            if(!txt || currentRating === 0) return alert("Completa el comentario y las estrellas");
+
+            await addDoc(collection(db, "comentarios"), {
+                movieID,
+                user: usuarioActual.username,
+                txt,
+                rating: currentRating,
+                fecha: Date.now()
             });
+            
             document.getElementById('comentarioTxt').value = "";
             setRating(0);
         };
 
-        function escucharComentariosNube() {
-            const q = window.query(window.collection(window.db, "comentarios"), window.where("movieID", "==", movieID), window.orderBy("fecha", "desc"));
-            window.onSnapshot(q, (snap) => {
-                const cont = document.getElementById('listaComentarios');
-                cont.innerHTML = "";
+        function escucharComentarios() {
+            const q = query(collection(db, "comentarios"), where("movieID", "==", movieID), orderBy("fecha", "desc"));
+            onSnapshot(q, (snap) => {
+                const lista = document.getElementById('listaComentarios');
+                lista.innerHTML = "";
                 snap.forEach(doc => {
                     const c = doc.data();
-                    cont.innerHTML += `
-                        <div class="bg-white/5 p-6 rounded-2xl border border-white/5">
+                    lista.innerHTML += `
+                        <div class="bg-white/5 p-6 rounded-2xl border border-white/5 fade-in">
                             <div class="flex justify-between mb-2">
-                                <span class="text-red-600 font-black text-[10px] uppercase">${c.user}</span>
+                                <span class="text-accent font-black text-[10px] uppercase">${c.user}</span>
                                 <span class="text-yellow-500 text-[10px]">${"★".repeat(c.rating)}</span>
                             </div>
                             <p class="text-zinc-400 text-sm italic">"${c.txt}"</p>
@@ -285,7 +242,7 @@
             });
         }
 
-        cargarPagina();
+        cargarDetalles();
     </script>
 </body>
 </html>
