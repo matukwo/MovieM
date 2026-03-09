@@ -12,7 +12,10 @@
         .border-accent { border-color: var(--accent); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        #actorCarousel { transition: transform .5s cubic-bezier(.4,0,.2,1); }
+        @keyframes skPulse{0%,100%{opacity:1}50%{opacity:.35}}
+        .sk{animation:skPulse 1.4s ease-in-out infinite;background:rgba(39,39,42,.8)!important;color:transparent!important;border-color:rgba(63,63,70,.5)!important;border-radius:8px;user-select:none;pointer-events:none}
+        .sk *{visibility:hidden!important}
+        .sk-circle{border-radius:9999px!important}
         .fade-in { animation: fi .5s ease forwards; opacity: 0; }
         @keyframes fi { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
     </style>
@@ -99,7 +102,7 @@
 
         <!-- Avatar -->
         <div class="relative shrink-0 group">
-            <div class="w-24 h-24 md:w-32 md:h-32 bg-zinc-900 border-4 border-accent rounded-full flex items-center justify-center text-4xl md:text-5xl font-black italic shadow-2xl overflow-hidden" id="userAvatarFrame">M</div>
+            <div class="w-24 h-24 md:w-32 md:h-32 bg-zinc-900 border-4 border-accent rounded-full flex items-center justify-center text-4xl md:text-5xl font-black italic shadow-2xl overflow-hidden sk sk-circle" id="userAvatarFrame">M</div>
             <div id="overlayEdit" class="hidden absolute inset-0 bg-black/60 rounded-full items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity" onclick="abrirOpcionesAvatar()">
                 <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
             </div>
@@ -108,15 +111,15 @@
         <!-- Info -->
         <div class="flex-1 text-center sm:text-left w-full">
             <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-3 justify-center sm:justify-start flex-wrap">
-                <h2 class="text-2xl md:text-4xl font-black uppercase tracking-tighter flex items-center gap-2" id="profileName">...</h2>
+                <h2 class="text-2xl md:text-4xl font-black uppercase tracking-tighter flex items-center gap-2 sk rounded-xl min-w-[120px]" id="profileName">...</h2>
                 <!-- Contadores -->
                 <div class="flex gap-5 items-center justify-center sm:justify-start border-t sm:border-t-0 sm:border-l border-white/10 pt-3 sm:pt-0 sm:pl-5">
                     <button onclick="abrirModalSeguidos('seguidores')" class="text-center hover:opacity-70 active:scale-95 transition-all">
-                        <span class="block text-lg md:text-xl font-bold leading-none" id="contSeguidores">0</span>
+                        <span class="block text-lg md:text-xl font-bold leading-none sk rounded min-w-[20px]" id="contSeguidores">0</span>
                         <span class="text-[8px] text-zinc-500 uppercase font-black tracking-widest">Seguidores</span>
                     </button>
                     <button onclick="abrirModalSeguidos('siguiendo')" class="text-center hover:opacity-70 active:scale-95 transition-all">
-                        <span class="block text-lg md:text-xl font-bold leading-none" id="contSiguiendo">0</span>
+                        <span class="block text-lg md:text-xl font-bold leading-none sk rounded min-w-[20px]" id="contSiguiendo">0</span>
                         <span class="text-[8px] text-zinc-500 uppercase font-black tracking-widest">Siguiendo</span>
                     </button>
                 </div>
@@ -131,7 +134,7 @@
 
             <!-- Bio -->
             <div id="contenedorBio" class="mb-4 flex items-start gap-2 group justify-center sm:justify-start min-h-[40px]">
-                <p class="text-zinc-300 text-sm md:text-base italic leading-relaxed max-w-lg" id="userBio">...</p>
+                <p class="text-zinc-300 text-sm md:text-base italic leading-relaxed max-w-lg sk rounded-lg w-48 h-5" id="userBio">...</p>
                 <button id="btnEditarBio" class="hidden text-accent opacity-0 group-hover:opacity-100 transition-opacity mt-0.5 shrink-0" onclick="editarBio()">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                 </button>
@@ -259,6 +262,12 @@
         var data = snap.exists() ? snap.data() : {};
 
         if (data.color) { document.documentElement.style.setProperty('--accent', data.color); if(isMiPerfil) localStorage.setItem('movieM_color',data.color); }
+
+        // ── Quitar skeletons ──────────────────────────────────────
+        ['userAvatarFrame','profileName','contSeguidores','contSiguiendo','userBio'].forEach(function(id){
+            var el=document.getElementById(id);
+            if(el){el.classList.remove('sk','sk-circle');el.style.width='';el.style.height='';}
+        });
 
         document.getElementById('profileName').innerText = perfilUsername||'Usuario';
 
