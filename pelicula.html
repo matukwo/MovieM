@@ -30,7 +30,6 @@
         .fade-in { animation: fadeIn 0.8s ease forwards; opacity: 0; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ESTILO EXTRA PARA EL REPRODUCTOR */
         #playerOverlay { display: none; background: #000; position: fixed; inset: 0; z-index: 200; flex-direction: column; }
     </style>
 </head>
@@ -161,12 +160,32 @@
         <div id="videoContainer" class="w-full max-w-5xl aspect-video rounded-3xl overflow-hidden shadow-2xl shadow-red-600/10"></div>
     </div>
 
-    <script>
+    <script type="module">
+        // 1. IMPORTACIONES FIREBASE
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, onSnapshot, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+
+        // 2. CONFIGURACIÓN FIREBASE (Tus llaves)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAn5N7mEhICK2aZG4Nx8DIW9RZd9kK1DA",
+            authDomain: "moviem-5b73d.firebaseapp.com",
+            projectId: "moviem-5b73d",
+            storageBucket: "moviem-5b73d.firebasestorage.app",
+            messagingSenderId: "843796138544",
+            appId: "1:843796138544:web:c2bde9b39d437b84d97bf5",
+            measurementId: "G-7FH2FMPYZT"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 3. VARIABLES GLOBALES
         const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
         const urlParams = new URLSearchParams(window.location.search);
         const movieID = urlParams.get('id');
         let currentRating = 0;
 
+        // --- CARGAR PÁGINA (TMDB) ---
         async function cargarPagina() {
             try {
                 const [pRes, cRes] = await Promise.all([
@@ -201,31 +220,105 @@
                         <p class="text-[8px] text-zinc-600 truncate italic px-1">${actor.character}</p>
                     </div>`).join('');
 
-                cargarComentariosLocal();
+                cargarComentariosRealtime(); // <-- Firebase en tiempo real
                 checkStatus();
             } catch (error) { console.error(error); }
         }
 
-        // --- FUNCIONES DEL REPRODUCTOR VIDSRC.CC ---
-        function verPelicula() {
-            const overlay = document.getElementById('playerOverlay');
-            const frame = document.getElementById('movieFrame');
-            // Cambiado a vidsrc.cc con parámetros de idioma
-            frame.src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
-            overlay.style.display = 'flex';
-            document.body.style.overflow = "hidden";
+        // --- GESTIÓN DE COMENTARIOS CON FIREBASE ---
+        function cargarComentariosRealtime() {
+            if(!movieID) return;
+            const q = query(collection(db, "peliculas", movieID, "comentarios"), orderBy("timestamp", "desc"));
+            
+            onSnapshot(q, (snapshot) => {
+                const lista = document.getElementById('listaComentarios');
+                lista.innerHTML = "";
+                
+                if (snapshot.empty) {
+                    lista.innerHTML = `<p class="text-zinc-600 text-sm italic">Sé el primero en opinar...</p>`;
+                    return;
+                }
+
+                snapshot.forEach((doc) => {
+                    const c = doc.data();
+                    lista.innerHTML += `
+                        <div class="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 shadow-xl fade-in mb-4">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-red-600 font-black text-xs uppercase tracking-widest leading-none">${c.user}</span>
+                                <span class="text-yellow-500 text-[10px] tracking-widest">${"★".repeat(c.rating)}</span>
+                            </div>
+                            <p class="text-zinc-400 text-sm leading-relaxed font-medium">${c.txt}</p>
+                        </div>`;
+                });
+            });
         }
 
-        function cerrarPelicula() {
+        async function publicarComentario() {
+            const txt = document.getElementById('comentarioTxt').value.trim();
+            if(!txt || currentRating === 0) return alert("Por favor, deja una valoración.");
+            
+            try {
+                await addDoc(collection(db, "peliculas", movieID, "comentarios"), {
+                    user: "Anónimo",
+                    txt: txt,
+                    rating: currentRating,
+                    timestamp: serverTimestamp()
+                });
+                
+                document.getElementById('comentarioTxt').value = ""; 
+                setRating(0); 
+            } catch (e) {
+                console.error("Error al publicar:", e);
+                alert("Error al conectar con la base de datos.");
+            }
+        }
+
+        // --- FUNCIONES DE INTERFAZ (Exportadas a Window para HTML) ---
+        window.verPelicula = () => {
+            document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
+            document.getElementById('playerOverlay').style.display = 'flex';
+            document.body.style.overflow = "hidden";
+        };
+
+        window.cerrarPelicula = () => {
             document.getElementById('playerOverlay').style.display = 'none';
             document.getElementById('movieFrame').src = "";
             document.body.style.overflow = "auto";
-        }
+        };
 
-        function scrollReparto(distancia) { document.getElementById('reparto').scrollBy({ left: distancia, behavior: 'smooth' }); }
-        function scrollPelis(distancia) { document.getElementById('listaPelisActor').scrollBy({ left: distancia, behavior: 'smooth' }); }
+        window.setRating = (n) => {
+            currentRating = n;
+            document.querySelectorAll('.star').forEach((s, i) => {
+                s.classList.toggle('text-yellow-500', i < n);
+                s.classList.toggle('text-zinc-700', i >= n);
+            });
+        };
 
-        async function verActor(id) {
+        window.publicarComentario = publicarComentario;
+
+        window.abrirTrailer = async () => {
+            try {
+                const res = await fetch(`https://api.themoviedb.org/3/movie/${movieID}/videos?api_key=${API_KEY}`);
+                const data = await res.json();
+                const tr = data.results.find(v => v.type === "Trailer" && v.site === "YouTube");
+                if(tr) {
+                    document.getElementById('videoContainer').innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${tr.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>`;
+                    document.getElementById('modalVideo').classList.remove('hidden');
+                    document.body.style.overflow = "hidden";
+                }
+            } catch (error) { console.error(error); }
+        };
+
+        window.cerrarTrailer = () => { 
+            document.getElementById('modalVideo').classList.add('hidden'); 
+            document.getElementById('videoContainer').innerHTML = '';
+            document.body.style.overflow = "auto";
+        };
+
+        window.scrollReparto = (distancia) => document.getElementById('reparto').scrollBy({ left: distancia, behavior: 'smooth' });
+        window.scrollPelis = (distancia) => document.getElementById('listaPelisActor').scrollBy({ left: distancia, behavior: 'smooth' });
+
+        window.verActor = async (id) => {
             try {
                 const [resBio, resPelis] = await Promise.all([
                     fetch(`https://api.themoviedb.org/3/person/${id}?api_key=${API_KEY}&language=es-ES`),
@@ -254,11 +347,11 @@
                 document.getElementById('modalActor').classList.remove('hidden');
                 document.body.style.overflow = "hidden";
             } catch (error) { console.error(error); }
-        }
+        };
 
-        function cerrarActor() { document.getElementById('modalActor').classList.add('hidden'); document.body.style.overflow = "auto"; }
+        window.cerrarActor = () => { document.getElementById('modalActor').classList.add('hidden'); document.body.style.overflow = "auto"; };
 
-        function toggleWatchlist() {
+        window.toggleWatchlist = () => {
             const isSaved = localStorage.getItem(`watchlist_${movieID}`);
             const btn = document.getElementById('btnWatchlist');
             if(!isSaved) {
@@ -270,9 +363,9 @@
                 btn.classList.remove('bg-zinc-100', 'text-black', 'border-white');
                 btn.classList.add('bg-zinc-900', 'text-zinc-400', 'border-white/5');
             }
-        }
+        };
 
-        function toggleLike() {
+        window.toggleLike = () => {
             const isLiked = localStorage.getItem(`like_${movieID}`);
             const btn = document.getElementById('btnLike');
             if(!isLiked) {
@@ -284,7 +377,7 @@
                 btn.classList.remove('bg-red-600', 'border-red-600', 'text-white');
                 btn.classList.add('bg-zinc-900', 'text-zinc-400', 'border-white/5');
             }
-        }
+        };
 
         function checkStatus() {
             if(localStorage.getItem(`watchlist_${movieID}`)) {
@@ -299,60 +392,7 @@
             }
         }
 
-        function setRating(n) {
-            currentRating = n;
-            document.querySelectorAll('.star').forEach((s, i) => {
-                s.classList.toggle('text-yellow-500', i < n);
-                s.classList.toggle('text-zinc-700', i >= n);
-            });
-        }
-
-        async function abrirTrailer() {
-            try {
-                const res = await fetch(`https://api.themoviedb.org/3/movie/${movieID}/videos?api_key=${API_KEY}`);
-                const data = await res.json();
-                const tr = data.results.find(v => v.type === "Trailer" && v.site === "YouTube");
-                if(tr) {
-                    document.getElementById('videoContainer').innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${tr.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>`;
-                    document.getElementById('modalVideo').classList.remove('hidden');
-                    document.body.style.overflow = "hidden";
-                }
-            } catch (error) { console.error(error); }
-        }
-
-        function cerrarTrailer() { 
-            document.getElementById('modalVideo').classList.add('hidden'); 
-            document.getElementById('videoContainer').innerHTML = '';
-            document.body.style.overflow = "auto";
-        }
-
-        function publicarComentario() {
-            const txt = document.getElementById('comentarioTxt').value.trim();
-            if(!txt || currentRating === 0) return alert("Por favor, deja una valoración.");
-            const com = { user: "Anónimo", txt, rating: currentRating, date: new Date().toLocaleDateString() };
-            let total = JSON.parse(localStorage.getItem(`coments_${movieID}`)) || [];
-            total.unshift(com);
-            localStorage.setItem(`coments_${movieID}`, JSON.stringify(total));
-            document.getElementById('comentarioTxt').value = ""; 
-            setRating(0); 
-            cargarComentariosLocal();
-        }
-
-        function cargarComentariosLocal() {
-            const lista = document.getElementById('listaComentarios');
-            let coms = JSON.parse(localStorage.getItem(`coments_${movieID}`)) || [];
-            if(coms.length > 0) {
-                lista.innerHTML = coms.map(c => `
-                    <div class="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 shadow-xl fade-in">
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="text-red-600 font-black text-xs uppercase tracking-widest leading-none">${c.user}</span>
-                            <span class="text-yellow-500 text-[10px] tracking-widest">${"★".repeat(c.rating)}</span>
-                        </div>
-                        <p class="text-zinc-400 text-sm leading-relaxed font-medium">${c.txt}</p>
-                    </div>`).join('');
-            }
-        }
-
+        // Ejecutar carga inicial
         cargarPagina();
     </script>
 </body>
