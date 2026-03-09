@@ -19,7 +19,6 @@
             box-shadow: 0 0 15px rgba(220, 38, 38, 0.1);
         }
 
-        /* Animación de Vibración */
         .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake {
             10%, 90% { transform: translate3d(-1px, 0, 0); }
@@ -28,7 +27,6 @@
             40%, 60% { transform: translate3d(4px, 0, 0); }
         }
 
-        /* Colores dinámicos */
         .text-accent { color: var(--accent-color, #dc2626); }
         .bg-accent { background-color: var(--accent-color, #dc2626); }
         .border-accent { border-color: var(--accent-color, #dc2626); }
@@ -72,6 +70,8 @@
                 <p id="modalSubtitulo" class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-6">Ingresa tus datos para continuar</p>
                 
                 <div class="space-y-4">
+                    <input type="text" id="nicknameUsuario" placeholder="Usuario" class="w-full input-premium p-3 rounded-xl text-sm outline-none hidden">
+                    
                     <input type="text" id="nombreUsuario" placeholder="Email" class="w-full input-premium p-3 rounded-xl text-sm outline-none">
                     <input type="password" id="passUsuario" placeholder="Contraseña" class="w-full input-premium p-3 rounded-xl text-sm outline-none text-white">
                     <input type="password" id="confirmPass" placeholder="Confirmar contraseña" class="w-full input-premium p-3 rounded-xl text-sm outline-none hidden text-white">
@@ -96,6 +96,10 @@
                     </div>
                 </div>
                 <p class="text-zinc-200 font-black uppercase tracking-tighter text-lg mb-1" id="saludoUsuario">Hola</p>
+                
+                <button onclick="window.location.href='perfil.html'" class="w-full mt-4 bg-zinc-800/50 hover:bg-accent text-white text-[10px] font-bold py-3 rounded-xl uppercase tracking-widest transition border border-white/5">
+                    Mi Perfil
+                </button>
                 
                 <div class="mt-6 space-y-4 text-left border-t border-white/5 pt-4">
                     <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">Color de Acento</p>
@@ -148,20 +152,19 @@
 </main>
 
 <script type="module">
-    // --- FIREBASE CONFIG ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAn5N7m7EhICK2aZG4Nx8DIW9RZd9kK1DA",
-    authDomain: "moviem-5b73d.firebaseapp.com",
-    projectId: "moviem-5b73d",
-    storageBucket: "moviem-5b73d.firebasestorage.app",
-    messagingSenderId: "843796138544",
-    appId: "1:843796138544:web:c2bde9b39d437b84d97bf5",
-    measurementId: "G-7FH2FMPYZT"
-  };
+    const firebaseConfig = {
+        apiKey: "AIzaSyAn5N7m7EhICK2aZG4Nx8DIW9RZd9kK1DA",
+        authDomain: "moviem-5b73d.firebaseapp.com",
+        projectId: "moviem-5b73d",
+        storageBucket: "moviem-5b73d.firebasestorage.app",
+        messagingSenderId: "843796138544",
+        appId: "1:843796138544:web:c2bde9b39d437b84d97bf5",
+        measurementId: "G-7FH2FMPYZT"
+    };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -170,7 +173,6 @@
     const BASE_IMAGE = 'https://image.tmdb.org/t/p/w500';
     let esModoRegistro = false;
 
-    // --- SISTEMA DE NOTIFICACIONES ---
     window.notificar = function(mensaje, tipo = 'success') {
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
@@ -184,7 +186,6 @@
         }, 3000);
     }
 
-    // --- PERSONALIZACIÓN ---
     window.cambiarColor = function(hex) {
         document.documentElement.style.setProperty('--accent-color', hex);
         localStorage.setItem('movieM_color', hex);
@@ -196,6 +197,7 @@
         const titulo = document.getElementById('modalTitulo');
         const subtitulo = document.getElementById('modalSubtitulo');
         const btnAccion = document.getElementById('btnAccionPrincipal');
+        const nickField = document.getElementById('nicknameUsuario');
         const confirmPass = document.getElementById('confirmPass');
         const textoToggle = document.getElementById('textoToggle');
 
@@ -203,12 +205,14 @@
             titulo.innerText = "Crea tu cuenta";
             subtitulo.innerText = "Únete a la comunidad MovieM";
             btnAccion.innerText = "Crear Cuenta";
+            nickField.classList.remove('hidden');
             confirmPass.classList.remove('hidden');
             textoToggle.innerHTML = `¿Ya tienes cuenta? <button onclick="toggleModoRegistro(false)" class="text-accent hover:underline">Inicia Sesión</button>`;
         } else {
             titulo.innerText = "Bienvenido";
             subtitulo.innerText = "Ingresa tus datos para continuar";
             btnAccion.innerText = "Entrar";
+            nickField.classList.add('hidden');
             confirmPass.classList.add('hidden');
             textoToggle.innerHTML = `¿No tienes cuenta? <button onclick="toggleModoRegistro(true)" class="text-accent hover:underline">Regístrate</button>`;
         }
@@ -216,11 +220,12 @@
 
     window.procesarUsuario = async function() {
         const email = document.getElementById('nombreUsuario').value;
+        const nickname = document.getElementById('nicknameUsuario').value;
         const p = document.getElementById('passUsuario').value;
         const cp = document.getElementById('confirmPass').value;
         const card = document.getElementById('modalCard');
 
-        if(!email || !p) {
+        if(!email || !p || (esModoRegistro && !nickname)) {
             card.classList.add('shake');
             setTimeout(() => card.classList.remove('shake'), 400);
             notificar("Completa todos los campos", "error");
@@ -237,7 +242,7 @@
                 }
                 const res = await createUserWithEmailAndPassword(auth, email, p);
                 await setDoc(doc(db, "usuarios", res.user.uid), {
-                    username: email.split('@')[0],
+                    username: nickname,
                     email: email,
                     color: localStorage.getItem('movieM_color') || '#dc2626'
                 });
@@ -266,7 +271,6 @@
         setTimeout(() => location.reload(), 1000);
     }
 
-    // --- OBSERVADOR DE ESTADO ---
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             const docSnap = await getDoc(doc(db, "usuarios", user.uid));
@@ -278,7 +282,6 @@
         }
     });
 
-    // --- CARGA DE PELÍCULAS ---
     window.crearCard = function(peli) {
         const puntaje = peli.vote_average ? peli.vote_average.toFixed(1) : 'S/R';
         const card = document.createElement('div');
@@ -328,11 +331,9 @@
 
     window.scrollFila = function(id, d) { document.getElementById(id).scrollBy({ left: d, behavior: 'smooth' }); }
 
-    // On Load
     const color = localStorage.getItem('movieM_color');
     if (color) document.documentElement.style.setProperty('--accent-color', color);
     document.getElementById('btnUsuario').onclick = () => document.getElementById('modalLogin').classList.toggle('hidden');
 </script>
 </body>
 </html>
-
