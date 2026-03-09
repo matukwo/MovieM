@@ -1,27 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { 
-    getFirestore, 
-    collection, 
-    addDoc, 
-    query, 
-    where, 
-    orderBy, 
-    onSnapshot, 
-    doc, 
-    getDoc, 
-    setDoc, 
-    updateDoc, 
-    arrayUnion, 
-    arrayRemove 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-import { 
-    getAuth, 
-    onAuthStateChanged, 
-    signOut,
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, doc, setDoc, getDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAn5N7m7EhICK2aZG4Nx8DIW9RZd9kK1DA",
@@ -33,35 +12,25 @@ const firebaseConfig = {
     measurementId: "G-7FH2FMPYZT"
 };
 
-// Inicialización
+// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// --- EXPOSICIÓN GLOBAL (El "Puente" para tus otros HTML) ---
-
-// Auth
-window.auth = auth;
-window.onAuthStateChanged = onAuthStateChanged;
-window.signOut = signOut;
-window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
-
-// Firestore
+// Exportar Firestore
 window.db = db;
-window.doc = doc;
-window.getDoc = getDoc;
-window.setDoc = setDoc;
 window.addDoc = addDoc;
-window.updateDoc = updateDoc;
 window.collection = collection;
 window.query = query;
 window.where = where;
 window.orderBy = orderBy;
 window.onSnapshot = onSnapshot;
+window.doc = doc;
+window.setDoc = setDoc;
+window.getDoc = getDoc;
 window.arrayUnion = arrayUnion;
 window.arrayRemove = arrayRemove;
 
-console.log("🔥 Firebase: Sistema Global Activado");
-
-export { app, db, auth };
+// Exportar Auth
+window.auth = auth;
+window.onAuthStateChanged = onAuthStateChanged;
