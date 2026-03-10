@@ -450,16 +450,29 @@ window.mmAbrirChatCon = async function(otroUID, otroUsername, otroAvatar) {
     // Crear/actualizar doc del chat con metadatos
     const cid = chatId(miUID, otroUID);
     try {
-        await setDoc(doc(db, 'chats', cid), {
-            participantes: [miUID, otroUID],
-            [`usernames.${miUID}`]: miUsername,
-            [`usernames.${otroUID}`]: otroUsername,
-            [`avatars.${miUID}`]: miAvatar || null,
-            [`avatars.${otroUID}`]: otroAvatar || null,
-            // Resetear no leídos del usuario actual
-            [`noLeidos.${miUID}`]: 0
-        }, { merge: true });
-    } catch(e) {}
+        const chatRef = doc(db, 'chats', cid);
+        const chatSnap = await getDoc(chatRef);
+        if (!chatSnap.exists()) {
+            // Crear el documento del chat por primera vez
+            await setDoc(chatRef, {
+                participantes: [miUID, otroUID],
+                usernames: { [miUID]: miUsername, [otroUID]: otroUsername },
+                avatars: { [miUID]: miAvatar || null, [otroUID]: otroAvatar || null },
+                noLeidos: { [miUID]: 0, [otroUID]: 0 },
+                ultimoMensaje: '',
+                ultimaFecha: serverTimestamp()
+            });
+        } else {
+            // Solo resetear no leídos del usuario actual y actualizar metadatos
+            const upd = {};
+            upd[`noLeidos.${miUID}`] = 0;
+            upd[`usernames.${miUID}`] = miUsername;
+            upd[`avatars.${miUID}`] = miAvatar || null;
+            upd[`usernames.${otroUID}`] = otroUsername;
+            upd[`avatars.${otroUID}`] = otroAvatar || null;
+            await updateDoc(chatRef, upd);
+        }
+    } catch(e) { console.warn('Error creando chat doc', e); }
 
     // Escuchar mensajes en tiempo real
     if (chatMsgUnsub) chatMsgUnsub();
@@ -508,13 +521,15 @@ window.mmEnviarMensaje = async function() {
             texto,
             fecha: serverTimestamp()
         });
-        // Actualizar metadata del chat
-        await setDoc(doc(db, 'chats', cid), {
+        // Actualizar metadata — dot-notation keys en updateDoc son soportados por Firestore
+        const noLeidosActuales = await getNoLeidos(cid, chatAbiertoConUID);
+        const upd = {
             ultimoMensaje: texto.length > 50 ? texto.slice(0, 47) + '...' : texto,
-            ultimaFecha: serverTimestamp(),
-            [`noLeidos.${chatAbiertoConUID}`]: (await getNoLeidos(cid, chatAbiertoConUID)) + 1,
-            [`noLeidos.${miUID}`]: 0
-        }, { merge: true });
+            ultimaFecha: serverTimestamp()
+        };
+        upd[`noLeidos.${chatAbiertoConUID}`] = noLeidosActuales + 1;
+        upd[`noLeidos.${miUID}`] = 0;
+        await updateDoc(doc(db, 'chats', cid), upd);
         // Notificación al destinatario
         await crearNotif(chatAbiertoConUID, 'mensaje', {
             de: miUID,
