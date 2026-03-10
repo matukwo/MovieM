@@ -124,6 +124,12 @@
                 <button onclick="abrirTrailer()" class="bg-white text-black px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-600 hover:text-white transition-all shadow-xl active:scale-95">
                     <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6zM21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9 9-4.03 9-9zm-16.1 0c0-3.92 3.18-7.1 7.1-7.1s7.1 3.18 7.1 7.1-3.18 7.1-7.1 7.1-7.1-3.18-7.1-7.1z"/></svg> VER TRAILER
                 </button>
+                <button id="btnWatchlistDesktop" onclick="toggleWatchlist()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95" title="Guardar en Mi Lista">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                </button>
+                <button id="btnLikeDesktop" onclick="toggleLike()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95" title="Me gusta">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78v0z"/></svg>
+                </button>
             </div>
         </div>
     </div>
@@ -167,14 +173,14 @@
                 class="absolute left-0 top-1/2 -translate-y-6 z-20 bg-black/80 p-2.5 rounded-full hidden md:group-hover/sim:flex border border-white/10 hover:bg-red-600 transition shadow-xl">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
             </button>
-            <div id="similaresFila" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-3 scroll-smooth">
+            <div id="similaresFila" class="flex gap-2 md:gap-3 overflow-x-auto no-scrollbar pb-3 scroll-smooth">
                 <!-- skeletons iniciales -->
-                <div class="min-w-[100px] md:min-w-[140px] skeleton rounded-xl aspect-[2/3]"></div>
-                <div class="min-w-[100px] md:min-w-[140px] skeleton rounded-xl aspect-[2/3]"></div>
-                <div class="min-w-[100px] md:min-w-[140px] skeleton rounded-xl aspect-[2/3]"></div>
-                <div class="min-w-[100px] md:min-w-[140px] skeleton rounded-xl aspect-[2/3]"></div>
-                <div class="min-w-[100px] md:min-w-[140px] skeleton rounded-xl aspect-[2/3]"></div>
-                <div class="min-w-[100px] md:min-w-[140px] skeleton rounded-xl aspect-[2/3]"></div>
+                <div class="min-w-[75px] md:min-w-[100px] skeleton rounded-xl aspect-[2/3]"></div>
+                <div class="min-w-[75px] md:min-w-[100px] skeleton rounded-xl aspect-[2/3]"></div>
+                <div class="min-w-[75px] md:min-w-[100px] skeleton rounded-xl aspect-[2/3]"></div>
+                <div class="min-w-[75px] md:min-w-[100px] skeleton rounded-xl aspect-[2/3]"></div>
+                <div class="min-w-[75px] md:min-w-[100px] skeleton rounded-xl aspect-[2/3]"></div>
+                <div class="min-w-[75px] md:min-w-[100px] skeleton rounded-xl aspect-[2/3]"></div>
             </div>
             <button onclick="document.getElementById('similaresFila').scrollBy({left:320,behavior:'smooth'})"
                 class="absolute right-0 top-1/2 -translate-y-6 z-20 bg-black/80 p-2.5 rounded-full hidden md:group-hover/sim:flex border border-white/10 hover:bg-red-600 transition shadow-xl">
@@ -416,7 +422,7 @@
 
         // --- SISTEMAS DE INTERACCIÓN ---
         async function checkStatus() {
-            if (!miUID_pelicula) return; // esperar a que onAuthStateChanged entregue el UID
+            if (!miUID_pelicula) return;
 
             try {
                 const userRef = window.doc(window.db, "usuarios", miUID_pelicula);
@@ -425,14 +431,10 @@
                 if (userDoc.exists()) {
                     const data = userDoc.data();
                     if (data.watchlist && data.watchlist.includes(movieID)) {
-                        const btn = document.getElementById('btnWatchlist');
-                        btn.classList.add('bg-zinc-100', 'text-black', 'border-white');
-                        btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
+                        ['btnWatchlist','btnWatchlistDesktop'].forEach(id => { const b=document.getElementById(id); if(!b)return; b.classList.add('bg-zinc-100','text-black','border-white'); b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5'); });
                     }
                     if (data.likes && data.likes.includes(movieID)) {
-                        const btn = document.getElementById('btnLike');
-                        btn.classList.add('bg-red-600', 'border-red-600', 'text-white');
-                        btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
+                        ['btnLike','btnLikeDesktop'].forEach(id => { const b=document.getElementById(id); if(!b)return; b.classList.add('bg-red-600','border-red-600','text-white'); b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5'); });
                     }
                 }
             } catch (e) { console.error("Error al checkear status:", e); }
@@ -450,13 +452,11 @@
                     watchlist: isSaved ? window.arrayRemove(movieID) : window.arrayUnion(movieID) 
                 }, { merge: true });
                 
-                if(!isSaved) {
-                    btn.classList.add('bg-zinc-100', 'text-black', 'border-white');
-                    btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
-                } else {
-                    btn.classList.remove('bg-zinc-100', 'text-black', 'border-white');
-                    btn.classList.add('bg-zinc-900', 'text-zinc-400', 'border-white/5');
-                }
+                ['btnWatchlist','btnWatchlistDesktop'].forEach(id => {
+                    const b = document.getElementById(id); if(!b) return;
+                    if(!isSaved){b.classList.add('bg-zinc-100','text-black','border-white');b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5');}
+                    else{b.classList.remove('bg-zinc-100','text-black','border-white');b.classList.add('bg-zinc-900','text-zinc-400','border-white/5');}
+                });
             } catch (e) { console.error("Error en Watchlist:", e); }
         };
 
@@ -472,13 +472,11 @@
                     likes: isLiked ? window.arrayRemove(movieID) : window.arrayUnion(movieID) 
                 }, { merge: true });
                 
-                if(!isLiked) {
-                    btn.classList.add('bg-red-600', 'border-red-600', 'text-white');
-                    btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-white/5');
-                } else {
-                    btn.classList.remove('bg-red-600', 'border-red-600', 'text-white');
-                    btn.classList.add('bg-zinc-900', 'text-zinc-400', 'border-white/5');
-                }
+                ['btnLike','btnLikeDesktop'].forEach(id => {
+                    const b = document.getElementById(id); if(!b) return;
+                    if(!isLiked){b.classList.add('bg-red-600','border-red-600','text-white');b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5');}
+                    else{b.classList.remove('bg-red-600','border-red-600','text-white');b.classList.add('bg-zinc-900','text-zinc-400','border-white/5');}
+                });
             } catch (e) { console.error("Error en Like:", e); }
         };
 
@@ -634,17 +632,17 @@
                     const anio = (p.release_date || '').split('-')[0];
                     return `
                     <div onclick="location.href='pelicula.html?id=${p.id}'"
-                        class="min-w-[100px] md:min-w-[140px] shrink-0 cursor-pointer group/sim-card">
+                        class="min-w-[75px] md:min-w-[100px] shrink-0 cursor-pointer group/sim-card">
                         <div class="relative rounded-xl overflow-hidden border border-white/5 transition-transform duration-200 group-hover/sim-card:scale-105 mb-1.5">
-                            <img src="https://image.tmdb.org/t/p/w300${p.poster_path}"
+                            <img src="https://image.tmdb.org/t/p/w200${p.poster_path}"
                                  class="w-full aspect-[2/3] object-cover" loading="lazy">
-                            <div class="absolute top-1.5 right-1.5 flex flex-col gap-1 items-end">
-                                ${rating ? `<div class="bg-black/80 text-yellow-500 text-[8px] font-black px-1.5 py-0.5 rounded-lg">⭐ ${rating}</div>` : ''}
-                                ${anio ? `<div class="bg-black/80 text-zinc-300 text-[8px] font-black px-1.5 py-0.5 rounded-lg">${anio}</div>` : ''}
+                            <div class="absolute top-1 right-1 flex flex-col gap-0.5 items-end">
+                                ${rating ? `<div class="bg-black/80 text-yellow-500 text-[7px] font-black px-1 py-0.5 rounded">⭐ ${rating}</div>` : ''}
+                                ${anio ? `<div class="bg-black/80 text-zinc-300 text-[7px] font-black px-1 py-0.5 rounded">${anio}</div>` : ''}
                             </div>
                             ${prog > 0 ? `<div class="absolute bottom-0 left-0 right-0 h-1 bg-zinc-800/80"><div class="h-full bg-red-600 rounded-full transition-all" style="width:${prog}%"></div></div>` : ''}
                         </div>
-                        <p class="text-[9px] font-bold uppercase tracking-tighter text-zinc-500 truncate">${p.title}</p>
+                        <p class="text-[8px] font-bold uppercase tracking-tighter text-zinc-500 truncate">${p.title}</p>
                     </div>`;
                 }).join('');
             } catch(e) { console.error('similares:', e); }
