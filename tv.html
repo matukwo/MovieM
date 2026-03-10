@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieM | TV en Vivo</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.jwplayer.com/libraries/SAHhwqHg.js"></script>
     <style>
         :root { --accent-color: #dc2626; }
         .text-accent   { color: var(--accent-color); }
@@ -27,7 +27,7 @@
             box-shadow:0 25px 60px rgba(0,0,0,.8);
             aspect-ratio:16/9;
         }
-        #hlsVideo { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:#000; }
+        #jwplayer-container { position:absolute; inset:0; width:100%; height:100%; }
         #playerOverlayBox {
             position:absolute; inset:0;
             display:flex; flex-direction:column;
@@ -62,7 +62,7 @@
         <!-- PLAYER + INFO -->
         <div class="flex-1 min-w-0 fade-in">
             <div id="playerWrap" class="mb-4">
-                <video id="hlsVideo" playsinline webkit-playsinline controls></video>
+                <div id="jwplayer-container"></div>
                 <div id="playerOverlayBox">
                     <div id="overlayContent" class="flex flex-col items-center text-center px-6">
                         <svg class="w-16 h-16 text-zinc-800 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,7 +174,7 @@ var CORS_PROXIES = [
 var categorias = [...new Set(CANALES.map(function(c){ return c.cat; }))];
 var catActiva  = 'Todos';
 var canalActual = null;
-var hlsInstance = null;
+var jwPlayer = null;
 
 // ─── CATEGORIAS ───────────────────────────────────────────────────────────────
 function renderCategorias() {
@@ -259,7 +259,7 @@ function hideOverlay() {
     document.getElementById('playerOverlayBox').classList.add('oculto');
 }
 
-// ─── CARGAR CANAL con reintentos via proxy CORS ───────────────────────────────
+// ─── CARGAR CANAL con JW Player + reintentos proxy CORS ──────────────────────
 function cargarCanal(canal) {
     canalActual = canal;
 
@@ -277,7 +277,6 @@ function cargarCanal(canal) {
 
     if (!canal.stream) { showError(canal); return; }
 
-    // Intentar primero directo, luego cada proxy CORS
     var intentos = [canal.stream].concat(CORS_PROXIES.map(function(fn){ return fn(canal.stream); }));
     intentarStream(canal, intentos, 0);
 }
@@ -285,56 +284,63 @@ function cargarCanal(canal) {
 function intentarStream(canal, intentos, idx) {
     if (idx >= intentos.length) { showError(canal); return; }
 
-    var url = intentos[idx];
-    var intento = idx + 1;
+    var url   = intentos[idx];
     var label = idx === 0 ? 'Conectando...' : 'Reintentando vía proxy ' + idx + '...';
     showSpinner(label);
 
-    // Destruir instancia anterior
-    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
-    var video = document.getElementById('hlsVideo');
-    video.pause();
-    video.removeAttribute('src');
-    video.load();
-
-    function onFail() {
-        // Espera un momento antes del siguiente intento
-        setTimeout(function(){ intentarStream(canal, intentos, idx + 1); }, 800);
-    }
-
-    if (Hls.isSupported()) {
-        hlsInstance = new Hls({
-            enableWorker: true,
-            lowLatencyMode: true,
-            backBufferLength: 30,
-            manifestLoadingTimeOut: 8000,
-            manifestLoadingMaxRetry: 1
-        });
-        hlsInstance.loadSource(url);
-        hlsInstance.attachMedia(video);
-        hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
-            video.play().then(hideOverlay).catch(function(){ hideOverlay(); });
-        });
-        hlsInstance.on(Hls.Events.ERROR, function(ev, data) {
-            if (data.fatal) { onFail(); }
-        });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = url;
-        video.addEventListener('loadedmetadata', function onMeta() {
-            video.removeEventListener('loadedmetadata', onMeta);
-            video.play().then(hideOverlay).catch(function(){ hideOverlay(); });
-        });
-        video.addEventListener('error', function onErr() {
-            video.removeEventListener('error', onErr);
-            onFail();
-        });
+    // Si ya existe un player JW, sólo cambiamos la fuente
+    if (jwPlayer && typeof jwPlayer.load === 'function') {
+        jwPlayer.load([{ file: url, type: 'hls' }]);
+        jwPlayer.play();
     } else {
-        showError(canal);
+        // Primera vez: inicializar JW Player
+        try {
+            jwPlayer = jwplayer('jwplayer-container').setup({
+                file:         url,
+                type:         'hls',
+                width:        '100%',
+                aspectratio:  '16:9',
+                autostart:    true,
+                mute:         false,
+                stretching:   'fill',
+                skin: {
+                    name: 'netflix',
+                    active: getComputedStyle(document.documentElement)
+                                .getPropertyValue('--accent-color').trim() || '#dc2626'
+                },
+                logo: { hide: true },
+                cast: {},
+                hlshtml: true
+            });
+
+            jwPlayer.on('ready', function() {
+                // El player está listo, ocultar overlay
+            });
+
+            jwPlayer.on('play', function() {
+                hideOverlay();
+            });
+
+            jwPlayer.on('error', function() {
+                setTimeout(function(){ intentarStream(canal, intentos, idx + 1); }, 800);
+            });
+
+            jwPlayer.on('setupError', function() {
+                setTimeout(function(){ intentarStream(canal, intentos, idx + 1); }, 800);
+            });
+
+        } catch(e) {
+            setTimeout(function(){ intentarStream(canal, intentos, idx + 1); }, 800);
+        }
     }
 }
 
 // ─── FULLSCREEN ───────────────────────────────────────────────────────────────
 function toggleFullscreen() {
+    if (jwPlayer && typeof jwPlayer.setFullscreen === 'function') {
+        jwPlayer.setFullscreen(true);
+        return;
+    }
     var wrap = document.getElementById('playerWrap');
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
         if (wrap.requestFullscreen) wrap.requestFullscreen();
