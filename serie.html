@@ -50,10 +50,15 @@
                     <svg class="w-2.5 h-2.5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                 </button>
                 <div id="serverMenu">
+                    <div style="padding:6px 14px 4px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:#52525b;">Servidores</div>
                     <button onclick="cambiarServidor(1,'S1 — VidSrc')" class="srv-active">S1 — VidSrc</button>
                     <button onclick="cambiarServidor(2,'S2 — MultiEmbed')">S2 — MultiEmbed</button>
                     <button onclick="cambiarServidor(3,'S3 — Embed.su')">S3 — Embed.su</button>
                     <button onclick="cambiarServidor(4,'S4 — VidSrc XYZ')">S4 — VidSrc XYZ</button>
+                    <div style="margin:4px 14px;border-top:1px solid rgba(255,255,255,.07)"></div>
+                    <div style="padding:4px 14px 4px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:#16a34a;">🌎 Con selector de audio</div>
+                    <button onclick="cambiarServidor(5,'🌎 VidLink')" style="color:#4ade80">VidLink — Audio selector</button>
+                    <button onclick="cambiarServidor(6,'🌎 SuperEmbed')" style="color:#4ade80">SuperEmbed — Audio selector</button>
                 </div>
             </div>
         </div>
@@ -406,7 +411,9 @@
         1: (id,t,e) => `https://vidsrc.cc/v3/embed/tv/${id}/${t}/${e}?auto_lang=es`,
         2: (id,t,e) => `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${t}&e=${e}&lang=es`,
         3: (id,t,e) => `https://embed.su/embed/tv/${id}/${t}/${e}`,
-        4: (id,t,e) => `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${t}&episode=${e}&ds_langs=es,es-419`
+        4: (id,t,e) => `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${t}&episode=${e}&ds_langs=es,es-419`,
+        5: (id,t,e) => `https://vidlink.pro/tv/${id}/${t}/${e}`,
+        6: (id,t,e) => `https://multiembed.mov/directstream.php?video_id=${id}&tmdb=1&s=${t}&e=${e}`
     };
     let servidorActivo = 1;
     let epTemp = 1, epNum = 1, epNombre = '';
