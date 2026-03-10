@@ -27,84 +27,10 @@
         <span class="text-red-600 font-black tracking-tighter text-lg md:text-xl">MOVIE<span class="text-white font-light">M</span></span>
         <button onclick="cerrarPelicula()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/5">Cerrar x</button>
     </div>
-    <div class="flex-1 bg-black relative">
+    <div class="flex-1 bg-black">
         <iframe id="movieFrame" src="" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media"></iframe>
-        <!-- Overlay de anuncio -->
-        <div id="adOverlay" style="display:none;position:absolute;inset:0;z-index:50;background:#000;flex-direction:column;align-items:center;justify-content:center;">
-            <!-- Video del anuncio -->
-            <video id="adVideo" class="w-full h-full object-cover absolute inset-0" playsinline muted></video>
-            <!-- UI sobre el video -->
-            <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:16px;">
-                <!-- Top: label anuncio + countdown -->
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-                    <div style="background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.1);padding:4px 12px;border-radius:999px;display:flex;align-items:center;gap:6px;">
-                        <div style="width:6px;height:6px;background:#f59e0b;border-radius:50%;animation:adpulse 1s infinite"></div>
-                        <span style="font-size:9px;font-weight:900;color:#f59e0b;text-transform:uppercase;letter-spacing:.15em">Anuncio</span>
-                    </div>
-                    <div style="background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.1);padding:6px 14px;border-radius:999px;text-align:center;">
-                        <span id="adCountdown" style="font-size:13px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums">15</span>
-                        <span style="font-size:9px;color:rgba(255,255,255,0.5);margin-left:3px">seg</span>
-                    </div>
-                </div>
-                <!-- Bottom: info anuncio + botón saltar -->
-                <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;">
-                    <div id="adInfo" style="background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.1);padding:10px 14px;border-radius:14px;max-width:60%;cursor:pointer;" onclick="window.open(window._adClickUrl||'#','_blank')">
-                        <p style="font-size:9px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.12em;margin-bottom:2px">Patrocinado</p>
-                        <p id="adTitle" style="font-size:13px;font-weight:900;color:#fff;line-height:1.2">Tu anuncio aquí</p>
-                        <p id="adSubtitle" style="font-size:10px;color:rgba(255,255,255,0.55);margin-top:2px">Llegá a miles de espectadores</p>
-                    </div>
-                    <button id="adSkipBtn" onclick="saltarAnuncio()" style="display:none;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.15em;padding:10px 18px;border-radius:999px;cursor:pointer;transition:all .2s;white-space:nowrap;">
-                        Saltar →
-                    </button>
-                    <div id="adSkipSoon" style="background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);font-size:10px;font-weight:700;padding:10px 16px;border-radius:999px;white-space:nowrap;">
-                        Podés saltar en <span id="adSkipIn">5</span>s
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Overlay post-roll -->
-        <div id="postrollOverlay" style="display:none;position:absolute;inset:0;z-index:50;background:linear-gradient(135deg,#09090b 0%,#18181b 100%);flex-direction:column;align-items:center;justify-content:center;gap:20px;">
-            <div style="text-align:center;margin-bottom:8px;">
-                <p style="font-size:10px;font-weight:900;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:.2em;margin-bottom:6px">Gracias por ver</p>
-                <p id="postrollTitle" style="font-size:22px;font-weight:900;color:#fff;text-transform:uppercase;letter-spacing:-.02em;line-height:1.1;max-width:320px;text-align:center"></p>
-            </div>
-            <!-- Video anuncio post-roll -->
-            <div style="position:relative;width:100%;max-width:480px;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);">
-                <video id="adVideoPost" class="w-full" style="display:block;" playsinline muted></video>
-                <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:12px;">
-                    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-                        <div style="background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.1);padding:3px 10px;border-radius:999px;display:flex;align-items:center;gap:5px;">
-                            <div style="width:5px;height:5px;background:#f59e0b;border-radius:50%;animation:adpulse 1s infinite"></div>
-                            <span style="font-size:9px;font-weight:900;color:#f59e0b;text-transform:uppercase;letter-spacing:.12em">Anuncio</span>
-                        </div>
-                        <div style="background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.1);padding:4px 12px;border-radius:999px;">
-                            <span id="adCountdownPost" style="font-size:12px;font-weight:900;color:#fff">15</span>
-                            <span style="font-size:9px;color:rgba(255,255,255,0.4);margin-left:2px">seg</span>
-                        </div>
-                    </div>
-                    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px;">
-                        <div id="adInfoPost" style="background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.1);padding:8px 12px;border-radius:12px;cursor:pointer;" onclick="window.open(window._adClickUrl||'#','_blank')">
-                            <p style="font-size:9px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1px">Patrocinado</p>
-                            <p id="adTitlePost" style="font-size:12px;font-weight:900;color:#fff">Tu anuncio aquí</p>
-                        </div>
-                        <button id="adSkipBtnPost" onclick="saltarAnuncioPost()" style="display:none;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#fff;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;padding:8px 16px;border-radius:999px;cursor:pointer;white-space:nowrap;">
-                            Saltar →
-                        </button>
-                        <div id="adSkipSoonPost" style="background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);font-size:10px;font-weight:700;padding:8px 14px;border-radius:999px;white-space:nowrap;">
-                            Saltar en <span id="adSkipInPost">5</span>s
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <button onclick="cerrarPelicula()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.18em;padding:12px 28px;border-radius:999px;cursor:pointer;margin-top:4px;">
-                ✕ Cerrar
-            </button>
-        </div>
     </div>
 </div>
-<style>
-@keyframes adpulse{0%,100%{opacity:1}50%{opacity:.3}}
-</style>
 
 <!-- Backdrop -->
 <div id="backdrop" class="fixed inset-0 w-full h-full bg-cover bg-center opacity-20 md:opacity-30 blur-sm -z-10 transition-all duration-700"></div>
@@ -116,9 +42,25 @@
 </button>
 
 <!-- HUD usuario -->
-<div id="userHUD" class="fixed top-4 right-4 md:top-8 md:right-8 z-50 hidden items-center gap-3 bg-black/40 backdrop-blur-md p-1.5 pr-4 rounded-full border border-white/10 shadow-2xl">
-    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-600 flex items-center justify-center font-black text-white border-2 border-white/20 text-sm" id="userInitial">?</div>
+<div id="userHUD" class="fixed top-4 right-4 md:top-8 md:right-8 z-50 hidden items-center gap-3 bg-black/40 backdrop-blur-md p-1.5 pr-4 rounded-full border border-white/10 shadow-2xl cursor-pointer select-none" onclick="toggleUserMenu()">
+    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-600 flex items-center justify-center font-black text-white border-2 border-white/20 text-sm overflow-hidden" id="userInitial">?</div>
     <span id="userNameHUD" class="text-xs font-bold uppercase tracking-widest hidden md:inline">Usuario</span>
+    <svg class="w-3 h-3 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+</div>
+<div id="userDropdown" class="fixed top-16 right-4 md:top-24 md:right-8 z-50 hidden bg-zinc-900/95 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl overflow-hidden min-w-[180px]">
+    <a href="perfil.html" class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition text-sm font-bold text-white">
+        <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        Mi Perfil
+    </a>
+    <a href="mi_lista.html" class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition text-sm font-bold text-white">
+        <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+        Mi Lista
+    </a>
+    <div class="border-t border-white/10"></div>
+    <button onclick="cerrarSesionHUD()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-600/20 transition text-sm font-bold text-red-400">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Cerrar Sesión
+    </button>
 </div>
 
 <main class="px-4 md:px-8 pt-16 md:pt-20 pb-8">
@@ -376,10 +318,7 @@
         // --- HUD DE USUARIO + captura UID ---
         // Cargar el UID real del usuario logueado lo antes posible
         window.onAuthStateChanged(window.auth, function(user) {
-            if (user) {
-                miUID_pelicula = user.uid;
-                checkStatus(); // re-check con UID real
-            }
+            if (user) { miUID_pelicula = user.uid; checkStatus(); actualizarHUD(); }
         });
 
         function actualizarHUD() {
@@ -391,7 +330,22 @@
                 hud.classList.remove('hidden');
                 hud.classList.add('flex');
             }
+            if (miUID_pelicula) {
+                window.getDoc(window.doc(window.db, 'usuarios', miUID_pelicula)).then(snap => {
+                    if (snap.exists() && snap.data().avatar) {
+                        document.getElementById('userInitial').innerHTML = '<img src="'+snap.data().avatar+'" class="w-full h-full object-cover">';
+                    }
+                }).catch(()=>{});
+            }
         }
+        window.toggleUserMenu = function() { document.getElementById('userDropdown').classList.toggle('hidden'); };
+        document.addEventListener('click', function(e) {
+            const hud = document.getElementById('userHUD'), dd = document.getElementById('userDropdown');
+            if (dd && !dd.classList.contains('hidden') && !hud.contains(e.target) && !dd.contains(e.target)) dd.classList.add('hidden');
+        });
+        window.cerrarSesionHUD = function() {
+            window.signOut(window.auth).then(() => { localStorage.removeItem('usuarioMovieM'); window.location.href = 'index.html'; }).catch(()=>{ window.location.href = 'index.html'; });
+        };
 
         // --- FIREBASE LOGIC (COMENTARIOS) ---
         // Badge SVGs por rango
@@ -656,85 +610,13 @@
             }
         }
 
-        // ── SISTEMA DE ANUNCIOS ──────────────────────────────────
-        // Configurá aquí tus anuncios. Podés tener varios y se elige al azar.
-        const ADS_CONFIG = [
-            {
-                videoUrl: '', // URL de tu video mp4 (ej: 'https://tudominio.com/ads/ad1.mp4')
-                clickUrl: 'https://tudominio.com',
-                title: 'Tu anuncio aquí',
-                subtitle: 'Contactanos para anunciarte',
-            }
-            // Agregá más objetos para múltiples anunciantes
-        ];
-
-        let _adTimer = null;
-        let _adIsPre = true; // true = pre-roll, false = post-roll
-
-        function getRandomAd() {
-            return ADS_CONFIG[Math.floor(Math.random() * ADS_CONFIG.length)];
-        }
-
-        function mostrarAnuncio(tipo) {
-            const ad = getRandomAd();
-            _adIsPre = (tipo === 'pre');
-            window._adClickUrl = ad.clickUrl;
-
-            if (tipo === 'pre') {
-                const overlay = document.getElementById('adOverlay');
-                const video = document.getElementById('adVideo');
-                overlay.style.display = 'flex';
-                document.getElementById('adTitle').innerText = ad.title;
-                document.getElementById('adSubtitle').innerText = ad.subtitle || '';
-                document.getElementById('adSkipBtn').style.display = 'none';
-                document.getElementById('adSkipSoon').style.display = 'block';
-                document.getElementById('adSkipIn').innerText = '5';
-                document.getElementById('adCountdown').innerText = '15';
-                if (ad.videoUrl) { video.src = ad.videoUrl; video.play().catch(()=>{}); }
-                let t = 15, skip = 5;
-                _adTimer = setInterval(() => {
-                    t--;
-                    document.getElementById('adCountdown').innerText = t;
-                    if (skip > 0) { skip--; document.getElementById('adSkipIn').innerText = skip; }
-                    if (skip === 0) {
-                        document.getElementById('adSkipSoon').style.display = 'none';
-                        document.getElementById('adSkipBtn').style.display = 'block';
-                    }
-                    if (t <= 0) saltarAnuncio();
-                }, 1000);
-            } else {
-                const overlay = document.getElementById('postrollOverlay');
-                const video = document.getElementById('adVideoPost');
-                overlay.style.display = 'flex';
-                document.getElementById('postrollTitle').innerText = document.title.replace(' — MovieM','') || 'la película';
-                document.getElementById('adTitlePost').innerText = ad.title;
-                document.getElementById('adSkipBtnPost').style.display = 'none';
-                document.getElementById('adSkipSoonPost').style.display = 'block';
-                document.getElementById('adSkipInPost').innerText = '5';
-                document.getElementById('adCountdownPost').innerText = '15';
-                if (ad.videoUrl) { video.src = ad.videoUrl; video.play().catch(()=>{}); }
-                let t = 15, skip = 5;
-                _adTimer = setInterval(() => {
-                    t--;
-                    document.getElementById('adCountdownPost').innerText = t;
-                    if (skip > 0) { skip--; document.getElementById('adSkipInPost').innerText = skip; }
-                    if (skip === 0) {
-                        document.getElementById('adSkipSoonPost').style.display = 'none';
-                        document.getElementById('adSkipBtnPost').style.display = 'block';
-                    }
-                    if (t <= 0) saltarAnuncioPost();
-                }, 1000);
-            }
-        }
-
-        window.saltarAnuncio = function() {
-            if (_adTimer) { clearInterval(_adTimer); _adTimer = null; }
-            const video = document.getElementById('adVideo');
-            video.pause(); video.src = '';
-            document.getElementById('adOverlay').style.display = 'none';
-            // Ahora sí arrancar la película
+        window.verPelicula = () => {
             document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
+            document.getElementById('playerOverlay').style.display = 'flex';
+            document.body.style.overflow = "hidden";
+            // Estimar progreso por tiempo abierto (aproximación sin API del iframe)
             progresoInicio = Date.now();
+            // Duración estimada estándar: 2h = 7200s. Se actualiza con dato real de TMDB si está disponible
             const duracionEstimada = (window._peliculaDuracion || 120) * 60 * 1000;
             const progresoActual = leerProgreso();
             progresoTimer = setInterval(() => {
@@ -742,28 +624,15 @@
                 const pctNuevo = progresoActual + (transcurrido / duracionEstimada) * 100;
                 guardarProgreso(pctNuevo);
                 actualizarBarraProgreso(Math.min(100, Math.round(pctNuevo)));
-            }, 10000);
+            }, 10000); // cada 10s
         };
 
-        window.saltarAnuncioPost = function() {
-            if (_adTimer) { clearInterval(_adTimer); _adTimer = null; }
-            const video = document.getElementById('adVideoPost');
-            video.pause(); video.src = '';
-            document.getElementById('postrollOverlay').style.display = 'none';
-            cerrarPelicula();
-        };
-
-        window.verPelicula = () => {
-            document.getElementById('playerOverlay').style.display = 'flex';
-            document.body.style.overflow = "hidden";
-            mostrarAnuncio('pre');
-        };
-
-        window._cerrarPeliculaReal = () => {
+        window.cerrarPelicula = () => {
             document.getElementById('playerOverlay').style.display = 'none';
             document.getElementById('movieFrame').src = "";
             document.body.style.overflow = "auto";
             if (progresoTimer) { clearInterval(progresoTimer); progresoTimer = null; }
+            // Guardar progreso final
             if (progresoInicio) {
                 const duracion = (window._peliculaDuracion || 120) * 60 * 1000;
                 const transcurrido = Date.now() - progresoInicio;
@@ -772,27 +641,6 @@
                 progresoInicio = null;
             }
             actualizarBarraProgreso(leerProgreso());
-        };
-
-        window.cerrarPelicula = () => {
-            // Guardar progreso primero
-            if (progresoTimer) { clearInterval(progresoTimer); progresoTimer = null; }
-            if (progresoInicio) {
-                const duracion = (window._peliculaDuracion || 120) * 60 * 1000;
-                const transcurrido = Date.now() - progresoInicio;
-                const actual = leerProgreso();
-                guardarProgreso(actual + (transcurrido / duracion) * 100);
-                progresoInicio = null;
-            }
-            actualizarBarraProgreso(leerProgreso());
-            // Si el iframe tiene contenido, mostrar post-roll. Si no (viene de saltarAnuncioPost), cerrar directo.
-            const frame = document.getElementById('movieFrame');
-            if (frame.src && frame.src !== window.location.href) {
-                frame.src = "";
-                mostrarAnuncio('post');
-            } else {
-                window._cerrarPeliculaReal();
-            }
         };
 
         async function cargarSimilares() {
