@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieM | 404</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { --accent-color: #dc2626; }
+        .text-accent { color: var(--accent-color); }
+        .bg-accent    { background-color: var(--accent-color); }
+        .border-accent{ border-color: var(--accent-color); }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-16px)} }
+        @keyframes glitch {
+            0%,100%{clip-path:inset(0 0 100% 0);transform:translateX(0)}
+            10%{clip-path:inset(10% 0 60% 0);transform:translateX(-4px)}
+            20%{clip-path:inset(50% 0 30% 0);transform:translateX(4px)}
+            30%{clip-path:inset(80% 0 5%  0);transform:translateX(-2px)}
+            40%{clip-path:inset(0   0 90% 0);transform:translateX(0)}
+            50%{clip-path:inset(30% 0 50% 0);transform:translateX(3px)}
+            60%{clip-path:inset(70% 0 10% 0);transform:translateX(-3px)}
+            70%{clip-path:inset(5%  0 80% 0);transform:translateX(2px)}
+            80%{clip-path:inset(40% 0 40% 0);transform:translateX(-1px)}
+            90%{clip-path:inset(90% 0 2%  0);transform:translateX(1px)}
+        }
+        .glitch-container { position:relative; display:inline-block; }
+        .glitch-container::before,
+        .glitch-container::after {
+            content: attr(data-text);
+            position:absolute; inset:0;
+            font: inherit; color: inherit;
+            pointer-events:none;
+        }
+        .glitch-container::before {
+            color: #ef4444; left:2px;
+            animation: glitch 3s infinite step-start;
+        }
+        .glitch-container::after {
+            color: #3b82f6; left:-2px;
+            animation: glitch 3s infinite step-start reverse;
+        }
+        .film-grain {
+            position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+        .float { animation: float 4s ease-in-out infinite; }
+        .scan-line {
+            position:fixed; inset:0; pointer-events:none; z-index:1;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.03) 2px, rgba(0,0,0,.03) 4px);
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-white min-h-screen flex flex-col overflow-hidden">
+<div class="film-grain"></div>
+<div class="scan-line"></div>
+
+<!-- Nav -->
+<nav class="px-6 py-4 border-b border-white/5 relative z-10">
+    <h1 onclick="location.href='index.html'" class="text-2xl font-black italic tracking-tighter cursor-pointer w-fit">
+        MOVIE<span class="text-accent">M</span>
+    </h1>
+</nav>
+
+<!-- Main -->
+<main class="flex-1 flex flex-col items-center justify-center px-6 text-center relative z-10 pb-20">
+
+    <!-- Giant 404 -->
+    <div class="mb-8 select-none float">
+        <div class="glitch-container text-[120px] md:text-[200px] font-black italic tracking-tighter leading-none text-zinc-900" data-text="404">
+            404
+        </div>
+    </div>
+
+    <!-- Film reel icon -->
+    <div class="w-16 h-16 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center mb-6 shadow-2xl">
+        <svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                  d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/>
+        </svg>
+    </div>
+
+    <h2 class="text-2xl md:text-4xl font-black italic uppercase tracking-tighter mb-3">
+        Página no encontrada
+    </h2>
+    <p class="text-zinc-500 text-sm md:text-base max-w-sm mb-10 leading-relaxed">
+        Esta escena fue cortada del guión.<br>
+        La página que buscás no existe o fue movida.
+    </p>
+
+    <!-- Actions -->
+    <div class="flex flex-col sm:flex-row gap-3">
+        <button onclick="location.href='index.html'"
+            class="bg-accent text-white px-8 py-3.5 rounded-full font-black text-xs uppercase tracking-widest hover:opacity-90 active:scale-95 transition shadow-xl shadow-red-900/30">
+            ← Volver al inicio
+        </button>
+        <button onclick="history.back()"
+            class="bg-zinc-900 border border-white/10 text-zinc-300 px-8 py-3.5 rounded-full font-black text-xs uppercase tracking-widest hover:bg-zinc-800 active:scale-95 transition">
+            Página anterior
+        </button>
+    </div>
+
+    <!-- Quick links -->
+    <div class="mt-12 flex flex-wrap gap-3 justify-center">
+        <a href="series.html"   class="text-[10px] font-bold uppercase tracking-widest text-zinc-600 hover:text-accent transition px-3 py-2 rounded-xl border border-white/5 hover:border-accent/30">Series</a>
+        <a href="mi_lista.html" class="text-[10px] font-bold uppercase tracking-widest text-zinc-600 hover:text-accent transition px-3 py-2 rounded-xl border border-white/5 hover:border-accent/30">Mi Lista</a>
+        <a href="tv.html"       class="text-[10px] font-bold uppercase tracking-widest text-zinc-600 hover:text-accent transition px-3 py-2 rounded-xl border border-white/5 hover:border-accent/30">TV en Vivo</a>
+        <a href="perfil.html"   class="text-[10px] font-bold uppercase tracking-widest text-zinc-600 hover:text-accent transition px-3 py-2 rounded-xl border border-white/5 hover:border-accent/30">Perfil</a>
+    </div>
+</main>
+
+<script>
+var c = localStorage.getItem('movieM_color');
+if (c) document.documentElement.style.setProperty('--accent-color', c);
+</script>
+</body>
+</html>
