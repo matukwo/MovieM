@@ -33,7 +33,7 @@
     </div>
     <div class="flex items-center justify-end gap-3">
         <div class="relative">
-            <input type="text" id="buscador" placeholder="Buscar pelicula o usuario..." class="bg-zinc-900 border border-zinc-800 text-white text-xs rounded-full py-2.5 px-4 pl-10 focus:ring-1 focus:ring-red-600 w-52 transition-all focus:w-72 outline-none" onkeydown="manejarTeclaDropdown(event,'searchDropdown')" onkeyup="if(event.key==='Escape'){document.getElementById('searchDropdown').classList.add('hidden');this.blur();}">
+            <input type="text" id="buscador" placeholder="Buscar pelicula o usuario..." class="bg-zinc-900 border border-zinc-800 text-white text-xs rounded-full py-2.5 px-4 pl-10 focus:ring-1 focus:ring-red-600 w-52 transition-all focus:w-72 outline-none" onkeydown="manejarTeclaDropdown(event,'searchDropdown')">
             <svg class="absolute left-3 top-2.5 w-4 h-4 text-zinc-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             <div id="searchDropdown" class="absolute right-0 top-11 bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl w-80 hidden z-50 no-scrollbar"></div>
         </div>
@@ -64,7 +64,7 @@
 <div id="searchOverlayMobile" class="fixed inset-0 z-[200] bg-zinc-950 hidden flex-col">
     <div class="flex items-center gap-3 px-4 py-4 border-b border-white/5 pt-safe">
         <div class="relative flex-1">
-            <input type="text" id="buscadorMobile" placeholder="Buscar pelicula o usuario..." class="w-full bg-zinc-900 border border-zinc-800 text-white text-sm rounded-full py-3 px-4 pl-10 outline-none">
+            <input type="text" id="buscadorMobile" placeholder="Buscar pelicula o usuario..." class="w-full bg-zinc-900 border border-zinc-800 text-white text-sm rounded-full py-3 px-4 pl-10 outline-none" onkeydown="if(event.key==='Enter'&&this.value.trim().length>1)location.href='buscar.html?q='+encodeURIComponent(this.value.trim())">
             <svg class="absolute left-3 top-3.5 w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
         </div>
         <button id="btnCerrarBusqueda" class="text-zinc-400 font-bold text-sm px-2">Cerrar</button>
@@ -88,7 +88,7 @@
                 <div class="space-y-3">
                     <input type="text" id="nicknameUsuario" placeholder="Usuario" class="w-full input-premium p-3 rounded-xl text-sm outline-none hidden">
                     <input type="email" id="nombreUsuario" placeholder="Email" class="w-full input-premium p-3 rounded-xl text-sm outline-none" autocomplete="email">
-                    <input type="password" id="passUsuario" placeholder="Contraseña" class="w-full input-premium p-3 rounded-xl text-sm outline-none text-white" autocomplete="current-password">
+                    <input type="password" id="passUsuario" placeholder="Contrasena" class="w-full input-premium p-3 rounded-xl text-sm outline-none text-white" autocomplete="current-password">
                     <input type="password" id="confirmPass" placeholder="Confirmar contrasena" class="w-full input-premium p-3 rounded-xl text-sm outline-none hidden text-white">
                     <button id="btnAccionPrincipal" onclick="procesarUsuario()" class="w-full bg-accent text-white font-black py-4 rounded-xl text-xs uppercase tracking-[0.2em] transition-all active:scale-95 shadow-lg">Entrar</button>
                 </div>
@@ -316,22 +316,6 @@ async function buscarTodo(q,dropEl){
   }catch(e){dropEl.innerHTML='<p class="text-zinc-600 text-xs p-4 text-center">Error</p>';}
 }
 
-// Fix 6: Keyboard navigation in dropdown
-window.manejarTeclaDropdown=function(event,dropId){
-  var drop=document.getElementById(dropId);
-  var items=drop.querySelectorAll('[onclick]');
-  if(!items.length){
-    if(event.key==='Enter'&&event.target.value.trim().length>1)location.href='buscar.html?q='+encodeURIComponent(event.target.value.trim());
-    return;
-  }
-  var active=drop.querySelector('.bg-zinc-700');
-  var idx=Array.from(items).indexOf(active);
-  if(event.key==='ArrowDown'){event.preventDefault();if(active)active.classList.remove('bg-zinc-700');var next=items[idx+1]||items[0];next.classList.add('bg-zinc-700');next.scrollIntoView({block:'nearest'});}
-  else if(event.key==='ArrowUp'){event.preventDefault();if(active)active.classList.remove('bg-zinc-700');var prev=items[idx-1]||items[items.length-1];prev.classList.add('bg-zinc-700');prev.scrollIntoView({block:'nearest'});}
-  else if(event.key==='Enter'){if(active){event.preventDefault();active.click();}else if(event.target.value.trim().length>1)location.href='buscar.html?q='+encodeURIComponent(event.target.value.trim());}
-  else if(event.key==='Escape'){drop.classList.add('hidden');event.target.blur();}
-};
-
 var buscador=document.getElementById('buscador'),dropdown=document.getElementById('searchDropdown');
 buscador.addEventListener('input',function(){
   clearTimeout(timer);var q=buscador.value.trim();
@@ -340,7 +324,6 @@ buscador.addEventListener('input',function(){
 });
 document.addEventListener('click',function(e){if(!buscador.contains(e.target)&&!dropdown.contains(e.target))dropdown.classList.add('hidden');});
 
-// Fix 7: Mobile overlay reset — use style instead of class toggle to avoid flex/hidden conflict
 var overlay=document.getElementById('searchOverlayMobile'),buscMob=document.getElementById('buscadorMobile'),dropMob=document.getElementById('searchDropdownMobile');
 document.getElementById('btnBuscarMobile').onclick=function(){overlay.style.display='flex';setTimeout(function(){buscMob.focus();},100);};
 document.getElementById('btnCerrarBusqueda').onclick=function(){overlay.style.display='none';buscMob.value='';dropMob.innerHTML='';document.body.style.overflow='';};
@@ -353,7 +336,7 @@ buscMob.addEventListener('input',function(){
 function crearCard(peli){
   var puntaje=peli.vote_average?peli.vote_average.toFixed(1):'S/R';
   var anio=(peli.release_date||peli.first_air_date||'').split('-')[0]||'';
-  var poster=peli.poster_path?BASE+peli.poster_path:'data:image/svg+xml,%3Csvg xmlns%3D%22http%3A//www.w3.org/2000/svg%22 width%3D%22500%22 height%3D%22750%22 viewBox%3D%220 0 500 750%22%3E%3Crect width%3D%22500%22 height%3D%22750%22 fill%3D%22%2327272a%22/%3E%3Ctext x%3D%22250%22 y%3D%22375%22 fill%3D%22%2352525b%22 font-size%3D%2260%22 text-anchor%3D%22middle%22 dominant-baseline%3D%22middle%22%3E%3F%3C/text%3E%3C/svg%3E';
+  var poster=peli.poster_path?BASE+peli.poster_path:'data:image/svg+xml,%3Csvg xmlns%3D%22http%3A//www.w3.org/2000/svg%22 width%3D%22500%22 height%3D%22750%22%3E%3Crect width%3D%22500%22 height%3D%22750%22 fill%3D%22%2327272a%22/%3E%3Ctext x%3D%22250%22 y%3D%22375%22 fill%3D%22%2352525b%22 font-size%3D%2260%22 text-anchor%3D%22middle%22 dominant-baseline%3D%22middle%22%3E%3F%3C/text%3E%3C/svg%3E';
   var progress=JSON.parse(localStorage.getItem('movieM_progress')||'{}');
   var prog=progress['pelicula_'+peli.id]||0;
   var card=document.createElement('div');
@@ -385,32 +368,54 @@ async function cargarSeccion(url,id){
 
 window.scrollFila=function(id,d){document.getElementById(id).scrollBy({left:d,behavior:'smooth'});};
 var colorG=localStorage.getItem('movieM_color');if(colorG)document.documentElement.style.setProperty('--accent-color',colorG);
+
+// ── Navegación por teclado en dropdown de búsqueda ────────────────────────────
+window.manejarTeclaDropdown=function(event,dropId){
+  var drop=document.getElementById(dropId);
+  var items=Array.from(drop.querySelectorAll('[onclick]'));
+  var active=drop.querySelector('.bg-zinc-700');
+  var idx=items.indexOf(active);
+  if(event.key==='ArrowDown'){
+    event.preventDefault();
+    if(active)active.classList.remove('bg-zinc-700');
+    var next=items[idx+1]||items[0];
+    if(next){next.classList.add('bg-zinc-700');next.scrollIntoView({block:'nearest'});}
+  } else if(event.key==='ArrowUp'){
+    event.preventDefault();
+    if(active)active.classList.remove('bg-zinc-700');
+    var prev=items[idx-1]||items[items.length-1];
+    if(prev){prev.classList.add('bg-zinc-700');prev.scrollIntoView({block:'nearest'});}
+  } else if(event.key==='Enter'){
+    if(active){event.preventDefault();active.click();}
+    else if(event.target.value.trim().length>1){
+      location.href='buscar.html?q='+encodeURIComponent(event.target.value.trim());
+    }
+  } else if(event.key==='Escape'){
+    drop.classList.add('hidden');event.target.blur();
+  }
+};
 // ── Continuar Viendo ──────────────────────────────────────────────────────────
 (async function cargarContinuar(){
   try {
     var prog=JSON.parse(localStorage.getItem('movieM_progress')||'{}');
-    // Fix 8: include both movies (pelicula_) AND series (serie_)
-    var itemsConProgreso=Object.entries(prog)
-      .filter(function(e){return (e[0].startsWith('pelicula_')||e[0].startsWith('serie_'))&&e[1]>2&&e[1]<98;})
-      .sort(function(a,b){return b[1]-a[1]})
+    var pelisConProgreso=Object.entries(prog)
+      .filter(function(e){return e[0].startsWith('pelicula_')&&e[1]>2&&e[1]<98;})
+      .sort(function(a,b){return b[1]-a[1]}) // las más avanzadas primero
       .slice(0,12);
-    if(!itemsConProgreso.length) return;
+    if(!pelisConProgreso.length) return;
     document.getElementById('secContinuar').classList.remove('hidden');
     var fila=document.getElementById('continuar');
     fila.innerHTML='';
-    await Promise.all(itemsConProgreso.map(async function(entry){
-      var isSerie=entry[0].startsWith('serie_');
-      var id=entry[0].replace(isSerie?'serie_':'pelicula_','');
+    await Promise.all(pelisConProgreso.map(async function(entry){
+      var id=entry[0].replace('pelicula_','');
       var pct=entry[1];
-      var destino=isSerie?'serie.html':'pelicula.html';
-      var endpoint=isSerie?'tv':'movie';
       try{
-        var r=await fetch('https://api.themoviedb.org/3/'+endpoint+'/'+id+'?api_key='+API_KEY+'&language=es-ES');
+        var r=await fetch('https://api.themoviedb.org/3/movie/'+id+'?api_key='+API_KEY+'&language=es-ES');
         var p=await r.json();
         if(!p.poster_path) return;
         var card=document.createElement('div');
         card.className='min-w-[120px] md:min-w-[160px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2';
-        card.onclick=function(){location.href=destino+'?id='+id;};
+        card.onclick=function(){location.href='pelicula.html?id='+id;};
         var wrap=document.createElement('div');wrap.className='relative';
         var sk=document.createElement('div');sk.className='absolute inset-0 rounded-xl skeleton';
         var im=document.createElement('img');
@@ -420,7 +425,6 @@ var colorG=localStorage.getItem('movieM_color');if(colorG)document.documentEleme
         im.onload=function(){sk.style.display='none';};
         var badge=document.createElement('div');badge.className='absolute top-1.5 left-1.5 z-20';
         badge.innerHTML='<div class="bg-black/80 text-white text-[8px] font-black px-2 py-0.5 rounded-lg flex items-center gap-1"><svg class="w-2.5 h-2.5 fill-red-500" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>'+Math.round(pct)+'%</div>';
-        if(isSerie){var typeBadge=document.createElement('div');typeBadge.className='absolute top-1.5 right-1.5 z-20';typeBadge.innerHTML='<div class="bg-black/80 text-zinc-400 text-[7px] font-black px-1.5 py-0.5 rounded-lg uppercase">Serie</div>';wrap.appendChild(typeBadge);}
         var progWrap=document.createElement('div');progWrap.className='absolute bottom-0 left-0 right-0 z-20 px-1.5 pb-1.5';
         progWrap.innerHTML='<div class="w-full h-1.5 bg-zinc-800/80 rounded-full"><div class="h-full bg-red-600 rounded-full" style="width:'+Math.round(pct)+'%"></div></div>';
         wrap.appendChild(sk);wrap.appendChild(im);wrap.appendChild(badge);wrap.appendChild(progWrap);
