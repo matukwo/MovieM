@@ -73,13 +73,9 @@
     <h1 class="text-xl md:text-2xl font-black text-accent tracking-tighter cursor-pointer" onclick="location.href='index.html'">MOVIE<span class="text-white font-light">M</span></h1>
     <div class="flex items-center gap-3">
         <button id="btnSeccionColor" class="hidden text-[9px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition px-3 py-2 bg-zinc-900 rounded-full border border-white/5">Ajustes</button>
-        <!-- Campanita -->
-        <button id="mmBellBtnPerfil" onclick="mmAbrir('notif')" title="Notificaciones"
-            class="hidden relative w-9 h-9 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:bg-zinc-700 transition shrink-0">
-            <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-            </svg>
-            <span class="mm-bell-badge" style="position:absolute;top:-4px;right:-4px;background:var(--accent-color,#dc2626);color:white;font-size:9px;font-weight:900;border-radius:999px;min-width:17px;height:17px;display:none;align-items:center;justify-content:center;padding:0 4px;"></span>
+        <button id="btnBell" class="hidden relative w-9 h-9 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:bg-zinc-700 transition shrink-0">
+            <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+            <span id="bellBadge" style="position:absolute;top:-5px;right:-5px;background:var(--accent-color,#dc2626);color:#fff;font-size:9px;font-weight:900;border-radius:999px;min-width:17px;height:17px;display:none;align-items:center;justify-content:center;padding:0 4px"></span>
         </button>
         <button onclick="location.href='index.html'" class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-white transition">← Inicio</button>
     </div>
@@ -100,9 +96,7 @@
         <button onclick="cerrarSesion()" class="px-5 py-2.5 rounded-xl border border-zinc-700 text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-white hover:bg-zinc-800 transition">
             Cerrar Sesión
         </button>
-        <button id="btnAnuncio" class="hidden px-5 py-2.5 rounded-xl border border-yellow-600/40 text-[10px] font-bold uppercase tracking-widest text-yellow-500 hover:bg-yellow-600/10 transition" onclick="window.mmAnuncio window.mmMostrarAnuncio && window.mmMostrarAnuncio()window.mmMostrarAnuncio && window.mmMostrarAnuncio() window.mmAnuncio()">
-            📢 Anuncio
-        </button>
+        <button id="btnAnuncio" class="hidden px-4 py-2.5 rounded-xl border border-yellow-600/40 text-[10px] font-bold uppercase tracking-widest text-yellow-500 hover:bg-yellow-600/10 transition">📢 Anuncio</button>
     </div>
 </div>
 
@@ -134,13 +128,12 @@
                         <span class="text-[8px] text-zinc-500 uppercase font-black tracking-widest">Siguiendo</span>
                     </button>
                 </div>
-                <!-- Botón seguir + mensaje + te sigue -->
+                <!-- Botón seguir + te sigue -->
                 <div class="flex items-center gap-2">
                     <button id="btnSeguir" class="hidden px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest transition-all border-2 border-accent text-accent hover:bg-accent hover:text-white active:scale-95" onclick="toggleSeguir()">
                         Seguir
                     </button>
-                    <button id="btnMensaje" class="hidden px-4 py-2 rounded-full font-black text-xs uppercase tracking-widest transition-all border border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-white active:scale-95 flex items-center gap-1.5" onclick="abrirChatDesdeBoton()">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    <button id="btnMensaje" class="hidden px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest transition-all border border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-white active:scale-95">
                         Mensaje
                     </button>
                     <span id="badgeTeSigue" class="hidden px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-zinc-800 border border-white/10 text-zinc-400">Te sigue</span>
@@ -275,6 +268,10 @@
     async function cargarPerfil() {
         var snap = await getDoc(doc(db,'usuarios',perfilUID));
         var data = snap.exists() ? snap.data() : {};
+        // Exponer para notif-chat
+        window._mmPerfilUID      = perfilUID;
+        window._mmPerfilUsername = perfilUsername;
+        window._mmPerfilAvatar   = data.avatar || '';
 
         if (data.color) { document.documentElement.style.setProperty('--accent', data.color); if(isMiPerfil) localStorage.setItem('movieM_color',data.color); }
 
@@ -316,7 +313,7 @@
             document.getElementById('btnEditarBio').classList.remove('hidden');
             document.getElementById('btnAgregarActor').classList.remove('hidden');
             document.getElementById('btnSeccionColor').classList.remove('hidden');
-            document.getElementById('mmBellBtnPerfil').classList.remove('hidden');
+            document.getElementById('btnBell').classList.remove('hidden');
             if (miUID === ADMIN_UID) document.getElementById('btnAnuncio').classList.remove('hidden');
             renderizarGeneros(data.generos||[], true);
             renderizarFavs(true);
@@ -330,18 +327,11 @@
                 var btn = document.getElementById('btnSeguir');
                 btn.classList.remove('hidden');
                 actualizarBtnSeguir(yaSigo);
+                document.getElementById('btnMensaje').classList.remove('hidden');
+                document.getElementById('btnBell').classList.remove('hidden');
 
-                // Botón Mensaje
-                var btnMsg = document.getElementById('btnMensaje');
-                if (btnMsg) btnMsg.classList.remove('hidden');
-
-                // Campanita
-                document.getElementById('mmBellBtnPerfil').classList.remove('hidden');
-
-                // ── "Te sigue" badge — datos frescos ─────────────
-                var perfilSnapFresco = await getDoc(doc(db,'usuarios',perfilUID));
-                var perfilDataFresco = perfilSnapFresco.exists() ? perfilSnapFresco.data() : {};
-                var ellosSeguidores = perfilDataFresco.seguidores || data.seguidores || [];
+                // ── "Te sigue" badge ──────────────────────────────
+                var ellosSeguidores = data.seguidores||[];
                 if (ellosSeguidores.includes(miUID)) {
                     document.getElementById('badgeTeSigue').classList.remove('hidden');
                 }
@@ -366,18 +356,6 @@
         var cont = document.getElementById('contSeguidores');
         cont.innerText = parseInt(cont.innerText) + (yaSigo ? -1 : 1);
         actualizarBtnSeguir(!yaSigo);
-        // Notificar al usuario seguido
-        if (!yaSigo && window.mmNotifSeguidor) {
-            var miSnap2 = await getDoc(doc(db,'usuarios',miUID));
-            var miAv = miSnap2.exists() ? (miSnap2.data().avatar || null) : null;
-            window.mmNotifSeguidor(perfilUID, miUsername || localStorage.getItem('usuarioMovieM') || 'Alguien', miAv);
-        }
-        // Actualizar badge "Te sigue"
-        var perfilSnap = await getDoc(doc(db,'usuarios',perfilUID));
-        var perfilData = perfilSnap.exists() ? perfilSnap.data() : {};
-        var badge = document.getElementById('badgeTeSigue');
-        if ((perfilData.seguidores||[]).includes(miUID)) badge.classList.remove('hidden');
-        else badge.classList.add('hidden');
     }
     window.toggleSeguir = toggleSeguir;
 
@@ -690,18 +668,7 @@
     document.getElementById('modalSeguidos').addEventListener('click', function(e) {
         if (e.target === this) cerrarModalSeguidos();
     });
-
-    // Función para el botón "Mensaje"
-    window.abrirChatDesdeBoton = function() {
-        if (!miUID || !perfilUID || !perfilUsername) return;
-        var av = document.querySelector('#userAvatarFrame img');
-        var avatarUrl = av ? av.src : '';
-        window.mmAbrirChat(perfilUID, perfilUsername, avatarUrl);
-    };
 </script>
-
-<!-- Sistema Notificaciones + Chat -->
-<script type="module" src="notif-chat.js"></script>
 
 <!-- Bottom nav mobile -->
 <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-zinc-950/95 backdrop-blur-xl border-t border-white/5">
@@ -720,5 +687,26 @@
         </a>
     </div>
 </nav>
+
+<script type="module" src="notif-chat.js"></script>
+<script>
+// Wire up buttons that depend on notif-chat — poll until ready
+(function() {
+    var t = setInterval(function() {
+        if (!window._mmReady) return;
+        clearInterval(t);
+        var bell = document.getElementById('btnBell');
+        if (bell) bell.onclick = function() { window._mmAbrir('n'); };
+        var anuncio = document.getElementById('btnAnuncio');
+        if (anuncio) anuncio.onclick = function() { window._mmAnuncio(); };
+        var msg = document.getElementById('btnMensaje');
+        if (msg) msg.onclick = function() {
+            if (window._mmAbrirChat && window._mmPerfilUID && window._mmPerfilUsername) {
+                window._mmAbrirChat(window._mmPerfilUID, window._mmPerfilUsername, window._mmPerfilAvatar || '');
+            }
+        };
+    }, 100);
+})();
+</script>
 </body>
 </html>
