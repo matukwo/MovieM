@@ -33,7 +33,7 @@
     </div>
     <div class="flex items-center justify-end gap-3">
         <div class="relative">
-            <input type="text" id="buscador" placeholder="Buscar pelicula o usuario..." class="bg-zinc-900 border border-zinc-800 text-white text-xs rounded-full py-2.5 px-4 pl-10 focus:ring-1 focus:ring-red-600 w-52 transition-all focus:w-72 outline-none" onkeydown="manejarTeclaDropdown(event,'searchDropdown')">
+            <input type="text" id="buscador" placeholder="Buscar pelicula o usuario..." class="bg-zinc-900 border border-zinc-800 text-white text-xs rounded-full py-2.5 px-4 pl-10 focus:ring-1 focus:ring-red-600 w-52 transition-all focus:w-72 outline-none">
             <svg class="absolute left-3 top-2.5 w-4 h-4 text-zinc-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             <div id="searchDropdown" class="absolute right-0 top-11 bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl w-80 hidden z-50 no-scrollbar"></div>
         </div>
@@ -64,7 +64,7 @@
 <div id="searchOverlayMobile" class="fixed inset-0 z-[200] bg-zinc-950 hidden flex-col">
     <div class="flex items-center gap-3 px-4 py-4 border-b border-white/5 pt-safe">
         <div class="relative flex-1">
-            <input type="text" id="buscadorMobile" placeholder="Buscar pelicula o usuario..." class="w-full bg-zinc-900 border border-zinc-800 text-white text-sm rounded-full py-3 px-4 pl-10 outline-none" onkeydown="if(event.key==='Enter'&&this.value.trim().length>1)location.href='buscar.html?q='+encodeURIComponent(this.value.trim())">
+            <input type="text" id="buscadorMobile" placeholder="Buscar pelicula o usuario..." class="w-full bg-zinc-900 border border-zinc-800 text-white text-sm rounded-full py-3 px-4 pl-10 outline-none">
             <svg class="absolute left-3 top-3.5 w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
         </div>
         <button id="btnCerrarBusqueda" class="text-zinc-400 font-bold text-sm px-2">Cerrar</button>
@@ -322,21 +322,35 @@ buscador.addEventListener('input',function(){
   if(q.length<2){dropdown.classList.add('hidden');return;}
   timer=setTimeout(function(){dropdown.classList.remove('hidden');buscarTodo(q,dropdown);},350);
 });
+// Enter en el buscador desktop → buscar.html con el query
+buscador.addEventListener('keydown',function(e){
+  if(e.key==='Enter'){
+    var q=buscador.value.trim();
+    if(q.length>1){location.href='buscar.html?q='+encodeURIComponent(q);}
+  }
+});
 document.addEventListener('click',function(e){if(!buscador.contains(e.target)&&!dropdown.contains(e.target))dropdown.classList.add('hidden');});
 
 var overlay=document.getElementById('searchOverlayMobile'),buscMob=document.getElementById('buscadorMobile'),dropMob=document.getElementById('searchDropdownMobile');
 document.getElementById('btnBuscarMobile').onclick=function(){overlay.style.display='flex';setTimeout(function(){buscMob.focus();},100);};
-document.getElementById('btnCerrarBusqueda').onclick=function(){overlay.style.display='none';buscMob.value='';dropMob.innerHTML='';document.body.style.overflow='';};
+document.getElementById('btnCerrarBusqueda').onclick=function(){overlay.style.display='none';buscMob.value='';dropMob.innerHTML='';};
 buscMob.addEventListener('input',function(){
   clearTimeout(timer);var q=buscMob.value.trim();
   if(q.length<2){dropMob.innerHTML='';return;}
   timer=setTimeout(function(){buscarTodo(q,dropMob);},350);
 });
+// Enter en el buscador mobile → buscar.html con el query
+buscMob.addEventListener('keydown',function(e){
+  if(e.key==='Enter'){
+    var q=buscMob.value.trim();
+    if(q.length>1){location.href='buscar.html?q='+encodeURIComponent(q);}
+  }
+});
 
 function crearCard(peli){
   var puntaje=peli.vote_average?peli.vote_average.toFixed(1):'S/R';
   var anio=(peli.release_date||peli.first_air_date||'').split('-')[0]||'';
-  var poster=peli.poster_path?BASE+peli.poster_path:'data:image/svg+xml,%3Csvg xmlns%3D%22http%3A//www.w3.org/2000/svg%22 width%3D%22500%22 height%3D%22750%22%3E%3Crect width%3D%22500%22 height%3D%22750%22 fill%3D%22%2327272a%22/%3E%3Ctext x%3D%22250%22 y%3D%22375%22 fill%3D%22%2352525b%22 font-size%3D%2260%22 text-anchor%3D%22middle%22 dominant-baseline%3D%22middle%22%3E%3F%3C/text%3E%3C/svg%3E';
+  var poster=peli.poster_path?BASE+peli.poster_path:'https://via.placeholder.com/500x750?text=?';
   var progress=JSON.parse(localStorage.getItem('movieM_progress')||'{}');
   var prog=progress['pelicula_'+peli.id]||0;
   var card=document.createElement('div');
@@ -368,32 +382,6 @@ async function cargarSeccion(url,id){
 
 window.scrollFila=function(id,d){document.getElementById(id).scrollBy({left:d,behavior:'smooth'});};
 var colorG=localStorage.getItem('movieM_color');if(colorG)document.documentElement.style.setProperty('--accent-color',colorG);
-
-// ── Navegación por teclado en dropdown de búsqueda ────────────────────────────
-window.manejarTeclaDropdown=function(event,dropId){
-  var drop=document.getElementById(dropId);
-  var items=Array.from(drop.querySelectorAll('[onclick]'));
-  var active=drop.querySelector('.bg-zinc-700');
-  var idx=items.indexOf(active);
-  if(event.key==='ArrowDown'){
-    event.preventDefault();
-    if(active)active.classList.remove('bg-zinc-700');
-    var next=items[idx+1]||items[0];
-    if(next){next.classList.add('bg-zinc-700');next.scrollIntoView({block:'nearest'});}
-  } else if(event.key==='ArrowUp'){
-    event.preventDefault();
-    if(active)active.classList.remove('bg-zinc-700');
-    var prev=items[idx-1]||items[items.length-1];
-    if(prev){prev.classList.add('bg-zinc-700');prev.scrollIntoView({block:'nearest'});}
-  } else if(event.key==='Enter'){
-    if(active){event.preventDefault();active.click();}
-    else if(event.target.value.trim().length>1){
-      location.href='buscar.html?q='+encodeURIComponent(event.target.value.trim());
-    }
-  } else if(event.key==='Escape'){
-    drop.classList.add('hidden');event.target.blur();
-  }
-};
 // ── Continuar Viendo ──────────────────────────────────────────────────────────
 (async function cargarContinuar(){
   try {
