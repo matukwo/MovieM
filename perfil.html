@@ -74,7 +74,7 @@
     <div class="flex items-center gap-3">
         <button id="btnSeccionColor" class="hidden text-[9px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition px-3 py-2 bg-zinc-900 rounded-full border border-white/5">Ajustes</button>
         <!-- Campanita -->
-        <button id="mmBellBtnPerfil" onclick="window.mmAbrirPanel('notif')" title="Notificaciones"
+        <button id="mmBellBtnPerfil" onclick="mmAbrir('notif')" title="Notificaciones"
             class="hidden relative w-9 h-9 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:bg-zinc-700 transition shrink-0">
             <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                 <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
@@ -100,7 +100,7 @@
         <button onclick="cerrarSesion()" class="px-5 py-2.5 rounded-xl border border-zinc-700 text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-white hover:bg-zinc-800 transition">
             Cerrar Sesión
         </button>
-        <button id="btnAnuncio" class="hidden px-5 py-2.5 rounded-xl border border-yellow-600/40 text-[10px] font-bold uppercase tracking-widest text-yellow-500 hover:bg-yellow-600/10 transition" onclick="window.mmMostrarAnuncio && window.mmMostrarAnuncio()">
+        <button id="btnAnuncio" class="hidden px-5 py-2.5 rounded-xl border border-yellow-600/40 text-[10px] font-bold uppercase tracking-widest text-yellow-500 hover:bg-yellow-600/10 transition" onclick="window.mmAnuncio window.mmMostrarAnuncio && window.mmMostrarAnuncio()window.mmMostrarAnuncio && window.mmMostrarAnuncio() window.mmAnuncio()">
             📢 Anuncio
         </button>
     </div>
@@ -367,10 +367,10 @@
         cont.innerText = parseInt(cont.innerText) + (yaSigo ? -1 : 1);
         actualizarBtnSeguir(!yaSigo);
         // Notificar al usuario seguido
-        if (!yaSigo && window.notifNuevoSeguidor) {
+        if (!yaSigo && window.mmNotifSeguidor) {
             var miSnap2 = await getDoc(doc(db,'usuarios',miUID));
             var miAv = miSnap2.exists() ? (miSnap2.data().avatar || null) : null;
-            window.notifNuevoSeguidor(perfilUID, miUsername || localStorage.getItem('usuarioMovieM') || 'Alguien', miAv);
+            window.mmNotifSeguidor(perfilUID, miUsername || localStorage.getItem('usuarioMovieM') || 'Alguien', miAv);
         }
         // Actualizar badge "Te sigue"
         var perfilSnap = await getDoc(doc(db,'usuarios',perfilUID));
@@ -696,15 +696,12 @@
         if (!miUID || !perfilUID || !perfilUsername) return;
         var av = document.querySelector('#userAvatarFrame img');
         var avatarUrl = av ? av.src : '';
-        window.mmAbrirChatCon(perfilUID, perfilUsername, avatarUrl);
+        window.mmAbrirChat(perfilUID, perfilUsername, avatarUrl);
     };
 </script>
 
 <!-- Sistema Notificaciones + Chat -->
-<script type="module">
-import { iniciarSistema } from './notif-chat.js';
-iniciarSistema();
-</script>
+<script type="module" src="notif-chat.js"></script>
 
 <!-- Bottom nav mobile -->
 <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-zinc-950/95 backdrop-blur-xl border-t border-white/5">
