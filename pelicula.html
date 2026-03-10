@@ -25,23 +25,22 @@
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden">
 
-<!-- Player overlay -->
 <div id="playerOverlay">
     <div class="w-full flex justify-between items-center p-3 md:p-4 bg-zinc-950 border-b border-white/5">
         <div class="flex items-center gap-3">
             <span class="text-red-600 font-black tracking-tighter text-lg md:text-xl">MOVIE<span class="text-white font-light">M</span></span>
-            <!-- Dropdown servidor -->
             <div class="relative" id="serverDropdownWrap">
                 <button onclick="toggleServerMenu()" class="flex items-center gap-1.5 bg-white/5 border border-white/10 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full hover:bg-white/10 transition">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01"/></svg>
-                    <span id="serverLabel">S1 — VidSrc</span>
+                    <span id="serverLabel">LAT — VidSrc</span>
                     <svg class="w-2.5 h-2.5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                 </button>
                 <div id="serverMenu">
-                    <button onclick="cambiarServidor(1,'S1 — VidSrc')" class="srv-active">S1 — VidSrc</button>
-                    <button onclick="cambiarServidor(2,'S2 — MultiEmbed')">S2 — MultiEmbed</button>
-                    <button onclick="cambiarServidor(3,'S3 — Embed.su')">S3 — Embed.su</button>
-                    <button onclick="cambiarServidor(4,'S4 — VidSrc XYZ')">S4 — VidSrc XYZ</button>
+                    <button onclick="cambiarServidor(1,'LAT — VidSrc')" class="srv-active">LAT — VidSrc</button>
+                    <button onclick="cambiarServidor(2,'LAT — MultiEmbed')">LAT — MultiEmbed</button>
+                    <button onclick="cambiarServidor(5,'LAT — AutoEmbed')">LAT — AutoEmbed</button>
+                    <button onclick="cambiarServidor(4,'SUB — VidSrc XYZ')">SUB — VidSrc XYZ</button>
+                    <button onclick="cambiarServidor(3,'ENG — Embed.su')">ENG — Embed.su</button>
                 </div>
             </div>
         </div>
@@ -52,32 +51,24 @@
     </div>
 </div>
 
-<!-- Backdrop -->
 <div id="backdrop" class="fixed inset-0 w-full h-full bg-cover bg-center opacity-20 md:opacity-30 blur-sm -z-10 transition-all duration-700"></div>
 <div class="fixed inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent -z-10"></div>
 
-<!-- Botón volver -->
 <button onclick="location.href='index.html'" class="fixed top-4 left-4 md:top-8 md:left-8 bg-black/50 p-2.5 md:p-3 rounded-full hover:bg-red-600 transition z-50 border border-white/10 shadow-2xl">
     <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
 </button>
 
-<!-- HUD usuario -->
 <div id="userHUD" class="fixed top-4 right-4 md:top-8 md:right-8 z-50 hidden items-center gap-3 bg-black/40 backdrop-blur-md p-1.5 pr-4 rounded-full border border-white/10 shadow-2xl">
     <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-600 flex items-center justify-center font-black text-white border-2 border-white/20 text-sm" id="userInitial">?</div>
     <span id="userNameHUD" class="text-xs font-bold uppercase tracking-widest hidden md:inline">Usuario</span>
 </div>
 
 <main class="px-4 md:px-8 pt-16 md:pt-20 pb-8">
-
-    <!-- Info principal -->
     <div class="flex flex-col md:flex-row gap-6 md:gap-12 items-start mb-10 md:mb-16 relative z-0 fade-in">
-
-        <!-- Poster: pequeño y a la izquierda en mobile -->
         <div class="flex gap-4 md:block w-full md:w-80 md:shrink-0">
             <div class="w-28 md:w-full shrink-0">
                 <div id="posterSkeleton" class="w-full aspect-[2/3] rounded-xl md:rounded-2xl skeleton"></div>
                 <img id="poster" src="" class="w-full rounded-xl md:rounded-2xl border border-white/10 shadow-2xl hidden" onload="this.classList.remove('hidden');document.getElementById('posterSkeleton')?.remove()">
-                <!-- Barra de progreso "Continuar viendo" -->
                 <div id="progresoWrap" class="hidden mt-2">
                     <div class="flex items-center justify-between mb-1">
                         <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">Continuar viendo</span>
@@ -88,615 +79,98 @@
                     </div>
                 </div>
             </div>
-            <!-- Info inline en mobile (al lado del poster) -->
             <div class="flex-1 md:hidden pt-1">
-                <div id="badget-premios-mobile" class="hidden mb-2 inline-flex items-center gap-1.5 bg-yellow-600/20 border border-yellow-600/50 text-yellow-500 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest">
-                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z"/></svg>
-                    Nominada
-                </div>
                 <h1 id="tituloMobile" class="text-2xl font-black italic tracking-tighter uppercase leading-none text-white mb-2"></h1>
                 <div class="flex items-center gap-2 mb-3 flex-wrap">
                     <span id="anioMobile" class="bg-zinc-800 px-2 py-0.5 rounded text-white text-xs font-bold"></span>
                     <span class="text-yellow-500 text-sm font-bold">&#11088; <span id="votoMobile">0.0</span></span>
                 </div>
-                <span id="directorMobile" class="text-zinc-500 text-xs italic block mb-3"></span>
-                <!-- Botones mobile compactos -->
                 <div class="flex gap-2 flex-wrap">
-                    <button onclick="verPelicula()" class="bg-red-600 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95 shadow-lg">
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Ver
-                    </button>
-                    <button onclick="abrirTrailer()" class="bg-zinc-800 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95">
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6zM21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9 9-4.03 9-9zm-16.1 0c0-3.92 3.18-7.1 7.1-7.1s7.1 3.18 7.1 7.1-3.18 7.1-7.1 7.1-7.1-3.18-7.1-7.1z"/></svg> Trailer
-                    </button>
-                    <button id="btnWatchlist" onclick="toggleWatchlist()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
-                    </button>
-                    <button id="btnLike" onclick="toggleLike()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78v0z"/></svg>
-                    </button>
+                    <button onclick="verPelicula()" class="bg-red-600 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95 shadow-lg">VER</button>
+                    <button onclick="abrirTrailer()" class="bg-zinc-800 text-white px-4 py-2.5 rounded-full font-black text-xs active:scale-95">TRAILER</button>
                 </div>
             </div>
         </div>
 
-        <!-- Info desktop (lado derecho) -->
         <div class="flex-1 relative z-10 min-w-0 hidden md:block">
-            <div id="badget-premios" class="hidden mb-4 inline-flex items-center gap-2.5 bg-yellow-600/20 border border-yellow-600/50 text-yellow-500 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-lg">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z"/></svg>
-                Nominada a Premios de la Academia
-            </div>
             <h1 id="titulo" class="text-5xl md:text-7xl font-black mb-4 italic tracking-tighter uppercase leading-none text-white truncate"></h1>
             <div id="tituloSkeleton" class="h-16 w-3/4 skeleton rounded-xl mb-4"></div>
             <div class="flex items-center gap-4 mb-6 font-bold flex-wrap">
                 <span id="anio" class="bg-zinc-800 px-3 py-1 rounded text-white text-sm"></span>
-                <span class="text-yellow-500 flex items-center gap-1 text-lg">&#11088; <span id="voto">0.0</span></span>
-                <span id="director" class="text-zinc-400 border-l border-zinc-800 pl-4 font-semibold italic text-base"></span>
-            </div>
-            <div id="sinopsisSkeleton" class="space-y-3 mb-8 max-w-2xl">
-                <div class="h-4 w-full skeleton rounded"></div>
-                <div class="h-4 w-full skeleton rounded"></div>
-                <div class="h-4 w-2/3 skeleton rounded"></div>
+                <span class="text-yellow-500 text-lg">&#11088; <span id="voto">0.0</span></span>
+                <span id="director" class="text-zinc-400 border-l border-zinc-800 pl-4 italic"></span>
             </div>
             <p id="sinopsis" class="text-lg text-zinc-500 max-w-2xl leading-relaxed mb-10 hidden"></p>
             <div class="flex flex-wrap items-center gap-4">
-                <button onclick="verPelicula()" class="bg-red-600 text-white px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-700 transition-all shadow-xl shadow-red-600/20 active:scale-95 tracking-tight uppercase">
-                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> VER PELICULA
-                </button>
-                <button onclick="abrirTrailer()" class="bg-white text-black px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-600 hover:text-white transition-all shadow-xl active:scale-95">
-                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6zM21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9 9-4.03 9-9zm-16.1 0c0-3.92 3.18-7.1 7.1-7.1s7.1 3.18 7.1 7.1-3.18 7.1-7.1 7.1-7.1-3.18-7.1-7.1z"/></svg> VER TRAILER
-                </button>
-                <button id="btnWatchlistDesktop" onclick="toggleWatchlist()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95" title="Guardar en Mi Lista">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
-                </button>
-                <button id="btnLikeDesktop" onclick="toggleLike()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95" title="Me gusta">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78v0z"/></svg>
-                </button>
+                <button onclick="verPelicula()" class="bg-red-600 text-white px-8 py-4 rounded-full font-black hover:bg-red-700 transition shadow-xl active:scale-95 tracking-tight uppercase">VER PELICULA</button>
+                <button onclick="abrirTrailer()" class="bg-white text-black px-8 py-4 rounded-full font-black hover:bg-red-600 hover:text-white transition shadow-xl active:scale-95">VER TRAILER</button>
             </div>
         </div>
     </div>
 
-    <!-- Sinopsis mobile (abajo del poster) -->
-    <div class="md:hidden mb-8 fade-in">
-        <div id="sinopsisSkeleton" class="space-y-2 mb-4">
-            <div class="h-3 w-full skeleton rounded"></div>
-            <div class="h-3 w-5/6 skeleton rounded"></div>
-            <div class="h-3 w-2/3 skeleton rounded"></div>
-        </div>
-        <p id="sinopsisMobile" class="text-sm text-zinc-400 leading-relaxed hidden"></p>
-    </div>
-
-    <!-- Reparto -->
-    <section class="mb-12 md:mb-20 fade-in group/reparto" style="animation-delay:.2s">
-        <h3 class="text-xs md:text-sm font-black uppercase tracking-widest mb-4 md:mb-8 text-zinc-400 flex items-center gap-3">
-            Reparto Principal <div class="h-px flex-1 bg-zinc-800/50"></div>
-        </h3>
-        <div class="relative">
-            <button onclick="document.getElementById('reparto').scrollBy({left:-320,behavior:'smooth'})" class="absolute left-0 top-1/2 -translate-y-6 z-20 bg-black/80 p-2.5 rounded-full hidden md:group-hover/reparto:flex border border-white/10 hover:bg-red-600 transition shadow-xl">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
-            </button>
-            <div id="reparto" class="flex gap-5 md:gap-8 overflow-x-auto no-scrollbar pb-4 scroll-smooth px-2">
-                <div class="min-w-[80px] skeleton h-20 rounded-full"></div>
-            </div>
-            <button onclick="document.getElementById('reparto').scrollBy({left:320,behavior:'smooth'})" class="absolute right-0 top-1/2 -translate-y-6 z-20 bg-black/80 p-2.5 rounded-full hidden md:group-hover/reparto:flex border border-white/10 hover:bg-red-600 transition shadow-xl">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg>
-            </button>
-        </div>
-    </section>
-
-    <!-- Películas Similares -->
-    <section class="mb-10 md:mb-14 fade-in" style="animation-delay:.35s">
-        <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 flex items-center gap-3">
-            <span class="w-1 h-6 bg-red-600 rounded-full inline-block"></span>
-            También te puede gustar
-        </h2>
-        <div class="relative group/sim">
-            <button onclick="document.getElementById('similaresFila').scrollBy({left:-320,behavior:'smooth'})"
-                class="absolute left-0 top-1/2 -translate-y-6 z-20 bg-black/80 p-2.5 rounded-full hidden md:group-hover/sim:flex border border-white/10 hover:bg-red-600 transition shadow-xl">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
-            </button>
-            <div id="similaresFila" class="flex gap-2 md:gap-3 overflow-x-auto no-scrollbar pb-3 scroll-smooth">
-                <!-- skeletons iniciales -->
-                <div class="min-w-[75px] md:min-w-[100px] skeleton rounded-xl aspect-[2/3]"></div>
-                <div class="min-w-[75px] md:min-w-[100px] skeleton rounded-xl aspect-[2/3]"></div>
-                <div class="min-w-[75px] md:min-w-[100px] skeleton rounded-xl aspect-[2/3]"></div>
-                <div class="min-w-[75px] md:min-w-[100px] skeleton rounded-xl aspect-[2/3]"></div>
-                <div class="min-w-[75px] md:min-w-[100px] skeleton rounded-xl aspect-[2/3]"></div>
-                <div class="min-w-[75px] md:min-w-[100px] skeleton rounded-xl aspect-[2/3]"></div>
-            </div>
-            <button onclick="document.getElementById('similaresFila').scrollBy({left:320,behavior:'smooth'})"
-                class="absolute right-0 top-1/2 -translate-y-6 z-20 bg-black/80 p-2.5 rounded-full hidden md:group-hover/sim:flex border border-white/10 hover:bg-red-600 transition shadow-xl">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg>
-            </button>
-        </div>
-    </section>
-
-    <!-- Comentarios + Resena -->
-    <section class="border-t border-white/5 pt-8 md:pt-12 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 mb-16 fade-in" style="animation-delay:.4s">
-        <div class="bg-zinc-900/40 p-6 md:p-10 rounded-2xl md:rounded-3xl border border-white/5 shadow-2xl">
-            <h3 class="text-lg md:text-2xl font-bold mb-5 italic">Tu resena en <span class="text-red-600">MovieM</span></h3>
-            <div id="starRating" class="flex gap-2 mb-5 text-zinc-700">
-                <span onclick="setRating(1)" class="star text-3xl md:text-4xl">&#9733;</span>
-                <span onclick="setRating(2)" class="star text-3xl md:text-4xl">&#9733;</span>
-                <span onclick="setRating(3)" class="star text-3xl md:text-4xl">&#9733;</span>
-                <span onclick="setRating(4)" class="star text-3xl md:text-4xl">&#9733;</span>
-                <span onclick="setRating(5)" class="star text-3xl md:text-4xl">&#9733;</span>
-            </div>
-            <textarea id="comentarioTxt" placeholder="Que te parecio la pelicula?" class="w-full bg-zinc-800/50 p-4 rounded-2xl text-white mb-5 h-28 outline-none focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600 text-sm resize-none border-none"></textarea>
-            <button onclick="publicarComentario()" class="w-full bg-red-600 py-3.5 rounded-2xl font-black hover:bg-red-700 transition tracking-widest uppercase text-sm shadow-xl active:scale-95">PUBLICAR</button>
-        </div>
-        <div>
-            <h3 class="text-lg md:text-2xl font-bold mb-5 flex items-center gap-2 md:gap-3">
-                Opiniones <span class="text-[9px] md:text-[10px] bg-red-600 px-2 py-1 rounded text-white font-black uppercase">GLOBAL</span>
-            </h3>
-            <div id="listaComentarios" class="space-y-3 md:space-y-4 max-h-[350px] md:max-h-[400px] overflow-y-auto no-scrollbar pr-1">
-                <p class="text-zinc-600 text-xs animate-pulse">Sincronizando...</p>
-            </div>
-        </div>
-    </section>
-</main>
-
-<!-- Modal Actor -->
-<div id="modalActor" class="fixed inset-0 z-[110] hidden flex items-end md:items-center justify-center p-0 md:p-6">
-    <div class="absolute inset-0 bg-black/70 backdrop-blur-md" onclick="cerrarActor()"></div>
-    <div class="relative glass-card px-5 py-6 md:px-10 md:py-10 rounded-t-3xl md:rounded-[45px] w-full max-w-4xl max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl">
-        <button onclick="cerrarActor()" class="absolute top-5 right-5 md:top-8 md:right-10 text-white/30 hover:text-white transition-all text-2xl z-20">x</button>
-        <div id="modalActorContent" class="flex flex-col md:flex-row gap-6 md:gap-10 items-start relative z-10">
-            <img id="actorFoto" src="" class="w-24 md:w-48 h-auto object-cover rounded-2xl md:rounded-[30px] shadow-2xl border border-white/10 shrink-0">
-            <div class="flex-1 w-full min-w-0">
-                <h2 id="actorNombre" class="text-2xl md:text-4xl font-black mb-3 italic tracking-tighter uppercase text-white"></h2>
-                <div class="mb-6"><p id="actorInfo" class="text-zinc-300 text-sm leading-relaxed"></p></div>
-                <h4 class="text-[10px] font-bold uppercase tracking-[0.2em] text-red-500 mb-3">Filmografia</h4>
-                <div id="actorPelisContenedor" class="relative group w-full"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Trailer -->
-<div id="modalVideo" class="fixed inset-0 bg-black/95 z-[100] hidden flex items-center justify-center p-2 md:p-4">
-    <button onclick="cerrarTrailer()" class="absolute top-4 right-4 md:top-8 md:right-8 text-white text-3xl hover:text-red-600 transition z-10">x</button>
-    <div id="videoContainer" class="w-full max-w-5xl aspect-video rounded-xl md:rounded-3xl overflow-hidden shadow-2xl"></div>
-</div>
+    </main>
 
 <script type="module">
-        const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
-        const urlParams = new URLSearchParams(window.location.search);
-        const movieID = urlParams.get('id');
-        let currentRating = 0;
+    const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
+    const urlParams = new URLSearchParams(window.location.search);
+    const movieID = urlParams.get('id');
 
-        // ── Rangos de usuario ────────────────────────────────────
-        const ADMIN_UID = '41XWZR8OzwdpMHf54UIQEzAEt7s1';
-        const VERIFIED_USERS = []; // Agregá UIDs verificados: ['uid1', 'uid2']
-        let miUID_pelicula = null; // UID del usuario logueado en esta página
+    // CONFIGURACIÓN DE SERVIDORES PARA AUDIO LATINO
+    const SERVERS_MOVIE = {
+        1: (id) => `https://vidsrc.cc/v3/embed/movie/${id}?auto_lang=es-419`,
+        2: (id) => `https://multiembed.mov/?video_id=${id}&tmdb=1&lang=es-419`,
+        3: (id) => `https://embed.su/embed/movie/${id}`, // Backup
+        4: (id) => `https://vidsrc.xyz/embed/movie?tmdb=${id}&ds_langs=es-419`,
+        5: (id) => `https://player.autoembed.cc/embed/movie/${id}?lang=es`
+    };
 
-        async function cargarPagina() {
-            try {
-                const [pRes, cRes] = await Promise.all([
-                    fetch(`https://api.themoviedb.org/3/movie/${movieID}?api_key=${API_KEY}&language=es-ES`),
-                    fetch(`https://api.themoviedb.org/3/movie/${movieID}/credits?api_key=${API_KEY}&language=es-ES`)
-                ]);
-                const peli = await pRes.json();
-                const credits = await cRes.json();
+    let servidorActivo = 1;
 
-                if(document.getElementById('tituloSkeleton')) document.getElementById('tituloSkeleton').remove();
-                if(document.getElementById('sinopsisSkeleton')) document.getElementById('sinopsisSkeleton').remove();
-                document.getElementById('sinopsis').classList.remove('hidden');
+    async function cargarPagina() {
+        try {
+            const pRes = await fetch(`https://api.themoviedb.org/3/movie/${movieID}?api_key=${API_KEY}&language=es-ES`);
+            const peli = await pRes.json();
 
-                document.getElementById('titulo').innerText = peli.title;
-                var tmob=document.getElementById('tituloMobile');if(tmob)tmob.innerText=peli.title;
-                document.getElementById('sinopsis').innerText = peli.overview || "Sin descripción disponible.";
-                document.getElementById('anio').innerText = peli.release_date ? peli.release_date.split('-')[0] : "S/F";
-                document.getElementById('voto').innerText = peli.vote_average.toFixed(1);
-                var vm=document.getElementById('votoMobile');if(vm)vm.innerText=peli.vote_average.toFixed(1);
-                var am=document.getElementById('anioMobile');if(am)am.innerText=peli.release_date?peli.release_date.split('-')[0]:'S/F';
-                document.getElementById('sinopsis').innerText = peli.overview || "Sin descripcion disponible.";
-                var sm=document.getElementById('sinopsisMobile');if(sm){sm.innerText=peli.overview||'Sin descripcion.';sm.classList.remove('hidden');var sk=document.getElementById('sinopsisSkeleton');if(sk)sk.remove();}
-                document.getElementById('poster').src = 'https://image.tmdb.org/t/p/w500' + peli.poster_path;
-                document.getElementById('backdrop').style.backgroundImage = `url('https://image.tmdb.org/t/p/original${peli.backdrop_path}')`;
-                
-                if(peli.vote_average > 7.4) document.getElementById('badget-premios').classList.remove('hidden');
+            if(document.getElementById('tituloSkeleton')) document.getElementById('tituloSkeleton').remove();
+            document.getElementById('titulo').innerText = peli.title;
+            document.getElementById('tituloMobile').innerText = peli.title;
+            document.getElementById('sinopsis').innerText = peli.overview || "Sin descripción disponible.";
+            document.getElementById('sinopsis').classList.remove('hidden');
+            document.getElementById('poster').src = 'https://image.tmdb.org/t/p/w500' + peli.poster_path;
+            document.getElementById('backdrop').style.backgroundImage = `url('https://image.tmdb.org/t/p/original${peli.backdrop_path}')`;
+            document.getElementById('anio').innerText = peli.release_date ? peli.release_date.split('-')[0] : "S/F";
+            document.getElementById('voto').innerText = peli.vote_average.toFixed(1);
+        } catch (error) { console.error(error); }
+    }
 
-                const dir = credits.crew.find(c => c.job === "Director");
-                if(dir) { document.getElementById('director').innerText = `Director: ${dir.name}`; var dm=document.getElementById('directorMobile');if(dm)dm.innerText='Dir: '+dir.name; }
+    window.toggleServerMenu = () => {
+        const menu = document.getElementById('serverMenu');
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    };
 
-                document.getElementById('reparto').innerHTML = credits.cast.slice(0, 15).map(actor => `
-                    <div onclick="verActor(${actor.id})" class="min-w-[110px] text-center cursor-pointer shrink-0 fade-in">
-                        <div class="w-20 h-20 mx-auto mb-4 overflow-hidden rounded-full border border-zinc-800 hover:border-red-600 transition-all transform hover:scale-110 duration-300">
-                            <img src="${actor.profile_path ? 'https://image.tmdb.org/t/p/w200' + actor.profile_path : 'https://via.placeholder.com/200'}" class="w-full h-full object-cover">
-                        </div>
-                        <p class="text-[10px] font-black text-zinc-200 truncate uppercase tracking-tighter px-1">${actor.name}</p>
-                        <p class="text-[8px] text-zinc-600 truncate italic px-1">${actor.character}</p>
-                    </div>`).join('');
-
-                escucharComentariosNube(); 
-                checkStatus();
-                actualizarHUD();
-                // Guardar duración real para progreso más preciso
-                if (peli.runtime) window._peliculaDuracion = peli.runtime;
-                // Cargar similares
-                cargarSimilares();
-                // Mostrar barra de progreso si ya vio algo
-                actualizarBarraProgreso(leerProgreso());
-            } catch (error) { console.error(error); }
-        }
-
-        // --- HUD DE USUARIO + captura UID ---
-        // Cargar el UID real del usuario logueado lo antes posible
-        window.onAuthStateChanged(window.auth, function(user) {
-            if (user) {
-                miUID_pelicula = user.uid;
-                checkStatus(); // re-check con UID real
-            }
+    window.cambiarServidor = (num, label) => {
+        servidorActivo = num;
+        document.getElementById('movieFrame').src = SERVERS_MOVIE[num](movieID);
+        document.getElementById('serverLabel').innerText = label;
+        document.getElementById('serverMenu').style.display = 'none';
+        document.querySelectorAll('#serverMenu button').forEach((b, i) => {
+            b.classList.toggle('srv-active', b.innerText.includes(label));
         });
+    };
 
-        function actualizarHUD() {
-            const userActual = localStorage.getItem('usuarioMovieM');
-            const hud = document.getElementById('userHUD');
-            if (userActual && userActual !== 'undefined') {
-                document.getElementById('userNameHUD').innerText = userActual;
-                document.getElementById('userInitial').innerText = userActual.charAt(0).toUpperCase();
-                hud.classList.remove('hidden');
-                hud.classList.add('flex');
-            }
-        }
+    window.verPelicula = () => {
+        document.getElementById('movieFrame').src = SERVERS_MOVIE[servidorActivo](movieID);
+        document.getElementById('playerOverlay').style.display = 'flex';
+        document.body.style.overflow = "hidden";
+    };
 
-        // --- FIREBASE LOGIC (COMENTARIOS) ---
-        // Badge SVGs por rango
-        function getBadge(uid) {
-            if (uid === ADMIN_UID) return '<svg title="Creador" class="w-3.5 h-3.5 text-blue-400 inline-block ml-1 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>';
-            if (VERIFIED_USERS.includes(uid)) return '<svg title="Verificado" class="w-3.5 h-3.5 text-yellow-400 inline-block ml-1 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.491 4.491 0 01-3.497-1.307 4.491 4.491 0 01-1.307-3.497A4.49 4.49 0 012.25 12a4.49 4.49 0 011.549-3.397 4.491 4.491 0 011.307-3.497 4.491 4.491 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd"/></svg>';
-            return '';
-        }
+    window.cerrarPelicula = () => {
+        document.getElementById('playerOverlay').style.display = 'none';
+        document.getElementById('movieFrame').src = "";
+        document.body.style.overflow = "auto";
+    };
 
-        function escucharComentariosNube() {
-            const contenedor = document.getElementById('listaComentarios');
-            const q = window.query(
-                window.collection(window.db, "comentarios"),
-                window.where("movieID", "==", movieID),
-                window.orderBy("fecha", "desc")
-            );
-
-            // Primero buscamos los UIDs de todos los usuarios para poder mostrar badges
-            window.onSnapshot(q, async (snapshot) => {
-                contenedor.innerHTML = "";
-                if (snapshot.empty) {
-                    contenedor.innerHTML = `<p class="text-zinc-600 text-sm italic">Nadie ha comentado aún. ¡Sé el primero!</p>`;
-                    return;
-                }
-
-                // Recolectar usernames únicos y buscar sus UIDs
-                const usernames = [...new Set(snapshot.docs.map(d => d.data().user))];
-                const uidMap = {}; // username → uid
-                try {
-                    const usersSnap = await window.getDocs(
-                        window.query(window.collection(window.db, 'usuarios'), window.where('username', 'in', usernames.slice(0,10)))
-                    );
-                    usersSnap.forEach(d => { uidMap[d.data().username] = d.id; });
-                } catch(e) {}
-
-                snapshot.forEach((docSnap) => {
-                    const c = docSnap.data();
-                    const docId = docSnap.id;
-                    const fechaComentario = c.fecha ? new Date(c.fecha).toLocaleString() : "Reciente";
-                    const uid = uidMap[c.user] || '';
-                    const badge = getBadge(uid);
-                    const esAdmin = miUID_pelicula === ADMIN_UID;
-                    
-                    const div = document.createElement('div');
-                    div.className = 'bg-zinc-900/50 p-5 rounded-2xl border border-white/5 shadow-xl fade-in mb-4 group/comment';
-                    div.innerHTML = `
-                        <div class="flex justify-between items-start mb-3 gap-2">
-                            <div class="flex flex-col gap-1 min-w-0">
-                                <span class="text-red-600 font-black text-xs uppercase tracking-widest leading-none flex items-center gap-1">
-                                    <a href="perfil.html?user=${encodeURIComponent(c.user)}" class="hover:underline">${c.user}</a>${badge}
-                                </span>
-                                <span class="text-[9px] text-zinc-600 font-bold uppercase tracking-tighter">${fechaComentario}</span>
-                            </div>
-                            <div class="flex items-center gap-2 shrink-0">
-                                <span class="text-yellow-500 text-[10px] tracking-widest">${"★".repeat(c.rating)}</span>
-                                ${esAdmin ? `<button onclick="borrarComentarioPelicula('${docId}')" class="opacity-0 group-hover/comment:opacity-100 transition-opacity w-6 h-6 rounded-full bg-red-900/60 hover:bg-red-600 flex items-center justify-center" title="Borrar">
-                                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                                </button>` : ''}
-                            </div>
-                        </div>
-                        <p class="text-zinc-400 text-sm leading-relaxed font-medium">${c.txt}</p>
-                    `;
-                    contenedor.appendChild(div);
-                });
-            });
-        }
-
-        window.borrarComentarioPelicula = async function(docId) {
-            if (miUID_pelicula !== ADMIN_UID) return;
-            if (!confirm('¿Borrar este comentario?')) return;
-            try { await window.deleteDoc(window.doc(window.db, 'comentarios', docId)); }
-            catch(e) { alert('Error al borrar.'); }
-        };
-
-        window.publicarComentario = async () => {
-            const txt = document.getElementById('comentarioTxt').value.trim();
-            const userActual = localStorage.getItem('usuarioMovieM');
-            
-            // Corrección: Validación de sesión primero
-            if (!userActual || userActual === 'undefined') {
-                return alert("Debes iniciar sesión para comentar.");
-            }
-            if(!txt || currentRating === 0) {
-                return alert("Por favor, escribe un comentario y selecciona una valoración.");
-            }
-
-            try {
-                await window.addDoc(window.collection(window.db, "comentarios"), {
-                    movieID: movieID,
-                    user: userActual,
-                    txt: txt,
-                    rating: currentRating,
-                    fecha: Date.now()
-                });
-                document.getElementById('comentarioTxt').value = "";
-                window.setRating(0);
-            } catch (e) {
-                console.error("Error Firebase:", e);
-                alert("Error al publicar el comentario.");
-            }
-        };
-
-        // --- SISTEMAS DE INTERACCIÓN ---
-        async function checkStatus() {
-            if (!miUID_pelicula) return;
-
-            try {
-                const userRef = window.doc(window.db, "usuarios", miUID_pelicula);
-                const userDoc = await window.getDoc(userRef);
-                
-                if (userDoc.exists()) {
-                    const data = userDoc.data();
-                    if (data.watchlist && data.watchlist.includes(movieID)) {
-                        ['btnWatchlist','btnWatchlistDesktop'].forEach(id => { const b=document.getElementById(id); if(!b)return; b.classList.add('bg-zinc-100','text-black','border-white'); b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5'); });
-                    }
-                    if (data.likes && data.likes.includes(movieID)) {
-                        ['btnLike','btnLikeDesktop'].forEach(id => { const b=document.getElementById(id); if(!b)return; b.classList.add('bg-red-600','border-red-600','text-white'); b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5'); });
-                    }
-                }
-            } catch (e) { console.error("Error al checkear status:", e); }
-        }
-
-        window.toggleWatchlist = async () => {
-            if (!miUID_pelicula) return alert("Debes iniciar sesión para guardar películas.");
-
-            const btn = document.getElementById('btnWatchlist');
-            const userRef = window.doc(window.db, "usuarios", miUID_pelicula);
-            const isSaved = btn.classList.contains('bg-zinc-100');
-
-            try {
-                await window.setDoc(userRef, { 
-                    watchlist: isSaved ? window.arrayRemove(movieID) : window.arrayUnion(movieID) 
-                }, { merge: true });
-                
-                ['btnWatchlist','btnWatchlistDesktop'].forEach(id => {
-                    const b = document.getElementById(id); if(!b) return;
-                    if(!isSaved){b.classList.add('bg-zinc-100','text-black','border-white');b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5');}
-                    else{b.classList.remove('bg-zinc-100','text-black','border-white');b.classList.add('bg-zinc-900','text-zinc-400','border-white/5');}
-                });
-            } catch (e) { console.error("Error en Watchlist:", e); }
-        };
-
-        window.toggleLike = async () => {
-            if (!miUID_pelicula) return alert("Debes iniciar sesión para dar like.");
-
-            const btn = document.getElementById('btnLike');
-            const userRef = window.doc(window.db, "usuarios", miUID_pelicula);
-            const isLiked = btn.classList.contains('bg-red-600');
-
-            try {
-                await window.setDoc(userRef, { 
-                    likes: isLiked ? window.arrayRemove(movieID) : window.arrayUnion(movieID) 
-                }, { merge: true });
-                
-                ['btnLike','btnLikeDesktop'].forEach(id => {
-                    const b = document.getElementById(id); if(!b) return;
-                    if(!isLiked){b.classList.add('bg-red-600','border-red-600','text-white');b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5');}
-                    else{b.classList.remove('bg-red-600','border-red-600','text-white');b.classList.add('bg-zinc-900','text-zinc-400','border-white/5');}
-                });
-            } catch (e) { console.error("Error en Like:", e); }
-        };
-
-        // --- MODAL ACTORES & TRAILER ---
-        window.verActor = async (id) => {
-            try {
-                const [resBio, resPelis] = await Promise.all([
-                    fetch(`https://api.themoviedb.org/3/person/${id}?api_key=${API_KEY}&language=es-ES`),
-                    fetch(`https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=${API_KEY}&language=es-ES`)
-                ]);
-                const actor = await resBio.json();
-                const créditos = await resPelis.json();
-                
-                document.getElementById('actorNombre').innerText = actor.name;
-                document.getElementById('actorFoto').src = actor.profile_path ? 'https://image.tmdb.org/t/p/w500' + actor.profile_path : 'https://via.placeholder.com/500';
-                document.getElementById('actorInfo').innerText = actor.biography || "Biografía no disponible.";
-                
-                const pelisValidas = créditos.cast.filter(p => p.poster_path).sort((a, b) => b.popularity - a.popularity).slice(0, 15);
-                const isScrollable = pelisValidas.length > 5;
-                const contenedorPelis = document.getElementById('actorPelisContenedor');
-                
-                const pelisHTML = pelisValidas.map(p => `
-                    <div class="w-[85px] group/item cursor-pointer shrink-0" onclick="window.location.href='pelicula.html?id=${p.id}'">
-                        <div class="w-[85px] h-[125px] overflow-hidden rounded-xl border border-white/5 group-hover/item:border-red-600 transition-all duration-300 transform group-hover/item:scale-105">
-                            <img src="https://image.tmdb.org/t/p/w200${p.poster_path}" class="w-full h-full object-cover">
-                        </div>
-                        <p class="text-[7px] mt-2 text-zinc-500 truncate w-full text-center uppercase font-bold px-1">${p.title}</p>
-                    </div>`).join('');
-
-                contenedorPelis.innerHTML = `
-                    ${isScrollable ? `<button onclick="scrollPelis(-300)" class="absolute -left-6 top-[62px] -translate-y-1/2 bg-zinc-900/90 p-2 rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity z-20 hover:bg-red-600 text-white shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>` : ''}
-                    <div id="listaPelisActor" class="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-4 px-1">${pelisHTML}</div>
-                    ${isScrollable ? `<button onclick="scrollPelis(300)" class="absolute -right-6 top-[62px] -translate-y-1/2 bg-zinc-900/90 p-2 rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity z-20 hover:bg-red-600 text-white shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>` : ''}
-                `;
-                document.getElementById('modalActor').classList.remove('hidden');
-                document.body.style.overflow = "hidden";
-            } catch (error) { console.error(error); }
-        };
-
-        window.cerrarActor = () => { document.getElementById('modalActor').classList.add('hidden'); document.body.style.overflow = "auto"; };
-        window.scrollPelis = (distancia) => document.getElementById('listaPelisActor').scrollBy({ left: distancia, behavior: 'smooth' });
-        window.scrollReparto = (distancia) => document.getElementById('reparto').scrollBy({ left: distancia, behavior: 'smooth' });
-
-        window.abrirTrailer = async () => {
-            try {
-                const res = await fetch(`https://api.themoviedb.org/3/movie/${movieID}/videos?api_key=${API_KEY}`);
-                const data = await res.json();
-                const tr = data.results.find(v => v.type === "Trailer" && v.site === "YouTube");
-                if(tr) {
-                    document.getElementById('videoContainer').innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${tr.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>`;
-                    document.getElementById('modalVideo').classList.remove('hidden');
-                    document.body.style.overflow = "hidden";
-                }
-            } catch (error) { console.error(error); }
-        };
-
-        window.cerrarTrailer = () => { 
-            document.getElementById('modalVideo').classList.add('hidden'); 
-            document.getElementById('videoContainer').innerHTML = '';
-            document.body.style.overflow = "auto";
-        };
-
-        // --- OTROS HELPERS ---
-        window.setRating = (n) => {
-            currentRating = n;
-            document.querySelectorAll('.star').forEach((s, i) => {
-                s.style.color = i < n ? '#eab308' : '#3f3f46';
-            });
-        };
-
-        // ── CONTINUAR VIENDO ───────────────────────────────────────────────────────
-        // Guarda el progreso de reproducción en localStorage
-        // Clave: movieM_progress → { "pelicula_ID": porcentaje }
-        let progresoTimer = null;
-        let progresoInicio = null;
-
-        function guardarProgreso(porcentaje) {
-            try {
-                const prog = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
-                prog['pelicula_' + movieID] = Math.min(100, Math.max(0, Math.round(porcentaje)));
-                localStorage.setItem('movieM_progress', JSON.stringify(prog));
-            } catch(e) {}
-        }
-
-        function leerProgreso() {
-            try {
-                const prog = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
-                return prog['pelicula_' + movieID] || 0;
-            } catch(e) { return 0; }
-        }
-
-        function actualizarBarraProgreso(pct) {
-            const bar = document.getElementById('progresoBar');
-            const wrap = document.getElementById('progresoWrap');
-            const num  = document.getElementById('progresoNum');
-            if (!bar || !wrap) return;
-            if (pct > 2) {
-                wrap.classList.remove('hidden');
-                bar.style.width = pct + '%';
-                if (num) num.innerText = Math.round(pct) + '%';
-            } else {
-                wrap.classList.add('hidden');
-            }
-        }
-
-        const SERVERS_MOVIE = {
-            1: (id) => `https://vidsrc.cc/v3/embed/movie/${id}?auto_lang=es`,
-            2: (id) => `https://multiembed.mov/?video_id=${id}&tmdb=1&lang=es`,
-            3: (id) => `https://embed.su/embed/movie/${id}`,
-            4: (id) => `https://vidsrc.xyz/embed/movie?tmdb=${id}&ds_langs=es,es-419`
-        };
-        let servidorActivo = 1;
-
-        window.toggleServerMenu = () => {
-            const menu = document.getElementById('serverMenu');
-            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-        };
-
-        window.cambiarServidor = (num, label) => {
-            servidorActivo = num;
-            document.getElementById('movieFrame').src = SERVERS_MOVIE[num](movieID);
-            document.getElementById('serverLabel').innerText = label;
-            document.getElementById('serverMenu').style.display = 'none';
-            document.querySelectorAll('#serverMenu button').forEach((b, i) => {
-                b.classList.toggle('srv-active', i + 1 === num);
-            });
-        };
-
-        document.addEventListener('click', (e) => {
-            const wrap = document.getElementById('serverDropdownWrap');
-            if (wrap && !wrap.contains(e.target)) document.getElementById('serverMenu').style.display = 'none';
-        });
-
-        window.verPelicula = () => {
-            document.getElementById('movieFrame').src = SERVERS_MOVIE[servidorActivo](movieID);
-            document.getElementById('playerOverlay').style.display = 'flex';
-            document.body.style.overflow = "hidden";
-            // Estimar progreso por tiempo abierto (aproximación sin API del iframe)
-            progresoInicio = Date.now();
-            // Duración estimada estándar: 2h = 7200s. Se actualiza con dato real de TMDB si está disponible
-            const duracionEstimada = (window._peliculaDuracion || 120) * 60 * 1000;
-            const progresoActual = leerProgreso();
-            progresoTimer = setInterval(() => {
-                const transcurrido = Date.now() - progresoInicio;
-                const pctNuevo = progresoActual + (transcurrido / duracionEstimada) * 100;
-                guardarProgreso(pctNuevo);
-                actualizarBarraProgreso(Math.min(100, Math.round(pctNuevo)));
-            }, 10000); // cada 10s
-        };
-
-        window.cerrarPelicula = () => {
-            document.getElementById('playerOverlay').style.display = 'none';
-            document.getElementById('movieFrame').src = "";
-            document.body.style.overflow = "auto";
-            if (progresoTimer) { clearInterval(progresoTimer); progresoTimer = null; }
-            // Guardar progreso final
-            if (progresoInicio) {
-                const duracion = (window._peliculaDuracion || 120) * 60 * 1000;
-                const transcurrido = Date.now() - progresoInicio;
-                const actual = leerProgreso();
-                guardarProgreso(actual + (transcurrido / duracion) * 100);
-                progresoInicio = null;
-            }
-            actualizarBarraProgreso(leerProgreso());
-        };
-
-        async function cargarSimilares() {
-            try {
-                const res = await fetch(`https://api.themoviedb.org/3/movie/${movieID}/similar?api_key=${API_KEY}&language=es-ES&page=1`);
-                const data = await res.json();
-                const fila = document.getElementById('similaresFila');
-                const progress = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
-                const items = (data.results || []).filter(p => p.poster_path).slice(0, 18);
-                if (!items.length) {
-                    fila.closest('section').classList.add('hidden');
-                    return;
-                }
-                fila.innerHTML = items.map(p => {
-                    const prog = progress['pelicula_' + p.id] || 0;
-                    const rating = p.vote_average ? p.vote_average.toFixed(1) : '';
-                    const anio = (p.release_date || '').split('-')[0];
-                    return `
-                    <div onclick="location.href='pelicula.html?id=${p.id}'"
-                        class="min-w-[75px] md:min-w-[100px] shrink-0 cursor-pointer group/sim-card">
-                        <div class="relative rounded-xl overflow-hidden border border-white/5 transition-transform duration-200 group-hover/sim-card:scale-105 mb-1.5">
-                            <img src="https://image.tmdb.org/t/p/w200${p.poster_path}"
-                                 class="w-full aspect-[2/3] object-cover" loading="lazy">
-                            <div class="absolute top-1 right-1 flex flex-col gap-0.5 items-end">
-                                ${rating ? `<div class="bg-black/80 text-yellow-500 text-[7px] font-black px-1 py-0.5 rounded">⭐ ${rating}</div>` : ''}
-                                ${anio ? `<div class="bg-black/80 text-zinc-300 text-[7px] font-black px-1 py-0.5 rounded">${anio}</div>` : ''}
-                            </div>
-                            ${prog > 0 ? `<div class="absolute bottom-0 left-0 right-0 h-1 bg-zinc-800/80"><div class="h-full bg-red-600 rounded-full transition-all" style="width:${prog}%"></div></div>` : ''}
-                        </div>
-                        <p class="text-[8px] font-bold uppercase tracking-tighter text-zinc-500 truncate">${p.title}</p>
-                    </div>`;
-                }).join('');
-            } catch(e) { console.error('similares:', e); }
-        }
-
-        cargarPagina();
-    </script>
+    cargarPagina();
+</script>
 </body>
 </html>
