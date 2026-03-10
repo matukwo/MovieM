@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, doc, setDoc, getDoc, arrayUnion, arrayRemove, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, doc, setDoc, getDoc, arrayUnion, arrayRemove, deleteDoc, getDocs, updateDoc, serverTimestamp, writeBatch, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -31,6 +31,10 @@ window.getDocs = getDocs;
 window.arrayUnion = arrayUnion;
 window.arrayRemove = arrayRemove;
 window.deleteDoc = deleteDoc;
+window.updateDoc = updateDoc;
+window.serverTimestamp = serverTimestamp;
+window.writeBatch = writeBatch;
+window.limit = limit;
 
 // Auth
 window.auth = auth;
