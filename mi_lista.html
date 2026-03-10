@@ -57,32 +57,64 @@
     </div>
 
     <div id="contenidoLista" class="hidden fade-in">
-        <header class="mb-6 flex items-end justify-between gap-4">
-            <div>
-                <h2 class="text-2xl md:text-4xl font-black italic uppercase tracking-tighter mb-1">Mi Lista</h2>
-                <p class="text-zinc-500 text-sm"><span id="cntPelis">0</span> películas guardadas</p>
-            </div>
-            <!-- Flechas carrusel -->
-            <div class="flex gap-2 shrink-0">
-                <button id="btnPrev" onclick="scrollCarrusel(-1)" class="w-9 h-9 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center hover:bg-accent transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
-                </button>
-                <button id="btnNext" onclick="scrollCarrusel(1)" class="w-9 h-9 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center hover:bg-accent transition active:scale-95 disabled:opacity-30 disabled:pointer-events-none">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                </button>
-            </div>
+        <header class="mb-8">
+            <h2 class="text-2xl md:text-4xl font-black italic uppercase tracking-tighter mb-1">Mi Lista</h2>
+            <p id="subtitleLista" class="text-zinc-500 text-sm"></p>
         </header>
-        <!-- Carrusel -->
-        <div class="relative">
-            <!-- Gradiente izq -->
-            <div id="fadeLeft" class="pointer-events-none absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-zinc-950 to-transparent z-10 opacity-0 transition-opacity"></div>
-            <!-- Gradiente der -->
-            <div id="fadeRight" class="pointer-events-none absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-zinc-950 to-transparent z-10 transition-opacity"></div>
-            <div id="gridLista" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-2"
-                 style="scroll-snap-type:x mandatory;"
-                 onscroll="actualizarFades()">
+
+        <!-- PELÍCULAS -->
+        <section id="secPeliculas" class="mb-10 hidden">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-base md:text-xl font-black italic uppercase tracking-tighter flex items-center gap-2">
+                    <span class="w-1 h-5 bg-accent rounded-full inline-block"></span> Películas
+                    <span id="cntPelis" class="text-xs font-bold text-zinc-500 normal-case italic tracking-normal"></span>
+                </h3>
+                <div class="flex gap-2">
+                    <button id="btnPrevPelis" onclick="scrollCarrusel('filaPelis',-1)"
+                        class="w-9 h-9 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center hover:bg-accent transition active:scale-95 disabled:opacity-30">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <button id="btnNextPelis" onclick="scrollCarrusel('filaPelis',1)"
+                        class="w-9 h-9 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center hover:bg-accent transition active:scale-95 disabled:opacity-30">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
             </div>
-        </div>
+            <div class="relative overflow-hidden">
+                <div id="filaPelis" class="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth pb-2"
+                     style="scroll-snap-type:x mandatory;" onscroll="actualizarFades('pelis')">
+                </div>
+                <div id="fadeLPelis" class="pointer-events-none absolute left-0 top-0 bottom-2 w-12 bg-gradient-to-r from-zinc-950 to-transparent opacity-0 transition-opacity"></div>
+                <div id="fadeRPelis" class="pointer-events-none absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-zinc-950 to-transparent transition-opacity"></div>
+            </div>
+        </section>
+
+        <!-- SERIES -->
+        <section id="secSeries" class="mb-10 hidden">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-base md:text-xl font-black italic uppercase tracking-tighter flex items-center gap-2">
+                    <span class="w-1 h-5 bg-accent rounded-full inline-block"></span> Series
+                    <span id="cntSeries" class="text-xs font-bold text-zinc-500 normal-case italic tracking-normal"></span>
+                </h3>
+                <div class="flex gap-2">
+                    <button id="btnPrevSeries" onclick="scrollCarrusel('filaSeries',-1)"
+                        class="w-9 h-9 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center hover:bg-accent transition active:scale-95 disabled:opacity-30">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <button id="btnNextSeries" onclick="scrollCarrusel('filaSeries',1)"
+                        class="w-9 h-9 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center hover:bg-accent transition active:scale-95 disabled:opacity-30">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="relative overflow-hidden">
+                <div id="filaSeries" class="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth pb-2"
+                     style="scroll-snap-type:x mandatory;" onscroll="actualizarFades('series')">
+                </div>
+                <div id="fadeLSeries" class="pointer-events-none absolute left-0 top-0 bottom-2 w-12 bg-gradient-to-r from-zinc-950 to-transparent opacity-0 transition-opacity"></div>
+                <div id="fadeRSeries" class="pointer-events-none absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-zinc-950 to-transparent transition-opacity"></div>
+            </div>
+        </section>
     </div>
 </main>
 
@@ -114,64 +146,105 @@ import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.7.1
 import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 const app=initializeApp({apiKey:"AIzaSyAn5N7m7EhICK2aZG4Nx8DIW9RZd9kK1DA",authDomain:"moviem-5b73d.firebaseapp.com",projectId:"moviem-5b73d",storageBucket:"moviem-5b73d.firebasestorage.app",messagingSenderId:"843796138544",appId:"1:843796138544:web:c2bde9b39d437b84d97bf5"});
 const auth=getAuth(app),db=getFirestore(app),API_KEY='86dfc26f9d7b8c9957129a1d7a173ddc';
+const IMG='https://image.tmdb.org/t/p/w500';
 var color=localStorage.getItem('movieM_color');if(color)document.documentElement.style.setProperty('--accent-color',color);
 
 function mostrar(id){['estadoCargando','estadoNoLogin','estadoVacio','contenidoLista'].forEach(function(s){var el=document.getElementById(s);el.classList.add('hidden');el.classList.remove('flex');});var el=document.getElementById(id);el.classList.remove('hidden');if(id==='estadoNoLogin'||id==='estadoVacio')el.classList.add('flex');}
 
-onAuthStateChanged(auth,async function(user){
-  if(!user){mostrar('estadoNoLogin');return;}
-  try{
-    var snap=await getDoc(doc(db,'usuarios',user.uid));
-    if(!snap.exists()){mostrar('estadoVacio');return;}
-    var data=snap.data();
-    if(data.color)document.documentElement.style.setProperty('--accent-color',data.color);
-    var watchlist=data.watchlist||[];
-    if(!watchlist.length){mostrar('estadoVacio');return;}
-    var pelis=await Promise.all(watchlist.map(function(id){return fetch('https://api.themoviedb.org/3/movie/'+id+'?api_key='+API_KEY+'&language=es-ES').then(function(r){return r.json();});}));
-    var grid=document.getElementById('gridLista');grid.innerHTML='';
-    var validas=pelis.filter(function(p){return p&&!p.status_code;});
-    document.getElementById('cntPelis').textContent=validas.length;
-    validas.forEach(function(p){
-      var poster=p.poster_path?'https://image.tmdb.org/t/p/w342'+p.poster_path:'https://via.placeholder.com/342x513?text=?';
-      var div=document.createElement('div');
-      div.className='group cursor-pointer shrink-0';
-      div.style.cssText='width:calc((100% - 3*0.75rem)/4);min-width:120px;max-width:160px;scroll-snap-align:start;';
-      div.onclick=function(){location.href='pelicula.html?id='+p.id;};
-      div.innerHTML='<div class="relative aspect-[2/3] overflow-hidden rounded-xl border border-white/5 group-hover:border-accent transition-all duration-500 shadow-xl">'
-        +'<img src="'+poster+'" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy">'
-        +'<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2"><span class="text-yellow-500 text-[10px] font-bold">&#11088; '+(p.vote_average?p.vote_average.toFixed(1):'-')+'</span></div>'
-        +'</div>'
-        +'<h4 class="mt-1.5 text-[10px] font-bold truncate uppercase tracking-tighter group-hover:text-accent transition">'+p.title+'</h4>'
-        +'<p class="text-[9px] text-zinc-600 font-bold uppercase">'+(p.release_date?p.release_date.split('-')[0]:'')+'</p>';
-      grid.appendChild(div);
-    });
-    mostrar('contenidoLista');
-    setTimeout(actualizarFades,50);
-  }catch(e){console.error(e);mostrar('estadoVacio');}
-});
-
 // ── Carrusel helpers ──────────────────────────────────────────────────────────
-window.scrollCarrusel = function(dir) {
-    var el = document.getElementById('gridLista');
-    var card = el.querySelector('div');
-    var step = card ? (card.offsetWidth + 12) * 3 : el.offsetWidth * 0.75;
-    el.scrollBy({ left: dir * step, behavior: 'smooth' });
-    setTimeout(actualizarFades, 350);
+var CARD_W = 140; // px aprox por card + gap
+window.scrollCarrusel = function(filaId, dir) {
+    var fila = document.getElementById(filaId);
+    if (!fila) return;
+    fila.scrollBy({ left: dir * CARD_W * 3, behavior: 'smooth' });
+    setTimeout(function(){ actualizarFades(filaId === 'filaPelis' ? 'pelis' : 'series'); }, 350);
 };
-window.actualizarFades = function() {
-    var el   = document.getElementById('gridLista');
-    var fl   = document.getElementById('fadeLeft');
-    var fr   = document.getElementById('fadeRight');
-    var prev = document.getElementById('btnPrev');
-    var next = document.getElementById('btnNext');
-    if (!el) return;
-    var atStart = el.scrollLeft <= 4;
-    var atEnd   = el.scrollLeft + el.offsetWidth >= el.scrollWidth - 4;
-    if (fl) fl.style.opacity  = atStart ? '0' : '1';
-    if (fr) fr.style.opacity  = atEnd   ? '0' : '1';
-    if (prev) prev.disabled   = atStart;
-    if (next) next.disabled   = atEnd;
+
+window.actualizarFades = function(tipo) {
+    var filaId = tipo === 'pelis' ? 'filaPelis' : 'filaSeries';
+    var fila = document.getElementById(filaId);
+    if (!fila) return;
+    var atLeft  = fila.scrollLeft <= 10;
+    var atRight = fila.scrollLeft >= fila.scrollWidth - fila.clientWidth - 10;
+    document.getElementById('fadeL' + (tipo==='pelis'?'Pelis':'Series')).style.opacity = atLeft  ? '0' : '1';
+    document.getElementById('fadeR' + (tipo==='pelis'?'Pelis':'Series')).style.opacity = atRight ? '0' : '1';
+    var prevBtn = document.getElementById('btnPrev' + (tipo==='pelis'?'Pelis':'Series'));
+    var nextBtn = document.getElementById('btnNext' + (tipo==='pelis'?'Pelis':'Series'));
+    if (prevBtn) prevBtn.disabled = atLeft;
+    if (nextBtn) nextBtn.disabled = atRight;
 };
+
+function crearCard(item, tipo) {
+    var id     = item.id;
+    var titulo = item.title || item.name || '';
+    var anio   = (item.release_date || item.first_air_date || '').split('-')[0];
+    var rating  = item.vote_average ? item.vote_average.toFixed(1) : '-';
+    var poster  = item.poster_path ? IMG + item.poster_path : 'https://via.placeholder.com/500x750?text=?';
+    var href    = tipo === 'pelicula' ? 'pelicula.html?id=' + id : 'serie.html?id=' + id;
+    var div = document.createElement('div');
+    div.className = 'shrink-0 group cursor-pointer';
+    div.style.cssText = 'width:calc((100% - 4*0.75rem)/5);min-width:110px;max-width:160px;scroll-snap-align:start';
+    div.onclick = function(){ location.href = href; };
+    div.innerHTML =
+        '<div class="relative aspect-[2/3] overflow-hidden rounded-xl border border-white/5 group-hover:border-accent transition-all duration-300 shadow-xl mb-1.5">'
+        + '<img src="' + poster + '" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy">'
+        + '<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2">'
+        +   '<span class="text-yellow-500 text-[10px] font-bold">&#11088; ' + rating + '</span>'
+        + '</div>'
+        + '</div>'
+        + '<p class="text-[10px] font-bold truncate uppercase tracking-tighter group-hover:text-accent transition">' + titulo + '</p>'
+        + '<p class="text-[9px] text-zinc-600 font-bold">' + anio + '</p>';
+    return div;
+}
+
+onAuthStateChanged(auth, async function(user) {
+    if (!user) { mostrar('estadoNoLogin'); return; }
+    try {
+        var snap = await getDoc(doc(db, 'usuarios', user.uid));
+        if (!snap.exists()) { mostrar('estadoVacio'); return; }
+        var data = snap.data();
+        if (data.color) document.documentElement.style.setProperty('--accent-color', data.color);
+
+        var watchlist       = data.watchlist || [];
+        var seriesWatchlist = data.seriesWatchlist || [];
+
+        if (!watchlist.length && !seriesWatchlist.length) { mostrar('estadoVacio'); return; }
+
+        // Fetch en paralelo
+        var [pelis, series] = await Promise.all([
+            Promise.all(watchlist.map(function(id){ return fetch('https://api.themoviedb.org/3/movie/'+id+'?api_key='+API_KEY+'&language=es-ES').then(function(r){return r.json();}); })),
+            Promise.all(seriesWatchlist.map(function(id){ return fetch('https://api.themoviedb.org/3/tv/'+id+'?api_key='+API_KEY+'&language=es-ES').then(function(r){return r.json();}); }))
+        ]);
+
+        pelis  = pelis.filter(function(p){ return p && !p.status_code; });
+        series = series.filter(function(s){ return s && !s.status_code; });
+
+        var total = pelis.length + series.length;
+        document.getElementById('subtitleLista').innerText = total + ' elemento' + (total!==1?'s':'') + ' guardado' + (total!==1?'s':'');
+
+        // Películas
+        if (pelis.length) {
+            document.getElementById('secPeliculas').classList.remove('hidden');
+            document.getElementById('cntPelis').innerText = '(' + pelis.length + ')';
+            var filaPelis = document.getElementById('filaPelis');
+            filaPelis.innerHTML = '';
+            pelis.forEach(function(p){ filaPelis.appendChild(crearCard(p, 'pelicula')); });
+            setTimeout(function(){ actualizarFades('pelis'); }, 100);
+        }
+
+        // Series
+        if (series.length) {
+            document.getElementById('secSeries').classList.remove('hidden');
+            document.getElementById('cntSeries').innerText = '(' + series.length + ')';
+            var filaSeries = document.getElementById('filaSeries');
+            filaSeries.innerHTML = '';
+            series.forEach(function(s){ filaSeries.appendChild(crearCard(s, 'serie')); });
+            setTimeout(function(){ actualizarFades('series'); }, 100);
+        }
+
+        mostrar('contenidoLista');
+    } catch(e) { console.error(e); mostrar('estadoVacio'); }
+});
 </script>
 </body>
 </html>
