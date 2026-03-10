@@ -404,9 +404,9 @@
     // ── PLAYER MULTI-SERVIDOR ─────────────────────────────────────
     const SERVERS_TV = {
         1: (id,t,e) => `https://vidsrc.cc/v3/embed/tv/${id}/${t}/${e}?auto_lang=es`,
-        2: (id,t,e) => `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${t}&e=${e}`,
+        2: (id,t,e) => `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${t}&e=${e}&lang=es`,
         3: (id,t,e) => `https://embed.su/embed/tv/${id}/${t}/${e}`,
-        4: (id,t,e) => `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${t}&episode=${e}`
+        4: (id,t,e) => `https://vidsrc.xyz/embed/tv?tmdb=${id}&season=${t}&episode=${e}&ds_langs=es,es-419`
     };
     let servidorActivo = 1;
     let epTemp = 1, epNum = 1, epNombre = '';
