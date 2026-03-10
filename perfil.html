@@ -314,8 +314,10 @@
                 btn.classList.remove('hidden');
                 actualizarBtnSeguir(yaSigo);
 
-                // ── "Te sigue" badge ──────────────────────────────
-                var ellosSeguidores = data.seguidores||[];
+                // ── "Te sigue" badge — leemos el perfil visitado nuevamente para tener datos frescos ──
+                var perfilSnapFresco = await getDoc(doc(db,'usuarios',perfilUID));
+                var perfilDataFresco = perfilSnapFresco.exists() ? perfilSnapFresco.data() : {};
+                var ellosSeguidores = perfilDataFresco.seguidores || data.seguidores || [];
                 if (ellosSeguidores.includes(miUID)) {
                     document.getElementById('badgeTeSigue').classList.remove('hidden');
                 }
@@ -340,6 +342,15 @@
         var cont = document.getElementById('contSeguidores');
         cont.innerText = parseInt(cont.innerText) + (yaSigo ? -1 : 1);
         actualizarBtnSeguir(!yaSigo);
+        // Re-chequear badge "Te sigue" después de seguir/dejar de seguir
+        var perfilSnap = await getDoc(doc(db,'usuarios',perfilUID));
+        var perfilData = perfilSnap.exists() ? perfilSnap.data() : {};
+        var badge = document.getElementById('badgeTeSigue');
+        if ((perfilData.seguidores||[]).includes(miUID)) {
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
     }
     window.toggleSeguir = toggleSeguir;
 
