@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieM | Series</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="firebase-config.js"></script>
     <style>
         .no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
         .text-accent{color:var(--accent-color,#dc2626)}.bg-accent{background-color:var(--accent-color,#dc2626)}.border-accent{border-color:var(--accent-color,#dc2626)}
@@ -124,12 +125,6 @@
 </nav>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-const FB = {apiKey:"AIzaSyAn5N7m7EhICK2aZG4Nx8DIW9RZd9kK1DA",authDomain:"moviem-5b73d.firebaseapp.com",projectId:"moviem-5b73d",storageBucket:"moviem-5b73d.firebasestorage.app",messagingSenderId:"843796138544",appId:"1:843796138544:web:c2bde9b39d437b84d97bf5"};
-const app = initializeApp(FB);
-const db = getFirestore(app);
-
 const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
 const BASE = 'https://image.tmdb.org/t/p/w500';
 let timer = null;
@@ -200,10 +195,15 @@ window.filtrarGenero = async function(genreId, btn) {
 // ── BÚSQUEDA (series + usuarios) ──────────────────────────────────
 async function buscarTodo(q, dropEl) {
     dropEl.innerHTML = '<p class="text-zinc-600 text-xs p-4 text-center animate-pulse">Buscando...</p>';
+    // Esperar a que firebase-config.js inicialice window.db
+    for (let i = 0; i < 20; i++) {
+        if (window.db && window.getDocs && window.collection) break;
+        await new Promise(r => setTimeout(r, 100));
+    }
     try {
         const [resSeries, snapU] = await Promise.all([
             fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(q)}`).then(r => r.json()),
-            getDocs(collection(db, 'usuarios'))
+            window.getDocs(window.collection(window.db, 'usuarios'))
         ]);
         const series = (resSeries.results || []).slice(0, 4);
         let users = [];
@@ -237,15 +237,29 @@ buscador.addEventListener('input', function() {
     if (q.length < 2) { dropdown.classList.add('hidden'); return; }
     timer = setTimeout(() => { dropdown.classList.remove('hidden'); buscarTodo(q, dropdown); }, 350);
 });
+// Enter → buscar.html con el query
+buscador.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        const q = buscador.value.trim();
+        if (q.length > 1) location.href = 'buscar.html?q=' + encodeURIComponent(q);
+    }
+});
 document.addEventListener('click', e => { if (!buscador.contains(e.target) && !dropdown.contains(e.target)) dropdown.classList.add('hidden'); });
 
 const overlay = document.getElementById('searchOverlayMobile'), buscMob = document.getElementById('buscadorMobile'), dropMob = document.getElementById('searchDropdownMobile');
-document.getElementById('btnBuscarMobile').onclick = () => { overlay.classList.remove('hidden'); overlay.classList.add('flex'); setTimeout(() => buscMob.focus(), 100); };
-document.getElementById('btnCerrarBusqueda').onclick = () => { overlay.classList.add('hidden'); overlay.classList.remove('flex'); buscMob.value = ''; dropMob.innerHTML = ''; };
+document.getElementById('btnBuscarMobile').onclick = () => { overlay.style.display = 'flex'; setTimeout(() => buscMob.focus(), 100); };
+document.getElementById('btnCerrarBusqueda').onclick = () => { overlay.style.display = 'none'; buscMob.value = ''; dropMob.innerHTML = ''; };
 buscMob.addEventListener('input', function() {
     clearTimeout(timer); const q = buscMob.value.trim();
     if (q.length < 2) { dropMob.innerHTML = ''; return; }
     timer = setTimeout(() => buscarTodo(q, dropMob), 350);
+});
+// Enter mobile → buscar.html con el query
+buscMob.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        const q = buscMob.value.trim();
+        if (q.length > 1) location.href = 'buscar.html?q=' + encodeURIComponent(q);
+    }
 });
 
 document.getElementById('btnUsuario').onclick = () => location.href = 'perfil.html';
