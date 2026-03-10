@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor TV - Moviem</title>
+    
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+    <style>
+        body { background-color: #111; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .container { width: 80%; max-width: 800px; }
+        .video-js { width: 100%; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1 { margin-bottom: 20px; font-weight: 300; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Canal 7 en Vivo</h1>
+        
+        <video-js id="mi-reproductor" class="vjs-default-skin vjs-big-play-centered" controls preload="auto" width="800" height="450">
+            <source src="http://107.152.39.199:8030/hls/canal7.m3u8" type="application/x-mpegURL">
+            <p class="vjs-no-js">
+                Para ver este video, por favor habilita JavaScript o usa un navegador que soporte video HTML5.
+            </p>
+        </video-js>
+    </div>
+
+    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+
+    <script>
+        // Inicializar el reproductor
+        var player = videojs('mi-reproductor', {
+            autoplay: false,
+            muted: false,
+            fluid: true // Esto hace que sea responsivo (se adapta al celular)
+        });
+
+        // Manejo de errores (útil para canales de IPTV que se caen)
+        player.on('error', function() {
+            alert('El canal está fuera de línea o el enlace ha caducado.');
+        });
+    </script>
+</body>
+</html>
