@@ -157,8 +157,8 @@ var CANALES = [
      "embed":"https://hlsplayer.net/embed?type=m3u8&src=https://livetrx01.vodgc.net/eltrecetv/index.m3u8"},
     {"nombre":"TN","logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/TN_todo_noticias_logo.svg/2560px-TN_todo_noticias_logo.svg.png","cat":"Noticias","pais":"🇦🇷",
      "embed":"https://hlsplayer.net/embed?type=m3u8&src=https://live-01-01-tn.vodgc.net/TN24/index_TN24_1080.m3u8"},
-    {"nombre":"ESPN","logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/ESPN_wordmark.svg/2560px-ESPN_wordmark.svg.png","cat":"Deportes","pais":"🌎",
-     "hls":"http://mundo2.pro:80//live/Clienteehhdhd/73773hdhdh2/444055.ts"}
+    {"nombre":"Canal IPTV","logo":"https://files.catbox.moe/finwuj.png","cat":"General","pais":"🇦🇷",
+     "embed":"https://hlsplayer.net/embed?type=m3u8&src=http://mundo2.pro:80/live/Clienteehhdhd/73773hdhdh2/361001.ts"}
 ];
 
 // ─── PROXIES CORS (reintentos automáticos si el stream directo falla) ─────────
@@ -256,7 +256,7 @@ function hideOverlay() {
     document.getElementById('playerOverlayBox').classList.add('oculto');
 }
 
-// ─── CARGAR CANAL ─────────────────────────────────────────────────────────────
+// ─── CARGAR CANAL — iframe directo ───────────────────────────────────────────
 function cargarCanal(canal) {
     canalActual = canal;
     document.getElementById('nombreCanal').innerText    = canal.nombre;
@@ -268,50 +268,13 @@ function cargarCanal(canal) {
     document.querySelectorAll('.canal-card').forEach(function(el) {
         el.classList.toggle('activo', el.dataset.id === canal.id);
     });
-
-    // Destruir instancia HLS previa si existe
-    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
-
-    var video  = document.getElementById('hlsVideo');
-    var iframe = document.getElementById('iframeEmbed');
-
-    // — Modo HLS nativo (stream .ts / .m3u8) —
-    if (canal.hls) {
-        showSpinner('Conectando señal...');
-        iframe.style.display = 'none';
-        iframe.src = '';
-        video.style.display = 'block';
-        if (Hls.isSupported()) {
-            hlsInstance = new Hls({ enableWorker: true, lowLatencyMode: true });
-            hlsInstance.loadSource(canal.hls);
-            hlsInstance.attachMedia(video);
-            hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
-                video.play().catch(function(){});
-                hideOverlay();
-            });
-            hlsInstance.on(Hls.Events.ERROR, function(e, data) {
-                if (data.fatal) { showError(canal); }
-            });
-        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            video.src = canal.hls;
-            video.addEventListener('loadedmetadata', function() {
-                video.play().catch(function(){});
-                hideOverlay();
-            });
-            video.addEventListener('error', function() { showError(canal); });
-        } else {
-            showError(canal);
-        }
-        return;
-    }
-
-    // — Modo iframe embed —
     if (!canal.embed) { showError(canal); return; }
     showSpinner('Cargando...');
-    video.style.display = 'none';
-    iframe.src = canal.embed;
-    iframe.style.display = 'block';
-    iframe.onload = function() { hideOverlay(); };
+    var fr = document.getElementById('iframeEmbed');
+    fr.src = canal.embed;
+    fr.style.display = 'block';
+    document.getElementById('hlsVideo').style.display = 'none';
+    fr.onload = function() { hideOverlay(); };
 }
 
 // ─── FULLSCREEN ───────────────────────────────────────────────────────────────
