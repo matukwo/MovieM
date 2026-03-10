@@ -158,7 +158,8 @@ var CANALES = [
     {"nombre":"TN","logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/TN_todo_noticias_logo.svg/2560px-TN_todo_noticias_logo.svg.png","cat":"Noticias","pais":"🇦🇷",
      "embed":"https://hlsplayer.net/embed?type=m3u8&src=https://live-01-01-tn.vodgc.net/TN24/index_TN24_1080.m3u8"},
     {"nombre":"Canal IPTV","logo":"https://files.catbox.moe/finwuj.png","cat":"General","pais":"🇦🇷",
-     "embed":"https://hlsplayer.net/embed?type=m3u8&src=http://mundo2.pro:80/live/Clienteehhdhd/73773hdhdh2/361001.ts"}
+     "stream":"http://mundo2.pro:80/live/Clienteehhdhd/73773hdhdh2/361001.ts",
+     "proxy":"https://iptv-proxy.matukwo.workers.dev"}
 ];
 
 // ─── PROXIES CORS (reintentos automáticos si el stream directo falla) ─────────
@@ -268,12 +269,45 @@ function cargarCanal(canal) {
     document.querySelectorAll('.canal-card').forEach(function(el) {
         el.classList.toggle('activo', el.dataset.id === canal.id);
     });
+
+    // ── Modo IPTV con Cloudflare Worker proxy ─────────────────────
+    if (canal.proxy && canal.stream) {
+        var proxyUrl = canal.proxy + '?url=' + encodeURIComponent(canal.stream);
+        var video = document.getElementById('hlsVideo');
+        var fr2 = document.getElementById('iframeEmbed');
+        fr2.style.display = 'none'; fr2.src = '';
+        video.style.display = 'block';
+        showSpinner('Conectando stream...');
+        if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+            if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+            hlsInstance = new Hls({ enableWorker: true, lowLatencyMode: true });
+            hlsInstance.loadSource(proxyUrl);
+            hlsInstance.attachMedia(video);
+            hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
+                video.play().catch(function(){});
+                hideOverlay();
+            });
+            hlsInstance.on(Hls.Events.ERROR, function(e, data) {
+                if (data.fatal) showError(canal);
+            });
+        } else if (video.canPlayType('video/mp2t') || video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = proxyUrl;
+            video.play().catch(function(){});
+            hideOverlay();
+        } else {
+            showError(canal);
+        }
+        return;
+    }
+
+    // ── Modo embed iframe normal ───────────────────────────────────
     if (!canal.embed) { showError(canal); return; }
     showSpinner('Cargando...');
+    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+    document.getElementById('hlsVideo').style.display = 'none';
     var fr = document.getElementById('iframeEmbed');
     fr.src = canal.embed;
     fr.style.display = 'block';
-    document.getElementById('hlsVideo').style.display = 'none';
     fr.onload = function() { hideOverlay(); };
 }
 
