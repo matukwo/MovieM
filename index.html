@@ -13,6 +13,8 @@
         @keyframes shake{10%,90%{transform:translate3d(-1px,0,0)}20%,80%{transform:translate3d(2px,0,0)}30%,50%,70%{transform:translate3d(-4px,0,0)}40%,60%{transform:translate3d(4px,0,0)}}
         .text-accent{color:var(--accent-color,#dc2626)}.bg-accent{background-color:var(--accent-color,#dc2626)}.border-accent{border-color:var(--accent-color,#dc2626)}
         #searchDropdown,#searchDropdownMobile{max-height:70vh;overflow-y:auto}
+        @keyframes pulse-sk{0%{background:rgba(39,39,42,.5)}50%{background:rgba(63,63,70,.5)}100%{background:rgba(39,39,42,.5)}}
+        .skeleton{animation:pulse-sk 1.5s infinite ease-in-out;border-radius:.75rem}
     </style>
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden">
@@ -339,13 +341,13 @@ function crearCard(peli){
   var prog=progress['pelicula_'+peli.id]||0;
   var card=document.createElement('div');
   card.className='min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2';
-  var inner=document.createElement('div');inner.className='relative';
+  var inner=document.createElement('div');inner.className='relative aspect-[2/3]';
   // Skeleton placeholder detrás de la imagen
   var skDiv=document.createElement('div');skDiv.className='absolute inset-0 rounded-xl skeleton';
   var img=document.createElement('img');img.src=poster;
-  img.className='rounded-xl shadow-lg mb-1 border border-white/5 w-full relative z-10 transition-opacity duration-500 opacity-0';
+  img.className='absolute inset-0 w-full h-full object-cover rounded-xl shadow-lg mb-1 border border-white/5 z-10';
   img.loading='lazy';
-  img.onload=function(){this.style.opacity='1';skDiv.style.display='none';};
+  img.onload=function(){skDiv.style.display='none';};
   img.onclick=function(){location.href='pelicula.html?id='+peli.id;};
   var badge=document.createElement('div');
   badge.className='absolute top-1.5 right-1.5 flex flex-col items-end gap-1 z-20';
@@ -356,7 +358,7 @@ function crearCard(peli){
   if(prog>2){progBar='<div class="absolute bottom-0 left-0 right-0 z-20 px-1 pb-1"><div class="w-full h-1 bg-zinc-800/80 rounded-full"><div class="h-full bg-red-600 rounded-full" style="width:'+Math.round(prog)+'%"></div></div></div>';}
   inner.appendChild(skDiv);inner.appendChild(img);inner.appendChild(badge);
   if(prog>2){var pb=document.createElement('div');pb.className='absolute bottom-0 left-0 right-0 z-20 px-1 pb-1';pb.innerHTML='<div class="w-full h-1 bg-zinc-800/80 rounded-full"><div class="h-full bg-red-600 rounded-full" style="width:'+Math.round(prog)+'%"></div></div>';inner.appendChild(pb);}
-  var title=document.createElement('p');title.className='text-[9px] md:text-[10px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 mt-1';title.textContent=peli.title||peli.name;
+  var title=document.createElement('p');title.className='text-[9px] md:text-[10px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 mt-2';title.textContent=peli.title||peli.name;
   card.appendChild(inner);card.appendChild(title);return card;
 }
 
@@ -388,14 +390,20 @@ var colorG=localStorage.getItem('movieM_color');if(colorG)document.documentEleme
         var card=document.createElement('div');
         card.className='min-w-[120px] md:min-w-[160px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2';
         card.onclick=function(){location.href='pelicula.html?id='+id;};
-        card.innerHTML=
-          '<div class="relative">'
-          +'<div class="absolute inset-0 rounded-xl skeleton"></div>'
-          +'<img src="'+BASE+p.poster_path+'" class="rounded-xl shadow-lg border border-white/5 w-full relative z-10 opacity-0 transition-opacity duration-500" loading="lazy" onload="this.style.opacity='1';this.previousElementSibling.style.display='none'">'
-          +'<div class="absolute top-1.5 left-1.5 z-20"><div class="bg-black/80 text-white text-[8px] font-black px-2 py-0.5 rounded-lg flex items-center gap-1"><svg class="w-2.5 h-2.5 fill-red-500" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>'+Math.round(pct)+'%</div></div>'
-          +'<div class="absolute bottom-0 left-0 right-0 z-20 px-1.5 pb-1.5"><div class="w-full h-1.5 bg-zinc-800/80 rounded-full"><div class="h-full bg-red-600 rounded-full transition-all" style="width:'+Math.round(pct)+'%"></div></div></div>'
-          +'</div>'
-          +'<p class="text-[9px] md:text-[10px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 mt-1">'+((p.title||p.name)||'')+'</p>';
+        var wrap=document.createElement('div');wrap.className='relative';
+        var sk=document.createElement('div');sk.className='absolute inset-0 rounded-xl skeleton';
+        var im=document.createElement('img');
+        im.src=BASE+p.poster_path;
+        im.className='rounded-xl shadow-lg border border-white/5 w-full relative z-10';
+        im.loading='lazy';
+        im.onload=function(){sk.style.display='none';};
+        var badge=document.createElement('div');badge.className='absolute top-1.5 left-1.5 z-20';
+        badge.innerHTML='<div class="bg-black/80 text-white text-[8px] font-black px-2 py-0.5 rounded-lg flex items-center gap-1"><svg class="w-2.5 h-2.5 fill-red-500" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>'+Math.round(pct)+'%</div>';
+        var progWrap=document.createElement('div');progWrap.className='absolute bottom-0 left-0 right-0 z-20 px-1.5 pb-1.5';
+        progWrap.innerHTML='<div class="w-full h-1.5 bg-zinc-800/80 rounded-full"><div class="h-full bg-red-600 rounded-full" style="width:'+Math.round(pct)+'%"></div></div>';
+        wrap.appendChild(sk);wrap.appendChild(im);wrap.appendChild(badge);wrap.appendChild(progWrap);
+        var titP=document.createElement('p');titP.className='text-[9px] md:text-[10px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 mt-1';titP.textContent=(p.title||p.name||'');
+        card.appendChild(wrap);card.appendChild(titP);
         fila.appendChild(card);
       }catch(e){}
     }));
