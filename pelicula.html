@@ -42,8 +42,8 @@
 </button>
 
 <!-- HUD usuario -->
-<div id="userHUD" class="fixed top-4 right-4 md:top-8 md:right-8 z-50 hidden items-center gap-3 bg-black/40 backdrop-blur-md p-1.5 pr-4 rounded-full border border-white/10 shadow-2xl cursor-pointer" onclick="location.href='perfil.html'">
-    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-600 flex items-center justify-center font-black text-white border-2 border-white/20 text-sm overflow-hidden shrink-0" id="userInitial">?</div>
+<div id="userHUD" class="fixed top-4 right-4 md:top-8 md:right-8 z-50 hidden items-center gap-3 bg-black/40 backdrop-blur-md p-1.5 pr-4 rounded-full border border-white/10 shadow-2xl">
+    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-600 flex items-center justify-center font-black text-white border-2 border-white/20 text-sm" id="userInitial">?</div>
     <span id="userNameHUD" class="text-xs font-bold uppercase tracking-widest hidden md:inline">Usuario</span>
 </div>
 
@@ -57,6 +57,16 @@
             <div class="w-28 md:w-full shrink-0">
                 <div id="posterSkeleton" class="w-full aspect-[2/3] rounded-xl md:rounded-2xl skeleton"></div>
                 <img id="poster" src="" class="w-full rounded-xl md:rounded-2xl border border-white/10 shadow-2xl hidden" onload="this.classList.remove('hidden');document.getElementById('posterSkeleton')?.remove()">
+                <!-- Barra de progreso "Continuar viendo" -->
+                <div id="progresoWrap" class="hidden mt-2">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">Continuar viendo</span>
+                        <span id="progresoNum" class="text-[9px] font-black text-accent"></span>
+                    </div>
+                    <div class="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                        <div id="progresoBar" class="h-full bg-red-600 rounded-full transition-all duration-500" style="width:0%"></div>
+                    </div>
+                </div>
             </div>
             <!-- Info inline en mobile (al lado del poster) -->
             <div class="flex-1 md:hidden pt-1">
@@ -141,6 +151,33 @@
                 <div class="min-w-[80px] skeleton h-20 rounded-full"></div>
             </div>
             <button onclick="document.getElementById('reparto').scrollBy({left:320,behavior:'smooth'})" class="absolute right-0 top-1/2 -translate-y-6 z-20 bg-black/80 p-2.5 rounded-full hidden md:group-hover/reparto:flex border border-white/10 hover:bg-red-600 transition shadow-xl">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg>
+            </button>
+        </div>
+    </section>
+
+    <!-- Películas Similares -->
+    <section class="mb-10 md:mb-14 fade-in" style="animation-delay:.35s">
+        <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 flex items-center gap-3">
+            <span class="w-1 h-6 bg-red-600 rounded-full inline-block"></span>
+            También te puede gustar
+        </h2>
+        <div class="relative group/sim">
+            <button onclick="document.getElementById('similaresFila').scrollBy({left:-320,behavior:'smooth'})"
+                class="absolute left-0 top-1/2 -translate-y-6 z-20 bg-black/80 p-2.5 rounded-full hidden md:group-hover/sim:flex border border-white/10 hover:bg-red-600 transition shadow-xl">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <div id="similaresFila" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-3 scroll-smooth">
+                <!-- skeletons iniciales -->
+                <div class="min-w-[100px] md:min-w-[140px] skeleton rounded-xl aspect-[2/3]"></div>
+                <div class="min-w-[100px] md:min-w-[140px] skeleton rounded-xl aspect-[2/3]"></div>
+                <div class="min-w-[100px] md:min-w-[140px] skeleton rounded-xl aspect-[2/3]"></div>
+                <div class="min-w-[100px] md:min-w-[140px] skeleton rounded-xl aspect-[2/3]"></div>
+                <div class="min-w-[100px] md:min-w-[140px] skeleton rounded-xl aspect-[2/3]"></div>
+                <div class="min-w-[100px] md:min-w-[140px] skeleton rounded-xl aspect-[2/3]"></div>
+            </div>
+            <button onclick="document.getElementById('similaresFila').scrollBy({left:320,behavior:'smooth'})"
+                class="absolute right-0 top-1/2 -translate-y-6 z-20 bg-black/80 p-2.5 rounded-full hidden md:group-hover/sim:flex border border-white/10 hover:bg-red-600 transition shadow-xl">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg>
             </button>
         </div>
@@ -246,44 +283,35 @@
 
                 escucharComentariosNube(); 
                 checkStatus();
+                actualizarHUD();
+                // Guardar duración real para progreso más preciso
+                if (peli.runtime) window._peliculaDuracion = peli.runtime;
+                // Cargar similares
+                cargarSimilares();
+                // Mostrar barra de progreso si ya vio algo
+                actualizarBarraProgreso(leerProgreso());
             } catch (error) { console.error(error); }
         }
 
         // --- HUD DE USUARIO + captura UID ---
         // Cargar el UID real del usuario logueado lo antes posible
-        window.onAuthStateChanged(window.auth, async function(user) {
+        window.onAuthStateChanged(window.auth, function(user) {
             if (user) {
                 miUID_pelicula = user.uid;
                 checkStatus(); // re-check con UID real
-                // Cargar avatar del HUD desde Firestore
-                try {
-                    var snap = await window.getDoc(window.doc(window.db, 'usuarios', user.uid));
-                    var data = snap.exists() ? snap.data() : {};
-                    actualizarHUD(data.username || localStorage.getItem('usuarioMovieM'), data.avatar || null);
-                } catch(e) {
-                    actualizarHUD(localStorage.getItem('usuarioMovieM'), null);
-                }
             }
         });
 
-        function actualizarHUD(userActual, avatarSrc) {
+        function actualizarHUD() {
+            const userActual = localStorage.getItem('usuarioMovieM');
             const hud = document.getElementById('userHUD');
             if (userActual && userActual !== 'undefined') {
                 document.getElementById('userNameHUD').innerText = userActual;
-                const circle = document.getElementById('userInitial');
-                if (avatarSrc) {
-                    circle.innerHTML = '<img src="'+avatarSrc+'" class="w-full h-full object-cover">';
-                    circle.style.background = 'transparent';
-                } else {
-                    circle.innerHTML = userActual.charAt(0).toUpperCase();
-                    circle.style.background = 'var(--accent-color, #dc2626)';
-                }
+                document.getElementById('userInitial').innerText = userActual.charAt(0).toUpperCase();
                 hud.classList.remove('hidden');
                 hud.classList.add('flex');
             }
         }
-        // Llamar con localStorage mientras Firebase resuelve (evita el parpadeo)
-        actualizarHUD(localStorage.getItem('usuarioMovieM'), null);
 
         // --- FIREBASE LOGIC (COMENTARIOS) ---
         // Badge SVGs por rango
@@ -327,14 +355,8 @@
                     const badge = getBadge(uid);
                     const esAdmin = miUID_pelicula === ADMIN_UID;
                     
-                    // Likes en comentario
-                    const likesArr   = c.likes || [];
-                    const likeCount  = likesArr.length;
-                    const yaDiLike   = miUID_pelicula && likesArr.includes(miUID_pelicula);
-                    
                     const div = document.createElement('div');
                     div.className = 'bg-zinc-900/50 p-5 rounded-2xl border border-white/5 shadow-xl fade-in mb-4 group/comment';
-                    div.id = 'comment-' + docId;
                     div.innerHTML = `
                         <div class="flex justify-between items-start mb-3 gap-2">
                             <div class="flex flex-col gap-1 min-w-0">
@@ -350,21 +372,7 @@
                                 </button>` : ''}
                             </div>
                         </div>
-                        <p class="text-zinc-400 text-sm leading-relaxed font-medium mb-3">${c.txt}</p>
-                        <div class="flex items-center gap-2">
-                            <button onclick="toggleLikeComentario('${docId}')"
-                                class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border
-                                    ${yaDiLike
-                                        ? 'bg-accent/10 border-accent text-accent'
-                                        : 'bg-zinc-800/60 border-white/5 text-zinc-500 hover:border-zinc-500 hover:text-white'}"
-                                id="like-btn-${docId}">
-                                <svg class="w-3 h-3" fill="${yaDiLike ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
-                                </svg>
-                                <span id="like-cnt-${docId}">${likeCount > 0 ? likeCount : ''}</span>
-                            </button>
-                        </div>
+                        <p class="text-zinc-400 text-sm leading-relaxed font-medium">${c.txt}</p>
                     `;
                     contenedor.appendChild(div);
                 });
@@ -376,37 +384,6 @@
             if (!confirm('¿Borrar este comentario?')) return;
             try { await window.deleteDoc(window.doc(window.db, 'comentarios', docId)); }
             catch(e) { alert('Error al borrar.'); }
-        };
-
-        window.toggleLikeComentario = async function(docId) {
-            if (!miUID_pelicula) return alert('Debes iniciar sesión para dar like.');
-            const ref = window.doc(window.db, 'comentarios', docId);
-            try {
-                const snap = await window.getDoc(ref);
-                if (!snap.exists()) return;
-                const likesArr = snap.data().likes || [];
-                const yaLiked  = likesArr.includes(miUID_pelicula);
-                await window.setDoc(ref, {
-                    likes: yaLiked
-                        ? window.arrayRemove(miUID_pelicula)
-                        : window.arrayUnion(miUID_pelicula)
-                }, { merge: true });
-                // UI optimista inmediata
-                const btn = document.getElementById('like-btn-' + docId);
-                const cnt = document.getElementById('like-cnt-' + docId);
-                if (!btn || !cnt) return;
-                const newCount = yaLiked ? likesArr.length - 1 : likesArr.length + 1;
-                cnt.textContent = newCount > 0 ? newCount : '';
-                if (yaLiked) {
-                    btn.classList.remove('bg-accent/10','border-accent','text-accent');
-                    btn.classList.add('bg-zinc-800/60','border-white/5','text-zinc-500');
-                    btn.querySelector('svg').setAttribute('fill','none');
-                } else {
-                    btn.classList.add('bg-accent/10','border-accent','text-accent');
-                    btn.classList.remove('bg-zinc-800/60','border-white/5','text-zinc-500');
-                    btn.querySelector('svg').setAttribute('fill','currentColor');
-                }
-            } catch(e) { console.error('Like error:', e); }
         };
 
         window.publicarComentario = async () => {
@@ -572,17 +549,106 @@
             });
         };
 
+        // ── CONTINUAR VIENDO ───────────────────────────────────────────────────────
+        // Guarda el progreso de reproducción en localStorage
+        // Clave: movieM_progress → { "pelicula_ID": porcentaje }
+        let progresoTimer = null;
+        let progresoInicio = null;
+
+        function guardarProgreso(porcentaje) {
+            try {
+                const prog = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
+                prog['pelicula_' + movieID] = Math.min(100, Math.max(0, Math.round(porcentaje)));
+                localStorage.setItem('movieM_progress', JSON.stringify(prog));
+            } catch(e) {}
+        }
+
+        function leerProgreso() {
+            try {
+                const prog = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
+                return prog['pelicula_' + movieID] || 0;
+            } catch(e) { return 0; }
+        }
+
+        function actualizarBarraProgreso(pct) {
+            const bar = document.getElementById('progresoBar');
+            const wrap = document.getElementById('progresoWrap');
+            const num  = document.getElementById('progresoNum');
+            if (!bar || !wrap) return;
+            if (pct > 2) {
+                wrap.classList.remove('hidden');
+                bar.style.width = pct + '%';
+                if (num) num.innerText = Math.round(pct) + '%';
+            } else {
+                wrap.classList.add('hidden');
+            }
+        }
+
         window.verPelicula = () => {
             document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
             document.getElementById('playerOverlay').style.display = 'flex';
             document.body.style.overflow = "hidden";
+            // Estimar progreso por tiempo abierto (aproximación sin API del iframe)
+            progresoInicio = Date.now();
+            // Duración estimada estándar: 2h = 7200s. Se actualiza con dato real de TMDB si está disponible
+            const duracionEstimada = (window._peliculaDuracion || 120) * 60 * 1000;
+            const progresoActual = leerProgreso();
+            progresoTimer = setInterval(() => {
+                const transcurrido = Date.now() - progresoInicio;
+                const pctNuevo = progresoActual + (transcurrido / duracionEstimada) * 100;
+                guardarProgreso(pctNuevo);
+                actualizarBarraProgreso(Math.min(100, Math.round(pctNuevo)));
+            }, 10000); // cada 10s
         };
 
         window.cerrarPelicula = () => {
             document.getElementById('playerOverlay').style.display = 'none';
             document.getElementById('movieFrame').src = "";
             document.body.style.overflow = "auto";
+            if (progresoTimer) { clearInterval(progresoTimer); progresoTimer = null; }
+            // Guardar progreso final
+            if (progresoInicio) {
+                const duracion = (window._peliculaDuracion || 120) * 60 * 1000;
+                const transcurrido = Date.now() - progresoInicio;
+                const actual = leerProgreso();
+                guardarProgreso(actual + (transcurrido / duracion) * 100);
+                progresoInicio = null;
+            }
+            actualizarBarraProgreso(leerProgreso());
         };
+
+        async function cargarSimilares() {
+            try {
+                const res = await fetch(`https://api.themoviedb.org/3/movie/${movieID}/similar?api_key=${API_KEY}&language=es-ES&page=1`);
+                const data = await res.json();
+                const fila = document.getElementById('similaresFila');
+                const progress = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
+                const items = (data.results || []).filter(p => p.poster_path).slice(0, 18);
+                if (!items.length) {
+                    fila.closest('section').classList.add('hidden');
+                    return;
+                }
+                fila.innerHTML = items.map(p => {
+                    const prog = progress['pelicula_' + p.id] || 0;
+                    const rating = p.vote_average ? p.vote_average.toFixed(1) : '';
+                    const anio = (p.release_date || '').split('-')[0];
+                    return `
+                    <div onclick="location.href='pelicula.html?id=${p.id}'"
+                        class="min-w-[100px] md:min-w-[140px] shrink-0 cursor-pointer group/sim-card">
+                        <div class="relative rounded-xl overflow-hidden border border-white/5 transition-transform duration-200 group-hover/sim-card:scale-105 mb-1.5">
+                            <img src="https://image.tmdb.org/t/p/w300${p.poster_path}"
+                                 class="w-full aspect-[2/3] object-cover" loading="lazy">
+                            <div class="absolute top-1.5 right-1.5 flex flex-col gap-1 items-end">
+                                ${rating ? `<div class="bg-black/80 text-yellow-500 text-[8px] font-black px-1.5 py-0.5 rounded-lg">⭐ ${rating}</div>` : ''}
+                                ${anio ? `<div class="bg-black/80 text-zinc-300 text-[8px] font-black px-1.5 py-0.5 rounded-lg">${anio}</div>` : ''}
+                            </div>
+                            ${prog > 0 ? `<div class="absolute bottom-0 left-0 right-0 h-1 bg-zinc-800/80"><div class="h-full bg-red-600 rounded-full transition-all" style="width:${prog}%"></div></div>` : ''}
+                        </div>
+                        <p class="text-[9px] font-bold uppercase tracking-tighter text-zinc-500 truncate">${p.title}</p>
+                    </div>`;
+                }).join('');
+            } catch(e) { console.error('similares:', e); }
+        }
 
         cargarPagina();
     </script>
