@@ -143,29 +143,26 @@
 </nav>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-const _app = initializeApp({apiKey:"AIzaSyAn5N7m7EhICK2aZG4Nx8DIW9RZd9kK1DA",authDomain:"moviem-5b73d.firebaseapp.com",projectId:"moviem-5b73d",storageBucket:"moviem-5b73d.firebasestorage.app",messagingSenderId:"843796138544",appId:"1:843796138544:web:c2bde9b39d437b84d97bf5"});
-const _db = getFirestore(_app);
 const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
 const IMG = 'https://image.tmdb.org/t/p/w500';
-const IMG_SM = 'https://image.tmdb.org/t/p/w185';
 
 // Color accent
 const savedColor = localStorage.getItem('movieM_color');
 if (savedColor) document.documentElement.style.setProperty('--accent-color', savedColor);
 
-// Leer query de URL si viene de otro lado
+// Leer query de URL
 const params = new URLSearchParams(location.search);
-const qInit = params.get('q') || '';
-const input = document.getElementById('searchInput');
-if (qInit) { input.value = qInit; }
+const qInit  = (params.get('q') || '').trim();
+const input  = document.getElementById('searchInput');
+if (qInit) {
+    input.value = qInit;
+    document.getElementById('btnClearSearch').classList.remove('hidden');
+}
 
 let timer = null;
 let filtroActivo = 'todo';
 let allResults = { peliculas: [], series: [], personas: [] };
 
-// Géneros TMDB
 const GENEROS = { accion: 28, terror: 27, comedia: 35 };
 
 // ── Filtros ────────────────────────────────────────────────────────────────────
@@ -187,6 +184,10 @@ input.addEventListener('input', () => {
     timer = setTimeout(() => buscar(q), 350);
 });
 
+input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && input.value.trim().length >= 2) buscar(input.value.trim());
+});
+
 document.getElementById('btnClearSearch').addEventListener('click', () => {
     input.value = '';
     input.focus();
@@ -199,10 +200,16 @@ function mostrarVacio() {
     document.getElementById('resultsWrap').classList.add('hidden');
 }
 
-// ── Buscar ─────────────────────────────────────────────────────────────────────
+// ── Usuarios Firebase (usa window.db del firebase-config.js) ──────────────────
 async function buscarUsuarios(q) {
+    // Esperar a que firebase-config.js termine de inicializar window.db
+    for (let i = 0; i < 20; i++) {
+        if (window.db && window.getDocs && window.collection) break;
+        await new Promise(r => setTimeout(r, 100));
+    }
+    if (!window.db) return [];
     try {
-        const snap = await getDocs(collection(_db, 'usuarios'));
+        const snap = await window.getDocs(window.collection(window.db, 'usuarios'));
         const usuarios = [];
         snap.forEach(d => {
             const u = d.data();
@@ -211,9 +218,10 @@ async function buscarUsuarios(q) {
             }
         });
         return usuarios.slice(0, 10);
-    } catch(e) { return []; }
+    } catch(e) { console.error('buscarUsuarios:', e); return []; }
 }
 
+// ── Buscar ─────────────────────────────────────────────────────────────────────
 async function buscar(q) {
     document.getElementById('emptyState').classList.add('hidden');
     document.getElementById('resultsWrap').classList.remove('hidden');
@@ -221,8 +229,8 @@ async function buscar(q) {
 
     try {
         const [rMovies, rTv, usuarios] = await Promise.all([
-            fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(q)}&page=1`).then(r=>r.json()),
-            fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(q)}&page=1`).then(r=>r.json()),
+            fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(q)}&page=1`).then(r => r.json()),
+            fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(q)}&page=1`).then(r => r.json()),
             buscarUsuarios(q),
         ]);
 
@@ -234,6 +242,7 @@ async function buscar(q) {
 
         renderResultados();
     } catch(e) {
+        console.error('buscar error:', e);
         document.getElementById('noResults').classList.remove('hidden');
     }
 }
@@ -244,7 +253,6 @@ function renderResultados() {
     let series  = allResults.series;
     let personas = allResults.personas;
 
-    // Filtro por tipo
     if (filtroActivo === 'pelicula') { series = []; personas = []; }
     if (filtroActivo === 'serie')    { pelis = [];  personas = []; }
     if (filtroActivo === 'usuario')  { pelis = [];  series = []; }
@@ -263,8 +271,7 @@ function renderResultados() {
     const secP = document.getElementById('secPersonas');
     const gridP = document.getElementById('gridPersonas');
     gridP.innerHTML = '';
-    const filtroEsUsuario = filtroActivo === 'usuario';
-    const personasFiltradas = (filtroActivo === 'todo' || filtroEsUsuario) ? personas : [];
+    const personasFiltradas = (filtroActivo === 'todo' || filtroActivo === 'usuario') ? personas : [];
     if (personasFiltradas.length) {
         secP.classList.remove('hidden');
         personasFiltradas.forEach((u, i) => {
@@ -292,11 +299,8 @@ function renderResultados() {
     gridPelis.innerHTML = '';
     if (pelis.length) {
         secPelis.classList.remove('hidden');
-        // Leer progreso guardado
         const progress = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
-        pelis.forEach((p, i) => {
-            gridPelis.appendChild(crearCard(p, 'pelicula', i, progress));
-        });
+        pelis.forEach((p, i) => gridPelis.appendChild(crearCard(p, 'pelicula', i, progress)));
     } else { secPelis.classList.add('hidden'); }
 
     // Series
@@ -306,9 +310,7 @@ function renderResultados() {
     if (series.length) {
         secSer.classList.remove('hidden');
         const progress = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
-        series.forEach((s, i) => {
-            gridSer.appendChild(crearCard(s, 'serie', i, progress));
-        });
+        series.forEach((s, i) => gridSer.appendChild(crearCard(s, 'serie', i, progress)));
     } else { secSer.classList.add('hidden'); }
 }
 
@@ -318,9 +320,9 @@ function crearCard(item, tipo, idx, progress) {
     const titulo = item.title || item.name || '';
     const anio   = (item.release_date || item.first_air_date || '').split('-')[0];
     const rating  = item.vote_average ? item.vote_average.toFixed(1) : 'S/R';
-    const poster  = IMG + (item.poster_path);
+    const poster  = IMG + item.poster_path;
     const href    = esPeli ? `pelicula.html?id=${id}` : `serie.html?id=${id}`;
-    const prog    = progress[`${tipo}_${id}`] || 0; // 0-100
+    const prog    = progress[`${tipo}_${id}`] || 0;
 
     const div = document.createElement('div');
     div.className = 'fade-up cursor-pointer';
@@ -328,7 +330,8 @@ function crearCard(item, tipo, idx, progress) {
     div.onclick = () => location.href = href;
     div.innerHTML = `
         <div class="relative rounded-xl overflow-hidden border border-white/5 card-hover mb-1.5">
-            <img src="${poster}" alt="${titulo}" class="w-full aspect-[2/3] object-cover" loading="lazy">
+            <img src="${poster}" alt="${titulo}" class="w-full aspect-[2/3] object-cover" loading="lazy"
+                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns%3D%22http%3A//www.w3.org/2000/svg%22 width%3D%22200%22 height%3D%22300%22%3E%3Crect width%3D%22200%22 height%3D%22300%22 fill%3D%22%2327272a%22/%3E%3Ctext x%3D%22100%22 y%3D%22150%22 fill%3D%22%2352525b%22 font-size%3D%2240%22 text-anchor%3D%22middle%22 dominant-baseline%3D%22middle%22%3E%3F%3C/text%3E%3C/svg%3E'">
             <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-1">
                 <div class="bg-black/80 text-yellow-500 text-[8px] font-black px-1.5 py-0.5 rounded-lg">⭐ ${rating}</div>
                 ${anio ? `<div class="bg-black/80 text-zinc-300 text-[8px] font-black px-1.5 py-0.5 rounded-lg">${anio}</div>` : ''}
@@ -342,10 +345,8 @@ function crearCard(item, tipo, idx, progress) {
 
 function mostrarSkeletons() {
     ['gridPeliculas','gridSeries'].forEach(id => {
-        const g = document.getElementById(id);
-        g.innerHTML = Array(12).fill(0).map(() =>
-            `<div class="rounded-xl skeleton aspect-[2/3]"></div>`
-        ).join('');
+        document.getElementById(id).innerHTML = Array(12).fill(0).map(() =>
+            `<div class="rounded-xl skeleton aspect-[2/3]"></div>`).join('');
     });
     document.getElementById('secPeliculas').classList.remove('hidden');
     document.getElementById('secSeries').classList.remove('hidden');
