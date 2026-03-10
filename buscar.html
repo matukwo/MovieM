@@ -74,7 +74,7 @@
             <button class="filter-btn active shrink-0 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border border-white/10 text-zinc-400" data-filter="todo">Todo</button>
             <button class="filter-btn shrink-0 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border border-white/10 text-zinc-400" data-filter="pelicula">Películas</button>
             <button class="filter-btn shrink-0 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border border-white/10 text-zinc-400" data-filter="serie">Series</button>
-            <button class="filter-btn shrink-0 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border border-white/10 text-zinc-400" data-filter="persona">Personas</button>
+            <button class="filter-btn shrink-0 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border border-white/10 text-zinc-400" data-filter="usuario">Usuarios</button>
             <!-- Géneros -->
             <button class="filter-btn shrink-0 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border border-white/10 text-zinc-400" data-filter="accion">Acción</button>
             <button class="filter-btn shrink-0 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border border-white/10 text-zinc-400" data-filter="terror">Terror</button>
@@ -87,9 +87,9 @@
         <!-- Sección personas -->
         <section id="secPersonas" class="mb-8 hidden">
             <h2 class="text-sm font-black uppercase tracking-widest text-zinc-500 mb-4 flex items-center gap-2">
-                <span class="w-1 h-4 bg-accent rounded-full inline-block"></span> Personas
+                <span class="w-1 h-4 bg-accent rounded-full inline-block"></span> Usuarios
             </h2>
-            <div id="gridPersonas" class="flex gap-4 overflow-x-auto no-scrollbar pb-2"></div>
+            <div id="gridPersonas" class="flex gap-3 flex-wrap"></div>
         </section>
 
         <!-- Sección películas -->
@@ -143,6 +143,10 @@
 </nav>
 
 <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+const _app = initializeApp({apiKey:"AIzaSyAn5N7m7EhICK2aZG4Nx8DIW9RZd9kK1DA",authDomain:"moviem-5b73d.firebaseapp.com",projectId:"moviem-5b73d",storageBucket:"moviem-5b73d.firebasestorage.app",messagingSenderId:"843796138544",appId:"1:843796138544:web:c2bde9b39d437b84d97bf5"});
+const _db = getFirestore(_app);
 const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
 const IMG = 'https://image.tmdb.org/t/p/w500';
 const IMG_SM = 'https://image.tmdb.org/t/p/w185';
@@ -196,22 +200,36 @@ function mostrarVacio() {
 }
 
 // ── Buscar ─────────────────────────────────────────────────────────────────────
+async function buscarUsuarios(q) {
+    try {
+        const snap = await getDocs(collection(_db, 'usuarios'));
+        const usuarios = [];
+        snap.forEach(d => {
+            const u = d.data();
+            if (u.username && u.username.toLowerCase().includes(q.toLowerCase())) {
+                usuarios.push({ uid: d.id, username: u.username, avatar: u.avatar || null, color: u.color || '#dc2626' });
+            }
+        });
+        return usuarios.slice(0, 10);
+    } catch(e) { return []; }
+}
+
 async function buscar(q) {
     document.getElementById('emptyState').classList.add('hidden');
     document.getElementById('resultsWrap').classList.remove('hidden');
     mostrarSkeletons();
 
     try {
-        const [rMovies, rTv, rPeople] = await Promise.all([
+        const [rMovies, rTv, usuarios] = await Promise.all([
             fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(q)}&page=1`).then(r=>r.json()),
             fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(q)}&page=1`).then(r=>r.json()),
-            fetch(`https://api.themoviedb.org/3/search/person?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(q)}&page=1`).then(r=>r.json()),
+            buscarUsuarios(q),
         ]);
 
         allResults = {
             peliculas: (rMovies.results || []).filter(p => p.poster_path),
             series:    (rTv.results    || []).filter(s => s.poster_path),
-            personas:  (rPeople.results|| []).filter(p => p.profile_path).slice(0, 8),
+            personas:  usuarios,
         };
 
         renderResultados();
@@ -229,7 +247,7 @@ function renderResultados() {
     // Filtro por tipo
     if (filtroActivo === 'pelicula') { series = []; personas = []; }
     if (filtroActivo === 'serie')    { pelis = [];  personas = []; }
-    if (filtroActivo === 'persona')  { pelis = [];  series = []; }
+    if (filtroActivo === 'usuario')  { pelis = [];  series = []; }
     if (['accion','terror','comedia'].includes(filtroActivo)) {
         const gId = GENEROS[filtroActivo];
         pelis  = pelis.filter(p  => (p.genre_ids||[]).includes(gId));
@@ -241,23 +259,29 @@ function renderResultados() {
     document.getElementById('resultCount').innerText = total + ' resultado' + (total !== 1 ? 's' : '');
     document.getElementById('noResults').classList.toggle('hidden', total > 0);
 
-    // Personas
+    // Usuarios
     const secP = document.getElementById('secPersonas');
     const gridP = document.getElementById('gridPersonas');
     gridP.innerHTML = '';
-    if (personas.length) {
+    const filtroEsUsuario = filtroActivo === 'usuario';
+    const personasFiltradas = (filtroActivo === 'todo' || filtroEsUsuario) ? personas : [];
+    if (personasFiltradas.length) {
         secP.classList.remove('hidden');
-        personas.forEach((p, i) => {
+        personasFiltradas.forEach((u, i) => {
+            const letra = u.username.charAt(0).toUpperCase();
             const card = document.createElement('div');
-            card.className = 'shrink-0 flex flex-col items-center gap-2 cursor-pointer group fade-up';
+            card.className = 'flex items-center gap-3 bg-zinc-900/60 border border-white/5 rounded-2xl px-4 py-3 cursor-pointer hover:border-accent/40 hover:bg-zinc-800/60 transition fade-up';
             card.style.animationDelay = (i * 40) + 'ms';
-            card.onclick = () => location.href = `perfil.html?tmdb_person=${p.id}`;
+            card.onclick = () => location.href = `perfil.html?user=${encodeURIComponent(u.username)}`;
             card.innerHTML = `
-                <div class="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-accent transition">
-                    <img src="${IMG_SM}${p.profile_path}" class="w-full h-full object-cover" loading="lazy">
+                <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 flex items-center justify-center font-black text-white text-sm" style="background:${u.color}">
+                    ${u.avatar ? `<img src="${u.avatar}" class="w-full h-full object-cover">` : letra}
                 </div>
-                <p class="text-[10px] font-black uppercase tracking-tighter text-center truncate w-20">${p.name}</p>
-                <p class="text-[8px] text-zinc-600 uppercase font-bold">${p.known_for_department || ''}</p>`;
+                <div class="min-w-0">
+                    <p class="text-sm font-black uppercase tracking-tighter truncate">${u.username}</p>
+                    <p class="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">Usuario MovieM</p>
+                </div>
+                <svg class="w-4 h-4 text-zinc-600 ml-auto shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>`;
             gridP.appendChild(card);
         });
     } else { secP.classList.add('hidden'); }
