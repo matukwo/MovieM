@@ -3,43 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reproductor TV - Moviem</title>
-    
+    <title>TV en Vivo - Moviem</title>
     <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
     <style>
-        body { background-color: #111; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .container { width: 80%; max-width: 800px; }
-        .video-js { width: 100%; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h1 { margin-bottom: 20px; font-weight: 300; }
+        :root { --bg-color: #0f172a; --panel-color: #1e293b; --accent-color: #38bdf8; }
+        body { background-color: var(--bg-color); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
+        
+        .main-layout { display: grid; grid-template-columns: 1fr 300px; gap: 20px; max-width: 1200px; margin: 0 auto; }
+        
+        /* Contenedor del Video */
+        .video-section { background: black; border-radius: 12px; overflow: hidden; border: 1px solid #334155; }
+        
+        /* Lista de Canales */
+        .channels-panel { background: var(--panel-color); border-radius: 12px; height: 500px; overflow-y: auto; border: 1px solid #334155; }
+        .channels-panel h3 { padding: 15px; margin: 0; border-bottom: 1px solid #334155; font-size: 1.1rem; }
+        
+        .channel-item { display: flex; align-items: center; padding: 10px; cursor: pointer; transition: 0.2s; border-bottom: 1px solid #334155; }
+        .channel-item:hover { background: #334155; }
+        .channel-item img { width: 50px; height: 35px; object-fit: contain; margin-right: 12px; background: #fff; border-radius: 4px; padding: 2px; }
+        .channel-name { font-size: 0.9rem; font-weight: 500; }
+
+        @media (max-width: 900px) {
+            .main-layout { grid-template-columns: 1fr; }
+            .channels-panel { height: 300px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Canal 7 en Vivo</h1>
-        
-        <video-js id="mi-reproductor" class="vjs-default-skin vjs-big-play-centered" controls preload="auto" width="800" height="450">
-            <source src="http://107.152.39.199:8030/hls/canal7.m3u8" type="application/x-mpegURL">
-            <p class="vjs-no-js">
-                Para ver este video, por favor habilita JavaScript o usa un navegador que soporte video HTML5.
-            </p>
+<div class="main-layout">
+    <div class="video-section">
+        <video-js id="player" class="vjs-default-skin vjs-big-play-centered" controls preload="auto" fluid="true">
+            <source src="http://41.205.93.154/AandE/index.m3u8" type="application/x-mpegURL">
         </video-js>
+        <div style="padding: 15px;">
+            <h2 id="current-channel-title" style="margin:0; font-size: 1.2rem;">A&E TV</h2>
+        </div>
     </div>
 
-    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+    <div class="channels-panel" id="playlist">
+        <h3>Canales Disponibles</h3>
+        </div>
+</div>
 
-    <script>
-        // Inicializar el reproductor
-        var player = videojs('mi-reproductor', {
-            autoplay: false,
-            muted: false,
-            fluid: true // Esto hace que sea responsivo (se adapta al celular)
-        });
+<script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
 
-        // Manejo de errores (útil para canales de IPTV que se caen)
-        player.on('error', function() {
-            alert('El canal está fuera de línea o el enlace ha caducado.');
-        });
-    </script>
+<script>
+    const channels = [
+        { name: "A&E TV", logo: "http://schedulesdirect-api20141201-logos.s3.dualstack.us-east-1.amazonaws.com/stationLogos/s51529_dark_360w_270h.png", url: "http://41.205.93.154/AandE/index.m3u8" },
+        { name: "ABC", logo: "http://schedulesdirect-api20141201-logos.s3.dualstack.us-east-1.amazonaws.com/stationLogos/s10003_dark_360w_270h.png", url: "https://restream-live.realiptv.to/Lucas123/Lucas123/112234" },
+        { name: "ACC Network", logo: "https://schedulesdirect-api20141201-logos.s3.dualstack.us-east-1.amazonaws.com/stationLogos/s111871_dark_360w_270h.png", url: "http://23.239.31.26:8989/accnetwork/index.m3u8" },
+        { name: "Adult Swim", logo: "http://schedulesdirect-api20141201-logos.s3.dualstack.us-east-1.amazonaws.com/stationLogos/s16496_dark_360w_270h.png", url: "https://turnerlive.warnermediacdn.com/hls/live/2023183/aseast/noslate/VIDEO_1_5128000.m3u8" },
+        { name: "Altitude Sports", logo: "http://schedulesdirect-api20141201-logos.s3.dualstack.us-east-1.amazonaws.com/stationLogos/s44263_dark_360w_270h.png", url: "https://restream-live.realiptv.to/Lucas123/Lucas123/332892" },
+        { name: "AMC", logo: "https://schedulesdirect-api20141201-logos.s3.dualstack.us-east-1.amazonaws.com/stationLogos/s10021_dark_360w_270h.png", url: "http://23.239.31.26:8989/amc/index.m3u8" },
+        { name: "Animal Planet", logo: "http://schedulesdirect-api20141201-logos.s3.dualstack.us-east-1.amazonaws.com/stationLogos/s16331_dark_360w_270h.png", url: "http://23.239.31.26:8989/animalplanet/index.m3u8" },
+        { name: "Antenna TV", logo: "https://cdn.tvpassport.com/image/station/240x135/v3/70248-224D0.png", url: "http://mytvstream.net:8080/live/30550113/30550113/20180.m3u8" },
+        { name: "Aspire", logo: "https://i.gyazo.com/0dec42cc5ef48c489cc10db906dc5b9b.png", url: "http://mytvstream.net:8080/live/30550113/30550113/21927.m3u8" }
+    ];
+
+    const player = videojs('player');
+    const playlistEl = document.getElementById('playlist');
+    const titleEl = document.getElementById('current-channel-title');
+
+    // Generar la lista de canales en el HTML
+    channels.forEach(ch => {
+        const item = document.createElement('div');
+        item.className = 'channel-item';
+        item.innerHTML = `
+            <img src="${ch.logo}" alt="${ch.name}">
+            <span class="channel-name">${ch.name}</span>
+        `;
+        item.onclick = () => {
+            player.src({ type: 'application/x-mpegURL', src: ch.url });
+            player.play();
+            titleEl.innerText = ch.name;
+        };
+        playlistEl.appendChild(item);
+    });
+</script>
+
 </body>
 </html>
