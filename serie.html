@@ -310,7 +310,7 @@
     const serieID = new URLSearchParams(window.location.search).get('id');
     let currentRating = 0;
     let _tituloActual = '', _posterActual = '';
-    let _sortMode = 'reciente', _allDocs = [], _listaIdActiva = null;
+    let _sortMode = 'reciente', _allDocs = [], _listaIdActiva = null, _writingLike = false;
     let serieData = null;
     let temporadaActiva = 1;
 
@@ -613,6 +613,7 @@
         _allDocs[localIdx] = { ..._allDocs[localIdx], data: { ...localData, reacciones: { ...localData.reacciones, like: newLikes }, misReacciones: newMisR } };
         renderComentarios();
 
+        _writingLike = true;
         try {
             const ref = window.doc(window.db,'comentarios',docId);
             const updates = {};
@@ -623,6 +624,8 @@
             _allDocs[localIdx] = { ..._allDocs[localIdx], data: localData };
             renderComentarios();
             console.error(e);
+        } finally {
+            setTimeout(() => { _writingLike = false; }, 1500);
         }
     };
 
@@ -631,7 +634,7 @@
         const q = window.query(window.collection(window.db,'comentarios'), window.where('movieID','==','tv-'+serieID), window.orderBy('fecha','desc'));
         window.onSnapshot(q, snapshot => {
             _allDocs = snapshot.docs.map(d => ({id:d.id,data:d.data()}));
-            renderComentarios();
+            if (!_writingLike) renderComentarios();
         });
     }
 
