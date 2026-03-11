@@ -110,17 +110,11 @@
                     <button onclick="abrirTrailer()" class="bg-zinc-800 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95">
                         <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6zM21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9 9-4.03 9-9zm-16.1 0c0-3.92 3.18-7.1 7.1-7.1s7.1 3.18 7.1 7.1-3.18 7.1-7.1 7.1-7.1-3.18-7.1-7.1z"/></svg> Trailer
                     </button>
-                    <button id="btnWatchlist" onclick="toggleWatchlist()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95" title="Mi Lista">
+                    <button id="btnWatchlist" onclick="toggleWatchlist()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
                     </button>
-                    <button id="btnLike" onclick="toggleLike()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95" title="Me gusta">
+                    <button id="btnLike" onclick="toggleLike()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-                    </button>
-                    <button onclick="abrirModalListas()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95" title="Mis Listas">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h10"/></svg>
-                    </button>
-                    <button onclick="compartirContenido()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95" title="Compartir">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
                     </button>
                 </div>
             </div>
@@ -153,17 +147,11 @@
                 <button onclick="abrirTrailer()" class="bg-white text-black px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-600 hover:text-white transition-all shadow-xl active:scale-95">
                     <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6zM21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9 9-4.03 9-9zm-16.1 0c0-3.92 3.18-7.1 7.1-7.1s7.1 3.18 7.1 7.1-3.18 7.1-7.1 7.1-7.1-3.18-7.1-7.1z"/></svg> VER TRAILER
                 </button>
-                <button id="btnWatchlistDesktop" onclick="toggleWatchlist()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95" title="Mi Lista">
+                <button id="btnWatchlistDesktop" onclick="toggleWatchlist()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
                 </button>
-                <button id="btnLikeDesktop" onclick="toggleLike()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95" title="Me gusta">
+                <button id="btnLikeDesktop" onclick="toggleLike()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-                </button>
-                <button onclick="abrirModalListas()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95" title="Mis Listas">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h10"/></svg>
-                </button>
-                <button onclick="compartirContenido()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95" title="Compartir">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
                 </button>
             </div>
         </div>
@@ -220,15 +208,9 @@
             <button onclick="publicarComentario()" class="w-full bg-red-600 py-3.5 rounded-2xl font-black hover:bg-red-700 transition tracking-widest uppercase text-sm shadow-xl active:scale-95">PUBLICAR</button>
         </div>
         <div>
-            <div class="flex items-center justify-between mb-5 gap-3 flex-wrap">
-                <h3 class="text-lg md:text-2xl font-bold flex items-center gap-2 md:gap-3">
-                    Opiniones <span class="text-[9px] md:text-[10px] bg-red-600 px-2 py-1 rounded text-white font-black uppercase">GLOBAL</span>
-                </h3>
-                <div class="flex bg-zinc-800/80 rounded-full p-0.5 shrink-0">
-                    <button id="sortBtn_reciente" onclick="setSortMode('reciente')" class="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-red-600 text-white transition-all">Recientes</button>
-                    <button id="sortBtn_populares" onclick="setSortMode('populares')" class="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full text-zinc-400 transition-all">Populares</button>
-                </div>
-            </div>
+            <h3 class="text-lg md:text-2xl font-bold mb-5 flex items-center gap-2 md:gap-3">
+                Opiniones <span class="text-[9px] md:text-[10px] bg-red-600 px-2 py-1 rounded text-white font-black uppercase">GLOBAL</span>
+            </h3>
             <div id="listaComentarios" class="space-y-3 md:space-y-4 max-h-[350px] md:max-h-[400px] overflow-y-auto no-scrollbar pr-1">
                 <p class="text-zinc-600 text-xs animate-pulse">Sincronizando...</p>
             </div>
@@ -259,58 +241,10 @@
     <div id="videoContainer" class="w-full max-w-5xl aspect-video rounded-xl md:rounded-3xl overflow-hidden shadow-2xl"></div>
 </div>
 
-<!-- MODAL LISTAS -->
-<div id="modalListas" class="fixed inset-0 z-[130] hidden items-end md:items-center justify-center bg-black/80 backdrop-blur-sm">
-    <div class="bg-zinc-900 border border-white/10 w-full max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl flex flex-col max-h-[85vh]">
-        <div class="flex items-center justify-between px-5 py-4 border-b border-white/5 shrink-0">
-            <h4 class="text-xs font-black uppercase tracking-widest" style="color:var(--accent-color,#dc2626)">Mis Listas</h4>
-            <button onclick="cerrarModalListas()" class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition">
-                <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
-        <div id="listaListasModal" class="overflow-y-auto no-scrollbar flex-1 p-4 space-y-2"></div>
-        <div class="p-4 border-t border-white/5 shrink-0">
-            <div class="flex gap-2">
-                <input id="inputNuevaLista" type="text" placeholder="Nueva lista..." maxlength="40"
-                    class="flex-1 bg-zinc-800 border border-zinc-700 focus:border-red-600 text-white text-sm rounded-xl px-3 py-2.5 outline-none transition">
-                <button onclick="crearNuevaLista()" class="bg-red-600 hover:bg-red-700 text-white font-black text-xs uppercase tracking-widest px-4 py-2.5 rounded-xl transition active:scale-95">Crear</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL COLABORADORES -->
-<div id="modalColabs" class="fixed inset-0 z-[140] hidden items-end md:items-center justify-center bg-black/80 backdrop-blur-sm">
-    <div class="bg-zinc-900 border border-white/10 w-full max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl flex flex-col max-h-[80vh]">
-        <div class="flex items-center justify-between px-5 py-4 border-b border-white/5 shrink-0">
-            <div>
-                <h4 class="text-xs font-black uppercase tracking-widest" style="color:var(--accent-color,#dc2626)">Colaboradores</h4>
-                <p id="collabListaNombre" class="text-[10px] text-zinc-500 mt-0.5 truncate max-w-[220px]"></p>
-            </div>
-            <button onclick="cerrarModalColabs()" class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition">
-                <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
-        <div id="listaColabs" class="overflow-y-auto no-scrollbar flex-1 p-4 space-y-2"></div>
-        <div class="p-4 border-t border-white/5 shrink-0">
-            <div class="flex gap-2">
-                <input id="inputInvitar" type="text" placeholder="Nombre de usuario..."
-                    class="flex-1 bg-zinc-800 border border-zinc-700 focus:border-red-600 text-white text-sm rounded-xl px-3 py-2.5 outline-none transition">
-                <button onclick="invitarColaborador()" class="bg-zinc-700 hover:bg-zinc-600 text-white font-black text-xs uppercase tracking-widest px-4 py-2.5 rounded-xl transition active:scale-95">Invitar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- TOAST -->
-<div id="toastMsg" class="fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-[500] pointer-events-none flex flex-col items-center gap-2"></div>
-
 <script type="module">
     const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
     const serieID = new URLSearchParams(window.location.search).get('id');
     let currentRating = 0;
-    let _tituloActual = '', _posterActual = '';
-    let _sortMode = 'reciente', _allDocs = [], _listaIdActiva = null, _writingLike = false;
     let serieData = null;
     let temporadaActiva = 1;
 
@@ -339,8 +273,6 @@
 
             document.getElementById('titulo').innerText = titulo;
             document.getElementById('tituloMobile').innerText = titulo;
-            _tituloActual = titulo;
-            _posterActual = serieData.poster_path ? `https://image.tmdb.org/t/p/w500${serieData.poster_path}` : '';
             document.getElementById('anio').innerText = anio;
             document.getElementById('anioMobile').innerText = anio;
             document.getElementById('voto').innerText = voto;
@@ -531,110 +463,35 @@
         }
     }
 
-    // ── TOAST ─────────────────────────────────────────────────
-    function toast(msg, ok=true) {
-        const t = document.getElementById('toastMsg');
-        const el = document.createElement('div');
-        el.className = `bg-zinc-900 border ${ok?'border-green-500/40':'border-red-500/40'} text-white text-xs font-black uppercase tracking-widest px-5 py-3 rounded-2xl shadow-2xl transition-all duration-300 opacity-0`;
-        el.innerText = msg;
-        t.appendChild(el);
-        requestAnimationFrame(() => { el.style.opacity = '1'; });
-        setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 2500);
-    }
-
-    // ── COMPARTIR ─────────────────────────────────────────────
-    window.compartirContenido = async function() {
-        const url = location.href, titulo = _tituloActual || 'Serie en MovieM';
-        if (navigator.share) { try { await navigator.share({ title: titulo, text: `Mirá "${titulo}" en MovieM`, url }); return; } catch(e) {} }
-        try { await navigator.clipboard.writeText(url); toast('¡Link copiado!'); } catch(e) { prompt('Copiá el link:', url); }
-    };
-
-    // ── SORT ──────────────────────────────────────────────────
-    window.setSortMode = function(modo) {
-        _sortMode = modo;
-        document.getElementById('sortBtn_reciente').className = `text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full transition-all ${modo==='reciente'?'bg-red-600 text-white':'text-zinc-400'}`;
-        document.getElementById('sortBtn_populares').className = `text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full transition-all ${modo==='populares'?'bg-red-600 text-white':'text-zinc-400'}`;
-        renderComentarios();
-    };
-
-    // ── COMENTARIOS CON REACCIONES ────────────────────────────
-    function totalLikes(r){ return (r && r['like']) || 0; }
-
-    function renderComentarios() {
-        const contenedor = document.getElementById('listaComentarios');
-        if (!_allDocs.length) { contenedor.innerHTML = '<p class="text-zinc-600 text-sm italic">Nadie comentó aún. ¡Sé el primero!</p>'; return; }
-        let sorted = [..._allDocs];
-        if (_sortMode === 'populares') sorted.sort((a,b) => totalLikes(b.data.reacciones) - totalLikes(a.data.reacciones));
-        contenedor.innerHTML = '';
-        sorted.forEach(item => {
-            const c = item.data, docId = item.id;
-            const fecha = c.fecha ? new Date(c.fecha).toLocaleString() : 'Reciente';
-            const likes = (c.reacciones && c.reacciones['like']) || 0;
-            const misR = c.misReacciones || {};
-            const yaLiked = miUID_serie ? !!misR[miUID_serie] : false;
-            const div = document.createElement('div');
-            div.className = 'bg-zinc-900/50 p-4 rounded-2xl border border-white/5 shadow-xl fade-in group/comment';
-            div.innerHTML = `
-                <div class="flex justify-between items-center mb-2 gap-2">
-                    <div class="flex flex-col gap-0.5">
-                        <span class="text-red-600 font-black text-xs uppercase tracking-widest">
-                            <a href="perfil.html?user=${encodeURIComponent(c.user)}" class="hover:underline">${c.user}</a>
-                        </span>
-                        <span class="text-[9px] text-zinc-600 font-bold uppercase">${fecha}</span>
-                    </div>
-                    <span class="text-yellow-500 text-[10px]">${"★".repeat(c.rating||0)}</span>
-                </div>
-                <p class="text-zinc-400 text-sm leading-relaxed mb-3">${c.txt}</p>
-                <button id="like-btn-${docId}" onclick="reaccionar('${docId}')"
-                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-all active:scale-95 select-none
-                    ${yaLiked?'bg-red-600/20 border-red-500/50 text-red-400':'bg-zinc-800/60 border-white/5 text-zinc-400 hover:border-white/20 hover:text-white'}">
-                    <svg class="w-3.5 h-3.5 ${yaLiked?'fill-red-400':'fill-none'}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
-                    </svg>
-                    ${likes > 0 ? `<span class="font-black tabular-nums">${likes}</span>` : ''}
-                </button>`;
-            contenedor.appendChild(div);
-        });
-    }
-
-    window.reaccionar = async function(docId) {
-        if (!miUID_serie) { toast('Iniciá sesión para reaccionar', false); return; }
-        const localIdx = _allDocs.findIndex(d => d.id === docId);
-        if (localIdx === -1) return;
-        const localData = _allDocs[localIdx].data;
-        const misR = localData.misReacciones || {};
-        const yaLiked = !!misR[miUID_serie];
-        const likesActuales = (localData.reacciones && localData.reacciones['like']) || 0;
-
-        // Optimistic update
-        const newMisR = { ...misR };
-        const newLikes = yaLiked ? Math.max(0, likesActuales - 1) : likesActuales + 1;
-        if (yaLiked) { delete newMisR[miUID_serie]; } else { newMisR[miUID_serie] = true; }
-        _allDocs[localIdx] = { ..._allDocs[localIdx], data: { ...localData, reacciones: { ...localData.reacciones, like: newLikes }, misReacciones: newMisR } };
-        renderComentarios();
-
-        _writingLike = true;
-        try {
-            const ref = window.doc(window.db,'comentarios',docId);
-            const updates = {};
-            updates['reacciones.like'] = yaLiked ? window.increment(-1) : window.increment(1);
-            updates[`misReacciones.${miUID_serie}`] = yaLiked ? window.deleteField() : true;
-            await window.updateDoc(ref, updates);
-        } catch(e) {
-            _allDocs[localIdx] = { ..._allDocs[localIdx], data: localData };
-            renderComentarios();
-            console.error(e);
-        } finally {
-            setTimeout(() => { _writingLike = false; }, 1500);
-        }
-    };
-
-    // ── COMENTARIOS ───────────────────────────────────────────
+    // ── COMENTARIOS ───────────────────────────────────────────────
     function escucharComentarios() {
-        const q = window.query(window.collection(window.db,'comentarios'), window.where('movieID','==','tv-'+serieID), window.orderBy('fecha','desc'));
+        const contenedor = document.getElementById('listaComentarios');
+        const q = window.query(
+            window.collection(window.db, 'comentarios'),
+            window.where('movieID', '==', 'tv-' + serieID),
+            window.orderBy('fecha', 'desc')
+        );
         window.onSnapshot(q, snapshot => {
-            _allDocs = snapshot.docs.map(d => ({id:d.id,data:d.data()}));
-            if (!_writingLike) renderComentarios();
+            contenedor.innerHTML = '';
+            if (snapshot.empty) {
+                contenedor.innerHTML = '<p class="text-zinc-600 text-sm italic">Nadie comentó aún. ¡Sé el primero!</p>';
+                return;
+            }
+            snapshot.forEach(d => {
+                const c = d.data();
+                const fecha = c.fecha ? new Date(c.fecha).toLocaleString() : 'Reciente';
+                contenedor.innerHTML += `
+                    <div class="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 shadow-xl fade-in mb-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-red-600 font-black text-xs uppercase tracking-widest">${c.user}</span>
+                                <span class="text-[9px] text-zinc-600 font-bold uppercase">${fecha}</span>
+                            </div>
+                            <span class="text-yellow-500 text-[10px]">${'★'.repeat(c.rating)}</span>
+                        </div>
+                        <p class="text-zinc-400 text-sm leading-relaxed">${c.txt}</p>
+                    </div>`;
+            });
         });
     }
 
@@ -644,53 +501,14 @@
         if (!userActual || userActual === 'undefined') return alert('Debes iniciar sesión para comentar.');
         if (!txt || currentRating === 0) return alert('Por favor escribí un comentario y seleccioná una valoración.');
         try {
-            await window.addDoc(window.collection(window.db,'comentarios'), {
-                movieID:'tv-'+serieID, user:userActual, txt, rating:currentRating,
-                fecha:Date.now(), reacciones:{}, misReacciones:{}
+            await window.addDoc(window.collection(window.db, 'comentarios'), {
+                movieID: 'tv-' + serieID,
+                user: userActual, txt, rating: currentRating, fecha: Date.now()
             });
             document.getElementById('comentarioTxt').value = '';
             window.setRating(0);
         } catch(e) { alert('Error al publicar.'); }
     };
-
-    // ── LISTAS ────────────────────────────────────────────────
-    window.abrirModalListas = async function() {
-        if (!miUID_serie) { toast('Iniciá sesión para usar listas', false); return; }
-        document.getElementById('modalListas').classList.remove('hidden'); document.getElementById('modalListas').classList.add('flex');
-        document.body.style.overflow = 'hidden'; await renderListas();
-    };
-    window.cerrarModalListas = function() {
-        document.getElementById('modalListas').classList.add('hidden'); document.getElementById('modalListas').classList.remove('flex'); document.body.style.overflow = '';
-    };
-    document.getElementById('modalListas').addEventListener('click', e=>{if(e.target===e.currentTarget)window.cerrarModalListas();});
-
-    async function renderListas() {
-        const cont=document.getElementById('listaListasModal');
-        cont.innerHTML='<p class="text-zinc-600 text-xs text-center py-6 animate-pulse">Cargando...</p>';
-        try {
-            const [s1,s2]=await Promise.all([window.getDocs(window.query(window.collection(window.db,'listas'),window.where('ownerUID','==',miUID_serie))),window.getDocs(window.query(window.collection(window.db,'listas'),window.where('colaboradores','array-contains',miUID_serie)))]);
-            const listas=[]; s1.forEach(d=>listas.push({id:d.id,...d.data(),esPropia:true})); s2.forEach(d=>{if(!listas.find(l=>l.id===d.id))listas.push({id:d.id,...d.data(),esPropia:false});});
-            if(!listas.length){cont.innerHTML='<p class="text-zinc-600 text-xs text-center py-6 italic">No tenés listas. ¡Creá una abajo!</p>';return;}
-            cont.innerHTML='';
-            listas.forEach(lista=>{
-                const items=lista.items||[],enLista=items.some(it=>it.id===serieID&&it.tipo==='serie');
-                const div=document.createElement('div'); div.className='flex items-center gap-3 p-3 rounded-2xl bg-zinc-800/40 border border-white/5 hover:border-white/10 transition';
-                div.innerHTML=`<div class="flex-1 min-w-0"><p class="text-sm font-black uppercase tracking-tight truncate">${lista.nombre}</p><p class="text-[9px] text-zinc-500 font-bold mt-0.5">${items.length} ítem${items.length!==1?'s':''} · ${lista.esPropia?'Tuya':'Colaborativa'}</p></div><div class="flex items-center gap-2 shrink-0">${lista.esPropia?`<button onclick="abrirColabs('${lista.id}','${lista.nombre.replace(/'/g,'\\'')}')" title="Colaboradores" class="w-7 h-7 rounded-full bg-zinc-700 hover:bg-zinc-600 flex items-center justify-center transition"><svg class="w-3.5 h-3.5 text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>`:''}<button onclick="toggleItemLista('${lista.id}',${enLista})" class="px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition active:scale-95 ${enLista?'bg-red-600 text-white hover:bg-red-700':'bg-zinc-700 text-zinc-300 hover:bg-red-600 hover:text-white'}">${enLista?'✓ Agregado':'+ Agregar'}</button></div>`;
-                cont.appendChild(div);
-            });
-        } catch(e){cont.innerHTML='<p class="text-red-500 text-xs text-center py-4">Error.</p>';}
-    }
-
-    window.crearNuevaLista=async function(){const nombre=document.getElementById('inputNuevaLista').value.trim();if(!nombre)return;try{await window.addDoc(window.collection(window.db,'listas'),{nombre,ownerUID:miUID_serie,items:[],colaboradores:[],fecha:Date.now()});document.getElementById('inputNuevaLista').value='';toast('¡Lista creada!');await renderListas();}catch(e){toast('Error al crear',false);}};
-    window.toggleItemLista=async function(listaId,enLista){try{const ref=window.doc(window.db,'listas',listaId),snap=await window.getDoc(ref);if(!snap.exists())return;let items=[...(snap.data().items||[])];if(enLista){items=items.filter(it=>!(it.id===serieID&&it.tipo==='serie'));}else{items.push({id:serieID,tipo:'serie',titulo:_tituloActual,poster:_posterActual,fecha:Date.now()});}await window.setDoc(ref,{items},{merge:true});toast(enLista?'Quitado de la lista':'¡Agregado!');await renderListas();}catch(e){toast('Error',false);}};
-
-    // ── COLABORADORES ─────────────────────────────────────────
-    window.abrirColabs=async function(listaId,nombre){_listaIdActiva=listaId;document.getElementById('collabListaNombre').innerText=nombre;document.getElementById('modalColabs').classList.remove('hidden');document.getElementById('modalColabs').classList.add('flex');await renderColabs();};
-    window.cerrarModalColabs=function(){document.getElementById('modalColabs').classList.add('hidden');document.getElementById('modalColabs').classList.remove('flex');};
-    document.getElementById('modalColabs').addEventListener('click',e=>{if(e.target===e.currentTarget)window.cerrarModalColabs();});
-    async function renderColabs(){const cont=document.getElementById('listaColabs');cont.innerHTML='<p class="text-zinc-600 text-xs text-center py-4 animate-pulse">Cargando...</p>';try{const snap=await window.getDoc(window.doc(window.db,'listas',_listaIdActiva));const uids=snap.exists()?(snap.data().colaboradores||[]):[];if(!uids.length){cont.innerHTML='<p class="text-zinc-600 text-xs text-center py-4 italic">Sin colaboradores.</p>';return;}cont.innerHTML='';for(const uid of uids){const u=await window.getDoc(window.doc(window.db,'usuarios',uid));const ud=u.exists()?u.data():{},nombre=ud.username||uid;const div=document.createElement('div');div.className='flex items-center justify-between gap-3 p-3 rounded-2xl bg-zinc-800/40';div.innerHTML=`<div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center font-black text-xs text-white overflow-hidden shrink-0">${ud.avatar?`<img src="${ud.avatar}" class="w-full h-full object-cover">`:nombre.charAt(0).toUpperCase()}</div><span class="text-sm font-bold">${nombre}</span></div><button onclick="quitarColab('${uid}')" class="text-[9px] text-zinc-500 hover:text-red-400 font-bold uppercase transition">Quitar</button>`;cont.appendChild(div);}}catch(e){cont.innerHTML='<p class="text-red-500 text-xs text-center py-4">Error.</p>';}}
-    window.invitarColaborador=async function(){const username=document.getElementById('inputInvitar').value.trim();if(!username||!_listaIdActiva)return;try{const snap=await window.getDocs(window.query(window.collection(window.db,'usuarios'),window.where('username','==',username)));if(snap.empty){toast('Usuario no encontrado',false);return;}let uid='';snap.forEach(d=>uid=d.id);if(uid===miUID_serie){toast('Eres el dueño',false);return;}await window.setDoc(window.doc(window.db,'listas',_listaIdActiva),{colaboradores:window.arrayUnion(uid)},{merge:true});document.getElementById('inputInvitar').value='';toast('¡Colaborador agregado!');await renderColabs();}catch(e){toast('Error al invitar',false);}};
-    window.quitarColab=async function(uid){if(!_listaIdActiva)return;await window.setDoc(window.doc(window.db,'listas',_listaIdActiva),{colaboradores:window.arrayRemove(uid)},{merge:true});toast('Colaborador quitado');await renderColabs();};
 
     // ── WATCHLIST / LIKE ──────────────────────────────────────────
     let miUID_serie = null;
@@ -730,9 +548,7 @@
         } catch(e) { console.error(e); }
     };
 
-    window.onAuthStateChanged(window.auth, user => {
-        if (user) { miUID_serie = user.uid; checkStatus(); }
-    });
+    // ── AUTH manejado en waitForFirebase ─────────────────────────
 
     // ── MODAL ACTORES ─────────────────────────────────────────────
     window.verActor = async (id) => {
@@ -788,7 +604,20 @@
         document.querySelectorAll('.star').forEach((s, i) => { s.style.color = i < n ? '#eab308' : '#3f3f46'; });
     };
 
-    cargarPagina();
+    function waitForFirebase(cb, tries) {
+        tries = tries || 0;
+        if (window.db && window.onAuthStateChanged && window.auth) {
+            window.onAuthStateChanged(window.auth, user => {
+                if (user) { miUID_serie = user.uid; checkStatus(); }
+            });
+            cb();
+        } else if (tries < 50) {
+            setTimeout(() => waitForFirebase(cb, tries + 1), 100);
+        } else {
+            console.error('Firebase no cargó');
+        }
+    }
+    waitForFirebase(cargarPagina);
 </script>
 </body>
 </html>
