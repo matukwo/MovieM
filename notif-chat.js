@@ -234,17 +234,23 @@ async function cargarNotifs() {
             const div = document.createElement('div');
             div.className = 'mmni' + (n.leida ? '' : ' unread');
             let ico = '';
-            if (n.tipo === 'seguidor' || n.tipo === 'mensaje') {
+            let texto = '';
+            if (n.tipo === 'mensaje') {
                 ico = avEl(n.deAvatar, n.deUsername, 38);
+                texto = `<strong>${esc(n.deUsername)}</strong> te envió un mensaje`;
+            } else if (n.tipo === 'seguidor') {
+                ico = avEl(n.deAvatar, n.deUsername, 38);
+                texto = `<strong>${esc(n.deUsername)}</strong> empezó a seguirte`;
             } else {
                 ico = `<div style="width:38px;height:38px;border-radius:50%;background:var(--accent-color,#dc2626);display:flex;align-items:center;justify-content:center;flex-shrink:0">📢</div>`;
+                texto = esc(n.texto || '');
             }
             div.innerHTML = ico + `<div style="flex:1;min-width:0">
-                <p style="font-size:12px;font-weight:700;color:#e4e4e7;line-height:1.4">${esc(n.texto||'')}</p>
+                <p style="font-size:12px;font-weight:700;color:#e4e4e7;line-height:1.4">${texto}</p>
                 <p style="font-size:10px;color:#52525b;margin-top:2px">${ago(n.fecha)}</p>
             </div>`;
             if (n.tipo === 'seguidor') div.addEventListener('click', () => location.href = 'perfil.html?user=' + encodeURIComponent(n.deUsername));
-            if (n.tipo === 'mensaje')  div.addEventListener('click', () => abrirChat(n.de, n.deUsername, n.deAvatar||''));
+            if (n.tipo === 'mensaje')  div.addEventListener('click', () => { tab('c'); abrirChat(n.de, n.deUsername, n.deAvatar||''); });
             el.appendChild(div);
         });
     } catch(e) {
@@ -266,16 +272,9 @@ function cargarChats() {
     const el = document.getElementById('mm-ll');
     el.innerHTML = '<p style="color:#52525b;font-size:11px;text-align:center;padding:40px 0;font-style:italic">Cargando...</p>';
     if (unsubL) { unsubL(); unsubL = null; }
-
-    // Query simple sin orderBy para evitar requerir índice compuesto
     const q = query(collection(db,'chats'), where('participantes','array-contains',miUID), limit(30));
     unsubL = onSnapshot(q, snap => {
-        if (snap.empty) {
-            el.innerHTML = '<p style="color:#52525b;font-size:11px;text-align:center;padding:40px 16px;font-style:italic">Sin conversaciones.<br><span style="font-size:10px">Visitá un perfil → Mensaje.</span></p>';
-            return;
-        }
-
-        // Ordenar localmente por ultimaFecha desc
+        if (snap.empty) { el.innerHTML = '<p style="color:#52525b;font-size:11px;text-align:center;padding:40px 16px;font-style:italic">Sin conversaciones.<br><span style="font-size:10px">Visitá un perfil → Mensaje.</span></p>'; return; }
         const docs = [];
         snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
         docs.sort((a, b) => {
@@ -283,39 +282,31 @@ function cargarChats() {
             const fb = b.ultimaFecha?.toMillis?.() || b.ultimaFecha || 0;
             return fb - fa;
         });
-
         el.innerHTML = '';
         docs.forEach(c => {
             const otro = (c.participantes||[]).find(u => u !== miUID) || '';
             const nom  = (c.usernames||{})[otro] || 'Usuario';
             const src  = (c.avatars||{})[otro] || '';
             const nl   = (c.noLeidos||{})[miUID] || 0;
-            const ultimo = c.ultimoMensaje || '';
-            const fecha  = ago(c.ultimaFecha);
-
-            const div = document.createElement('div');
+            const div  = document.createElement('div');
             div.className = 'mmci';
-            div.style.cssText = 'border-bottom:1px solid rgba(255,255,255,.04)';
+            div.style.borderBottom = '1px solid rgba(255,255,255,.04)';
             div.innerHTML = `
                 <div style="position:relative;flex-shrink:0">
-                    ${avEl(src, nom, 44)}
+                    ${avEl(src, nom, 42)}
                     ${nl > 0 ? `<span style="position:absolute;bottom:-2px;right:-2px;background:var(--accent-color,#dc2626);color:#fff;font-size:8px;font-weight:900;border-radius:999px;min-width:15px;height:15px;display:flex;align-items:center;justify-content:center;padding:0 3px">${nl}</span>` : ''}
                 </div>
                 <div style="flex:1;min-width:0;margin-left:10px">
-                    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:6px">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:6px">
                         <p style="font-size:12px;font-weight:${nl>0?900:700};color:${nl>0?'#fff':'#a1a1aa'};text-transform:uppercase;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(nom)}</p>
-                        <span style="font-size:9px;color:#3f3f46;flex-shrink:0">${fecha}</span>
+                        <span style="font-size:9px;color:#3f3f46;flex-shrink:0">${ago(c.ultimaFecha)}</span>
                     </div>
-                    <p style="font-size:11px;color:${nl>0?'#a1a1aa':'#52525b'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:${nl>0?700:400};margin-top:2px">${esc(ultimo) || '<span style="font-style:italic">Iniciar conversación</span>'}</p>
+                    <p style="font-size:11px;color:${nl>0?'#a1a1aa':'#52525b'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px">${esc(c.ultimoMensaje||'')}</p>
                 </div>`;
             div.addEventListener('click', () => abrirChat(otro, nom, src));
             el.appendChild(div);
         });
-    }, err => {
-        console.error('cargarChats error:', err);
-        // Si falla por índice faltante, intentar sin filtros
-        el.innerHTML = '<p style="color:#52525b;font-size:11px;text-align:center;padding:40px 0">Error al cargar chats.<br><span style="font-size:10px;color:#3f3f46">' + (err.code || err.message) + '</span></p>';
-    });
+    }, err => { el.innerHTML = '<p style="color:#52525b;font-size:11px;text-align:center;padding:40px 0">Error: ' + (err.code||err.message) + '</p>'; console.error(err); });
 }
 
 // ── Abrir chat ────────────────────────────────────────────────────────
