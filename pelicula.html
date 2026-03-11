@@ -265,6 +265,7 @@
         let _sortMode = 'reciente';
         let _allDocs = [];
         let _listaIdActiva = null;
+        let _writingLike = false;
 
         const ADMIN_UID = '41XWZR8OzwdpMHf54UIQEzAEt7s1';
         const VERIFIED_USERS = [];
@@ -361,8 +362,6 @@
 
         window.reaccionar = async function(docId) {
             if (!miUID_pelicula) { toast('Iniciá sesión para reaccionar', false); return; }
-
-            // Buscar doc local
             const localIdx = _allDocs.findIndex(d => d.id === docId);
             if (localIdx === -1) return;
             const localData = _allDocs[localIdx].data;
@@ -370,7 +369,7 @@
             const yaLiked = !!misR[miUID_pelicula];
             const likesActuales = (localData.reacciones && localData.reacciones['like']) || 0;
 
-            // Optimistic update — modificar local inmediatamente
+            // Optimistic update local
             const newMisR = { ...misR };
             const newLikes = yaLiked ? Math.max(0, likesActuales - 1) : likesActuales + 1;
             if (yaLiked) { delete newMisR[miUID_pelicula]; } else { newMisR[miUID_pelicula] = true; }
@@ -380,7 +379,9 @@
             };
             renderComentarios();
 
-            // Escribir a Firestore con FieldValue.increment y dot notation
+            // Bloquear re-render del snapshot mientras escribimos
+            _writingLike = true;
+
             try {
                 const ref = window.doc(window.db, 'comentarios', docId);
                 const updates = {};
@@ -388,10 +389,12 @@
                 updates[`misReacciones.${miUID_pelicula}`] = yaLiked ? window.deleteField() : true;
                 await window.updateDoc(ref, updates);
             } catch(e) {
-                // Revertir optimistic update en caso de error
                 _allDocs[localIdx] = { ..._allDocs[localIdx], data: localData };
                 renderComentarios();
                 console.error(e);
+            } finally {
+                // Desbloquear después de que el snapshot local ya pasó
+                setTimeout(() => { _writingLike = false; }, 1500);
             }
         };
 
@@ -417,7 +420,7 @@
                     } catch(e) {}
                 }
                 _allDocs = snapshot.docs.map(d => ({ id: d.id, data: d.data(), uid: uidMap[d.data().user]||'' }));
-                renderComentarios();
+                if (!_writingLike) renderComentarios();
             });
         }
 
