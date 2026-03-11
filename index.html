@@ -89,6 +89,9 @@
     <div id="modalCard" class="relative bg-zinc-900 border border-white/10 w-full md:w-80 rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto no-scrollbar">
         <div class="h-1.5 w-full bg-accent"></div>
         <div class="md:hidden w-12 h-1 bg-zinc-700 rounded-full mx-auto mt-3"></div>
+        <button onclick="cerrarModal()" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition z-10">
+            <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
         <div class="p-6 md:p-8">
             <div id="contenidoLogin">
                 <h3 id="modalTitulo" class="text-xl font-black italic uppercase tracking-tighter mb-1">Bienvenido</h3>
@@ -106,84 +109,23 @@
                     </p>
                 </div>
             </div>
-            <div id="perfilActivo" class="hidden">
-                <!-- Hero banner con avatar -->
-                <div class="relative -mx-6 md:-mx-8 -mt-6 md:-mt-8 mb-0">
-                    <!-- Fondo degradado con color acento -->
-                    <div class="h-24 w-full relative overflow-hidden" id="perfilBanner">
-                        <div class="absolute inset-0" style="background:linear-gradient(135deg,var(--accent-color,#dc2626)22 0%,#18181b 100%)"></div>
-                        <div class="absolute inset-0 opacity-10" style="background-image:repeating-linear-gradient(45deg,#ffffff 0,#ffffff 1px,transparent 0,transparent 50%);background-size:12px 12px"></div>
-                        <!-- Botón cerrar -->
-                        <button onclick="cerrarModal()" class="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full bg-black/30 hover:bg-black/60 transition text-white/70 hover:text-white">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                        </button>
-                    </div>
-                    <!-- Avatar flotante -->
-                    <div class="flex justify-center -mt-10 mb-3 relative z-10">
-                        <div class="relative">
-                            <div class="absolute -inset-1 rounded-full blur-md opacity-40" style="background:var(--accent-color,#dc2626)"></div>
-                            <div id="avatarCirculo" class="relative w-20 h-20 bg-zinc-800 border-3 rounded-full flex items-center justify-center text-3xl font-black shadow-2xl text-white overflow-hidden" style="border:3px solid var(--accent-color,#dc2626)"><span id="inicialUsuario">M</span></div>
-                            <!-- Badge online -->
-                            <div class="absolute bottom-0.5 right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-zinc-900 shadow"></div>
-                        </div>
-                    </div>
-                    <!-- Nombre -->
-                    <div class="text-center px-6 pb-4">
-                        <p class="text-white font-black uppercase tracking-tighter text-xl leading-none" id="saludoUsuario">Usuario</p>
-                        <p class="text-[10px] font-bold uppercase tracking-widest mt-1" style="color:var(--accent-color,#dc2626)">Miembro activo</p>
+            <div id="perfilActivo" class="hidden text-center">
+                <div class="relative w-20 h-20 mx-auto mb-4">
+                    <div class="absolute inset-0 bg-accent rounded-full blur-md opacity-20"></div>
+                    <div id="avatarCirculo" class="relative w-20 h-20 bg-zinc-800 border-2 border-accent rounded-full flex items-center justify-center text-3xl font-black shadow-2xl text-white overflow-hidden"><span id="inicialUsuario">M</span></div>
+                </div>
+                <p class="text-zinc-200 font-black uppercase tracking-tighter text-lg mb-1" id="saludoUsuario">Hola</p>
+                <button onclick="location.href='perfil.html'" class="w-full mt-4 bg-zinc-800/50 hover:bg-accent text-white text-[10px] font-bold py-3 rounded-xl uppercase tracking-widest transition border border-white/5">Mi Perfil</button>
+                <div class="mt-5 border-t border-white/5 pt-4">
+                    <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mb-3">Color de Acento</p>
+                    <div class="flex gap-3 justify-center">
+                        <div onclick="cambiarColor('#dc2626')" class="w-7 h-7 rounded-full bg-red-600 cursor-pointer hover:scale-110 transition"></div>
+                        <div onclick="cambiarColor('#2563eb')" class="w-7 h-7 rounded-full bg-blue-600 cursor-pointer hover:scale-110 transition"></div>
+                        <div onclick="cambiarColor('#16a34a')" class="w-7 h-7 rounded-full bg-green-600 cursor-pointer hover:scale-110 transition"></div>
+                        <div onclick="cambiarColor('#9333ea')" class="w-7 h-7 rounded-full bg-purple-600 cursor-pointer hover:scale-110 transition"></div>
                     </div>
                 </div>
-
-                <!-- Accesos rápidos -->
-                <div class="grid grid-cols-2 gap-2 px-1 mb-4">
-                    <button onclick="location.href='perfil.html'" class="flex flex-col items-center gap-1.5 bg-zinc-800/60 hover:bg-zinc-700/60 border border-white/5 hover:border-white/15 rounded-2xl py-3.5 transition group">
-                        <svg class="w-5 h-5 text-zinc-400 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                        <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 group-hover:text-white transition">Mi Perfil</span>
-                    </button>
-                    <button onclick="location.href='mi_lista.html'" class="flex flex-col items-center gap-1.5 bg-zinc-800/60 hover:bg-zinc-700/60 border border-white/5 hover:border-white/15 rounded-2xl py-3.5 transition group">
-                        <svg class="w-5 h-5 text-zinc-400 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
-                        <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 group-hover:text-white transition">Mi Lista</span>
-                    </button>
-                    <button onclick="location.href='membresias.html'" class="flex flex-col items-center gap-1.5 bg-zinc-800/60 hover:bg-zinc-700/60 border border-white/5 hover:border-white/15 rounded-2xl py-3.5 transition group">
-                        <svg class="w-5 h-5 text-zinc-400 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3l14 9-14 9V3z"/></svg>
-                        <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 group-hover:text-white transition">Membresía</span>
-                    </button>
-                    <button onclick="location.href='buscar.html'" class="flex flex-col items-center gap-1.5 bg-zinc-800/60 hover:bg-zinc-700/60 border border-white/5 hover:border-white/15 rounded-2xl py-3.5 transition group">
-                        <svg class="w-5 h-5 text-zinc-400 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        <span class="text-[9px] font-black uppercase tracking-widest text-zinc-400 group-hover:text-white transition">Buscar</span>
-                    </button>
-                </div>
-
-                <!-- Color de acento -->
-                <div class="bg-zinc-800/40 border border-white/5 rounded-2xl px-4 py-3.5 mb-3">
-                    <p class="text-[9px] text-zinc-500 font-black uppercase tracking-widest mb-3">Color de Acento</p>
-                    <div class="flex gap-2.5 items-center">
-                        <button onclick="cambiarColor('#dc2626')" title="Rojo" class="relative w-8 h-8 rounded-full bg-red-600 hover:scale-110 transition shadow-lg focus:outline-none" id="colorRojo">
-                            <span class="color-check absolute inset-0 flex items-center justify-center text-white opacity-0 transition">✓</span>
-                        </button>
-                        <button onclick="cambiarColor('#2563eb')" title="Azul" class="relative w-8 h-8 rounded-full bg-blue-600 hover:scale-110 transition shadow-lg focus:outline-none" id="colorAzul">
-                            <span class="color-check absolute inset-0 flex items-center justify-center text-white opacity-0 transition">✓</span>
-                        </button>
-                        <button onclick="cambiarColor('#16a34a')" title="Verde" class="relative w-8 h-8 rounded-full bg-green-600 hover:scale-110 transition shadow-lg focus:outline-none" id="colorVerde">
-                            <span class="color-check absolute inset-0 flex items-center justify-center text-white opacity-0 transition">✓</span>
-                        </button>
-                        <button onclick="cambiarColor('#9333ea')" title="Morado" class="relative w-8 h-8 rounded-full bg-purple-600 hover:scale-110 transition shadow-lg focus:outline-none" id="colorMorado">
-                            <span class="color-check absolute inset-0 flex items-center justify-center text-white opacity-0 transition">✓</span>
-                        </button>
-                        <button onclick="cambiarColor('#f59e0b')" title="Dorado" class="relative w-8 h-8 rounded-full bg-amber-500 hover:scale-110 transition shadow-lg focus:outline-none" id="colorDorado">
-                            <span class="color-check absolute inset-0 flex items-center justify-center text-white opacity-0 transition">✓</span>
-                        </button>
-                        <button onclick="cambiarColor('#ec4899')" title="Rosa" class="relative w-8 h-8 rounded-full bg-pink-500 hover:scale-110 transition shadow-lg focus:outline-none" id="colorRosa">
-                            <span class="color-check absolute inset-0 flex items-center justify-center text-white opacity-0 transition">✓</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Cerrar sesión -->
-                <button onclick="cerrarSesion()" class="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-zinc-800 hover:border-red-600/40 hover:bg-red-600/10 text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-red-400 transition group">
-                    <svg class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                    Cerrar Sesión
-                </button>
+                <button onclick="cerrarSesion()" class="w-full mt-5 py-3 rounded-xl border border-zinc-800 text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition">Cerrar Sesion</button>
             </div>
         </div>
     </div>
@@ -239,6 +181,18 @@
             <div class="relative"><div id="random" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div></div>
             <button onclick="scrollFila('random',400)" class="absolute right-2 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
         </section>
+        <section class="mb-10 relative group">
+            <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 text-zinc-100">Series en Tendencia</h2>
+            <button onclick="scrollFila('seriesTendencia',-400)" class="absolute left-0 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <div class="relative"><div id="seriesTendencia" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div></div>
+            <button onclick="scrollFila('seriesTendencia',400)" class="absolute right-2 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
+        </section>
+        <section class="mb-10 relative group">
+            <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 text-zinc-100">Series Mejor Valoradas</h2>
+            <button onclick="scrollFila('seriesTop',-400)" class="absolute left-0 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <div class="relative"><div id="seriesTop" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div></div>
+            <button onclick="scrollFila('seriesTop',400)" class="absolute right-2 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
+        </section>
     </div>
 </main>
 
@@ -249,10 +203,6 @@
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
             <span class="text-[9px] font-black uppercase tracking-widest">Inicio</span>
         </a>
-        <a href="mi_lista.html" class="flex flex-col items-center gap-1 text-zinc-500">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
-            <span class="text-[9px] font-black uppercase tracking-widest">Mi Lista</span>
-        </a>
         <a href="series.html" class="flex flex-col items-center gap-1 text-zinc-500">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.361a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
             <span class="text-[9px] font-black uppercase tracking-widest">Series</span>
@@ -261,16 +211,12 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             <span class="text-[9px] font-black uppercase tracking-widest">Buscar</span>
         </a>
-        <a href="tv.html" class="flex flex-col items-center gap-1 text-zinc-500">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            <span class="text-[9px] font-black uppercase tracking-widest">TV</span>
-        </a>
-        <button id="btnUsuarioMobileNav" class="flex flex-col items-center gap-1 text-zinc-500">
+        <a href="perfil.html" id="btnUsuarioMobileNav" class="flex flex-col items-center gap-1 text-zinc-500">
             <span id="navAvatarBottomNav" class="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center overflow-hidden">
                 <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
             </span>
-            <span class="text-[9px] font-black uppercase tracking-widest">Cuenta</span>
-        </button>
+            <span class="text-[9px] font-black uppercase tracking-widest">Perfil</span>
+        </a>
     </div>
 </nav>
 
@@ -291,23 +237,11 @@ window.notificar=function(msg,tipo){
   c.appendChild(t);setTimeout(function(){t.classList.remove('translate-x-10','opacity-0');},100);
   setTimeout(function(){t.classList.add('translate-x-10','opacity-0');setTimeout(function(){t.remove();},500);},3000);
 };
-window.cambiarColor=function(hex){
-  document.documentElement.style.setProperty('--accent-color',hex);
-  localStorage.setItem('movieM_color',hex);
-  notificar('Color actualizado');
-  // Actualizar banner
-  var banner=document.getElementById('perfilBanner');
-  if(banner) banner.querySelector('.absolute').style.background='linear-gradient(135deg,'+hex+'22 0%,#18181b 100%)';
-  // Marcar color activo
-  var colorMap={'#dc2626':'colorRojo','#2563eb':'colorAzul','#16a34a':'colorVerde','#9333ea':'colorMorado','#f59e0b':'colorDorado','#ec4899':'colorRosa'};
-  Object.values(colorMap).forEach(function(id){var el=document.getElementById(id);if(el){el.style.ring='none';el.style.outline='none';var ck=el.querySelector('.color-check');if(ck)ck.style.opacity='0';}});
-  var activeId=colorMap[hex];
-  if(activeId){var el=document.getElementById(activeId);if(el){el.style.outline='2px solid white';el.style.outlineOffset='2px';var ck=el.querySelector('.color-check');if(ck)ck.style.opacity='1';}}
-};
+window.cambiarColor=function(hex){document.documentElement.style.setProperty('--accent-color',hex);localStorage.setItem('movieM_color',hex);notificar('Color actualizado');};
 
 function abrirModal(){var m=document.getElementById('modalLogin');m.classList.remove('hidden');m.classList.add('flex');}
 function cerrarModal(){var m=document.getElementById('modalLogin');m.classList.add('hidden');m.classList.remove('flex');}
-['btnUsuario','btnUsuarioMobile','btnUsuarioMobileNav'].forEach(function(id){
+['btnUsuario','btnUsuarioMobile'].forEach(function(id){
   var el=document.getElementById(id);if(el)el.onclick=function(){document.getElementById('modalLogin').classList.contains('hidden')?abrirModal():cerrarModal();};
 });
 document.getElementById('modalLoginOverlay').onclick=cerrarModal;
@@ -340,21 +274,14 @@ function setAvatarUI(nombre,avatarSrc){
   document.getElementById('perfilActivo').classList.remove('hidden');
   document.getElementById('saludoUsuario').innerText=nombre;
   var letra=nombre.charAt(0).toUpperCase();
-  var av=avatarSrc?'<img src="'+avatarSrc+'" class="w-full h-full object-cover">':'<span class="text-2xl font-black text-white">'+letra+'</span>';
+  var av=avatarSrc?'<img src="'+avatarSrc+'" class="w-full h-full object-cover">':'<span class="text-xs font-black text-white">'+letra+'</span>';
   document.getElementById('navAvatarInner').innerHTML=av;
-  document.getElementById('avatarCirculo').innerHTML=avatarSrc?'<img src="'+avatarSrc+'" class="w-full h-full object-cover">':'<span class="text-2xl font-black">'+letra+'</span>';
+  document.getElementById('avatarCirculo').innerHTML=avatarSrc?'<img src="'+avatarSrc+'" class="w-full h-full object-cover">':'<span>'+letra+'</span>';
   document.getElementById('navAvatarInnerMobile').innerHTML=av;
   if(!avatarSrc){document.getElementById('btnUsuario').style.backgroundColor='var(--accent-color,#dc2626)';document.getElementById('btnUsuarioMobile').style.backgroundColor='var(--accent-color,#dc2626)';}
   var bn=document.getElementById('navAvatarBottomNav');
   bn.innerHTML=avatarSrc?'<img src="'+avatarSrc+'" class="w-full h-full object-cover rounded-full">':'<span class="text-[10px] font-black text-white">'+letra+'</span>';
   if(!avatarSrc)bn.style.backgroundColor='var(--accent-color,#dc2626)';
-  // Marcar color activo al abrir perfil
-  var hex=localStorage.getItem('movieM_color')||'#dc2626';
-  var colorMap={'#dc2626':'colorRojo','#2563eb':'colorAzul','#16a34a':'colorVerde','#9333ea':'colorMorado','#f59e0b':'colorDorado','#ec4899':'colorRosa'};
-  setTimeout(function(){
-    var activeId=colorMap[hex];
-    if(activeId){var el=document.getElementById(activeId);if(el){el.style.outline='2px solid white';el.style.outlineOffset='2px';var ck=el.querySelector('.color-check');if(ck)ck.style.opacity='1';}}
-  },50);
 }
 
 window.cerrarSesion=async function(){await signOut(auth);notificar('Sesion cerrada');setTimeout(function(){location.reload();},1000);};
@@ -508,6 +435,38 @@ cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&p
 cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&with_genres=27,53&sort_by=popularity.desc&language=es-ES','terror');
 // Sorprendeme — página aleatoria de discover
 (function(){var p=Math.floor(Math.random()*15)+1;cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&sort_by=vote_average.desc&vote_count.gte=1000&page='+p+'&language=es-ES','random');})();
+
+// ── Series ────────────────────────────────────────────────────────────────────
+async function cargarSeccionSeries(url, id) {
+  try {
+    var r = await fetch(url), d = await r.json(), c = document.getElementById(id);
+    if (d.results) d.results.forEach(function(s) { c.appendChild(crearCardSerie(s)); });
+  } catch(e) { console.error(e); }
+}
+function crearCardSerie(serie) {
+  var puntaje = serie.vote_average ? serie.vote_average.toFixed(1) : 'S/R';
+  var anio = (serie.first_air_date||'').split('-')[0]||'';
+  var poster = serie.poster_path ? BASE+serie.poster_path : 'https://via.placeholder.com/500x750?text=?';
+  var card = document.createElement('div');
+  card.className = 'min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2';
+  var inner = document.createElement('div'); inner.className = 'relative aspect-[2/3]';
+  var skDiv = document.createElement('div'); skDiv.className = 'absolute inset-0 rounded-xl skeleton';
+  var img = document.createElement('img'); img.src = poster;
+  img.className = 'absolute inset-0 w-full h-full object-cover rounded-xl shadow-lg mb-1 border border-white/5 z-10';
+  img.loading = 'lazy';
+  img.onload = function() { skDiv.style.display = 'none'; };
+  img.onclick = function() { location.href = 'serie.html?id='+serie.id; };
+  var badge = document.createElement('div');
+  badge.className = 'absolute top-1.5 right-1.5 flex flex-col items-end gap-1 z-20';
+  badge.innerHTML = '<div class="bg-black/80 text-yellow-500 text-[9px] font-black px-1.5 py-0.5 rounded-lg">⭐ '+puntaje+'</div>'
+    + (anio ? '<div class="bg-black/80 text-zinc-300 text-[9px] font-black px-1.5 py-0.5 rounded-lg">'+anio+'</div>' : '')
+    + '<div class="bg-accent/80 text-white text-[7px] font-black px-1.5 py-0.5 rounded-lg uppercase">Serie</div>';
+  inner.appendChild(skDiv); inner.appendChild(img); inner.appendChild(badge);
+  var title = document.createElement('p'); title.className = 'text-[9px] md:text-[10px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 mt-2'; title.textContent = serie.name;
+  card.appendChild(inner); card.appendChild(title); return card;
+}
+cargarSeccionSeries('https://api.themoviedb.org/3/trending/tv/week?api_key='+API_KEY+'&language=es-ES', 'seriesTendencia');
+cargarSeccionSeries('https://api.themoviedb.org/3/tv/top_rated?api_key='+API_KEY+'&language=es-ES', 'seriesTop');
 </script>
 <script type="module" src="notif-chat.js"></script>
 </body>
