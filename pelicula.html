@@ -265,6 +265,7 @@
         let _sortMode = 'reciente';
         let _allDocs = [];
         let _listaIdActiva = null;
+        let _likeEnVuelo = false;
 
         const ADMIN_UID = '41XWZR8OzwdpMHf54UIQEzAEt7s1';
         const VERIFIED_USERS = [];
@@ -397,6 +398,7 @@
                 btn.appendChild(span);
             }
 
+            _likeEnVuelo = true;
             try {
                 const ref = window.doc(window.db, 'comentarios', docId);
                 const updates = {};
@@ -411,6 +413,8 @@
                 console.error(e);
             } finally {
                 delete btn.dataset.loading;
+                // Liberar flag después de que el snapshot local haya pasado
+                setTimeout(() => { _likeEnVuelo = false; }, 2000);
             }
         };
 
@@ -435,11 +439,9 @@
                         us.forEach(d => { uidMap[d.data().username] = d.id; });
                     } catch(e) {}
                 }
-                const prevCount = _allDocs.length;
                 _allDocs = snapshot.docs.map(d => ({ id: d.id, data: d.data(), uid: uidMap[d.data().user]||'' }));
-                // Solo re-renderizar si cambió la cantidad de comentarios (nuevo comentario o borrado)
-                // Si solo cambió un like, el DOM ya está actualizado directo
-                if (_allDocs.length !== prevCount) renderComentarios();
+                // No renderizar si hay un like en vuelo (el DOM ya está actualizado)
+                if (!_likeEnVuelo) renderComentarios();
             });
         }
 
@@ -615,7 +617,12 @@
 
         // ── AUTH ──────────────────────────────────────────────────
         window.onAuthStateChanged(window.auth, function(user) {
-            if (user) { miUID_pelicula = user.uid; checkStatus(); }
+            if (user) {
+                miUID_pelicula = user.uid;
+                checkStatus();
+                // Si los comentarios ya cargaron sin UID, re-renderizar ahora que lo tenemos
+                if (_allDocs.length > 0) renderComentarios();
+            }
         });
 
         // ── HUD ───────────────────────────────────────────────────
