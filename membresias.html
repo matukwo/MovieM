@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieM | Membresías</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -13,24 +14,24 @@
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden">
 
-<nav class="p-6 flex justify-between items-center border-b border-white/5 bg-zinc-950">
-    <h1 class="text-2xl font-black text-accent tracking-tighter cursor-pointer" onclick="window.location.href='index.html'">MOVIE<span class="text-white font-light">M</span></h1>
+<nav class="px-4 md:p-6 py-4 flex justify-between items-center border-b border-white/5 bg-zinc-950">
+    <h1 class="text-xl md:text-2xl font-black text-accent tracking-tighter cursor-pointer" onclick="window.location.href='index.html'">MOVIE<span class="text-white font-light">M</span></h1>
     <button onclick="history.back()" class="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-500 hover:text-white transition">← Volver</button>
 </nav>
 
-<main class="max-w-5xl mx-auto pt-20 px-6 pb-20">
-    <div class="text-center mb-20">
-        <h2 class="text-4xl font-black uppercase tracking-tighter mb-4 italic">Elegí tu <span class="text-accent italic">Rango</span></h2>
+<main class="max-w-5xl mx-auto pt-10 md:pt-20 px-4 md:px-6 pb-20">
+    <div class="text-center mb-10 md:mb-20">
+        <h2 class="text-3xl md:text-4xl font-black uppercase tracking-tighter mb-4 italic">Elegí tu <span class="text-accent italic">Rango</span></h2>
         <div class="w-12 h-1 bg-accent mx-auto"></div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto">
         
-        <div class="bg-zinc-950 border border-white/5 p-12 rounded-3xl flex flex-col items-center">
-            <h3 class="text-[10px] font-black text-zinc-500 uppercase tracking-[0.4em] mb-8 italic">Cinéfilo Estándar</h3>
-            <p class="text-5xl font-black mb-10 tracking-tighter">$0</p>
+        <div class="bg-zinc-950 border border-white/5 p-8 md:p-12 rounded-3xl flex flex-col items-center">
+            <h3 class="text-[10px] font-black text-zinc-500 uppercase tracking-[0.4em] mb-6 md:mb-8 italic">Cinéfilo Estándar</h3>
+            <p class="text-4xl md:text-5xl font-black mb-8 md:mb-10 tracking-tighter">$0</p>
             
-            <ul class="w-full space-y-5 mb-12 text-[9px] font-bold uppercase tracking-widest text-zinc-500">
+            <ul class="w-full space-y-4 md:space-y-5 mb-10 md:mb-12 text-[9px] font-bold uppercase tracking-widest text-zinc-500">
                 <li class="flex items-center gap-3"><span class="text-accent">/</span> Listas de películas</li>
                 <li class="flex items-center gap-3"><span class="text-accent">/</span> Sistema de niveles</li>
                 <li class="flex items-center gap-3 opacity-20"><span class="text-zinc-800">/</span> Fondo de perfil pro</li>
@@ -42,15 +43,15 @@
             </button>
         </div>
 
-        <div class="bg-zinc-950 border-2 border-accent p-12 rounded-3xl flex flex-col items-center shadow-[0_0_40px_rgba(220,38,38,0.1)] relative overflow-hidden">
+        <div class="bg-zinc-950 border-2 border-accent p-8 md:p-12 rounded-3xl flex flex-col items-center shadow-[0_0_40px_rgba(220,38,38,0.1)] relative overflow-hidden">
             <div class="absolute top-4 right-4 bg-accent text-white text-[8px] font-black px-2 py-1 rounded italic uppercase">
                 Pro
             </div>
 
-            <h3 class="text-[10px] font-black text-accent uppercase tracking-[0.4em] mb-8 italic">Director Pro</h3>
-            <p class="text-5xl font-black mb-10 tracking-tighter">$499<span class="text-lg text-zinc-600 font-light">/mes</span></p>
+            <h3 class="text-[10px] font-black text-accent uppercase tracking-[0.4em] mb-6 md:mb-8 italic">Director Pro</h3>
+            <p class="text-4xl md:text-5xl font-black mb-8 md:mb-10 tracking-tighter">$499<span class="text-lg text-zinc-600 font-light">/mes</span></p>
             
-            <ul class="w-full space-y-5 mb-12 text-[9px] font-bold uppercase tracking-widest">
+            <ul class="w-full space-y-4 md:space-y-5 mb-10 md:mb-12 text-[9px] font-bold uppercase tracking-widest">
                 <li class="flex items-center gap-3"><span class="text-accent">/</span> Todo lo anterior</li>
                 <li class="flex items-center gap-3"><span class="text-accent">/</span> Banner de fondo en perfil</li>
                 <li class="flex items-center gap-3"><span class="text-accent">/</span> Insignia pro en comentarios</li>
@@ -64,7 +65,7 @@
 
     </div>
 
-    <p class="text-center text-[8px] text-zinc-700 uppercase tracking-[0.5em] mt-20">MovieM &copy; 2026 - Pasión por el séptimo arte</p>
+    <p class="text-center text-[8px] text-zinc-700 uppercase tracking-[0.5em] mt-12 md:mt-20">MovieM &copy; 2026 - Pasión por el séptimo arte</p>
 </main>
 
 </body>
