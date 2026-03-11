@@ -72,7 +72,34 @@ body {
     to { opacity: 1; transform: translateY(0); } 
 }
 
-/* --- AJUSTES ESPECÍFICOS PARA CELULARES --- */
+/* --- FLECHAS DE CARRUSEL (estandarizadas en todas las páginas) --- */
+.row-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 40;
+    background: rgba(0,0,0,0.8);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 9999px;
+    padding: 10px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.18s, transform 0.18s;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+    color: white;
+}
+.row-arrow:hover { background: var(--accent-color); transform: translateY(-50%) scale(1.08); }
+.row-arrow svg { width: 18px; height: 18px; flex-shrink: 0; }
+.row-arrow.left  { left: 0; }
+.row-arrow.right { right: 4px; }
+@media (min-width: 768px) {
+    .group:hover .row-arrow,
+    .group\/reparto:hover .row-arrow,
+    .group\/sim:hover .row-arrow,
+    .group\/actor:hover .row-arrow { display: flex; }
+}
 @media (max-width: 640px) {
     .glass-nav {
         padding: 0.75rem 1rem; /* Navbar más compacta */
