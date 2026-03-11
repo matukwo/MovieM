@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, doc, setDoc, getDoc, arrayUnion, arrayRemove, deleteDoc, getDocs, updateDoc, serverTimestamp, writeBatch, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, doc, setDoc, getDoc, arrayUnion, arrayRemove, deleteDoc, getDocs, updateDoc, serverTimestamp, writeBatch, limit, increment, deleteField } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAn5N7m7EhICK2aZG4Nx8DIW9RZd9kK1DA",
@@ -35,8 +35,9 @@ window.updateDoc = updateDoc;
 window.serverTimestamp = serverTimestamp;
 window.writeBatch = writeBatch;
 window.limit = limit;
+window.increment = increment;
+window.deleteField = deleteField;
 
 // Auth
 window.auth = auth;
 window.onAuthStateChanged = onAuthStateChanged;
-window.signOut = signOut;
