@@ -89,6 +89,9 @@
     <div id="modalCard" class="relative bg-zinc-900 border border-white/10 w-full md:w-80 rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto no-scrollbar">
         <div class="h-1.5 w-full bg-accent"></div>
         <div class="md:hidden w-12 h-1 bg-zinc-700 rounded-full mx-auto mt-3"></div>
+        <button onclick="document.getElementById('modalLogin').classList.replace('flex','hidden')" class="absolute top-3 right-3 w-7 h-7 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition z-10">
+            <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
         <div class="p-6 md:p-8">
             <div id="contenidoLogin">
                 <h3 id="modalTitulo" class="text-xl font-black italic uppercase tracking-tighter mb-1">Bienvenido</h3>
@@ -132,65 +135,51 @@
 <main class="pt-16 md:pt-24 pb-24 md:pb-8 px-4 md:pl-8 md:pr-4">
     <div id="contenidoPrincipal">
         <!-- Continuar Viendo (se muestra solo si hay progreso guardado) -->
-        <section id="secContinuar" class="mb-10 group hidden">
+        <section id="secContinuar" class="mb-10 relative group hidden">
             <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 text-zinc-100 flex items-center gap-3">
                 <span class="w-1 h-6 bg-red-600 rounded-full inline-block"></span>
                 Continuar Viendo
             </h2>
-            <div class="relative">
-                <button onclick="scrollFila('continuar',-400)" class="absolute left-0 top-1/2 -translate-y-1/2 z-40 bg-black/80 p-2.5 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
-                <div id="continuar" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div>
-                <button onclick="scrollFila('continuar',400)" class="absolute right-0 top-1/2 -translate-y-1/2 z-40 bg-black/80 p-2.5 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
-            </div>
+            <button onclick="scrollFila('continuar',-400)" class="absolute left-0 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <div class="relative"><div id="continuar" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div></div>
+            <button onclick="scrollFila('continuar',400)"  class="absolute right-2 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
         </section>
 
-        <section class="mb-10 group">
+        <section class="mb-10 relative group">
             <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 text-zinc-100">Tendencias Ahora</h2>
-            <div class="relative">
-                <button onclick="scrollFila('tendencias',-400)" class="absolute left-0 top-1/2 -translate-y-1/2 z-40 bg-black/80 p-2.5 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
-                <div id="tendencias" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div>
-                <button onclick="scrollFila('tendencias',400)" class="absolute right-0 top-1/2 -translate-y-1/2 z-40 bg-black/80 p-2.5 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
-            </div>
+            <button onclick="scrollFila('tendencias',-400)" class="absolute left-0 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <div class="relative"><div id="tendencias" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div></div>
+            <button onclick="scrollFila('tendencias',400)" class="absolute right-2 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
         </section>
-        <section class="mb-10 group">
+        <section class="mb-10 relative group">
             <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 text-zinc-100">Pura Accion</h2>
-            <div class="relative">
-                <button onclick="scrollFila('accion',-400)" class="absolute left-0 top-1/2 -translate-y-1/2 z-40 bg-black/80 p-2.5 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
-                <div id="accion" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div>
-                <button onclick="scrollFila('accion',400)" class="absolute right-0 top-1/2 -translate-y-1/2 z-40 bg-black/80 p-2.5 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
-            </div>
+            <button onclick="scrollFila('accion',-400)" class="absolute left-0 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <div class="relative"><div id="accion" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div></div>
+            <button onclick="scrollFila('accion',400)" class="absolute right-2 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
         </section>
-        <section class="mb-10 group">
+        <section class="mb-10 relative group">
             <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 text-zinc-100">Romance &amp; Drama</h2>
-            <div class="relative">
-                <button onclick="scrollFila('romance',-400)" class="absolute left-0 top-1/2 -translate-y-1/2 z-40 bg-black/80 p-2.5 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
-                <div id="romance" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div>
-                <button onclick="scrollFila('romance',400)" class="absolute right-0 top-1/2 -translate-y-1/2 z-40 bg-black/80 p-2.5 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
-            </div>
+            <button onclick="scrollFila('romance',-400)" class="absolute left-0 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <div class="relative"><div id="romance" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div></div>
+            <button onclick="scrollFila('romance',400)" class="absolute right-2 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
         </section>
-        <section class="mb-10 group">
+        <section class="mb-10 relative group">
             <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 text-zinc-100">Clasicos de los 80s</h2>
-            <div class="relative">
-                <button onclick="scrollFila('ochenta',-400)" class="absolute left-0 top-1/2 -translate-y-1/2 z-40 bg-black/80 p-2.5 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
-                <div id="ochenta" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div>
-                <button onclick="scrollFila('ochenta',400)" class="absolute right-0 top-1/2 -translate-y-1/2 z-40 bg-black/80 p-2.5 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
-            </div>
+            <button onclick="scrollFila('ochenta',-400)" class="absolute left-0 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <div class="relative"><div id="ochenta" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div></div>
+            <button onclick="scrollFila('ochenta',400)" class="absolute right-2 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
         </section>
-        <section class="mb-10 group">
+        <section class="mb-10 relative group">
             <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 text-zinc-100">Terror &amp; Suspenso</h2>
-            <div class="relative">
-                <button onclick="scrollFila('terror',-400)" class="absolute left-0 top-1/2 -translate-y-1/2 z-40 bg-black/80 p-2.5 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
-                <div id="terror" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div>
-                <button onclick="scrollFila('terror',400)" class="absolute right-0 top-1/2 -translate-y-1/2 z-40 bg-black/80 p-2.5 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
-            </div>
+            <button onclick="scrollFila('terror',-400)" class="absolute left-0 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <div class="relative"><div id="terror" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div></div>
+            <button onclick="scrollFila('terror',400)" class="absolute right-2 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
         </section>
-        <section class="mb-10 group">
+        <section class="mb-10 relative group">
             <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 text-zinc-100">Sorprendeme</h2>
-            <div class="relative">
-                <button onclick="scrollFila('random',-400)" class="absolute left-0 top-1/2 -translate-y-1/2 z-40 bg-black/80 p-2.5 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
-                <div id="random" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div>
-                <button onclick="scrollFila('random',400)" class="absolute right-0 top-1/2 -translate-y-1/2 z-40 bg-black/80 p-2.5 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
-            </div>
+            <button onclick="scrollFila('random',-400)" class="absolute left-0 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <div class="relative"><div id="random" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div></div>
+            <button onclick="scrollFila('random',400)" class="absolute right-2 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
         </section>
     </div>
 </main>
