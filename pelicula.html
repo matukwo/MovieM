@@ -265,7 +265,6 @@
         let _sortMode = 'reciente';
         let _allDocs = [];
         let _listaIdActiva = null;
-        let _writingLike = false;
 
         const ADMIN_UID = '41XWZR8OzwdpMHf54UIQEzAEt7s1';
         const VERIFIED_USERS = [];
@@ -348,13 +347,16 @@
                         </div>
                     </div>
                     <p class="text-zinc-400 text-sm leading-relaxed font-medium mb-3">${c.txt}</p>
-                    <button id="like-btn-${docId}" onclick="reaccionar('${docId}')"
+                    <button id="like-btn-${docId}"
+                        data-liked="${yaDioLike ? '1' : '0'}"
+                        data-likes="${likes}"
+                        onclick="reaccionar('${docId}')"
                         class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-all active:scale-95 select-none
                         ${yaDioLike ? 'bg-red-600/20 border-red-500/50 text-red-400' : 'bg-zinc-800/60 border-white/5 text-zinc-400 hover:border-white/20 hover:text-white'}">
                         <svg class="w-3.5 h-3.5 ${yaDioLike ? 'fill-red-400' : 'fill-none'}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
                         </svg>
-                        ${likes > 0 ? `<span class="font-black tabular-nums">${likes}</span>` : ''}
+                        ${likes > 0 ? `<span class="like-cnt font-black tabular-nums">${likes}</span>` : '<span class="like-cnt font-black tabular-nums" style="display:none"></span>'}
                     </button>`;
                 contenedor.appendChild(div);
             });
@@ -362,25 +364,38 @@
 
         window.reaccionar = async function(docId) {
             if (!miUID_pelicula) { toast('Iniciá sesión para reaccionar', false); return; }
-            const localIdx = _allDocs.findIndex(d => d.id === docId);
-            if (localIdx === -1) return;
-            const localData = _allDocs[localIdx].data;
-            const misR = localData.misReacciones || {};
-            const yaLiked = !!misR[miUID_pelicula];
-            const likesActuales = (localData.reacciones && localData.reacciones['like']) || 0;
 
-            // Optimistic update local
-            const newMisR = { ...misR };
+            const btn = document.getElementById('like-btn-' + docId);
+            if (!btn || btn.dataset.loading) return;
+            btn.dataset.loading = '1';
+
+            const yaLiked = btn.dataset.liked === '1';
+            const cntEl = btn.querySelector('.like-cnt');
+            const svgPath = btn.querySelector('svg');
+            const likesActuales = parseInt(btn.dataset.likes || '0', 10);
             const newLikes = yaLiked ? Math.max(0, likesActuales - 1) : likesActuales + 1;
-            if (yaLiked) { delete newMisR[miUID_pelicula]; } else { newMisR[miUID_pelicula] = true; }
-            _allDocs[localIdx] = {
-                ..._allDocs[localIdx],
-                data: { ...localData, reacciones: { ...localData.reacciones, like: newLikes }, misReacciones: newMisR }
-            };
-            renderComentarios();
 
-            // Bloquear re-render del snapshot mientras escribimos
-            _writingLike = true;
+            // Actualizar DOM directo, igual que toggleLike de película
+            if (yaLiked) {
+                btn.dataset.liked = '0';
+                btn.dataset.likes = newLikes;
+                btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-all active:scale-95 select-none bg-zinc-800/60 border-white/5 text-zinc-400 hover:border-white/20 hover:text-white';
+                svgPath.setAttribute('class', 'w-3.5 h-3.5 fill-none');
+            } else {
+                btn.dataset.liked = '1';
+                btn.dataset.likes = newLikes;
+                btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-all active:scale-95 select-none bg-red-600/20 border-red-500/50 text-red-400';
+                svgPath.setAttribute('class', 'w-3.5 h-3.5 fill-red-400');
+            }
+            if (cntEl) {
+                cntEl.innerText = newLikes > 0 ? newLikes : '';
+                cntEl.style.display = newLikes > 0 ? '' : 'none';
+            } else if (newLikes > 0) {
+                const span = document.createElement('span');
+                span.className = 'like-cnt font-black tabular-nums';
+                span.innerText = newLikes;
+                btn.appendChild(span);
+            }
 
             try {
                 const ref = window.doc(window.db, 'comentarios', docId);
@@ -389,12 +404,13 @@
                 updates[`misReacciones.${miUID_pelicula}`] = yaLiked ? window.deleteField() : true;
                 await window.updateDoc(ref, updates);
             } catch(e) {
-                _allDocs[localIdx] = { ..._allDocs[localIdx], data: localData };
-                renderComentarios();
+                // Revertir si falla
+                btn.dataset.liked = yaLiked ? '1' : '0';
+                btn.dataset.likes = likesActuales;
+                if (cntEl) cntEl.innerText = likesActuales > 0 ? likesActuales : '';
                 console.error(e);
             } finally {
-                // Desbloquear después de que el snapshot local ya pasó
-                setTimeout(() => { _writingLike = false; }, 1500);
+                delete btn.dataset.loading;
             }
         };
 
@@ -419,8 +435,11 @@
                         us.forEach(d => { uidMap[d.data().username] = d.id; });
                     } catch(e) {}
                 }
+                const prevCount = _allDocs.length;
                 _allDocs = snapshot.docs.map(d => ({ id: d.id, data: d.data(), uid: uidMap[d.data().user]||'' }));
-                if (!_writingLike) renderComentarios();
+                // Solo re-renderizar si cambió la cantidad de comentarios (nuevo comentario o borrado)
+                // Si solo cambió un like, el DOM ya está actualizado directo
+                if (_allDocs.length !== prevCount) renderComentarios();
             });
         }
 
