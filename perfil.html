@@ -18,6 +18,7 @@
         .sk-circle{border-radius:9999px!important}
         .fade-in { animation: fi .5s ease forwards; opacity: 0; }
         @keyframes fi { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        .carousel-track { transition: transform 0.35s cubic-bezier(.4,0,.2,1); }
     </style>
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden pb-24 md:pb-0">
@@ -167,7 +168,7 @@
                 <!-- Botón seguir + te sigue + editar perfil -->
                 <div class="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
                     <button id="btnEditarPerfil" class="hidden px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest transition-all bg-zinc-800 border border-zinc-700 text-zinc-300 hover:border-white hover:text-white active:scale-95" onclick="abrirModalEditarPerfil()">
-                        ✏️ Editar Perfil
+                        Editar Perfil
                     </button>
                     <button id="btnSeguir" class="hidden px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest transition-all border-2 border-accent text-accent hover:bg-accent hover:text-white active:scale-95" onclick="toggleSeguir()">
                         Seguir
@@ -227,7 +228,7 @@
             <section class="bg-zinc-900/30 p-5 md:p-6 rounded-2xl md:rounded-3xl border border-white/5 text-center relative overflow-hidden group shadow-lg min-h-[180px] md:min-h-[220px] flex flex-col">
                 <h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-4 italic">Actores Favoritos</h3>
                 <div class="relative overflow-hidden flex-1">
-                    <div id="actorCarousel" class="flex h-full"></div>
+                    <div id="actorCarousel" class="flex h-full carousel-track"></div>
                 </div>
                 <button onclick="prevActor()" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition z-10">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
@@ -237,6 +238,19 @@
                 </button>
                 <button id="btnAgregarActor" class="hidden mt-4 text-[9px] font-black uppercase tracking-widest text-accent hover:underline" onclick="abrirBuscadorActor()">+ Agregar Actor</button>
             </section>
+
+            <!-- Directores favoritos -->
+            <section class="bg-zinc-900/30 p-5 md:p-6 rounded-2xl md:rounded-3xl border border-white/5 text-center relative overflow-hidden group shadow-lg min-h-[180px] md:min-h-[220px] flex flex-col">
+                <h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-4 italic">Directores Favoritos</h3>
+                <div class="relative overflow-hidden flex-1">
+                    <div id="directorCarousel" class="flex h-full carousel-track"></div>
+                </div>
+                <button onclick="prevDirector()" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition z-10">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <button onclick="nextDirector()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition z-10">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg>
+                </button>
         </aside>
     </div>
 </main>
@@ -273,7 +287,7 @@
     const params = new URLSearchParams(location.search);
     const paramUser = params.get('user');
     let miUID=null, miUsername=null, perfilUID=null, perfilUsername=null, isMiPerfil=false;
-    let actorIndex=0, actoresLocal=[], favoritasLocal=[null,null,null,null], slotSel=null, tipoBusq='peli';
+    let actorIndex=0, actoresLocal=[], directorIndex=0, directoresLocal=[], favoritasLocal=[null,null,null,null], slotSel=null, tipoBusq='peli';
 
     // ── UID del creador/admin de la página ────────────────────────
     // Reemplazá este valor con tu UID real de Firebase (lo encontrás en Firebase Console → Authentication)
@@ -358,6 +372,7 @@
         document.getElementById('contSiguiendo').innerText = sig;
 
         actoresLocal = data.actores||[];
+        directoresLocal = data.directores||[];
         favoritasLocal = data.favoritas||[null,null,null,null];
 
         if (isMiPerfil) {
@@ -365,6 +380,7 @@
             oe.classList.remove('hidden'); oe.classList.add('flex');
             document.getElementById('btnEditarBio').classList.remove('hidden');
             document.getElementById('btnAgregarActor').classList.remove('hidden');
+            document.getElementById('btnAgregarDirector').classList.remove('hidden');
             document.getElementById('btnSeccionColor').classList.remove('hidden');
             document.getElementById('btnBell').classList.remove('hidden');
             document.getElementById('btnEditarPerfil').classList.remove('hidden');
@@ -392,6 +408,7 @@
             }
         }
         renderizarActores();
+        renderizarDirectores();
         cargarComentarios();
     }
 
@@ -502,7 +519,7 @@
     };
     document.getElementById('inputBusquedaGral').addEventListener('input', async function() {
         var q = this.value; if (q.length<2) return;
-        var ep = tipoBusq==='peli' ? 'search/movie' : 'search/person';
+        var ep = (tipoBusq==='peli') ? 'search/movie' : 'search/person';
         var res = await fetch('https://api.themoviedb.org/3/'+ep+'?api_key='+API+'&query='+encodeURIComponent(q)+'&language=es-ES');
         var data = await res.json();
         var cont = document.getElementById('resultadosGral'); cont.innerHTML='';
@@ -513,6 +530,7 @@
             d.onclick = async function() {
                 if (tipoBusq==='peli') { favoritasLocal[slotSel]={poster:img,id:item.id}; await guardarDato('favoritas',favoritasLocal); renderizarFavs(true); }
                 else if (tipoBusq==='actor') { actoresLocal.push({nombre:item.name,foto:img}); await guardarDato('actores',actoresLocal); actorIndex=actoresLocal.length-1; renderizarActores(); moverCarrusel(); }
+                else if (tipoBusq==='director') { directoresLocal.push({nombre:item.name,foto:img}); await guardarDato('directores',directoresLocal); directorIndex=directoresLocal.length-1; renderizarDirectores(); moverCarruselDirector(); }
                 else { await guardarDato('avatar','https://image.tmdb.org/t/p/w500'+img); document.getElementById('userAvatarFrame').innerHTML='<img src="https://image.tmdb.org/t/p/w500'+img+'" class="w-full h-full object-cover">'; }
                 cerrarModalBusqueda();
             };
@@ -556,17 +574,42 @@
     window.prevActor = function(){ actorIndex = actorIndex>0 ? actorIndex-1 : actoresLocal.length-1; moverCarrusel(); };
     function moverCarrusel(){ document.getElementById('actorCarousel').style.transform='translateX(-'+(actorIndex*100)+'%)'; }
 
+    // ── Directores ────────────────────────────────────────────────
+    function renderizarDirectores() {
+        var c = document.getElementById('directorCarousel');
+        if (!directoresLocal.length) { c.innerHTML='<div class="min-w-full h-full flex items-center justify-center text-zinc-600 text-[9px] font-bold uppercase italic">Sin directores</div>'; return; }
+        c.innerHTML = directoresLocal.map(function(d){
+            var src = d.foto && d.foto.startsWith('http') ? d.foto : 'https://image.tmdb.org/t/p/w200'+d.foto;
+            return '<div class="min-w-full flex flex-col items-center justify-center h-full">'
+                +'<div class="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-accent overflow-hidden mb-2 shadow-xl shrink-0"><img src="'+src+'" class="w-full h-full object-cover" loading="lazy" onerror="this.src=\'https://via.placeholder.com/80\'"></div>'
+                +'<p class="text-[9px] font-black text-white uppercase tracking-widest truncate w-full px-2 text-center">'+d.nombre+'</p>'
+                +(isMiPerfil?'<button onclick="eliminarDirector()" class="text-[8px] text-zinc-600 mt-1 hover:text-red-500 uppercase font-bold">Quitar</button>':'')
+                +'</div>';
+        }).join('');
+    }
+    window.eliminarDirector = async function(){ directoresLocal.splice(directorIndex,1); directorIndex=0; await guardarDato('directores',directoresLocal); renderizarDirectores(); moverCarruselDirector(); };
+    window.nextDirector = function(){ directorIndex = directorIndex<directoresLocal.length-1 ? directorIndex+1 : 0; moverCarruselDirector(); };
+    window.prevDirector = function(){ directorIndex = directorIndex>0 ? directorIndex-1 : directoresLocal.length-1; moverCarruselDirector(); };
+    function moverCarruselDirector(){ document.getElementById('directorCarousel').style.transform='translateX(-'+(directorIndex*100)+'%)'; }
+    window.abrirBuscadorDirector = function(){ tipoBusq='director'; mostrarModal('Agregar Director'); };
+
     // ── Comentarios ───────────────────────────────────────────────
     async function cargarComentarios() {
         var cont = document.getElementById('contenedorComentarios');
-        // Nota: miUID puede estar disponible o no según el timing de onAuthStateChanged
-        // Se compara con ADMIN_UID directamente; si miUID es null, no es admin
         var esAdmin = miUID !== null && miUID === ADMIN_UID;
         try {
+            // Necesitamos el username para buscar comentarios — esperarlo si aún no está disponible
+            if (!perfilUsername) { cont.innerHTML='<p class="text-zinc-600 text-xs italic">Sin comentarios aún.</p>'; return; }
+
             var snap = await getDocs(query(collection(db,'comentarios'), where('user','==',perfilUsername)));
             if (snap.empty) { cont.innerHTML='<p class="text-zinc-600 text-xs italic">Sin comentarios aún.</p>'; return; }
             var docs=[]; snap.forEach(function(d){ docs.push({id:d.id, ...d.data()}); });
-            docs.sort(function(a,b){ return (b.fecha||0)-(a.fecha||0); });
+            // Ordenar por fecha descendente — fecha puede ser número o Firestore Timestamp
+            docs.sort(function(a,b){
+                var ta = a.fecha?.toMillis ? a.fecha.toMillis() : (a.fecha||0);
+                var tb = b.fecha?.toMillis ? b.fecha.toMillis() : (b.fecha||0);
+                return tb - ta;
+            });
             var recientes = docs.slice(0,5);
             var pelisData = {};
             await Promise.all(recientes.map(async function(cm){
