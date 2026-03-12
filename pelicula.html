@@ -31,8 +31,14 @@
         </div>
         <button onclick="cerrarPelicula()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/5 shrink-0">Cerrar x</button>
     </div>
-    <div class="flex-1 bg-black">
-        <iframe id="movieFrame" src="" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+    <div class="flex-1 bg-black relative">
+        <iframe id="movieFrame" src="" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-popups-to-escape-sandbox"></iframe>
+        <!-- Botón respaldo latino -->
+        <div id="btnRespaldoWrap" class="hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-50">
+            <button onclick="usarRespaldo()" class="bg-zinc-900/95 border border-yellow-500/30 text-yellow-400 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-xl active:scale-95 hover:bg-zinc-800 transition">
+                ⚠️ ¿No funciona? Probar respaldo
+            </button>
+        </div>
     </div>
 </div>
 
@@ -591,6 +597,7 @@
         // Cargar link latino desde Firestore
         // Link latino desde Firestore
         let _latinoUrl = null;
+        let _latinoUrl2 = null;
         async function cargarLatinoLink() {
             try {
                 for (let i = 0; i < 30; i++) {
@@ -600,24 +607,35 @@
                 const snap = await window.getDoc(window.doc(window.db, 'latinoLinks', String(movieID)));
                 if (snap.exists()) {
                     _latinoUrl = snap.data().url;
+                    _latinoUrl2 = snap.data().url2 || null;
                     document.getElementById('btnFuenteLat').classList.remove('hidden');
                 }
             } catch(e) { console.log('Sin link latino para esta película'); }
         }
         cargarLatinoLink();
 
+        window.usarRespaldo = function() {
+            if (!_latinoUrl2) return;
+            document.getElementById('movieFrame').src = _latinoUrl2;
+            document.getElementById('btnRespaldoWrap').classList.add('hidden');
+        };
+
         window.cambiarFuente = function(fuente) {
             const subBtn = document.getElementById('btnFuenteSub');
             const latBtn = document.getElementById('btnFuenteLat');
-            const activeClass = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition';
+            const respaldoWrap = document.getElementById('btnRespaldoWrap');
+            const base = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition';
             if (fuente === 'sub') {
-                subBtn.className = activeClass + ' bg-white/10 border-white/20 text-white';
-                latBtn.className = activeClass + ' border-white/10 text-white/40 hover:text-yellow-400';
+                subBtn.className = base + ' bg-white/10 border-white/20 text-white';
+                latBtn.className = base + ' border-white/10 text-white/40 hover:text-yellow-400';
+                respaldoWrap.classList.add('hidden');
                 document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
             } else {
-                latBtn.className = activeClass + ' bg-yellow-500/20 border-yellow-500/50 text-yellow-400';
-                subBtn.className = activeClass + ' border-white/10 text-white/40 hover:text-white';
+                latBtn.className = base + ' bg-yellow-500/20 border-yellow-500/50 text-yellow-400';
+                subBtn.className = base + ' border-white/10 text-white/40 hover:text-white';
                 document.getElementById('movieFrame').src = _latinoUrl;
+                // Mostrar botón respaldo si hay url2
+                if (_latinoUrl2) respaldoWrap.classList.remove('hidden');
             }
         };
 
@@ -645,6 +663,7 @@
         window.cerrarPelicula = () => {
             document.getElementById('playerOverlay').style.display = 'none';
             document.getElementById('movieFrame').src = "";
+            document.getElementById('btnRespaldoWrap').classList.add('hidden');
             document.body.style.overflow = "auto";
             if (progresoTimer) { clearInterval(progresoTimer); progresoTimer = null; }
             // Guardar progreso final
