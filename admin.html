@@ -50,15 +50,22 @@
         <!-- Agregar nuevo link -->
         <div class="p-6 border-b border-white/5">
             <h4 class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-4">Agregar / Actualizar</h4>
-            <div class="flex flex-col md:flex-row gap-3">
+            <div class="flex flex-col md:flex-row gap-3 mb-3">
                 <div class="flex-1">
                     <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">ID de Película (TMDB)</label>
                     <input id="inputMovieID" type="text" placeholder="ej: 1265609"
                         class="w-full bg-zinc-800 border border-zinc-700 focus:border-accent rounded-2xl px-4 py-3 text-sm text-white outline-none transition placeholder-zinc-600">
                 </div>
-                <div class="flex-[2]">
-                    <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">URL del Embed</label>
+            </div>
+            <div class="flex flex-col gap-3 mb-3">
+                <div>
+                    <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">🔗 Link Principal</label>
                     <input id="inputEmbedURL" type="url" placeholder="https://vidmoly.biz/embed-..."
+                        class="w-full bg-zinc-800 border border-zinc-700 focus:border-accent rounded-2xl px-4 py-3 text-sm text-white outline-none transition placeholder-zinc-600">
+                </div>
+                <div>
+                    <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">🔗 Link de Respaldo <span class="text-zinc-700">(opcional)</span></label>
+                    <input id="inputEmbedURL2" type="url" placeholder="https://otro-embed.com/..."
                         class="w-full bg-zinc-800 border border-zinc-700 focus:border-accent rounded-2xl px-4 py-3 text-sm text-white outline-none transition placeholder-zinc-600">
                 </div>
             </div>
@@ -134,19 +141,27 @@ async function cargarLinks() {
         cont.innerHTML = '';
         links.forEach(item => {
             const div = document.createElement('div');
-            div.className = 'flex items-center gap-3 p-3 bg-zinc-800/40 rounded-2xl border border-white/5';
+            div.className = 'p-3 bg-zinc-800/40 rounded-2xl border border-white/5';
             div.innerHTML = `
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2 mb-0.5">
-                        <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">ID: ${item.id}</span>
-                        ${item.titulo ? `<span class="text-xs font-black text-white truncate">${item.titulo}</span>` : ''}
-                        ${item.anio ? `<span class="text-[9px] text-zinc-500">(${item.anio})</span>` : ''}
+                <div class="flex items-center gap-3">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">ID: ${item.id}</span>
+                            ${item.titulo ? `<span class="text-xs font-black text-white truncate">${item.titulo}</span>` : ''}
+                            ${item.anio ? `<span class="text-[9px] text-zinc-500">(${item.anio})</span>` : ''}
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[9px] font-black text-zinc-500 uppercase shrink-0">Principal:</span>
+                            <p class="text-[9px] text-zinc-600 truncate">${item.url}</p>
+                            <button onclick="probarLink('${item.url}')" class="shrink-0 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-zinc-700 hover:bg-zinc-600 text-zinc-300 transition active:scale-95">▶</button>
+                        </div>
+                        ${item.url2 ? `<div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-[9px] font-black text-yellow-600 uppercase shrink-0">Respaldo:</span>
+                            <p class="text-[9px] text-zinc-600 truncate">${item.url2}</p>
+                            <button onclick="probarLink('${item.url2}')" class="shrink-0 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-zinc-700 hover:bg-zinc-600 text-zinc-300 transition active:scale-95">▶</button>
+                        </div>` : '<p class="text-[9px] text-zinc-700 mt-0.5 italic">Sin respaldo</p>'}
                     </div>
-                    <p class="text-[9px] text-zinc-600 truncate">${item.url}</p>
-                </div>
-                <div class="flex gap-2 shrink-0">
-                    <button onclick="probarLink('${item.url}')" class="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-zinc-700 hover:bg-zinc-600 text-zinc-300 transition active:scale-95">▶ Probar</button>
-                    <button onclick="borrarLink('${item.id}')" class="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-red-600/20 hover:bg-red-600/40 text-red-400 transition active:scale-95">✕ Borrar</button>
+                    <button onclick="borrarLink('${item.id}')" class="shrink-0 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-red-600/20 hover:bg-red-600/40 text-red-400 transition active:scale-95">✕</button>
                 </div>`;
             cont.appendChild(div);
         });
@@ -174,15 +189,19 @@ window.buscarPelicula = async function() {
 window.guardarLink = async function() {
     const id = document.getElementById('inputMovieID').value.trim();
     const url = document.getElementById('inputEmbedURL').value.trim();
-    if (!id || !url) { showToast('Completá el ID y la URL', 'error'); return; }
+    const url2 = document.getElementById('inputEmbedURL2').value.trim();
+    if (!id || !url) { showToast('Completá el ID y el link principal', 'error'); return; }
 
     try {
         const titulo = document.getElementById('previewTitle').textContent || '';
         const anio = document.getElementById('previewYear').textContent || '';
-        await window.setDoc(window.doc(window.db, 'latinoLinks', id), { url, titulo, anio, fecha: new Date().toISOString() });
+        const data = { url, titulo, anio, fecha: new Date().toISOString() };
+        if (url2) data.url2 = url2;
+        await window.setDoc(window.doc(window.db, 'latinoLinks', id), data);
         showToast('✓ Guardado correctamente', 'ok');
         document.getElementById('inputMovieID').value = '';
         document.getElementById('inputEmbedURL').value = '';
+        document.getElementById('inputEmbedURL2').value = '';
         document.getElementById('peliculaPreview').classList.add('hidden');
         cargarLinks();
     } catch(e) { showToast('Error al guardar', 'error'); console.error(e); }
