@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieM | Comunidad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="firebase-config.js"></script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
+        .text-accent{color:var(--accent-color,#dc2626)}.bg-accent{background-color:var(--accent-color,#dc2626)}.border-accent{border-color:var(--accent-color,#dc2626)}
+        .skeleton{background:linear-gradient(90deg,#27272a 25%,#3f3f46 50%,#27272a 75%);background-size:200% 100%;animation:shimmer 1.4s infinite}
+        @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+        .rank-card{transition:all .2s;border:1px solid rgba(255,255,255,0.06)}
+        .rank-card:hover{border-color:rgba(255,255,255,0.15);transform:translateY(-1px)}
+        .medal-1{background:linear-gradient(135deg,#f59e0b,#fbbf24)}
+        .medal-2{background:linear-gradient(135deg,#9ca3af,#d1d5db)}
+        .medal-3{background:linear-gradient(135deg,#b45309,#d97706)}
+    </style>
+</head>
+<body class="bg-zinc-950 text-white font-sans overflow-x-hidden">
+
+<!-- NAV DESKTOP -->
+<nav class="hidden md:grid p-5 grid-cols-3 items-center bg-zinc-950/90 backdrop-blur-md fixed top-0 w-full z-50 border-b border-white/5">
+    <div class="flex space-x-6 text-xs font-bold uppercase tracking-widest text-zinc-400">
+        <a href="index.html" class="hover:text-white transition">Inicio</a>
+        <a href="peliculas.html" class="hover:text-white transition">Películas</a>
+        <a href="series.html" class="hover:text-white transition">Series</a>
+        <a href="tv.html" class="hover:text-white transition">TV en Vivo</a>
+        <a href="mi_lista.html" class="hover:text-white transition">Mi Lista</a>
+        <a href="comunidad.html" class="text-accent">Comunidad</a>
+    </div>
+    <div class="flex justify-center">
+        <h1 class="text-3xl font-black text-accent tracking-tighter cursor-pointer" onclick="location.href='index.html'">MOVIE<span class="text-white font-light">M</span></h1>
+    </div>
+    <div class="flex items-center justify-end gap-3">
+        <button id="btnUsuario" class="w-10 h-10 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:bg-red-600 transition group shadow-lg overflow-hidden shrink-0">
+            <svg class="h-5 w-5 text-zinc-400 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        </button>
+    </div>
+</nav>
+
+<!-- NAV MOBILE TOP -->
+<nav class="md:hidden flex items-center justify-between px-4 py-3 bg-zinc-950/90 backdrop-blur-md fixed top-0 w-full z-50 border-b border-white/5">
+    <h1 class="text-2xl font-black text-accent tracking-tighter cursor-pointer" onclick="location.href='index.html'">MOVIE<span class="text-white font-light">M</span></h1>
+    <span class="text-xs font-black uppercase tracking-widest text-zinc-400">Comunidad</span>
+</nav>
+
+<!-- MAIN -->
+<main class="pt-16 md:pt-24 pb-24 md:pb-8 px-4 md:px-8 max-w-5xl mx-auto">
+
+    <!-- Header -->
+    <div class="mb-8 mt-4">
+        <h1 class="text-2xl md:text-4xl font-black italic uppercase tracking-tighter text-white">Rankings</h1>
+        <p class="text-zinc-500 text-xs font-bold uppercase tracking-widest mt-1">Los más destacados de la comunidad MovieM</p>
+    </div>
+
+    <!-- Grid de rankings -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- Ranking 1: Más seguidores -->
+        <div class="bg-zinc-900/60 rounded-3xl border border-white/5 overflow-hidden">
+            <div class="px-5 py-4 border-b border-white/5 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-red-600/20 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-accent" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                </div>
+                <div>
+                    <h2 class="text-xs font-black uppercase tracking-widest text-white">Más Seguidos</h2>
+                    <p class="text-[9px] text-zinc-500 font-bold uppercase">Por seguidores</p>
+                </div>
+            </div>
+            <div id="rankSeguidores" class="p-4 space-y-2">
+                <!-- skeletons -->
+                <div class="h-14 skeleton rounded-2xl"></div>
+                <div class="h-14 skeleton rounded-2xl"></div>
+                <div class="h-14 skeleton rounded-2xl"></div>
+                <div class="h-14 skeleton rounded-2xl"></div>
+                <div class="h-14 skeleton rounded-2xl"></div>
+            </div>
+        </div>
+
+        <!-- Ranking 2: Lista más grande -->
+        <div class="bg-zinc-900/60 rounded-3xl border border-white/5 overflow-hidden">
+            <div class="px-5 py-4 border-b border-white/5 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-red-600/20 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                </div>
+                <div>
+                    <h2 class="text-xs font-black uppercase tracking-widest text-white">Mayor Lista</h2>
+                    <p class="text-[9px] text-zinc-500 font-bold uppercase">Películas y series guardadas</p>
+                </div>
+            </div>
+            <div id="rankListas" class="p-4 space-y-2">
+                <div class="h-14 skeleton rounded-2xl"></div>
+                <div class="h-14 skeleton rounded-2xl"></div>
+                <div class="h-14 skeleton rounded-2xl"></div>
+                <div class="h-14 skeleton rounded-2xl"></div>
+                <div class="h-14 skeleton rounded-2xl"></div>
+            </div>
+        </div>
+
+        <!-- Ranking 3: Más comentarios -->
+        <div class="bg-zinc-900/60 rounded-3xl border border-white/5 overflow-hidden">
+            <div class="px-5 py-4 border-b border-white/5 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-red-600/20 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                </div>
+                <div>
+                    <h2 class="text-xs font-black uppercase tracking-widest text-white">Más Activos</h2>
+                    <p class="text-[9px] text-zinc-500 font-bold uppercase">Por comentarios publicados</p>
+                </div>
+            </div>
+            <div id="rankComentarios" class="p-4 space-y-2">
+                <div class="h-14 skeleton rounded-2xl"></div>
+                <div class="h-14 skeleton rounded-2xl"></div>
+                <div class="h-14 skeleton rounded-2xl"></div>
+                <div class="h-14 skeleton rounded-2xl"></div>
+                <div class="h-14 skeleton rounded-2xl"></div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<!-- BOTTOM NAV MOBILE -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-zinc-950/95 backdrop-blur-xl border-t border-white/5">
+    <div class="flex items-center justify-around py-3 px-2">
+        <a href="index.html" class="flex flex-col items-center gap-1 text-zinc-500">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            <span class="text-[9px] font-black uppercase tracking-widest">Inicio</span>
+        </a>
+        <a href="mi_lista.html" class="flex flex-col items-center gap-1 text-zinc-500">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+            <span class="text-[9px] font-black uppercase tracking-widest">Mi Lista</span>
+        </a>
+        <a href="comunidad.html" class="flex flex-col items-center gap-1 text-accent">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span class="text-[9px] font-black uppercase tracking-widest">Comunidad</span>
+        </a>
+        <a href="perfil.html" class="flex flex-col items-center gap-1 text-zinc-500">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            <span class="text-[9px] font-black uppercase tracking-widest">Cuenta</span>
+        </a>
+    </div>
+</nav>
+
+<script type="module">
+const color = localStorage.getItem('movieM_color');
+if (color) document.documentElement.style.setProperty('--accent-color', color);
+
+document.getElementById('btnUsuario').onclick = () => location.href = 'perfil.html';
+
+// Esperar Firebase
+async function waitForFirebase() {
+    for (let i = 0; i < 50; i++) {
+        if (window.db && window.getDocs && window.collection && window.query && window.orderBy && window.where) return true;
+        await new Promise(r => setTimeout(r, 100));
+    }
+    return false;
+}
+
+function getMedalClass(pos) {
+    if (pos === 0) return 'medal-1';
+    if (pos === 1) return 'medal-2';
+    if (pos === 2) return 'medal-3';
+    return 'bg-zinc-700';
+}
+
+function getMedalText(pos) {
+    if (pos === 0) return '🥇';
+    if (pos === 1) return '🥈';
+    if (pos === 2) return '🥉';
+    return `#${pos + 1}`;
+}
+
+function renderRankCard(pos, username, avatar, valor, etiqueta) {
+    const div = document.createElement('div');
+    div.className = 'rank-card flex items-center gap-3 p-3 rounded-2xl bg-zinc-800/40 cursor-pointer';
+    div.onclick = () => location.href = 'perfil.html?user=' + encodeURIComponent(username);
+
+    const medalClass = getMedalClass(pos);
+    const medalText = getMedalText(pos);
+    const esMedalla = pos < 3;
+
+    const avatarHTML = avatar
+        ? `<img src="${avatar}" class="w-9 h-9 rounded-full object-cover shrink-0 border-2 border-white/10">`
+        : `<div class="w-9 h-9 rounded-full flex items-center justify-center font-black text-xs text-white shrink-0" style="background:var(--accent-color,#dc2626)">${username.charAt(0).toUpperCase()}</div>`;
+
+    div.innerHTML = `
+        <div class="w-7 h-7 rounded-full ${esMedalla ? medalClass : 'bg-zinc-700'} flex items-center justify-center shrink-0 text-[10px] font-black ${esMedalla ? 'text-zinc-900' : 'text-zinc-300'}">
+            ${esMedalla ? medalText : pos + 1}
+        </div>
+        ${avatarHTML}
+        <div class="flex-1 min-w-0">
+            <p class="text-sm font-black uppercase tracking-tight truncate">${username}</p>
+            <p class="text-[9px] text-zinc-500 font-bold uppercase">${valor} ${etiqueta}</p>
+        </div>`;
+    return div;
+}
+
+async function cargarRankSeguidores(usuarios) {
+    const cont = document.getElementById('rankSeguidores');
+    const sorted = [...usuarios]
+        .map(u => ({ ...u, count: (u.seguidores || []).length }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
+
+    cont.innerHTML = '';
+    if (!sorted.length || sorted[0].count === 0) {
+        cont.innerHTML = '<p class="text-zinc-600 text-xs text-center py-6 italic">Sin datos aún.</p>';
+        return;
+    }
+    sorted.forEach((u, i) => {
+        if (u.count === 0) return;
+        cont.appendChild(renderRankCard(i, u.username, u.avatar || null, u.count, u.count === 1 ? 'seguidor' : 'seguidores'));
+    });
+}
+
+async function cargarRankListas(usuarios) {
+    const cont = document.getElementById('rankListas');
+    const sorted = [...usuarios]
+        .map(u => ({
+            ...u,
+            count: (u.watchlist || []).length + (u.seriesWatchlist || []).length
+        }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
+
+    cont.innerHTML = '';
+    if (!sorted.length || sorted[0].count === 0) {
+        cont.innerHTML = '<p class="text-zinc-600 text-xs text-center py-6 italic">Sin datos aún.</p>';
+        return;
+    }
+    sorted.forEach((u, i) => {
+        if (u.count === 0) return;
+        cont.appendChild(renderRankCard(i, u.username, u.avatar || null, u.count, u.count === 1 ? 'guardado' : 'guardados'));
+    });
+}
+
+async function cargarRankComentarios() {
+    const cont = document.getElementById('rankComentarios');
+    try {
+        const snap = await window.getDocs(window.collection(window.db, 'comentarios'));
+        const conteo = {};
+        snap.forEach(d => {
+            const user = d.data().user;
+            if (user) conteo[user] = (conteo[user] || 0) + 1;
+        });
+
+        const sorted = Object.entries(conteo)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 10);
+
+        cont.innerHTML = '';
+        if (!sorted.length) {
+            cont.innerHTML = '<p class="text-zinc-600 text-xs text-center py-6 italic">Sin comentarios aún.</p>';
+            return;
+        }
+
+        // Buscar avatars para los top users
+        const usernames = sorted.map(([u]) => u);
+        const avatarMap = {};
+        try {
+            // Buscar en lotes de 10 (límite de 'in')
+            const usSnap = await window.getDocs(
+                window.query(window.collection(window.db, 'usuarios'), window.where('username', 'in', usernames.slice(0, 10)))
+            );
+            usSnap.forEach(d => { avatarMap[d.data().username] = d.data().avatar || null; });
+        } catch(e) {}
+
+        sorted.forEach(([username, count], i) => {
+            cont.appendChild(renderRankCard(i, username, avatarMap[username] || null, count, count === 1 ? 'comentario' : 'comentarios'));
+        });
+    } catch(e) {
+        cont.innerHTML = '<p class="text-red-500 text-xs text-center py-6">Error al cargar.</p>';
+    }
+}
+
+async function init() {
+    const ok = await waitForFirebase();
+    if (!ok) {
+        ['rankSeguidores','rankListas','rankComentarios'].forEach(id => {
+            document.getElementById(id).innerHTML = '<p class="text-red-500 text-xs text-center py-6">Error de conexión.</p>';
+        });
+        return;
+    }
+
+    try {
+        const snap = await window.getDocs(window.collection(window.db, 'usuarios'));
+        const usuarios = [];
+        snap.forEach(d => {
+            const data = d.data();
+            if (data.username) usuarios.push({ uid: d.id, ...data });
+        });
+
+        await Promise.all([
+            cargarRankSeguidores(usuarios),
+            cargarRankListas(usuarios),
+            cargarRankComentarios()
+        ]);
+    } catch(e) {
+        console.error(e);
+    }
+}
+
+init();
+</script>
+</body>
+</html>
