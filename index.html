@@ -392,7 +392,7 @@ var colorG=localStorage.getItem('movieM_color');if(colorG)document.documentEleme
         var p=await r.json();
         if(!p.poster_path) return;
         var card=document.createElement('div');
-        card.className='min-w-[120px] md:min-w-[160px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2';
+        card.className='min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2';
         card.onclick=function(){location.href='pelicula.html?id='+id;};
         var wrap=document.createElement('div');wrap.className='relative';
         var sk=document.createElement('div');sk.className='absolute inset-0 rounded-xl skeleton';
