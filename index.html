@@ -481,7 +481,7 @@ async function cargarContinuar(user) {
     items = items.filter(it => {
       if (it.tipo === 'serie') return !!it.episodio;
       const pct = it.porcentaje || 0;
-      return pct > 2 && pct < 99;
+      return pct > 2 && pct < 95;
     }).slice(0, 12);
 
     if (!items.length) { sec.classList.add('hidden'); return; }
