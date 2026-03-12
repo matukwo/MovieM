@@ -391,6 +391,7 @@ var colorG=localStorage.getItem('movieM_color');if(colorG)document.documentEleme
         resolve(u);
       });
     });
+    console.log('[MovieM Index] Usuario:', user ? user.uid : 'NO LOGUEADO');
 
     async function obtenerItemsFirestore(user) {
       try {
@@ -398,13 +399,14 @@ var colorG=localStorage.getItem('movieM_color');if(colorG)document.documentEleme
         const snap = await window.getDocs(ref);
         const items = [];
         snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+        console.log('[MovieM Index] Items en Firestore:', items.length, items);
         items.sort((a,b) => {
           const ta = a.updatedAt?.toMillis?.() || a.updatedAt || 0;
           const tb = b.updatedAt?.toMillis?.() || b.updatedAt || 0;
           return tb - ta;
         });
         return items.slice(0, 12);
-      } catch(e) { console.error('Firestore continuar:', e); return []; }
+      } catch(e) { console.error('[MovieM Index] Error leyendo Firestore:', e); return []; }
     }
 
     function obtenerItemsLocal() {
