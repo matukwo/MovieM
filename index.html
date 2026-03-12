@@ -15,11 +15,12 @@
         #searchDropdown,#searchDropdownMobile{max-height:70vh;overflow-y:auto}
         @keyframes pulse-sk{0%{background:rgba(39,39,42,.5)}50%{background:rgba(63,63,70,.5)}100%{background:rgba(39,39,42,.5)}}
         .skeleton{animation:pulse-sk 1.5s infinite ease-in-out;border-radius:.75rem}
+        #modalCard { animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes modalSlideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden">
 
-<!-- NAV DESKTOP -->
 <nav class="hidden md:grid p-5 grid-cols-3 items-center bg-zinc-950/90 backdrop-blur-md fixed top-0 w-full z-50 border-b border-white/5">
     <div class="flex space-x-6 text-xs font-bold uppercase tracking-widest text-zinc-400">
         <a href="index.html" class="hover:text-white transition">Inicio</a>
@@ -50,7 +51,6 @@
     </div>
 </nav>
 
-<!-- NAV MOBILE TOP -->
 <nav class="md:hidden flex items-center justify-between px-4 py-3 bg-zinc-950/90 backdrop-blur-md fixed top-0 w-full z-50 border-b border-white/5">
     <h1 class="text-2xl font-black text-accent tracking-tighter cursor-pointer" onclick="location.href='index.html'">MOVIE<span class="text-white font-light">M</span></h1>
     <div class="flex items-center gap-2">
@@ -69,7 +69,6 @@
     </div>
 </nav>
 
-<!-- BUSQUEDA OVERLAY MOBILE -->
 <div id="searchOverlayMobile" class="fixed inset-0 z-[200] bg-zinc-950 hidden flex-col">
     <div class="flex items-center gap-3 px-4 py-4 border-b border-white/5 pt-safe">
         <div class="relative flex-1">
@@ -81,10 +80,8 @@
     <div id="searchDropdownMobile" class="flex-1 overflow-y-auto no-scrollbar"></div>
 </div>
 
-<!-- TOAST -->
 <div id="toastContainer" class="fixed bottom-24 right-4 z-[300] flex flex-col gap-2 md:bottom-6 md:right-6"></div>
 
-<!-- MODAL LOGIN -->
 <div id="modalLogin" class="fixed inset-0 md:inset-auto md:top-20 md:right-6 z-[150] hidden items-end md:items-start justify-center md:justify-start">
     <div class="absolute inset-0 bg-black/60 md:hidden" id="modalLoginOverlay"></div>
     <div id="modalCard" class="relative bg-zinc-900 border border-white/10 w-full md:w-80 rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto no-scrollbar">
@@ -108,31 +105,41 @@
                 </div>
             </div>
             <div id="perfilActivo" class="hidden text-center">
-                <div class="relative w-20 h-20 mx-auto mb-4">
-                    <div class="absolute inset-0 bg-accent rounded-full blur-md opacity-20"></div>
-                    <div id="avatarCirculo" class="relative w-20 h-20 bg-zinc-800 border-2 border-accent rounded-full flex items-center justify-center text-3xl font-black shadow-2xl text-white overflow-hidden"><span id="inicialUsuario">M</span></div>
-                </div>
-                <p class="text-zinc-200 font-black uppercase tracking-tighter text-lg mb-1" id="saludoUsuario">Hola</p>
-                <button onclick="location.href='perfil.html'" class="w-full mt-4 bg-zinc-800/50 hover:bg-accent text-white text-[10px] font-bold py-3 rounded-xl uppercase tracking-widest transition border border-white/5">Mi Perfil</button>
-                <div class="mt-5 border-t border-white/5 pt-4">
-                    <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mb-3">Color de Acento</p>
-                    <div class="flex gap-3 justify-center">
-                        <div onclick="cambiarColor('#dc2626')" class="w-7 h-7 rounded-full bg-red-600 cursor-pointer hover:scale-110 transition"></div>
-                        <div onclick="cambiarColor('#2563eb')" class="w-7 h-7 rounded-full bg-blue-600 cursor-pointer hover:scale-110 transition"></div>
-                        <div onclick="cambiarColor('#16a34a')" class="w-7 h-7 rounded-full bg-green-600 cursor-pointer hover:scale-110 transition"></div>
-                        <div onclick="cambiarColor('#9333ea')" class="w-7 h-7 rounded-full bg-purple-600 cursor-pointer hover:scale-110 transition"></div>
+                <div class="relative group cursor-pointer mb-4 flex justify-center">
+                    <div class="absolute w-24 h-24 bg-accent/20 rounded-full blur-xl opacity-50"></div>
+                    <div id="avatarCirculo" class="relative w-24 h-24 bg-zinc-800 border-2 border-accent rounded-full flex items-center justify-center text-3xl font-black shadow-2xl text-white overflow-hidden ring-4 ring-black/50">
+                        <span id="inicialUsuario">M</span>
                     </div>
                 </div>
-                <button onclick="cerrarSesion()" class="w-full mt-5 py-3 rounded-xl border border-zinc-800 text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition">Cerrar Sesion</button>
+                <p class="text-white font-black uppercase tracking-tighter text-2xl mb-1" id="saludoUsuario">Hola</p>
+                <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-[0.3em] mb-6">Miembro MovieM</p>
+                
+                <div class="space-y-3 text-left">
+                    <button onclick="location.href='perfil.html'" class="w-full bg-accent hover:brightness-110 text-white text-[10px] font-black py-4 rounded-xl uppercase tracking-widest transition-all shadow-lg shadow-accent/10 border border-white/10">
+                        Ver Mi Perfil
+                    </button>
+                    
+                    <div class="bg-zinc-800/50 p-4 rounded-2xl border border-white/5 mt-4">
+                        <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mb-4 text-center">Acento Visual</p>
+                        <div class="flex gap-4 justify-center">
+                            <button onclick="cambiarColor('#dc2626')" class="w-8 h-8 rounded-full bg-red-600 ring-2 ring-offset-2 ring-offset-zinc-900 ring-transparent hover:scale-110 transition-all"></button>
+                            <button onclick="cambiarColor('#2563eb')" class="w-8 h-8 rounded-full bg-blue-600 ring-2 ring-offset-2 ring-offset-zinc-900 ring-transparent hover:scale-110 transition-all"></button>
+                            <button onclick="cambiarColor('#16a34a')" class="w-8 h-8 rounded-full bg-green-600 ring-2 ring-offset-2 ring-offset-zinc-900 ring-transparent hover:scale-110 transition-all"></button>
+                            <button onclick="cambiarColor('#9333ea')" class="w-8 h-8 rounded-full bg-purple-600 ring-2 ring-offset-2 ring-offset-zinc-900 ring-transparent hover:scale-110 transition-all"></button>
+                        </div>
+                    </div>
+
+                    <button onclick="cerrarSesion()" class="w-full mt-4 py-3 text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-500 hover:text-white transition-colors">
+                        Cerrar Sesión
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- MAIN -->
 <main class="pt-16 md:pt-24 pb-24 md:pb-8 px-4 md:pl-8 md:pr-4">
     <div id="contenidoPrincipal">
-        <!-- Continuar Viendo (se muestra solo si hay progreso guardado) -->
         <section id="secContinuar" class="mb-10 relative group hidden">
             <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 text-zinc-100 flex items-center gap-3">
                 <span class="w-1 h-6 bg-red-600 rounded-full inline-block"></span>
@@ -182,7 +189,6 @@
     </div>
 </main>
 
-<!-- BOTTOM NAV MOBILE -->
 <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-zinc-950/95 backdrop-blur-xl border-t border-white/5">
     <div class="flex items-center justify-around py-3 px-2">
         <a href="index.html" class="flex flex-col items-center gap-1 text-accent">
