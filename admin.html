@@ -78,9 +78,18 @@
             </div>
             <div class="p-6 border-b border-white/5">
                 <h4 class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-4">Agregar / Actualizar</h4>
+                <!-- Búsqueda por nombre -->
+                <div class="mb-3 relative">
+                    <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">🔍 Buscar por nombre</label>
+                    <div class="flex gap-2">
+                        <input id="inputBuscarNombrePeli" type="text" placeholder="ej: Interstellar" onkeydown="if(event.key==='Enter')buscarPorNombrePeli()" class="flex-1 bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600">
+                        <button onclick="buscarPorNombrePeli()" class="px-4 py-2.5 bg-zinc-700 hover:bg-zinc-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition active:scale-95">Buscar</button>
+                    </div>
+                    <div id="resultadosBusquedaPeli" class="hidden absolute left-0 right-0 top-full mt-1 bg-zinc-800 border border-white/10 rounded-2xl overflow-hidden z-30 shadow-2xl max-h-60 overflow-y-auto"></div>
+                </div>
                 <div class="mb-3">
                     <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">ID de Película (TMDB)</label>
-                    <input id="inputMovieID" type="text" placeholder="ej: 1265609" class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600">
+                    <input id="inputMovieID" type="text" placeholder="ej: 1265609" oninput="onMovieIDChange()" class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600">
                 </div>
                 <div class="flex flex-col gap-3 mb-3">
                     <div>
@@ -93,7 +102,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button onclick="buscarPelicula()" class="px-5 py-2.5 bg-zinc-800 border border-zinc-700 hover:border-zinc-500 text-zinc-300 rounded-2xl text-xs font-black uppercase tracking-widest transition active:scale-95">🔍 Buscar Título</button>
+                    <button onclick="buscarPelicula()" class="px-5 py-2.5 bg-zinc-800 border border-zinc-700 hover:border-zinc-500 text-zinc-300 rounded-2xl text-xs font-black uppercase tracking-widest transition active:scale-95">🔍 Verificar ID</button>
                     <button onclick="guardarLink()" class="px-5 py-2.5 bg-red-600 hover:opacity-90 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition active:scale-95">+ Guardar</button>
                     <span id="toastPelis" class="hidden text-xs font-bold"></span>
                 </div>
@@ -124,10 +133,19 @@
             </div>
             <div class="p-6 border-b border-white/5">
                 <h4 class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-4">Agregar / Actualizar Episodio</h4>
+                <!-- Búsqueda por nombre -->
+                <div class="mb-3 relative">
+                    <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">🔍 Buscar por nombre</label>
+                    <div class="flex gap-2">
+                        <input id="inputBuscarNombreSerie" type="text" placeholder="ej: Breaking Bad" onkeydown="if(event.key==='Enter')buscarPorNombreSerie()" class="flex-1 bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600">
+                        <button onclick="buscarPorNombreSerie()" class="px-4 py-2.5 bg-zinc-700 hover:bg-zinc-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition active:scale-95">Buscar</button>
+                    </div>
+                    <div id="resultadosBusquedaSerie" class="hidden absolute left-0 right-0 top-full mt-1 bg-zinc-800 border border-white/10 rounded-2xl overflow-hidden z-30 shadow-2xl max-h-60 overflow-y-auto"></div>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
                     <div>
                         <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">ID de Serie (TMDB)</label>
-                        <input id="inputSerieID" type="text" placeholder="ej: 1396" class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600">
+                        <input id="inputSerieID" type="text" placeholder="ej: 1396" oninput="onSerieIDChange()" class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600">
                     </div>
                     <div>
                         <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">Temporada</label>
@@ -149,7 +167,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button onclick="buscarSerie()" class="px-5 py-2.5 bg-zinc-800 border border-zinc-700 hover:border-zinc-500 text-zinc-300 rounded-2xl text-xs font-black uppercase tracking-widest transition active:scale-95">🔍 Buscar Serie</button>
+                    <button onclick="buscarSerie()" class="px-5 py-2.5 bg-zinc-800 border border-zinc-700 hover:border-zinc-500 text-zinc-300 rounded-2xl text-xs font-black uppercase tracking-widest transition active:scale-95">🔍 Verificar ID</button>
                     <button onclick="guardarEpisodio()" class="px-5 py-2.5 bg-red-600 hover:opacity-90 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition active:scale-95">+ Guardar</button>
                     <span id="toastSeries" class="hidden text-xs font-bold"></span>
                 </div>
@@ -334,12 +352,71 @@ window.buscarPelicula = async function() {
     } catch(e) { showToast('toastPelis','No se encontró la película','error'); }
 };
 
+// Búsqueda por nombre — Películas
+window.buscarPorNombrePeli = async function() {
+    const q = document.getElementById('inputBuscarNombrePeli').value.trim();
+    if (!q) return;
+    const cont = document.getElementById('resultadosBusquedaPeli');
+    cont.innerHTML = '<p class="text-zinc-500 text-xs text-center py-3">Buscando...</p>';
+    cont.classList.remove('hidden');
+    try {
+        const r = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=es-MX&query=${encodeURIComponent(q)}`);
+        const d = await r.json();
+        const resultados = (d.results||[]).filter(p=>p.poster_path||p.title).slice(0,8);
+        if (!resultados.length) { cont.innerHTML='<p class="text-zinc-500 text-xs text-center py-3">Sin resultados.</p>'; return; }
+        cont.innerHTML = resultados.map(p => `
+            <button onclick="seleccionarPeli(${p.id},'${(p.title||'').replace(/'/g,"\\'")}','${(p.release_date||'').split('-')[0]}','${p.poster_path||''}')"
+                class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-zinc-700 transition text-left">
+                ${p.poster_path?`<img src="https://image.tmdb.org/t/p/w45${p.poster_path}" class="w-7 h-10 rounded-lg object-cover shrink-0">`:'<div class="w-7 h-10 bg-zinc-700 rounded-lg shrink-0"></div>'}
+                <div class="min-w-0">
+                    <p class="text-xs font-black text-white truncate">${p.title}</p>
+                    <p class="text-[9px] text-zinc-500 font-bold">${(p.release_date||'').split('-')[0]} · ID: ${p.id}</p>
+                </div>
+            </button>`).join('');
+    } catch(e) { cont.innerHTML='<p class="text-red-400 text-xs text-center py-3">Error al buscar.</p>'; }
+};
+
+window.seleccionarPeli = function(id, titulo, anio, poster) {
+    document.getElementById('inputMovieID').value = id;
+    document.getElementById('previewTitle').textContent = titulo;
+    document.getElementById('previewYear').textContent = anio;
+    document.getElementById('previewPoster').src = poster ? `https://image.tmdb.org/t/p/w92${poster}` : '';
+    document.getElementById('peliculaPreview').classList.remove('hidden');
+    document.getElementById('resultadosBusquedaPeli').classList.add('hidden');
+    document.getElementById('inputBuscarNombrePeli').value = '';
+    // Verificar si ya existe en Firestore
+    checkExistePelicula(String(id));
+};
+
+window.onMovieIDChange = function() {
+    const id = document.getElementById('inputMovieID').value.trim();
+    if (id) checkExistePelicula(id);
+};
+
+async function checkExistePelicula(id) {
+    try {
+        const snap = await window.getDoc(window.doc(window.db, 'latinoLinks', id));
+        if (snap.exists()) {
+            // Ya existe → abrir modal de edición directamente
+            showToast('toastPelis', '⚠️ Ya existe — abriendo editor…', 'error');
+            setTimeout(() => editarPelicula({ id, ...snap.data() }), 600);
+        }
+    } catch(e) {}
+}
+
 window.guardarLink = async function() {
     const id = document.getElementById('inputMovieID').value.trim();
     const url = document.getElementById('inputEmbedURL').value.trim();
     const url2 = document.getElementById('inputEmbedURL2').value.trim();
     if (!id||!url) { showToast('toastPelis','Completá el ID y el link principal','error'); return; }
     try {
+        // Verificar si ya existe
+        const snap = await window.getDoc(window.doc(window.db, 'latinoLinks', id));
+        if (snap.exists()) {
+            showToast('toastPelis', '⚠️ Ya existe — abriendo editor…', 'error');
+            setTimeout(() => editarPelicula({ id, ...snap.data() }), 600);
+            return;
+        }
         const titulo = document.getElementById('previewTitle').textContent||'';
         const anio   = document.getElementById('previewYear').textContent||'';
         const data   = { url, titulo, anio, fecha: new Date().toISOString() };
@@ -440,6 +517,45 @@ window.buscarSerie = async function() {
     } catch(e) { showToast('toastSeries','No se encontró la serie','error'); }
 };
 
+// Búsqueda por nombre — Series
+window.buscarPorNombreSerie = async function() {
+    const q = document.getElementById('inputBuscarNombreSerie').value.trim();
+    if (!q) return;
+    const cont = document.getElementById('resultadosBusquedaSerie');
+    cont.innerHTML = '<p class="text-zinc-500 text-xs text-center py-3">Buscando...</p>';
+    cont.classList.remove('hidden');
+    try {
+        const r = await fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&language=es-MX&query=${encodeURIComponent(q)}`);
+        const d = await r.json();
+        const resultados = (d.results||[]).filter(s=>s.poster_path||s.name).slice(0,8);
+        if (!resultados.length) { cont.innerHTML='<p class="text-zinc-500 text-xs text-center py-3">Sin resultados.</p>'; return; }
+        cont.innerHTML = resultados.map(s => `
+            <button onclick="seleccionarSerie(${s.id},'${(s.name||'').replace(/'/g,"\\'")}','${(s.first_air_date||'').split('-')[0]}','${s.poster_path||''}')"
+                class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-zinc-700 transition text-left">
+                ${s.poster_path?`<img src="https://image.tmdb.org/t/p/w45${s.poster_path}" class="w-7 h-10 rounded-lg object-cover shrink-0">`:'<div class="w-7 h-10 bg-zinc-700 rounded-lg shrink-0"></div>'}
+                <div class="min-w-0">
+                    <p class="text-xs font-black text-white truncate">${s.name}</p>
+                    <p class="text-[9px] text-zinc-500 font-bold">${(s.first_air_date||'').split('-')[0]} · ID: ${s.id}</p>
+                </div>
+            </button>`).join('');
+    } catch(e) { cont.innerHTML='<p class="text-red-400 text-xs text-center py-3">Error al buscar.</p>'; }
+};
+
+window.seleccionarSerie = function(id, nombre, anio, poster) {
+    document.getElementById('inputSerieID').value = id;
+    document.getElementById('previewSerieName').textContent = nombre;
+    document.getElementById('previewSerieYear').textContent = anio;
+    document.getElementById('previewSeriePoster').src = poster ? `https://image.tmdb.org/t/p/w92${poster}` : '';
+    document.getElementById('seriePreview').classList.remove('hidden');
+    document.getElementById('resultadosBusquedaSerie').classList.add('hidden');
+    document.getElementById('inputBuscarNombreSerie').value = '';
+};
+
+window.onSerieIDChange = function() {
+    // Limpiar preview si cambia el ID manualmente (sin selección de búsqueda)
+    document.getElementById('seriePreview').classList.add('hidden');
+};
+
 window.guardarEpisodio = async function() {
     const serieID  = document.getElementById('inputSerieID').value.trim();
     const temporada = parseInt(document.getElementById('inputTemporada').value);
@@ -448,6 +564,14 @@ window.guardarEpisodio = async function() {
     const url2 = document.getElementById('inputSerieURL2').value.trim();
     if (!serieID||!temporada||!episodio||!url) { showToast('toastSeries','Completá todos los campos obligatorios','error'); return; }
     try {
+        const docID = `${serieID}_t${temporada}_e${episodio}`;
+        // Verificar si ya existe
+        const snapExiste = await window.getDoc(window.doc(window.db, 'latinoSeries', docID));
+        if (snapExiste.exists()) {
+            showToast('toastSeries', '⚠️ Ya existe — abriendo editor…', 'error');
+            setTimeout(() => editarEpisodio({ id: docID, ...snapExiste.data() }), 600);
+            return;
+        }
         const serieName = document.getElementById('previewSerieName').textContent||'';
         let epName = '';
         try {
@@ -455,7 +579,6 @@ window.guardarEpisodio = async function() {
             const ed = await er.json();
             epName = ed.name||'';
         } catch(e){}
-        const docID = `${serieID}_t${temporada}_e${episodio}`;
         const data = { serieID, temporada, episodio, url, serieName, epName, fecha: new Date().toISOString() };
         if (url2) data.url2 = url2;
         await window.setDoc(window.doc(window.db,'latinoSeries',docID), data);
@@ -477,6 +600,18 @@ window.borrarEpisodio = async function(id) {
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
 window.probarLink = function(url) { window.open(url,'_blank'); };
+
+// Cerrar dropdowns de búsqueda al hacer click fuera
+document.addEventListener('click', e => {
+    const resPeli = document.getElementById('resultadosBusquedaPeli');
+    const resSerie = document.getElementById('resultadosBusquedaSerie');
+    if (resPeli && !e.target.closest('#resultadosBusquedaPeli') && !e.target.closest('[id="inputBuscarNombrePeli"]') && !e.target.closest('button[onclick="buscarPorNombrePeli()"]')) {
+        resPeli.classList.add('hidden');
+    }
+    if (resSerie && !e.target.closest('#resultadosBusquedaSerie') && !e.target.closest('[id="inputBuscarNombreSerie"]') && !e.target.closest('button[onclick="buscarPorNombreSerie()"]')) {
+        resSerie.classList.add('hidden');
+    }
+});
 
 function showToast(id, msg, tipo) {
     const t = document.getElementById(id);
