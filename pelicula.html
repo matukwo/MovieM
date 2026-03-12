@@ -580,16 +580,13 @@
         async function guardarProgreso(porcentaje) {
             const pct = Math.min(100, Math.max(0, Math.round(porcentaje)));
             _progresoLocal = pct;
-            // Siempre guardar en localStorage como fallback
             try {
                 const prog = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
                 prog['pelicula_' + movieID] = pct;
                 localStorage.setItem('movieM_progress', JSON.stringify(prog));
             } catch(e) {}
-            // Guardar en Firestore si hay usuario
             try {
-                await waitForFirebase();
-                const user = window.auth.currentUser;
+                const user = await getFirebaseUser();
                 if (!user) return;
                 const ref = window.doc(window.db, 'usuarios', user.uid, 'continuar', 'pelicula_' + movieID);
                 await window.setDoc(ref, {
@@ -602,10 +599,8 @@
         }
 
         async function leerProgreso() {
-            // Intentar leer de Firestore primero
             try {
-                await waitForFirebase();
-                const user = window.auth.currentUser;
+                const user = await getFirebaseUser();
                 if (user) {
                     const ref = window.doc(window.db, 'usuarios', user.uid, 'continuar', 'pelicula_' + movieID);
                     const snap = await window.getDoc(ref);
@@ -615,7 +610,6 @@
                     }
                 }
             } catch(e) {}
-            // Fallback localStorage
             try {
                 const prog = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
                 _progresoLocal = prog['pelicula_' + movieID] || 0;
@@ -627,9 +621,24 @@
 
         async function waitForFirebase() {
             for (let i = 0; i < 30; i++) {
-                if (window.db && window.auth) break;
+                if (window.db && window.auth && window.onAuthStateChanged) break;
                 await new Promise(r => setTimeout(r, 100));
             }
+        }
+
+        async function getFirebaseUser() {
+            await waitForFirebase();
+            return new Promise(resolve => {
+                // Si ya hay usuario resuelto, usarlo
+                if (window.auth.currentUser !== undefined) {
+                    // currentUser puede ser null (no logueado) o un user
+                    // Pero justo al iniciar puede ser null aún si no resolvió
+                }
+                const unsub = window.onAuthStateChanged(window.auth, u => {
+                    unsub();
+                    resolve(u);
+                });
+            });
         }
 
         function actualizarBarraProgreso(pct) {
