@@ -84,14 +84,13 @@
 
                 seccion.classList.remove('hidden');
                 fila.innerHTML = itemsValidos.map(d => {
-                    // Aseguramos que el porcentaje sea un número válido
-                    const progreso = d.porcentaje || 0;
+                    const progreso = Math.round(d.porcentaje || 0);
                     return `
                         <div onclick="location.href='pelicula.html?id=${d.contentId}'" class="min-w-[140px] md:min-w-[180px] shrink-0 cursor-pointer group">
                             <div class="relative rounded-xl overflow-hidden border border-white/10 group-hover:scale-105 transition duration-300">
                                 <img src="${d.poster}" class="w-full aspect-[2/3] object-cover">
                                 <div class="absolute bottom-0 left-0 right-0 h-1.5 bg-zinc-900/80">
-                                    <div class="bg-red-600 h-full transition-all duration-500" style="width: ${progreso}%"></div>
+                                    <div class="bg-red-600 h-full transition-all duration-700" style="width: ${progreso}%"></div>
                                 </div>
                             </div>
                             <p class="text-[10px] font-black mt-2 truncate uppercase text-zinc-400 group-hover:text-white">${d.titulo}</p>
