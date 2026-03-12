@@ -378,11 +378,19 @@ var colorG=localStorage.getItem('movieM_color');if(colorG)document.documentEleme
 // ── Continuar Viendo (Firebase por usuario + Series) ──────────────────────────
 (async function cargarContinuar(){
   try {
-    // Esperar Firebase y autenticación
+    // Esperar Firebase
     for (let i = 0; i < 40; i++) {
-      if (window.db && window.auth) break;
+      if (window.db && window.auth && window.onAuthStateChanged) break;
       await new Promise(r => setTimeout(r, 100));
     }
+
+    // Esperar a que Auth resuelva el estado del usuario (puede ser null o un user)
+    const user = await new Promise(resolve => {
+      const unsub = window.onAuthStateChanged(window.auth, u => {
+        unsub();
+        resolve(u);
+      });
+    });
 
     async function obtenerItemsFirestore(user) {
       try {
@@ -390,14 +398,13 @@ var colorG=localStorage.getItem('movieM_color');if(colorG)document.documentEleme
         const snap = await window.getDocs(ref);
         const items = [];
         snap.forEach(d => items.push({ id: d.id, ...d.data() }));
-        // Ordenar por updatedAt desc
         items.sort((a,b) => {
           const ta = a.updatedAt?.toMillis?.() || a.updatedAt || 0;
           const tb = b.updatedAt?.toMillis?.() || b.updatedAt || 0;
           return tb - ta;
         });
         return items.slice(0, 12);
-      } catch(e) { return []; }
+      } catch(e) { console.error('Firestore continuar:', e); return []; }
     }
 
     function obtenerItemsLocal() {
@@ -407,23 +414,21 @@ var colorG=localStorage.getItem('movieM_color');if(colorG)document.documentEleme
           .filter(([k,v]) => k.startsWith('pelicula_') && typeof v === 'number' && v > 2 && v < 98)
           .map(([k,v]) => ({ id: k, tipo: 'pelicula', contentId: k.replace('pelicula_',''), porcentaje: v, updatedAt: 0 }));
         const series = Object.entries(prog)
-          .filter(([k,v]) => k.startsWith('serie_') && typeof v === 'object' && v.ep)
-          .map(([k,v]) => ({ id: k, tipo: 'serie', contentId: k.replace('serie_',''), ...v }));
+          .filter(([k,v]) => k.startsWith('serie_') && typeof v === 'object' && (v.ep || v.episodio))
+          .map(([k,v]) => ({ id: k, tipo: 'serie', contentId: k.replace('serie_',''), temporada: v.temp || v.temporada, episodio: v.ep || v.episodio, episodioNombre: v.nombre || v.episodioNombre || '', updatedAt: v.updatedAt || 0 }));
         return [...peliculas, ...series].slice(0, 12);
       } catch(e) { return []; }
     }
 
-    // Intentar con usuario de Firebase, si no usar localStorage
     let items = [];
-    const user = window.auth.currentUser;
     if (user) {
       items = await obtenerItemsFirestore(user);
     }
-    // Si no hay items en Firestore, intentar localStorage
+    // Fallback a localStorage si no hay items en Firestore
     if (!items.length) {
       items = obtenerItemsLocal();
     }
-    // Filtrar películas con progreso válido
+    // Filtrar items válidos
     items = items.filter(it => {
       if (it.tipo === 'pelicula') return (it.porcentaje || 0) > 2 && (it.porcentaje || 0) < 98;
       if (it.tipo === 'serie') return it.episodio;
