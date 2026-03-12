@@ -71,15 +71,18 @@
     const urlParams = new URLSearchParams(window.location.search);
     const movieID = urlParams.get('id');
     let miUID_pelicula = null;
-    let _progresoLocal = 0;
-    let progresoInicio = null;
+    let _progresoBase = 0; // Lo que ya estaba guardado
+    let progresoInicioSesion = null;
     let progresoTimer = null;
     let _latinoUrl = null;
 
     window.onAuthStateChanged(window.auth, (user) => {
         if (user) {
             miUID_pelicula = user.uid;
-            leerProgreso().then(pct => actualizarBarraProgreso(pct));
+            leerProgreso().then(pct => {
+                _progresoBase = pct;
+                actualizarBarraProgreso(pct);
+            });
         }
     });
 
@@ -103,14 +106,16 @@
 
     async function guardarProgreso(porcentaje) {
         if (!miUID_pelicula) return;
-        const pct = Math.min(100, Math.max(0, Math.round(porcentaje)));
-        _progresoLocal = pct;
+        const pctFinal = Math.min(100, Math.max(0, Math.round(porcentaje)));
         
+        // Actualizar UI local inmediatamente
+        actualizarBarraProgreso(pctFinal);
+
         try {
             const ref = window.doc(window.db, 'usuarios', miUID_pelicula, 'continuar', 'pelicula_' + movieID);
             await window.setDoc(ref, {
                 contentId: String(movieID),
-                porcentaje: pct,
+                porcentaje: pctFinal,
                 titulo: document.getElementById('titulo').innerText,
                 poster: document.getElementById('poster').src,
                 updatedAt: window.serverTimestamp()
@@ -122,56 +127,49 @@
         if (!miUID_pelicula) return 0;
         const ref = window.doc(window.db, 'usuarios', miUID_pelicula, 'continuar', 'pelicula_' + movieID);
         const snap = await window.getDoc(ref);
-        if (snap.exists()) {
-            _progresoLocal = snap.data().porcentaje || 0;
-            return _progresoLocal;
-        }
-        return 0;
+        return (snap.exists()) ? (snap.data().porcentaje || 0) : 0;
     }
 
     function actualizarBarraProgreso(pct) {
         const bar = document.getElementById('progresoBar');
         const wrap = document.getElementById('progresoWrap');
-        if (pct > 2) {
+        const num = document.getElementById('progresoNum');
+        if (pct > 1) {
             wrap.classList.remove('hidden');
             bar.style.width = pct + '%';
-            document.getElementById('progresoNum').innerText = Math.round(pct) + '%';
+            num.innerText = pct + '%';
         }
     }
 
     window.cambiarFuente = function(fuente) {
         const frame = document.getElementById('movieFrame');
-        if (fuente === 'sub') {
-            frame.src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
-        } else {
-            frame.src = _latinoUrl;
-        }
+        frame.src = (fuente === 'sub') 
+            ? `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es` 
+            : _latinoUrl;
     }
 
     window.verPelicula = () => {
         document.getElementById('playerOverlay').style.display = 'flex';
         document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
-        progresoInicio = Date.now();
+        progresoInicioSesion = Date.now();
         
+        // Guardado cada 15 segundos calculando incremento sobre la base
         progresoTimer = setInterval(() => {
-            const transcurrido = Date.now() - progresoInicio;
+            const msVistos = Date.now() - progresoInicioSesion;
             const duracionMs = (window._peliculaDuracion || 120) * 60 * 1000;
-            const pctSesion = (transcurrido / duracionMs) * 100;
-            guardarProgreso(_progresoLocal + pctSesion);
+            const incrementoPct = (msVistos / duracionMs) * 100;
+            guardarProgreso(_progresoBase + incrementoPct);
         }, 15000);
     }
 
     window.cerrarPelicula = async () => {
         clearInterval(progresoTimer);
-        // Guardar por última vez antes de cerrar
-        if (progresoInicio) {
-            const transcurrido = Date.now() - progresoInicio;
+        if (progresoInicioSesion) {
+            const msVistos = Date.now() - progresoInicioSesion;
             const duracionMs = (window._peliculaDuracion || 120) * 60 * 1000;
-            const pctSesion = (transcurrido / duracionMs) * 100;
-            await guardarProgreso(_progresoLocal + pctSesion);
+            const incrementoPct = (msVistos / duracionMs) * 100;
+            await guardarProgreso(_progresoBase + incrementoPct);
         }
-        document.getElementById('playerOverlay').style.display = 'none';
-        document.getElementById('movieFrame').src = "";
         location.reload(); 
     }
 
