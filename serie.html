@@ -59,10 +59,19 @@
                 </div>
             </div>
         </div>
-        <button onclick="cerrarPlayer()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-3 py-1.5 rounded-full border border-white/5">Cerrar ×</button>
+        <div class="flex items-center gap-2">
+            <button id="btnFuenteLatSerie" onclick="cambiarFuenteSerie('latino')" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">🇦🇷 Latino</button>
+            <button onclick="cerrarPlayer()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-3 py-1.5 rounded-full border border-white/5">Cerrar ×</button>
+        </div>
     </div>
-    <div class="player-wrap bg-black">
+    <div class="player-wrap bg-black" style="position:relative">
         <iframe id="serieFrame" src="" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" playsinline webkit-playsinline></iframe>
+        <!-- Botón respaldo latino serie -->
+        <div id="btnRespaldoWrapSerie" class="hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-50">
+            <button onclick="usarRespaldoSerie()" class="bg-zinc-900/95 border border-yellow-500/30 text-yellow-400 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-xl active:scale-95 hover:bg-zinc-800 transition">
+                ⚠️ ¿No funciona? Probar respaldo
+            </button>
+        </div>
     </div>
 </div>
 
@@ -490,6 +499,7 @@
     };
 
     window.cambiarServidor = (num, label) => {
+        _modoLatinoSerie = false;
         servidorActivo = num;
         document.getElementById('serieFrame').src = SERVERS_TV[num](serieID, epTemp, epNum);
         document.getElementById('serverLabel').innerText = label;
@@ -497,6 +507,53 @@
         document.querySelectorAll('#serverMenu button').forEach((b,i) => {
             b.classList.toggle('srv-active', i+1 === num);
         });
+        // Resetear botón latino a estilo inactivo
+        const latBtn = document.getElementById('btnFuenteLatSerie');
+        if (latBtn && _latinoUrlSerie) {
+            latBtn.className = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400';
+        }
+        document.getElementById('btnRespaldoWrapSerie').classList.add('hidden');
+    };
+
+    // ── LINK LATINO PARA SERIES ───────────────────────────────────
+    let _latinoUrlSerie = null;
+    let _latinoUrlSerie2 = null;
+    let _modoLatinoSerie = false;
+
+    async function cargarLatinoLinkSerie() {
+        try {
+            for (let i = 0; i < 30; i++) {
+                if (window.db && window.getDoc && window.doc) break;
+                await new Promise(r => setTimeout(r, 100));
+            }
+            const snap = await window.getDoc(window.doc(window.db, 'latinoLinks', 'tv-' + serieID));
+            if (snap.exists()) {
+                _latinoUrlSerie = snap.data().url;
+                _latinoUrlSerie2 = snap.data().url2 || null;
+                const latBtn = document.getElementById('btnFuenteLatSerie');
+                if (latBtn) latBtn.classList.remove('hidden');
+            }
+        } catch(e) { console.log('Sin link latino para esta serie'); }
+    }
+    cargarLatinoLinkSerie();
+
+    window.usarRespaldoSerie = function() {
+        if (!_latinoUrlSerie2) return;
+        document.getElementById('serieFrame').src = _latinoUrlSerie2;
+        document.getElementById('btnRespaldoWrapSerie').classList.add('hidden');
+    };
+
+    window.cambiarFuenteSerie = function(fuente) {
+        const latBtn = document.getElementById('btnFuenteLatSerie');
+        const respaldoWrap = document.getElementById('btnRespaldoWrapSerie');
+        const base = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition';
+        if (fuente === 'latino') {
+            _modoLatinoSerie = true;
+            latBtn.className = base + ' bg-yellow-500/20 border-yellow-500/50 text-yellow-400';
+            document.getElementById('serieFrame').src = _latinoUrlSerie;
+            if (_latinoUrlSerie2) respaldoWrap.classList.remove('hidden');
+            document.querySelectorAll('#serverMenu button').forEach(b => b.classList.remove('srv-active'));
+        }
     };
 
     document.addEventListener('click', e => {
