@@ -406,12 +406,12 @@
 
     function reproducirEpisodio(temp, ep, nombre) {
         epTemp = temp; epNum = ep; epNombre = nombre || '';
-        // Resetear a subtitulado al abrir
-        document.getElementById('btnFuenteSubSerie').className = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition bg-white/10 border-white/20 text-white';
+        // Ocultar latino mientras carga, resetear botones
         const latBtn = document.getElementById('btnFuenteLatSerie');
-        if (!latBtn.classList.contains('hidden')) {
-            latBtn.className = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400';
-        }
+        latBtn.classList.add('hidden');
+        _latinoUrlSerie = null; _latinoUrlSerie2 = null;
+        document.getElementById('btnFuenteSubSerie').className = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition bg-white/10 border-white/20 text-white';
+        latBtn.className = 'hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400';
         document.getElementById('btnRespaldoWrapSerie').classList.add('hidden');
         document.getElementById('serieFrame').src = `https://vidsrc.cc/v3/embed/tv/${serieID}/${temp}/${ep}?auto_lang=es`;
         document.getElementById('playerOverlay').style.display = 'flex';
@@ -419,6 +419,8 @@
         document.body.style.position = 'fixed';
         document.body.style.width = '100%';
         guardarProgresoSerie(temp, ep, nombre);
+        // Buscar link latino para este episodio específico
+        cargarLatinoEpisodio(temp, ep);
     }
 
     // ── SISTEMA DE PROGRESO SERIES (solo Firestore) ───────────────
@@ -461,25 +463,25 @@
 
     window.verPrimerEpisodio = () => reproducirEpisodio(1, 1, 'Episodio 1');
 
-    // ── LINK LATINO PARA SERIES ───────────────────────────────────
+    // ── LINK LATINO — busca en latinoSeries por episodio ─────────
     let _latinoUrlSerie = null;
     let _latinoUrlSerie2 = null;
 
-    async function cargarLatinoLinkSerie() {
+    async function cargarLatinoEpisodio(temp, ep) {
         try {
             for (let i = 0; i < 30; i++) {
                 if (window.db && window.getDoc && window.doc) break;
                 await new Promise(r => setTimeout(r, 100));
             }
-            const snap = await window.getDoc(window.doc(window.db, 'latinoLinks', 'tv-' + serieID));
+            const docID = `${serieID}_t${temp}_e${ep}`;
+            const snap = await window.getDoc(window.doc(window.db, 'latinoSeries', docID));
             if (snap.exists()) {
                 _latinoUrlSerie = snap.data().url;
                 _latinoUrlSerie2 = snap.data().url2 || null;
                 document.getElementById('btnFuenteLatSerie').classList.remove('hidden');
             }
-        } catch(e) { console.log('Sin link latino para esta serie'); }
+        } catch(e) { console.log('Sin link latino para este episodio'); }
     }
-    cargarLatinoLinkSerie();
 
     window.usarRespaldoSerie = function() {
         if (!_latinoUrlSerie2) return;
