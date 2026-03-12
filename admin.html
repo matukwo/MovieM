@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieM | Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="firebase-config.js"></script>
+    <style>
+        .text-accent{color:var(--accent-color,#dc2626)}
+        .bg-accent{background-color:var(--accent-color,#dc2626)}
+        .skeleton{background:linear-gradient(90deg,#27272a 25%,#3f3f46 50%,#27272a 75%);background-size:200% 100%;animation:shimmer 1.4s infinite}
+        @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    </style>
+</head>
+<body class="bg-zinc-950 text-white font-sans min-h-screen">
+
+<nav class="px-6 py-4 flex items-center justify-between bg-zinc-950/90 backdrop-blur-md border-b border-white/5 sticky top-0 z-50">
+    <h1 class="text-xl font-black text-accent tracking-tighter cursor-pointer" onclick="location.href='index.html'">MOVIE<span class="text-white font-light">M</span> <span class="text-zinc-600 text-xs font-bold">ADMIN</span></h1>
+    <button onclick="location.href='index.html'" class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-white transition">← Inicio</button>
+</nav>
+
+<!-- Acceso denegado -->
+<div id="accesoDenegado" class="hidden fixed inset-0 flex items-center justify-center bg-zinc-950 z-50">
+    <div class="text-center">
+        <p class="text-6xl mb-4">🔒</p>
+        <h2 class="text-2xl font-black uppercase tracking-tighter text-white mb-2">Acceso Denegado</h2>
+        <p class="text-zinc-500 text-sm mb-6">Esta página es solo para administradores.</p>
+        <button onclick="location.href='index.html'" class="px-6 py-3 bg-accent rounded-2xl text-sm font-black uppercase tracking-widest text-white">Volver al Inicio</button>
+    </div>
+</div>
+
+<main id="mainContent" class="hidden max-w-4xl mx-auto px-4 py-8">
+
+    <div class="mb-8">
+        <h2 class="text-3xl font-black italic uppercase tracking-tighter">Panel de Admin</h2>
+        <p class="text-zinc-500 text-xs font-bold uppercase tracking-widest mt-1">Gestión de contenido MovieM</p>
+    </div>
+
+    <!-- Sección Links Latinos -->
+    <div class="bg-zinc-900/60 rounded-3xl border border-white/5 overflow-hidden mb-6">
+        <div class="px-6 py-5 border-b border-white/5 flex items-center gap-3">
+            <span class="text-2xl">🇦🇷</span>
+            <div>
+                <h3 class="text-sm font-black uppercase tracking-widest">Links Latino</h3>
+                <p class="text-[9px] text-zinc-500 font-bold uppercase">Embeds en español latino por película</p>
+            </div>
+        </div>
+
+        <!-- Agregar nuevo link -->
+        <div class="p-6 border-b border-white/5">
+            <h4 class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-4">Agregar / Actualizar</h4>
+            <div class="flex flex-col md:flex-row gap-3">
+                <div class="flex-1">
+                    <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">ID de Película (TMDB)</label>
+                    <input id="inputMovieID" type="text" placeholder="ej: 1265609"
+                        class="w-full bg-zinc-800 border border-zinc-700 focus:border-accent rounded-2xl px-4 py-3 text-sm text-white outline-none transition placeholder-zinc-600">
+                </div>
+                <div class="flex-[2]">
+                    <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">URL del Embed</label>
+                    <input id="inputEmbedURL" type="url" placeholder="https://vidmoly.biz/embed-..."
+                        class="w-full bg-zinc-800 border border-zinc-700 focus:border-accent rounded-2xl px-4 py-3 text-sm text-white outline-none transition placeholder-zinc-600">
+                </div>
+            </div>
+            <div class="flex items-center gap-3 mt-3">
+                <button onclick="buscarPelicula()" class="px-5 py-2.5 bg-zinc-800 border border-zinc-700 hover:border-zinc-500 text-zinc-300 rounded-2xl text-xs font-black uppercase tracking-widest transition active:scale-95">
+                    🔍 Buscar Título
+                </button>
+                <button onclick="guardarLink()" class="px-5 py-2.5 bg-accent hover:opacity-90 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition active:scale-95">
+                    + Guardar
+                </button>
+                <span id="toastAdmin" class="hidden text-xs font-bold"></span>
+            </div>
+            <!-- Preview película -->
+            <div id="peliculaPreview" class="hidden mt-4 flex items-center gap-3 p-3 bg-zinc-800/60 rounded-2xl border border-white/5">
+                <img id="previewPoster" src="" class="w-10 h-14 rounded-lg object-cover shrink-0">
+                <div>
+                    <p id="previewTitle" class="text-sm font-black"></p>
+                    <p id="previewYear" class="text-[9px] text-zinc-500 font-bold uppercase"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de links guardados -->
+        <div class="p-6">
+            <h4 class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-4">Links guardados <span id="countLinks" class="text-zinc-600">(0)</span></h4>
+            <div id="listaLinks" class="space-y-3">
+                <div class="h-14 skeleton rounded-2xl"></div>
+                <div class="h-14 skeleton rounded-2xl"></div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<script type="module">
+const ADMIN_UID = '41XWZR8OzwdpMHf54UIQEzAEt7s1';
+const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
+
+async function waitForFirebase() {
+    for (let i = 0; i < 50; i++) {
+        if (window.db && window.auth && window.onAuthStateChanged && window.getDocs && window.setDoc && window.deleteDoc) return true;
+        await new Promise(r => setTimeout(r, 100));
+    }
+    return false;
+}
+
+const ok = await waitForFirebase();
+if (!ok) { alert('Error de conexión'); }
+
+window.onAuthStateChanged(window.auth, async user => {
+    if (!user || user.uid !== ADMIN_UID) {
+        document.getElementById('accesoDenegado').classList.remove('hidden');
+        return;
+    }
+    document.getElementById('mainContent').classList.remove('hidden');
+    cargarLinks();
+});
+
+async function cargarLinks() {
+    const cont = document.getElementById('listaLinks');
+    try {
+        const snap = await window.getDocs(window.collection(window.db, 'latinoLinks'));
+        const links = [];
+        snap.forEach(d => links.push({ id: d.id, ...d.data() }));
+
+        document.getElementById('countLinks').textContent = `(${links.length})`;
+
+        if (!links.length) {
+            cont.innerHTML = '<p class="text-zinc-600 text-xs text-center py-6 italic">No hay links guardados aún.</p>';
+            return;
+        }
+
+        cont.innerHTML = '';
+        links.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'flex items-center gap-3 p-3 bg-zinc-800/40 rounded-2xl border border-white/5';
+            div.innerHTML = `
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-0.5">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">ID: ${item.id}</span>
+                        ${item.titulo ? `<span class="text-xs font-black text-white truncate">${item.titulo}</span>` : ''}
+                        ${item.anio ? `<span class="text-[9px] text-zinc-500">(${item.anio})</span>` : ''}
+                    </div>
+                    <p class="text-[9px] text-zinc-600 truncate">${item.url}</p>
+                </div>
+                <div class="flex gap-2 shrink-0">
+                    <button onclick="probarLink('${item.url}')" class="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-zinc-700 hover:bg-zinc-600 text-zinc-300 transition active:scale-95">▶ Probar</button>
+                    <button onclick="borrarLink('${item.id}')" class="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-red-600/20 hover:bg-red-600/40 text-red-400 transition active:scale-95">✕ Borrar</button>
+                </div>`;
+            cont.appendChild(div);
+        });
+    } catch(e) {
+        cont.innerHTML = '<p class="text-red-400 text-xs text-center py-6">Error al cargar.</p>';
+        console.error(e);
+    }
+}
+
+window.buscarPelicula = async function() {
+    const id = document.getElementById('inputMovieID').value.trim();
+    if (!id) return;
+    try {
+        const r = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=es-ES`);
+        const d = await r.json();
+        if (d.title) {
+            document.getElementById('previewTitle').textContent = d.title;
+            document.getElementById('previewYear').textContent = (d.release_date||'').split('-')[0];
+            document.getElementById('previewPoster').src = d.poster_path ? `https://image.tmdb.org/t/p/w92${d.poster_path}` : '';
+            document.getElementById('peliculaPreview').classList.remove('hidden');
+        }
+    } catch(e) { showToast('No se encontró la película', 'error'); }
+};
+
+window.guardarLink = async function() {
+    const id = document.getElementById('inputMovieID').value.trim();
+    const url = document.getElementById('inputEmbedURL').value.trim();
+    if (!id || !url) { showToast('Completá el ID y la URL', 'error'); return; }
+
+    try {
+        const titulo = document.getElementById('previewTitle').textContent || '';
+        const anio = document.getElementById('previewYear').textContent || '';
+        await window.setDoc(window.doc(window.db, 'latinoLinks', id), { url, titulo, anio, fecha: new Date().toISOString() });
+        showToast('✓ Guardado correctamente', 'ok');
+        document.getElementById('inputMovieID').value = '';
+        document.getElementById('inputEmbedURL').value = '';
+        document.getElementById('peliculaPreview').classList.add('hidden');
+        cargarLinks();
+    } catch(e) { showToast('Error al guardar', 'error'); console.error(e); }
+};
+
+window.borrarLink = async function(id) {
+    if (!confirm(`¿Borrar el link de la película ID ${id}?`)) return;
+    try {
+        await window.deleteDoc(window.doc(window.db, 'latinoLinks', id));
+        showToast('✓ Borrado', 'ok');
+        cargarLinks();
+    } catch(e) { showToast('Error al borrar', 'error'); }
+};
+
+window.probarLink = function(url) {
+    window.open(url, '_blank');
+};
+
+function showToast(msg, tipo) {
+    const t = document.getElementById('toastAdmin');
+    t.textContent = msg;
+    t.className = `text-xs font-bold ${tipo === 'ok' ? 'text-green-400' : 'text-red-400'}`;
+    t.classList.remove('hidden');
+    setTimeout(() => t.classList.add('hidden'), 3000);
+}
+</script>
+</body>
+</html>
