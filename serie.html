@@ -429,6 +429,39 @@
         document.body.style.overflow = 'hidden';
         document.body.style.position = 'fixed';
         document.body.style.width = '100%';
+        // Guardar en Firestore: último episodio visto por este usuario
+        guardarProgresoSerie(temp, ep, nombre);
+    }
+
+    async function guardarProgresoSerie(temp, ep, nombre) {
+        // Guardar en localStorage como fallback
+        try {
+            const prog = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
+            prog['serie_' + serieID] = { temp, ep, nombre, updatedAt: Date.now() };
+            localStorage.setItem('movieM_progress', JSON.stringify(prog));
+        } catch(e) {}
+        // Guardar en Firestore si hay usuario
+        try {
+            for (let i = 0; i < 30; i++) {
+                if (window.db && window.auth && window.auth.currentUser) break;
+                await new Promise(r => setTimeout(r, 100));
+            }
+            const user = window.auth && window.auth.currentUser;
+            if (!user) return;
+            const serieName = serieData ? serieData.name : document.title.replace('MovieM | ', '');
+            const posterPath = serieData ? serieData.poster_path : '';
+            const ref = window.doc(window.db, 'usuarios', user.uid, 'continuar', 'serie_' + serieID);
+            await window.setDoc(ref, {
+                tipo: 'serie',
+                contentId: String(serieID),
+                nombre: serieName,
+                posterPath: posterPath,
+                temporada: temp,
+                episodio: ep,
+                episodioNombre: nombre || '',
+                updatedAt: window.serverTimestamp()
+            }, { merge: true });
+        } catch(e) { console.error('guardarProgresoSerie:', e); }
     }
 
     window.verPrimerEpisodio = () => reproducirEpisodio(1, 1, 'Episodio 1');
