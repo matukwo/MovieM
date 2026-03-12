@@ -586,13 +586,21 @@
 
         async function guardarProgreso(porcentaje) {
             if (!miUID_pelicula) return;
+
+            const titulo = document.getElementById('titulo')?.innerText || '';
+            const poster = document.getElementById('poster')?.src || '';
+
+            // Seguro: si el título no cargó todavía, no guardar basura
+            if (!titulo || titulo === 'Cargando...' || !poster || poster.includes('undefined')) {
+                console.log('[MovieM] Guardado abortado: datos de la película aún no cargados.');
+                return;
+            }
+
             let pct = parseFloat(porcentaje);
             if (isNaN(pct)) return;
             pct = Math.min(99, Math.max(0, Math.round(pct)));
             actualizarBarraProgreso(pct);
             try {
-                const titulo = document.getElementById('titulo')?.innerText || '';
-                const poster = document.getElementById('poster')?.src || '';
                 const ref = window.doc(window.db, 'usuarios', miUID_pelicula, 'continuar', 'pelicula_' + movieID);
                 await window.setDoc(ref, {
                     tipo: 'pelicula',
@@ -602,6 +610,7 @@
                     poster,
                     updatedAt: window.serverTimestamp()
                 }, { merge: true });
+                console.log('[MovieM] Progreso guardado:', pct + '%');
             } catch(e) { console.error('[MovieM] Error guardando progreso:', e); }
         }
 
