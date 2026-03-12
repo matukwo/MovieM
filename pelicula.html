@@ -7,91 +7,61 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module" src="firebase-config.js"></script>
     <style>
-        .star{cursor:pointer;transition:color .2s ease}
-        #starRating:hover .star{color:#ca8a04}
-        #starRating .star:hover~.star{color:#3f3f46!important}
         .no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
-        .glass-card{background:rgba(255,255,255,.04);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 60px -15px rgba(0,0,0,.8)}
-        @keyframes pulse-bg{0%{background-color:rgba(39,39,42,.5)}50%{background-color:rgba(63,63,70,.5)}100%{background-color:rgba(39,39,42,.5)}}
-        .skeleton{animation:pulse-bg 1.5s infinite ease-in-out}
-        .fade-in{animation:fadeIn .8s ease forwards;opacity:0}
-        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
         #playerOverlay{display:none;background:#000;position:fixed;inset:0;z-index:200;flex-direction:column}
+        .skeleton{animation:pulse-bg 1.5s infinite ease-in-out}@keyframes pulse-bg{0%{background-color:#18181b}50%{background-color:#27272a}100%{background-color:#18181b}}
     </style>
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden">
 
 <div id="playerOverlay">
-    <div class="w-full flex justify-between items-center px-3 py-2 md:px-4 md:py-3 bg-zinc-950 border-b border-white/5">
-        <span class="text-red-600 font-black tracking-tighter text-lg md:text-xl shrink-0">MOVIE<span class="text-white font-light">M</span></span>
-        <div id="fuentesBtns" class="flex gap-2">
-            <button id="btnFuenteSub" onclick="cambiarFuente('sub')" class="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition bg-white/10 border-white/20 text-white">📺 Subtitulado</button>
-            <button id="btnFuenteLat" onclick="cambiarFuente('latino')" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">🇦🇷 Latino</button>
+    <div class="w-full flex justify-between items-center px-4 py-3 bg-zinc-950 border-b border-white/5">
+        <span class="text-red-600 font-black tracking-tighter text-xl">MOVIE<span class="text-white font-light">M</span></span>
+        <div class="flex gap-2">
+            <button id="btnFuenteSub" onclick="cambiarFuente('sub')" class="text-[10px] font-black uppercase px-3 py-1.5 rounded-full border bg-white/10 border-white/20 text-white">Subtitulado</button>
+            <button id="btnFuenteLat" onclick="cambiarFuente('latino')" class="hidden text-[10px] font-black uppercase px-3 py-1.5 rounded-full border border-white/10 text-white/40">Latino</button>
         </div>
-        <button onclick="cerrarPelicula()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/5 shrink-0">Cerrar x</button>
+        <button onclick="cerrarPelicula()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/5">Cerrar x</button>
     </div>
-    <div class="flex-1 bg-black relative">
-        <iframe id="movieFrame" src="" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media"></iframe>
-        <div id="btnRespaldoWrap" class="hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-50">
-            <button onclick="usarRespaldo()" class="bg-zinc-900/95 border border-yellow-500/30 text-yellow-400 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-xl active:scale-95 hover:bg-zinc-800 transition">
-                ⚠️ ¿No funciona? Probar respaldo
-            </button>
-        </div>
+    <div class="flex-1 bg-black">
+        <iframe id="movieFrame" src="" class="w-full h-full" allowfullscreen></iframe>
     </div>
 </div>
 
-<div id="backdrop" class="fixed inset-0 w-full h-full bg-cover bg-center opacity-20 md:opacity-30 blur-sm -z-10 transition-all duration-700"></div>
+<div id="backdrop" class="fixed inset-0 w-full h-full bg-cover bg-center opacity-30 blur-sm -z-10 transition-all duration-700"></div>
 <div class="fixed inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent -z-10"></div>
 
-<button onclick="location.href='index.html'" class="fixed top-4 left-4 md:top-8 md:left-8 bg-black/50 p-2.5 md:p-3 rounded-full hover:bg-red-600 transition z-50 border border-white/10 shadow-2xl">
-    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+<button onclick="location.href='index.html'" class="fixed top-8 left-8 bg-black/50 p-3 rounded-full hover:bg-red-600 transition z-50 border border-white/10">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
 </button>
 
-<div id="userHUD" class="fixed top-4 right-4 md:top-8 md:right-8 z-50 hidden items-center gap-3 bg-black/40 backdrop-blur-md p-1.5 pr-4 rounded-full border border-white/10 shadow-2xl">
-    <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-600 flex items-center justify-center font-black text-white border-2 border-white/20 text-sm" id="userInitial">?</div>
-    <span id="userNameHUD" class="text-xs font-bold uppercase tracking-widest hidden md:inline">Usuario</span>
-</div>
-
-<main class="px-4 md:px-8 pt-16 md:pt-20 pb-8">
-    <div class="flex flex-col md:flex-row gap-6 md:gap-12 items-start mb-10 md:mb-16 relative z-0 fade-in">
-        <div class="flex gap-4 md:block w-full md:w-80 md:shrink-0">
-            <div class="w-28 md:w-full shrink-0">
-                <div id="posterSkeleton" class="w-full aspect-[2/3] rounded-xl md:rounded-2xl skeleton"></div>
-                <img id="poster" src="" class="w-full rounded-xl md:rounded-2xl border border-white/10 shadow-2xl hidden" onload="this.classList.remove('hidden');document.getElementById('posterSkeleton')?.remove()">
-                <div id="progresoWrap" class="hidden mt-2">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">Continuar viendo</span>
-                        <span id="progresoNum" class="text-[9px] font-black text-accent"></span>
-                    </div>
-                    <div class="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                        <div id="progresoBar" class="h-full bg-red-600 rounded-full transition-all duration-500" style="width:0%"></div>
-                    </div>
+<main class="px-4 md:px-8 pt-24 pb-8">
+    <div class="flex flex-col md:flex-row gap-12 items-start">
+        <div class="w-full md:w-80 shrink-0">
+            <div id="posterSkeleton" class="w-full aspect-[2/3] rounded-2xl skeleton"></div>
+            <img id="poster" src="" class="w-full rounded-2xl border border-white/10 shadow-2xl hidden" onload="this.classList.remove('hidden');document.getElementById('posterSkeleton').remove()">
+            
+            <div id="progresoWrap" class="hidden mt-4">
+                <div class="flex justify-between mb-1">
+                    <span class="text-[9px] font-black uppercase text-zinc-500 tracking-widest">Tu Progreso</span>
+                    <span id="progresoNum" class="text-[9px] font-black text-red-600">0%</span>
                 </div>
-            </div>
-            <div class="flex-1 md:hidden pt-1">
-                <h1 id="tituloMobile" class="text-2xl font-black italic tracking-tighter uppercase leading-none text-white mb-2"></h1>
-                <div class="flex items-center gap-2 mb-3 flex-wrap">
-                    <span id="anioMobile" class="bg-zinc-800 px-2 py-0.5 rounded text-white text-xs font-bold"></span>
-                    <span class="text-yellow-500 text-sm font-bold">&#11088; <span id="votoMobile">0.0</span></span>
-                </div>
-                <div class="flex gap-2 flex-wrap">
-                    <button onclick="verPelicula()" class="bg-red-600 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95 shadow-lg">Ver</button>
+                <div class="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                    <div id="progresoBar" class="h-full bg-red-600 transition-all duration-500" style="width:0%"></div>
                 </div>
             </div>
         </div>
 
-        <div class="flex-1 relative z-10 min-w-0 hidden md:block">
-            <h1 id="titulo" class="text-5xl md:text-7xl font-black mb-4 italic tracking-tighter uppercase leading-none text-white truncate"></h1>
-            <div class="flex items-center gap-4 mb-6 font-bold flex-wrap">
+        <div class="flex-1">
+            <h1 id="titulo" class="text-5xl md:text-7xl font-black mb-4 italic tracking-tighter uppercase leading-none">Cargando...</h1>
+            <div class="flex items-center gap-4 mb-6 font-bold">
                 <span id="anio" class="bg-zinc-800 px-3 py-1 rounded text-white text-sm"></span>
-                <span class="text-yellow-500 flex items-center gap-1 text-lg">&#11088; <span id="voto">0.0</span></span>
+                <span class="text-yellow-500 text-lg">&#11088; <span id="voto">0.0</span></span>
             </div>
-            <p id="sinopsis" class="text-lg text-zinc-500 max-w-2xl leading-relaxed mb-10 hidden"></p>
-            <div class="flex flex-wrap items-center gap-4">
-                <button onclick="verPelicula()" class="bg-red-600 text-white px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-700 transition-all shadow-xl active:scale-95 tracking-tight uppercase">
-                    VER PELICULA
-                </button>
-            </div>
+            <p id="sinopsis" class="text-lg text-zinc-400 max-w-2xl leading-relaxed mb-10"></p>
+            <button onclick="verPelicula()" class="bg-red-600 text-white px-10 py-4 rounded-full font-black hover:bg-red-700 transition transform active:scale-95 uppercase tracking-tighter">
+                Ver Película
+            </button>
         </div>
     </div>
 </main>
@@ -101,16 +71,14 @@
     const urlParams = new URLSearchParams(window.location.search);
     const movieID = urlParams.get('id');
     let miUID_pelicula = null;
+    let _progresoLocal = 0;
     let progresoInicio = null;
     let progresoTimer = null;
-    let _progresoLocal = 0;
     let _latinoUrl = null;
-    let _latinoUrl2 = null;
 
     window.onAuthStateChanged(window.auth, (user) => {
         if (user) {
             miUID_pelicula = user.uid;
-            actualizarHUD();
             leerProgreso().then(pct => actualizarBarraProgreso(pct));
         }
     });
@@ -119,22 +87,17 @@
         const res = await fetch(`https://api.themoviedb.org/3/movie/${movieID}?api_key=${API_KEY}&language=es-MX`);
         const peli = await res.json();
         document.getElementById('titulo').innerText = peli.title;
-        document.getElementById('tituloMobile').innerText = peli.title;
         document.getElementById('sinopsis').innerText = peli.overview;
-        document.getElementById('sinopsis').classList.remove('hidden');
         document.getElementById('anio').innerText = peli.release_date.split('-')[0];
         document.getElementById('voto').innerText = peli.vote_average.toFixed(1);
         document.getElementById('poster').src = 'https://image.tmdb.org/t/p/w500' + peli.poster_path;
         document.getElementById('backdrop').style.backgroundImage = `url('https://image.tmdb.org/t/p/original${peli.backdrop_path}')`;
         window._peliculaDuracion = peli.runtime || 120;
-        cargarLatinoLink();
-    }
-
-    async function cargarLatinoLink() {
+        
+        // Cargar link latino si existe
         const snap = await window.getDoc(window.doc(window.db, 'latinoLinks', String(movieID)));
         if (snap.exists()) {
             _latinoUrl = snap.data().url;
-            _latinoUrl2 = snap.data().url2 || null;
             document.getElementById('btnFuenteLat').classList.remove('hidden');
         }
     }
@@ -143,10 +106,10 @@
         if (!miUID_pelicula) return;
         const pct = Math.min(100, Math.max(0, Math.round(porcentaje)));
         _progresoLocal = pct;
+        
         try {
             const ref = window.doc(window.db, 'usuarios', miUID_pelicula, 'continuar', 'pelicula_' + movieID);
             await window.setDoc(ref, {
-                tipo: 'pelicula',
                 contentId: String(movieID),
                 porcentaje: pct,
                 titulo: document.getElementById('titulo').innerText,
@@ -178,26 +141,11 @@
     }
 
     window.cambiarFuente = function(fuente) {
-        // GUARDAR PROGRESO ANTES DEL CAMBIO
-        if (progresoInicio) {
-            const transcurrido = Date.now() - progresoInicio;
-            const duracionMs = (window._peliculaDuracion || 120) * 60 * 1000;
-            _progresoLocal += (transcurrido / duracionMs) * 100;
-            guardarProgreso(_progresoLocal);
-            progresoInicio = Date.now(); // Reiniciar contador para la nueva fuente
-        }
-
-        const subBtn = document.getElementById('btnFuenteSub');
-        const latBtn = document.getElementById('btnFuenteLat');
         const frame = document.getElementById('movieFrame');
         if (fuente === 'sub') {
             frame.src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
-            subBtn.className = 'text-[10px] bg-white/10 border-white/20 text-white px-3 py-1.5 rounded-full border';
-            latBtn.className = 'text-[10px] border-white/10 text-white/40 px-3 py-1.5 rounded-full border';
         } else {
             frame.src = _latinoUrl;
-            latBtn.className = 'text-[10px] bg-yellow-500/20 border-yellow-500/50 text-yellow-400 px-3 py-1.5 rounded-full border';
-            subBtn.className = 'text-[10px] border-white/10 text-white/40 px-3 py-1.5 rounded-full border';
         }
     }
 
@@ -205,6 +153,8 @@
         document.getElementById('playerOverlay').style.display = 'flex';
         document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
         progresoInicio = Date.now();
+        
+        // Guardar cada 15 segundos
         progresoTimer = setInterval(() => {
             const transcurrido = Date.now() - progresoInicio;
             const duracionMs = (window._peliculaDuracion || 120) * 60 * 1000;
@@ -214,24 +164,10 @@
     }
 
     window.cerrarPelicula = () => {
-        if (progresoInicio) {
-            const transcurrido = Date.now() - progresoInicio;
-            const duracionMs = (window._peliculaDuracion || 120) * 60 * 1000;
-            _progresoLocal += (transcurrido / duracionMs) * 100;
-            guardarProgreso(_progresoLocal);
-        }
         clearInterval(progresoTimer);
         document.getElementById('playerOverlay').style.display = 'none';
         document.getElementById('movieFrame').src = "";
-    }
-
-    function actualizarHUD() {
-        const user = localStorage.getItem('usuarioMovieM');
-        if (user) {
-            document.getElementById('userHUD').classList.remove('hidden');
-            document.getElementById('userNameHUD').innerText = user;
-            document.getElementById('userInitial').innerText = user[0].toUpperCase();
-        }
+        location.reload(); // Recargar para ver el progreso actualizado
     }
 
     cargarPagina();
