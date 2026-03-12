@@ -579,40 +579,11 @@
         };
 
         // ── SISTEMA DE PROGRESO ────────────────────────────────────────────────────
-        let progresoTimer = null;
-        let progresoInicio = null;
+        // El guardado a Firestore lo maneja el bloque "guardarProgresoIframe" más abajo.
+        // Aquí solo conservamos leerProgreso y actualizarBarraProgreso para mostrar
+        // la barra visual en la página de detalle.
+
         let _progresoBase = 0;
-        // miUID_pelicula ya está declarado arriba (línea ~261)
-
-        async function guardarProgreso(porcentaje) {
-            if (!miUID_pelicula) return;
-
-            const titulo = document.getElementById('titulo')?.innerText || '';
-            const poster = document.getElementById('poster')?.src || '';
-
-            // Seguro: si el título no cargó todavía, no guardar basura
-            if (!titulo || titulo === 'Cargando...' || !poster || poster.includes('undefined')) {
-                console.log('[MovieM] Guardado abortado: datos de la película aún no cargados.');
-                return;
-            }
-
-            let pct = parseFloat(porcentaje);
-            if (isNaN(pct)) return;
-            pct = Math.min(99, Math.max(0, Math.round(pct)));
-            actualizarBarraProgreso(pct);
-            try {
-                const ref = window.doc(window.db, 'usuarios', miUID_pelicula, 'continuar', 'pelicula_' + movieID);
-                await window.setDoc(ref, {
-                    tipo: 'pelicula',
-                    contentId: String(movieID),
-                    porcentaje: pct,
-                    titulo,
-                    poster,
-                    updatedAt: window.serverTimestamp()
-                }, { merge: true });
-                console.log('[MovieM] Progreso guardado:', pct + '%');
-            } catch(e) { console.error('[MovieM] Error guardando progreso:', e); }
-        }
 
         async function leerProgreso() {
             if (!miUID_pelicula) return 0;
@@ -664,15 +635,8 @@
         };
 
         window.cambiarFuente = function(fuente) {
-            // Al cambiar de fuente: guardar progreso acumulado y reiniciar cronómetro
-            if (progresoInicio) {
-                const duracionMs = (window._peliculaDuracion || 120) * 60 * 1000;
-                const incremento = ((Date.now() - progresoInicio) / duracionMs) * 100;
-                const pctActual = _progresoBase + incremento;
-                _progresoBase = pctActual; // actualizar base
-                guardarProgreso(pctActual);
-                progresoInicio = Date.now(); // reiniciar cronómetro
-            }
+            // Al cambiar fuente: guardar progreso acumulado y reiniciar cronómetro
+            detenerTracking();
             const subBtn = document.getElementById('btnFuenteSub');
             const latBtn = document.getElementById('btnFuenteLat');
             const respaldoWrap = document.getElementById('btnRespaldoWrap');
@@ -699,24 +663,11 @@
             document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
             document.getElementById('playerOverlay').style.display = 'flex';
             document.body.style.overflow = "hidden";
-            progresoInicio = Date.now();
-            // Guardar cada 15s: _progresoBase + tiempo transcurrido esta sesión
-            progresoTimer = setInterval(() => {
-                const duracionMs = (window._peliculaDuracion || 120) * 60 * 1000;
-                const incremento = ((Date.now() - progresoInicio) / duracionMs) * 100;
-                guardarProgreso(_progresoBase + incremento);
-            }, 15000);
+            // El tracking lo maneja el listener "load" del iframe
         };
 
         window.cerrarPelicula = async () => {
-            clearInterval(progresoTimer);
-            progresoTimer = null;
-            if (progresoInicio) {
-                const duracionMs = (window._peliculaDuracion || 120) * 60 * 1000;
-                const incremento = ((Date.now() - progresoInicio) / duracionMs) * 100;
-                await guardarProgreso(_progresoBase + incremento);
-                progresoInicio = null;
-            }
+            detenerTracking();
             document.getElementById('playerOverlay').style.display = 'none';
             document.getElementById('movieFrame').src = "";
             document.getElementById('btnRespaldoWrap').classList.add('hidden');
@@ -760,98 +711,104 @@
     </script>
 
 <script>
-/* ===== Sistema Continuar Viendo (iframe compatible) ===== */
+/* ===== Sistema Continuar Viendo — guardado mejorado (iframe compatible) ===== */
 
 let miUID_pelicula = null;
 let tiempoViendo = 0;
 let progresoInterval = null;
+let ultimoGuardadoIframe = 0;
 
 window.onAuthStateChanged && window.onAuthStateChanged(window.auth,(user)=>{
-    if(user){
-        miUID_pelicula = user.uid;
-    }
+    if(user){ miUID_pelicula = user.uid; }
 });
 
-async function guardarProgreso(){
-
+/* Guarda el progreso en Firestore usando tiempo acumulado viendo el iframe */
+async function guardarProgresoIframe(){
     if(!miUID_pelicula) return;
 
     const titulo = document.getElementById("titulo")?.innerText || "";
     const poster = document.getElementById("poster")?.src || "";
 
-    if(!titulo || poster.includes("undefined")) return;
+    if(!titulo || titulo === 'Cargando...' || !poster || poster.includes("undefined")) return;
 
-    const porcentaje = Math.min(100,Math.round((tiempoViendo/5400)*100));
+    const duracionSeg = (window._peliculaDuracion || 120) * 60;
+    const porcentaje  = Math.min(100, Math.round((tiempoViendo / duracionSeg) * 100));
+    const pct = Math.max(0, porcentaje);
 
     try{
-
         const ref = window.doc(
             window.db,
             "usuarios",
             miUID_pelicula,
             "continuar",
-            "pelicula_"+movieID
+            "pelicula_" + movieID
         );
 
-        if(porcentaje >= 95){
+        // Si ya vio casi todo → eliminar del historial
+        if(pct >= 95){
             await window.deleteDoc(ref);
             return;
         }
 
         await window.setDoc(ref,{
-            tipo:"pelicula",
-            contentId:String(movieID),
-            titulo:titulo,
-            poster:poster,
-            porcentaje:porcentaje,
-            tiempo:tiempoViendo,
-            updatedAt:window.serverTimestamp()
-        },{merge:true});
+            tipo:      "pelicula",
+            contentId: String(movieID),
+            titulo:    titulo,
+            poster:    poster,
+            porcentaje: pct,
+            tiempo:    Math.floor(tiempoViendo),
+            updatedAt: window.serverTimestamp()
+        },{ merge: true });
 
-        console.log("Progreso guardado:",porcentaje+"%");
+        // Actualizar barra visible en la página
+        if(typeof actualizarBarraProgreso === 'function') actualizarBarraProgreso(pct);
 
+        console.log("Progreso guardado:", pct + "%");
     }catch(e){
-        console.error("Error guardando progreso",e);
+        console.error("Error guardando progreso", e);
     }
 }
 
 function iniciarTracking(){
-
     tiempoViendo = 0;
+    ultimoGuardadoIframe = Date.now();
+    if(progresoInterval) clearInterval(progresoInterval);
 
-    if(progresoInterval){
-        clearInterval(progresoInterval);
-    }
-
+    // Tick cada segundo para acumular tiempo real
     progresoInterval = setInterval(()=>{
+        tiempoViendo += 1;
 
-        tiempoViendo += 5;
-        guardarProgreso();
-
-    },5000);
-
+        // Guardar a Firestore cada 3 segundos
+        if(Date.now() - ultimoGuardadoIframe > 3000){
+            guardarProgresoIframe();
+            ultimoGuardadoIframe = Date.now();
+        }
+    }, 1000);
 }
 
 function detenerTracking(){
-
-    if(progresoInterval){
-        clearInterval(progresoInterval);
-    }
-
-    guardarProgreso();
+    if(progresoInterval) clearInterval(progresoInterval);
+    guardarProgresoIframe();
 }
+
+// Pausar tracking cuando la pestaña pierde foco (el usuario no está mirando)
+document.addEventListener("visibilitychange", ()=>{
+    if(document.hidden){
+        if(progresoInterval){ clearInterval(progresoInterval); progresoInterval = null; }
+    } else {
+        // Solo reanudar si el player está abierto
+        const overlay = document.getElementById("playerOverlay");
+        if(overlay && overlay.style.display === 'flex') iniciarTracking();
+    }
+});
 
 const frame = document.getElementById("movieFrame");
-
 if(frame){
-    frame.addEventListener("load",()=>{
-        iniciarTracking();
-    });
+    frame.addEventListener("load",()=>{ iniciarTracking(); });
 }
 
-window.addEventListener("beforeunload",()=>{
-    detenerTracking();
-});
+// Guardar al cerrar/recargar la página
+window.addEventListener("beforeunload",()=>{ detenerTracking(); });
 </script>
 
 </body>
