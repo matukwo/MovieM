@@ -23,10 +23,13 @@
 
 <!-- Player overlay -->
 <div id="playerOverlay">
-    <div class="w-full flex justify-between items-center p-3 md:p-4 bg-zinc-950 border-b border-white/5">
-        <span class="text-red-600 font-black tracking-tighter text-lg md:text-xl">MOVIE<span class="text-white font-light">M</span></span>
-        <div id="fuentesBtns" class="flex gap-2"></div>
-        <button onclick="cerrarPelicula()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/5">Cerrar x</button>
+    <div class="w-full flex justify-between items-center px-3 py-2 md:px-4 md:py-3 bg-zinc-950 border-b border-white/5">
+        <span class="text-red-600 font-black tracking-tighter text-lg md:text-xl shrink-0">MOVIE<span class="text-white font-light">M</span></span>
+        <div id="fuentesBtns" class="flex gap-2">
+            <button id="btnFuenteSub" onclick="cambiarFuente('sub')" class="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition bg-white/10 border-white/20 text-white">📺 Subtitulado</button>
+            <button id="btnFuenteLat" onclick="cambiarFuente('latino')" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">🇦🇷 Latino</button>
+        </div>
+        <button onclick="cerrarPelicula()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/5 shrink-0">Cerrar x</button>
     </div>
     <div class="flex-1 bg-black">
         <iframe id="movieFrame" src="" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media"></iframe>
@@ -83,11 +86,8 @@
                 <span id="directorMobile" class="text-zinc-500 text-xs italic block mb-3"></span>
                 <!-- Botones mobile compactos -->
                 <div class="flex gap-2 flex-wrap">
-                    <button onclick="verPelicula('vidsrc')" class="bg-red-600 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95 shadow-lg">
+                    <button onclick="verPelicula()" class="bg-red-600 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95 shadow-lg">
                         <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Ver
-                    </button>
-                    <button id="btnLatinoMobile" onclick="verPelicula('latino')" class="hidden bg-zinc-800 border border-yellow-500/40 text-yellow-400 px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95 shadow-lg">
-                        🇦🇷 Latino
                     </button>
                     <button onclick="abrirTrailer()" class="bg-zinc-800 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95">
                         <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6zM21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9 9-4.03 9-9zm-16.1 0c0-3.92 3.18-7.1 7.1-7.1s7.1 3.18 7.1 7.1-3.18 7.1-7.1 7.1-7.1-3.18-7.1-7.1z"/></svg> Trailer
@@ -122,11 +122,8 @@
             </div>
             <p id="sinopsis" class="text-lg text-zinc-500 max-w-2xl leading-relaxed mb-10 hidden"></p>
             <div class="flex flex-wrap items-center gap-4">
-                <button onclick="verPelicula('vidsrc')" class="bg-red-600 text-white px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-700 transition-all shadow-xl shadow-red-600/20 active:scale-95 tracking-tight uppercase">
+                <button onclick="verPelicula()" class="bg-red-600 text-white px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-700 transition-all shadow-xl shadow-red-600/20 active:scale-95 tracking-tight uppercase">
                     <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> VER PELICULA
-                </button>
-                <button id="btnLatinoDesktop" onclick="verPelicula('latino')" class="hidden bg-zinc-900 border border-yellow-500/40 text-yellow-400 px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-yellow-500/10 transition-all shadow-xl active:scale-95 tracking-tight uppercase">
-                    🇦🇷 LATINO
                 </button>
                 <button onclick="abrirTrailer()" class="bg-white text-black px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-600 hover:text-white transition-all shadow-xl active:scale-95">
                     <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6zM21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9 9-4.03 9-9zm-16.1 0c0-3.92 3.18-7.1 7.1-7.1s7.1 3.18 7.1 7.1-3.18 7.1-7.1 7.1-7.1-3.18-7.1-7.1z"/></svg> VER TRAILER
@@ -250,10 +247,7 @@
         const movieID = urlParams.get('id');
         let currentRating = 0;
 
-        // Verificar si hay link latino para esta película al cargar
-        document.addEventListener('DOMContentLoaded', () => checkLatinoDisponible());
-        // También llamar directo por si DOMContentLoaded ya pasó
-        if (document.readyState !== 'loading') setTimeout(checkLatinoDisponible, 0);
+
 
         // ── Rangos de usuario ────────────────────────────────────
         const ADMIN_UID = '41XWZR8OzwdpMHf54UIQEzAEt7s1';
@@ -594,48 +588,47 @@
             }
         }
 
-        // Links latinos hardcodeados por movie ID
-        const LATINO_LINKS = {
-            '1265609': 'https://vidmoly.biz/embed-cwm9a9a92mn6.html'
+        // Cargar link latino desde Firestore
+        // Link latino desde Firestore
+        let _latinoUrl = null;
+        async function cargarLatinoLink() {
+            try {
+                for (let i = 0; i < 30; i++) {
+                    if (window.db && window.getDoc && window.doc) break;
+                    await new Promise(r => setTimeout(r, 100));
+                }
+                const snap = await window.getDoc(window.doc(window.db, 'latinoLinks', String(movieID)));
+                if (snap.exists()) {
+                    _latinoUrl = snap.data().url;
+                    document.getElementById('btnFuenteLat').classList.remove('hidden');
+                }
+            } catch(e) { console.log('Sin link latino para esta película'); }
+        }
+        cargarLatinoLink();
+
+        window.cambiarFuente = function(fuente) {
+            const subBtn = document.getElementById('btnFuenteSub');
+            const latBtn = document.getElementById('btnFuenteLat');
+            const activeClass = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition';
+            if (fuente === 'sub') {
+                subBtn.className = activeClass + ' bg-white/10 border-white/20 text-white';
+                latBtn.className = activeClass + ' border-white/10 text-white/40 hover:text-yellow-400';
+                document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
+            } else {
+                latBtn.className = activeClass + ' bg-yellow-500/20 border-yellow-500/50 text-yellow-400';
+                subBtn.className = activeClass + ' border-white/10 text-white/40 hover:text-white';
+                document.getElementById('movieFrame').src = _latinoUrl;
+            }
         };
 
-        // Mostrar botón latino si existe para esta peli
-        function checkLatinoDisponible() {
-            if (LATINO_LINKS[String(movieID)]) {
-                const btnMob = document.getElementById('btnLatinoMobile');
-                const btnDesk = document.getElementById('btnLatinoDesktop');
-                if (btnMob) btnMob.classList.remove('hidden');
-                if (btnDesk) btnDesk.classList.remove('hidden');
+        window.verPelicula = () => {
+            // Siempre arranca en Subtitulado
+            document.getElementById('btnFuenteSub').className = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition bg-white/10 border-white/20 text-white';
+            const latBtn = document.getElementById('btnFuenteLat');
+            if (!latBtn.classList.contains('hidden')) {
+                latBtn.className = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400';
             }
-        }
-
-        window.verPelicula = (fuente = 'vidsrc') => {
-            const latinoUrl = LATINO_LINKS[String(movieID)];
-            let src;
-            if (fuente === 'latino' && latinoUrl) {
-                src = latinoUrl;
-            } else {
-                src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
-            }
-
-            // Botones de fuente en el overlay
-            const fuentesBtns = document.getElementById('fuentesBtns');
-            fuentesBtns.innerHTML = '';
-            const btnDefault = document.createElement('button');
-            btnDefault.textContent = '🌐 Por defecto';
-            btnDefault.className = `text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition ${fuente === 'vidsrc' ? 'bg-white/10 border-white/20 text-white' : 'border-white/10 text-white/40 hover:text-white/70'}`;
-            btnDefault.onclick = () => verPelicula('vidsrc');
-            fuentesBtns.appendChild(btnDefault);
-
-            if (latinoUrl) {
-                const btnLat = document.createElement('button');
-                btnLat.textContent = '🇦🇷 Latino';
-                btnLat.className = `text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition ${fuente === 'latino' ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-400' : 'border-white/10 text-white/40 hover:text-yellow-400'}`;
-                btnLat.onclick = () => verPelicula('latino');
-                fuentesBtns.appendChild(btnLat);
-            }
-
-            document.getElementById('movieFrame').src = src;
+            document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
             document.getElementById('playerOverlay').style.display = 'flex';
             document.body.style.overflow = "hidden";
             progresoInicio = Date.now();
