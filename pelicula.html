@@ -319,7 +319,7 @@
                 // Cargar similares
                 cargarSimilares();
                 // Mostrar barra de progreso si ya vio algo
-                actualizarBarraProgreso(leerProgreso());
+                leerProgreso().then(pct => actualizarBarraProgreso(pct));
             } catch (error) { console.error(error); }
         }
 
@@ -572,24 +572,64 @@
         };
 
         // ── CONTINUAR VIENDO ───────────────────────────────────────────────────────
-        // Guarda el progreso de reproducción en localStorage
-        // Clave: movieM_progress → { "pelicula_ID": porcentaje }
+        // Guarda el progreso en Firestore por usuario (con fallback a localStorage)
         let progresoTimer = null;
         let progresoInicio = null;
+        let _progresoLocal = 0; // cache en memoria
 
-        function guardarProgreso(porcentaje) {
+        async function guardarProgreso(porcentaje) {
+            const pct = Math.min(100, Math.max(0, Math.round(porcentaje)));
+            _progresoLocal = pct;
+            // Siempre guardar en localStorage como fallback
             try {
                 const prog = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
-                prog['pelicula_' + movieID] = Math.min(100, Math.max(0, Math.round(porcentaje)));
+                prog['pelicula_' + movieID] = pct;
                 localStorage.setItem('movieM_progress', JSON.stringify(prog));
+            } catch(e) {}
+            // Guardar en Firestore si hay usuario
+            try {
+                await waitForFirebase();
+                const user = window.auth.currentUser;
+                if (!user) return;
+                const ref = window.doc(window.db, 'usuarios', user.uid, 'continuar', 'pelicula_' + movieID);
+                await window.setDoc(ref, {
+                    tipo: 'pelicula',
+                    contentId: String(movieID),
+                    porcentaje: pct,
+                    updatedAt: window.serverTimestamp()
+                }, { merge: true });
             } catch(e) {}
         }
 
-        function leerProgreso() {
+        async function leerProgreso() {
+            // Intentar leer de Firestore primero
+            try {
+                await waitForFirebase();
+                const user = window.auth.currentUser;
+                if (user) {
+                    const ref = window.doc(window.db, 'usuarios', user.uid, 'continuar', 'pelicula_' + movieID);
+                    const snap = await window.getDoc(ref);
+                    if (snap.exists()) {
+                        _progresoLocal = snap.data().porcentaje || 0;
+                        return _progresoLocal;
+                    }
+                }
+            } catch(e) {}
+            // Fallback localStorage
             try {
                 const prog = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
-                return prog['pelicula_' + movieID] || 0;
+                _progresoLocal = prog['pelicula_' + movieID] || 0;
+                return _progresoLocal;
             } catch(e) { return 0; }
+        }
+
+        function leerProgresoSync() { return _progresoLocal; }
+
+        async function waitForFirebase() {
+            for (let i = 0; i < 30; i++) {
+                if (window.db && window.auth) break;
+                await new Promise(r => setTimeout(r, 100));
+            }
         }
 
         function actualizarBarraProgreso(pct) {
@@ -651,7 +691,7 @@
             }
         };
 
-        window.verPelicula = () => {
+        window.verPelicula = async () => {
             // Siempre arranca en Subtitulado
             document.getElementById('btnFuenteSub').className = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition bg-white/10 border-white/20 text-white';
             const latBtn = document.getElementById('btnFuenteLat');
@@ -663,7 +703,7 @@
             document.body.style.overflow = "hidden";
             progresoInicio = Date.now();
             const duracionEstimada = (window._peliculaDuracion || 120) * 60 * 1000;
-            const progresoActual = leerProgreso();
+            const progresoActual = await leerProgreso();
             progresoTimer = setInterval(() => {
                 const transcurrido = Date.now() - progresoInicio;
                 const pctNuevo = progresoActual + (transcurrido / duracionEstimada) * 100;
@@ -682,11 +722,11 @@
             if (progresoInicio) {
                 const duracion = (window._peliculaDuracion || 120) * 60 * 1000;
                 const transcurrido = Date.now() - progresoInicio;
-                const actual = leerProgreso();
-                guardarProgreso(actual + (transcurrido / duracion) * 100);
+                const pct = leerProgresoSync();
+                guardarProgreso(pct + (transcurrido / duracion) * 100);
                 progresoInicio = null;
             }
-            actualizarBarraProgreso(leerProgreso());
+            actualizarBarraProgreso(leerProgresoSync());
         };
 
         async function cargarSimilares() {
