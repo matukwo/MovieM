@@ -375,67 +375,161 @@ async function cargarSeccion(url,id){
 window.scrollFila=function(id,d){document.getElementById(id).scrollBy({left:d,behavior:'smooth'});};
 var colorG=localStorage.getItem('movieM_color');if(colorG)document.documentElement.style.setProperty('--accent-color',colorG);
 
-// ── Continuar Viendo (CORREGIDO) ──────────────────────────────────────────────
+// ── Continuar Viendo (Firebase por usuario + Series) ──────────────────────────
 (async function cargarContinuar(){
   try {
-    var prog=JSON.parse(localStorage.getItem('movieM_progress')||'{}');
-    var pelisConProgreso=Object.entries(prog)
-      .filter(function(e){return e[0].startsWith('pelicula_')&&e[1]>2&&e[1]<98;})
-      .sort(function(a,b){return b[1]-a[1]}) 
-      .slice(0,12);
-    if(!pelisConProgreso.length) return;
-    
+    // Esperar Firebase y autenticación
+    for (let i = 0; i < 40; i++) {
+      if (window.db && window.auth) break;
+      await new Promise(r => setTimeout(r, 100));
+    }
+
+    async function obtenerItemsFirestore(user) {
+      try {
+        const ref = window.collection(window.db, 'usuarios', user.uid, 'continuar');
+        const snap = await window.getDocs(ref);
+        const items = [];
+        snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+        // Ordenar por updatedAt desc
+        items.sort((a,b) => {
+          const ta = a.updatedAt?.toMillis?.() || a.updatedAt || 0;
+          const tb = b.updatedAt?.toMillis?.() || b.updatedAt || 0;
+          return tb - ta;
+        });
+        return items.slice(0, 12);
+      } catch(e) { return []; }
+    }
+
+    function obtenerItemsLocal() {
+      try {
+        const prog = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
+        const peliculas = Object.entries(prog)
+          .filter(([k,v]) => k.startsWith('pelicula_') && typeof v === 'number' && v > 2 && v < 98)
+          .map(([k,v]) => ({ id: k, tipo: 'pelicula', contentId: k.replace('pelicula_',''), porcentaje: v, updatedAt: 0 }));
+        const series = Object.entries(prog)
+          .filter(([k,v]) => k.startsWith('serie_') && typeof v === 'object' && v.ep)
+          .map(([k,v]) => ({ id: k, tipo: 'serie', contentId: k.replace('serie_',''), ...v }));
+        return [...peliculas, ...series].slice(0, 12);
+      } catch(e) { return []; }
+    }
+
+    // Intentar con usuario de Firebase, si no usar localStorage
+    let items = [];
+    const user = window.auth.currentUser;
+    if (user) {
+      items = await obtenerItemsFirestore(user);
+    }
+    // Si no hay items en Firestore, intentar localStorage
+    if (!items.length) {
+      items = obtenerItemsLocal();
+    }
+    // Filtrar películas con progreso válido
+    items = items.filter(it => {
+      if (it.tipo === 'pelicula') return (it.porcentaje || 0) > 2 && (it.porcentaje || 0) < 98;
+      if (it.tipo === 'serie') return it.episodio;
+      return false;
+    });
+    if (!items.length) return;
+
     document.getElementById('secContinuar').classList.remove('hidden');
-    var fila=document.getElementById('continuar');
-    fila.innerHTML='';
+    var fila = document.getElementById('continuar');
+    fila.innerHTML = '';
 
-    await Promise.all(pelisConProgreso.map(async function(entry){
-      var id=entry[0].replace('pelicula_','');
-      var pct=entry[1];
-      try{
-        var r=await fetch('https://api.themoviedb.org/3/movie/'+id+'?api_key='+API_KEY+'&language=es-MX');
-        var p=await r.json();
-        if(!p.poster_path) return;
+    await Promise.all(items.map(async function(item) {
+      try {
+        if (item.tipo === 'pelicula') {
+          // Cargar datos de película
+          var r = await fetch('https://api.themoviedb.org/3/movie/'+item.contentId+'?api_key='+API_KEY+'&language=es-MX');
+          var p = await r.json();
+          if (!p.poster_path) return;
+          var pct = item.porcentaje || 0;
 
-        var card=document.createElement('div');
-        card.className='min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2';
-        card.onclick=function(){location.href='pelicula.html?id='+id;};
+          var card = document.createElement('div');
+          card.className = 'min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2';
+          card.onclick = function(){ location.href = 'pelicula.html?id='+item.contentId; };
 
-        var inner=document.createElement('div');
-        inner.className='relative aspect-[2/3]'; 
+          var inner = document.createElement('div');
+          inner.className = 'relative aspect-[2/3]';
 
-        var sk=document.createElement('div');
-        sk.className='absolute inset-0 rounded-xl skeleton';
-        
-        var im=document.createElement('img');
-        im.src=BASE+p.poster_path;
-        im.className='absolute inset-0 w-full h-full object-cover rounded-xl shadow-lg border border-white/5 z-10';
-        im.loading='lazy';
-        im.onload=function(){sk.style.display='none';};
+          var sk = document.createElement('div');
+          sk.className = 'absolute inset-0 rounded-xl skeleton';
 
-        var badge=document.createElement('div');
-        badge.className='absolute top-1.5 left-1.5 z-20';
-        badge.innerHTML='<div class="bg-black/80 text-white text-[8px] font-black px-2 py-0.5 rounded-lg flex items-center gap-1"><svg class="w-2.5 h-2.5 fill-red-500" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>'+Math.round(pct)+'%</div>';
+          var im = document.createElement('img');
+          im.src = BASE + p.poster_path;
+          im.className = 'absolute inset-0 w-full h-full object-cover rounded-xl shadow-lg border border-white/5 z-10';
+          im.loading = 'lazy';
+          im.onload = function(){ sk.style.display='none'; };
 
-        var progWrap=document.createElement('div');
-        progWrap.className='absolute bottom-0 left-0 right-0 z-20 px-1 pb-1';
-        progWrap.innerHTML='<div class="w-full h-1 bg-zinc-800/80 rounded-full"><div class="h-full bg-red-600 rounded-full" style="width:'+Math.round(pct)+'%"></div></div>';
+          var badge = document.createElement('div');
+          badge.className = 'absolute top-1.5 left-1.5 z-20';
+          badge.innerHTML = '<div class="bg-black/80 text-white text-[8px] font-black px-2 py-0.5 rounded-lg flex items-center gap-1"><svg class="w-2.5 h-2.5 fill-red-500" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>'+Math.round(pct)+'%</div>';
 
-        inner.appendChild(sk);
-        inner.appendChild(im);
-        inner.appendChild(badge);
-        inner.appendChild(progWrap);
+          var progWrap = document.createElement('div');
+          progWrap.className = 'absolute bottom-0 left-0 right-0 z-20 px-1 pb-1';
+          progWrap.innerHTML = '<div class="w-full h-1 bg-zinc-800/80 rounded-full"><div class="h-full bg-red-600 rounded-full" style="width:'+Math.round(pct)+'%"></div></div>';
 
-        var titP=document.createElement('p');
-        titP.className='text-[9px] md:text-[10px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 mt-2';
-        titP.textContent=(p.title||p.name||'');
+          inner.appendChild(sk); inner.appendChild(im); inner.appendChild(badge); inner.appendChild(progWrap);
 
-        card.appendChild(inner);
-        card.appendChild(titP);
-        fila.appendChild(card);
-      }catch(e){}
+          var titP = document.createElement('p');
+          titP.className = 'text-[9px] md:text-[10px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 mt-2';
+          titP.textContent = p.title || p.name || '';
+
+          card.appendChild(inner); card.appendChild(titP);
+          fila.appendChild(card);
+
+        } else if (item.tipo === 'serie') {
+          // Cargar datos de serie
+          var r2 = await fetch('https://api.themoviedb.org/3/tv/'+item.contentId+'?api_key='+API_KEY+'&language=es-MX');
+          var s = await r2.json();
+          if (!s.poster_path) return;
+
+          var card2 = document.createElement('div');
+          card2.className = 'min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2';
+          card2.onclick = function(){ location.href = 'serie.html?id='+item.contentId; };
+
+          var inner2 = document.createElement('div');
+          inner2.className = 'relative aspect-[2/3]';
+
+          var sk2 = document.createElement('div');
+          sk2.className = 'absolute inset-0 rounded-xl skeleton';
+
+          var im2 = document.createElement('img');
+          im2.src = BASE + s.poster_path;
+          im2.className = 'absolute inset-0 w-full h-full object-cover rounded-xl shadow-lg border border-white/5 z-10';
+          im2.loading = 'lazy';
+          im2.onload = function(){ sk2.style.display='none'; };
+
+          // Badge episodio
+          var badge2 = document.createElement('div');
+          badge2.className = 'absolute top-1.5 left-1.5 z-20';
+          badge2.innerHTML = '<div class="bg-black/80 text-white text-[8px] font-black px-2 py-0.5 rounded-lg flex items-center gap-1"><svg class="w-2.5 h-2.5 fill-red-500" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>T'+item.temporada+' E'+item.episodio+'</div>';
+
+          // Etiqueta "SERIE" arriba derecha
+          var serieTag = document.createElement('div');
+          serieTag.className = 'absolute top-1.5 right-1.5 z-20';
+          serieTag.innerHTML = '<div class="bg-accent/80 text-white text-[7px] font-black px-1.5 py-0.5 rounded-lg uppercase tracking-widest">SERIE</div>';
+
+          inner2.appendChild(sk2); inner2.appendChild(im2); inner2.appendChild(badge2); inner2.appendChild(serieTag);
+
+          var titP2 = document.createElement('p');
+          titP2.className = 'text-[9px] md:text-[10px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 mt-2';
+          titP2.textContent = s.name || s.title || '';
+
+          card2.appendChild(inner2); card2.appendChild(titP2);
+          fila.appendChild(card2);
+        }
+      } catch(e) {}
     }));
-  }catch(e){}
+
+    // Si también hay usuario autenticado, escuchar cambios en tiempo real
+    if (user) {
+      window.onAuthStateChanged(window.auth, function(u) {
+        if (u) {
+          // Re-cargar continuar viendo cuando el usuario cambie
+        }
+      });
+    }
+  } catch(e) { console.error('cargarContinuar:', e); }
 })();
 
 cargarSeccion('https://api.themoviedb.org/3/trending/movie/week?api_key='+API_KEY+'&language=es-MX','tendencias');
