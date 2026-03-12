@@ -181,7 +181,7 @@ window.filtrarGenero = async function(genreId, btn) {
     const gNames = {28:'Acción',35:'Comedia',18:'Drama',27:'Terror',878:'Ciencia Ficción',80:'Crimen',9648:'Misterio',12:'Aventura',16:'Animación',10749:'Romance'};
     document.getElementById('tituloFiltrado').textContent = gNames[genreId] || 'Películas';
     const grid = document.getElementById('gridFiltrado'); grid.innerHTML = '';
-    const r = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&language=es-ES&sort_by=popularity.desc`);
+    const r = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&language=es-MX&sort_by=popularity.desc`);
     const d = await r.json();
     (d.results || []).filter(p => p.poster_path).forEach(p => {
         const anio = (p.release_date||'').split('-')[0]||'';
@@ -206,11 +206,18 @@ async function buscarTodo(q, dropEl) {
         await new Promise(r => setTimeout(r, 100));
     }
     try {
-        const [resPelis, snapU] = await Promise.all([
-            fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(q)}`).then(r => r.json()),
+        const enc = encodeURIComponent(q);
+        const [resMX, resES, resEN, snapU] = await Promise.all([
+            fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=es-MX&query=${enc}`).then(r => r.json()),
+            fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=es-ES&query=${enc}`).then(r => r.json()),
+            fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=en-US&query=${enc}`).then(r => r.json()),
             window.getDocs(window.collection(window.db, 'usuarios'))
         ]);
-        const pelis = (resPelis.results || []).slice(0, 4);
+        const visto = new Set(), merged = [];
+        [resMX.results||[], resES.results||[], resEN.results||[]].forEach(arr => {
+            arr.forEach(p => { if(!visto.has(p.id)){visto.add(p.id); merged.push(p);} });
+        });
+        const pelis = merged.slice(0, 4);
         let users = [];
         snapU.forEach(d => { const u = d.data(); if(u.username && u.username.toLowerCase().indexOf(q.toLowerCase()) !== -1) users.push({uid: d.id, username: u.username, avatar: u.avatar || null}); });
         users = users.slice(0, 3);
@@ -267,9 +274,9 @@ buscMob.addEventListener('keydown', function(e) {
 
 document.getElementById('btnUsuario').onclick = () => location.href = 'perfil.html';
 
-cargarSeccion(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=es-ES`, 'tendencias');
-cargarSeccion(`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=es-ES`, 'topRated');
-cargarSeccion(`https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}&language=es-ES`, 'enCines');
+cargarSeccion(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=es-MX`, 'tendencias');
+cargarSeccion(`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=es-MX`, 'topRated');
+cargarSeccion(`https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}&language=es-MX`, 'enCines');
 </script>
 </body>
 </html>
