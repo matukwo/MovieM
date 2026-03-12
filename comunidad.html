@@ -130,22 +130,10 @@
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
 
-        <!-- Tab selector -->
-        <div class="md:col-span-3 flex gap-2">
-            <button onclick="setTipo('error')" id="tabError" class="feedback-tab active-tab px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all bg-accent text-white">🐛 Reportar Error</button>
-            <button onclick="setTipo('idea')" id="tabIdea" class="feedback-tab px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all bg-zinc-800 text-zinc-400 hover:text-white">💡 Aportar Idea</button>
-            <button onclick="setTipo('solicitud')" id="tabSolicitud" class="feedback-tab px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all bg-zinc-800 text-zinc-400 hover:text-white">🎬 Solicitar Contenido</button>
-        </div>
-
         <!-- Formulario -->
         <div class="md:col-span-3 bg-zinc-900/60 rounded-3xl border border-white/5 p-6">
 
-            <!-- Descripción del tipo -->
-            <p id="feedbackDesc" class="text-zinc-400 text-xs mb-5 leading-relaxed">
-                Describí el error que encontraste: en qué página ocurrió, qué estabas haciendo y qué pasó.
-            </p>
 
-            <!-- Título -->
             <div class="mb-4">
                 <label class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-2 block">Título</label>
                 <input id="feedbackTitulo" type="text" maxlength="100" placeholder="Resumí en una línea..."
@@ -376,20 +364,6 @@ const descripciones = {
 
 window.setTipo = function(tipo) {
     tipoActual = tipo;
-    document.querySelectorAll('.feedback-tab').forEach(b => {
-        b.classList.remove('active-tab');
-        b.classList.add('bg-zinc-800', 'text-zinc-400');
-        b.classList.remove('text-white');
-    });
-    const tab = document.getElementById('tab' + tipo.charAt(0).toUpperCase() + tipo.slice(1));
-    tab.classList.add('active-tab');
-    tab.classList.remove('bg-zinc-800', 'text-zinc-400');
-    tab.classList.add('text-white');
-    document.getElementById('feedbackDesc').textContent = descripciones[tipo];
-    document.getElementById('feedbackTitulo').value = '';
-    document.getElementById('feedbackTexto').value = '';
-    document.getElementById('charCount').textContent = '0';
-    document.getElementById('feedbackToast').classList.add('hidden');
 };
 
 document.getElementById('feedbackTexto').addEventListener('input', function() {
@@ -400,6 +374,7 @@ window.enviarFeedback = async function() {
     const titulo = document.getElementById('feedbackTitulo').value.trim();
     const texto = document.getElementById('feedbackTexto').value.trim();
     const nombre = document.getElementById('feedbackNombre').value.trim() || 'Anónimo';
+    const tipo = 'general';
     const toast = document.getElementById('feedbackToast');
     const btn = document.getElementById('btnEnviarFeedback');
 
@@ -427,7 +402,7 @@ window.enviarFeedback = async function() {
 
     try {
         await window.addDoc(window.collection(window.db, 'reportes'), {
-            tipo: tipoActual,
+            tipo,
             titulo,
             texto,
             nombre,
