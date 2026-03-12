@@ -262,12 +262,24 @@
 
         async function cargarPagina() {
             try {
-                const [pRes, cRes] = await Promise.all([
+                // Pedir es-MX primero, si título/overview viene vacío usar es-ES como fallback
+                const [pResMX, pResES, cRes] = await Promise.all([
+                    fetch(`https://api.themoviedb.org/3/movie/${movieID}?api_key=${API_KEY}&language=es-MX`),
                     fetch(`https://api.themoviedb.org/3/movie/${movieID}?api_key=${API_KEY}&language=es-ES`),
-                    fetch(`https://api.themoviedb.org/3/movie/${movieID}/credits?api_key=${API_KEY}&language=es-ES`)
+                    fetch(`https://api.themoviedb.org/3/movie/${movieID}/credits?api_key=${API_KEY}&language=es-MX`)
                 ]);
-                const peli = await pRes.json();
+                const peliMX = await pResMX.json();
+                const peliES = await pResES.json();
                 const credits = await cRes.json();
+
+                // Preferir título latino; si no hay, usar España; si tampoco, el original
+                const peli = {
+                    ...peliMX,
+                    title: (peliMX.title && peliMX.title !== peliMX.original_title) ? peliMX.title
+                           : (peliES.title && peliES.title !== peliMX.original_title) ? peliES.title
+                           : peliMX.original_title,
+                    overview: peliMX.overview || peliES.overview || ''
+                };
 
                 if(document.getElementById('tituloSkeleton')) document.getElementById('tituloSkeleton').remove();
                 if(document.getElementById('sinopsisSkeleton')) document.getElementById('sinopsisSkeleton').remove();
@@ -496,8 +508,8 @@
         window.verActor = async (id) => {
             try {
                 const [resBio, resPelis] = await Promise.all([
-                    fetch(`https://api.themoviedb.org/3/person/${id}?api_key=${API_KEY}&language=es-ES`),
-                    fetch(`https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=${API_KEY}&language=es-ES`)
+                    fetch(`https://api.themoviedb.org/3/person/${id}?api_key=${API_KEY}&language=es-MX`),
+                    fetch(`https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=${API_KEY}&language=es-MX`)
                 ]);
                 const actor = await resBio.json();
                 const créditos = await resPelis.json();
@@ -679,7 +691,7 @@
 
         async function cargarSimilares() {
             try {
-                const res = await fetch(`https://api.themoviedb.org/3/movie/${movieID}/similar?api_key=${API_KEY}&language=es-ES&page=1`);
+                const res = await fetch(`https://api.themoviedb.org/3/movie/${movieID}/similar?api_key=${API_KEY}&language=es-MX&page=1`);
                 const data = await res.json();
                 const fila = document.getElementById('similaresFila');
                 const progress = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
