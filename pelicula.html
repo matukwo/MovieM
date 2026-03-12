@@ -316,23 +316,28 @@
                 actualizarHUD();
                 // Guardar duración real para progreso más preciso
                 if (peli.runtime) window._peliculaDuracion = peli.runtime;
-                // Cargar similares
                 cargarSimilares();
-                // Mostrar barra de progreso si ya vio algo
-                leerProgreso().then(pct => actualizarBarraProgreso(pct));
             } catch (error) { console.error(error); }
         }
 
         // --- HUD DE USUARIO + progreso ---
-        window.onAuthStateChanged(window.auth, async function(user) {
-            if (user) {
-                miUID_pelicula = user.uid;
-                checkStatus();
-                const pct = await leerProgreso();
-                _progresoBase = parseFloat(pct) || 0;
-                actualizarBarraProgreso(_progresoBase);
+        async function iniciarAuth() {
+            // Esperar que firebase-config.js exponga window.auth
+            for (let i = 0; i < 50; i++) {
+                if (window.auth && window.onAuthStateChanged) break;
+                await new Promise(r => setTimeout(r, 100));
             }
-        });
+            window.onAuthStateChanged(window.auth, async function(user) {
+                if (user) {
+                    miUID_pelicula = user.uid;
+                    checkStatus();
+                    const pct = await leerProgreso();
+                    _progresoBase = parseFloat(pct) || 0;
+                    actualizarBarraProgreso(_progresoBase);
+                }
+            });
+        }
+        iniciarAuth();
 
         function actualizarHUD() {
             const userActual = localStorage.getItem('usuarioMovieM');
@@ -577,7 +582,7 @@
         let progresoTimer = null;
         let progresoInicio = null;
         let _progresoBase = 0;
-        let miUID_pelicula = null;
+        // miUID_pelicula ya está declarado arriba (línea ~261)
 
         async function guardarProgreso(porcentaje) {
             if (!miUID_pelicula) return;
