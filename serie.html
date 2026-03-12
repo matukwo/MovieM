@@ -437,16 +437,18 @@
         // Guardar en localStorage como fallback
         try {
             const prog = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
-            prog['serie_' + serieID] = { temp, ep, nombre, updatedAt: Date.now() };
+            prog['serie_' + serieID] = { temporada: temp, episodio: ep, nombre, updatedAt: Date.now() };
             localStorage.setItem('movieM_progress', JSON.stringify(prog));
         } catch(e) {}
-        // Guardar en Firestore si hay usuario
+        // Guardar en Firestore esperando que Auth resuelva
         try {
-            for (let i = 0; i < 30; i++) {
-                if (window.db && window.auth && window.auth.currentUser) break;
+            for (let i = 0; i < 40; i++) {
+                if (window.db && window.auth && window.onAuthStateChanged) break;
                 await new Promise(r => setTimeout(r, 100));
             }
-            const user = window.auth && window.auth.currentUser;
+            const user = await new Promise(resolve => {
+                const unsub = window.onAuthStateChanged(window.auth, u => { unsub(); resolve(u); });
+            });
             if (!user) return;
             const serieName = serieData ? serieData.name : document.title.replace('MovieM | ', '');
             const posterPath = serieData ? serieData.poster_path : '';
