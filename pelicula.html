@@ -758,5 +758,101 @@
 
         cargarPagina();
     </script>
+
+<script>
+/* ===== Sistema Continuar Viendo (iframe compatible) ===== */
+
+let miUID_pelicula = null;
+let tiempoViendo = 0;
+let progresoInterval = null;
+
+window.onAuthStateChanged && window.onAuthStateChanged(window.auth,(user)=>{
+    if(user){
+        miUID_pelicula = user.uid;
+    }
+});
+
+async function guardarProgreso(){
+
+    if(!miUID_pelicula) return;
+
+    const titulo = document.getElementById("titulo")?.innerText || "";
+    const poster = document.getElementById("poster")?.src || "";
+
+    if(!titulo || poster.includes("undefined")) return;
+
+    const porcentaje = Math.min(100,Math.round((tiempoViendo/5400)*100));
+
+    try{
+
+        const ref = window.doc(
+            window.db,
+            "usuarios",
+            miUID_pelicula,
+            "continuar",
+            "pelicula_"+movieID
+        );
+
+        if(porcentaje >= 95){
+            await window.deleteDoc(ref);
+            return;
+        }
+
+        await window.setDoc(ref,{
+            tipo:"pelicula",
+            contentId:String(movieID),
+            titulo:titulo,
+            poster:poster,
+            porcentaje:porcentaje,
+            tiempo:tiempoViendo,
+            updatedAt:window.serverTimestamp()
+        },{merge:true});
+
+        console.log("Progreso guardado:",porcentaje+"%");
+
+    }catch(e){
+        console.error("Error guardando progreso",e);
+    }
+}
+
+function iniciarTracking(){
+
+    tiempoViendo = 0;
+
+    if(progresoInterval){
+        clearInterval(progresoInterval);
+    }
+
+    progresoInterval = setInterval(()=>{
+
+        tiempoViendo += 5;
+        guardarProgreso();
+
+    },5000);
+
+}
+
+function detenerTracking(){
+
+    if(progresoInterval){
+        clearInterval(progresoInterval);
+    }
+
+    guardarProgreso();
+}
+
+const frame = document.getElementById("movieFrame");
+
+if(frame){
+    frame.addEventListener("load",()=>{
+        iniciarTracking();
+    });
+}
+
+window.addEventListener("beforeunload",()=>{
+    detenerTracking();
+});
+</script>
+
 </body>
 </html>
