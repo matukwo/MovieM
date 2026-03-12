@@ -25,6 +25,7 @@
 <div id="playerOverlay">
     <div class="w-full flex justify-between items-center p-3 md:p-4 bg-zinc-950 border-b border-white/5">
         <span class="text-red-600 font-black tracking-tighter text-lg md:text-xl">MOVIE<span class="text-white font-light">M</span></span>
+        <div id="fuentesBtns" class="flex gap-2"></div>
         <button onclick="cerrarPelicula()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/5">Cerrar x</button>
     </div>
     <div class="flex-1 bg-black">
@@ -82,23 +83,20 @@
                 <span id="directorMobile" class="text-zinc-500 text-xs italic block mb-3"></span>
                 <!-- Botones mobile compactos -->
                 <div class="flex gap-2 flex-wrap">
-                    <button onclick="verPelicula()" class="bg-red-600 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95 shadow-lg">
+                    <button onclick="verPelicula('vidsrc')" class="bg-red-600 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95 shadow-lg">
                         <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Ver
+                    </button>
+                    <button id="btnLatinoMobile" onclick="verPelicula('latino')" class="hidden bg-zinc-800 border border-yellow-500/40 text-yellow-400 px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95 shadow-lg">
+                        🇦🇷 Latino
                     </button>
                     <button onclick="abrirTrailer()" class="bg-zinc-800 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95">
                         <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6zM21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9 9-4.03 9-9zm-16.1 0c0-3.92 3.18-7.1 7.1-7.1s7.1 3.18 7.1 7.1-3.18 7.1-7.1 7.1-7.1-3.18-7.1-7.1z"/></svg> Trailer
                     </button>
-                    <button id="btnWatchlist" onclick="toggleWatchlist()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95" title="Mi Lista">
+                    <button id="btnWatchlist" onclick="toggleWatchlist()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
                     </button>
-                    <button id="btnLike" onclick="toggleLike()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95" title="Me gusta">
+                    <button id="btnLike" onclick="toggleLike()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78v0z"/></svg>
-                    </button>
-                    <button onclick="abrirModalListas()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95" title="Mis Listas">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h10"/></svg>
-                    </button>
-                    <button onclick="compartirContenido()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95" title="Compartir">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
                     </button>
                 </div>
             </div>
@@ -124,8 +122,11 @@
             </div>
             <p id="sinopsis" class="text-lg text-zinc-500 max-w-2xl leading-relaxed mb-10 hidden"></p>
             <div class="flex flex-wrap items-center gap-4">
-                <button onclick="verPelicula()" class="bg-red-600 text-white px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-700 transition-all shadow-xl shadow-red-600/20 active:scale-95 tracking-tight uppercase">
+                <button onclick="verPelicula('vidsrc')" class="bg-red-600 text-white px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-700 transition-all shadow-xl shadow-red-600/20 active:scale-95 tracking-tight uppercase">
                     <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> VER PELICULA
+                </button>
+                <button id="btnLatinoDesktop" onclick="verPelicula('latino')" class="hidden bg-zinc-900 border border-yellow-500/40 text-yellow-400 px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-yellow-500/10 transition-all shadow-xl active:scale-95 tracking-tight uppercase">
+                    🇦🇷 LATINO
                 </button>
                 <button onclick="abrirTrailer()" class="bg-white text-black px-8 py-4 rounded-full font-black flex items-center gap-3 hover:bg-red-600 hover:text-white transition-all shadow-xl active:scale-95">
                     <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6zM21 12c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9 9-4.03 9-9zm-16.1 0c0-3.92 3.18-7.1 7.1-7.1s7.1 3.18 7.1 7.1-3.18 7.1-7.1 7.1-7.1-3.18-7.1-7.1z"/></svg> VER TRAILER
@@ -135,12 +136,6 @@
                 </button>
                 <button id="btnLikeDesktop" onclick="toggleLike()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95" title="Me gusta">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78v0z"/></svg>
-                </button>
-                <button onclick="abrirModalListas()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95" title="Mis Listas">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h10"/></svg>
-                </button>
-                <button onclick="compartirContenido()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95" title="Compartir">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
                 </button>
             </div>
         </div>
@@ -162,13 +157,13 @@
             Reparto Principal <div class="h-px flex-1 bg-zinc-800/50"></div>
         </h3>
         <div class="relative">
-            <button onclick="document.getElementById('reparto').scrollBy({left:-320,behavior:'smooth'})" class="row-arrow left">
+            <button onclick="document.getElementById('reparto').scrollBy({left:-320,behavior:'smooth'})" class="absolute left-0 top-1/2 -translate-y-6 z-20 bg-black/80 p-2.5 rounded-full hidden md:group-hover/reparto:flex border border-white/10 hover:bg-red-600 transition shadow-xl">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
             </button>
             <div id="reparto" class="flex gap-5 md:gap-8 overflow-x-auto no-scrollbar pb-4 scroll-smooth px-2">
                 <div class="min-w-[80px] skeleton h-20 rounded-full"></div>
             </div>
-            <button onclick="document.getElementById('reparto').scrollBy({left:320,behavior:'smooth'})" class="row-arrow right">
+            <button onclick="document.getElementById('reparto').scrollBy({left:320,behavior:'smooth'})" class="absolute right-0 top-1/2 -translate-y-6 z-20 bg-black/80 p-2.5 rounded-full hidden md:group-hover/reparto:flex border border-white/10 hover:bg-red-600 transition shadow-xl">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg>
             </button>
         </div>
@@ -182,7 +177,7 @@
         </h2>
         <div class="relative group/sim">
             <button onclick="document.getElementById('similaresFila').scrollBy({left:-320,behavior:'smooth'})"
-                class="row-arrow left">
+                class="absolute left-0 top-1/2 -translate-y-6 z-20 bg-black/80 p-2.5 rounded-full hidden md:group-hover/sim:flex border border-white/10 hover:bg-red-600 transition shadow-xl">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
             </button>
             <div id="similaresFila" class="flex gap-2 md:gap-3 overflow-x-auto no-scrollbar pb-3 scroll-smooth">
@@ -195,7 +190,7 @@
                 <div class="min-w-[75px] md:min-w-[100px] skeleton rounded-xl aspect-[2/3]"></div>
             </div>
             <button onclick="document.getElementById('similaresFila').scrollBy({left:320,behavior:'smooth'})"
-                class="row-arrow right">
+                class="absolute right-0 top-1/2 -translate-y-6 z-20 bg-black/80 p-2.5 rounded-full hidden md:group-hover/sim:flex border border-white/10 hover:bg-red-600 transition shadow-xl">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg>
             </button>
         </div>
@@ -216,15 +211,9 @@
             <button onclick="publicarComentario()" class="w-full bg-red-600 py-3.5 rounded-2xl font-black hover:bg-red-700 transition tracking-widest uppercase text-sm shadow-xl active:scale-95">PUBLICAR</button>
         </div>
         <div>
-            <div class="flex items-center justify-between mb-5 gap-3 flex-wrap">
-                <h3 class="text-lg md:text-2xl font-bold flex items-center gap-2 md:gap-3">
-                    Opiniones <span class="text-[9px] md:text-[10px] bg-red-600 px-2 py-1 rounded text-white font-black uppercase">GLOBAL</span>
-                </h3>
-                <div class="flex bg-zinc-800/80 rounded-full p-0.5 shrink-0">
-                    <button id="sortBtn_reciente" onclick="setSortMode('reciente')" class="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-red-600 text-white transition-all">Recientes</button>
-                    <button id="sortBtn_populares" onclick="setSortMode('populares')" class="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full text-zinc-400 transition-all">Populares</button>
-                </div>
-            </div>
+            <h3 class="text-lg md:text-2xl font-bold mb-5 flex items-center gap-2 md:gap-3">
+                Opiniones <span class="text-[9px] md:text-[10px] bg-red-600 px-2 py-1 rounded text-white font-black uppercase">GLOBAL</span>
+            </h3>
             <div id="listaComentarios" class="space-y-3 md:space-y-4 max-h-[350px] md:max-h-[400px] overflow-y-auto no-scrollbar pr-1">
                 <p class="text-zinc-600 text-xs animate-pulse">Sincronizando...</p>
             </div>
@@ -260,164 +249,90 @@
         const urlParams = new URLSearchParams(window.location.search);
         const movieID = urlParams.get('id');
         let currentRating = 0;
-        let _tituloActual = '';
-        let _posterActual = '';
-        let _sortMode = 'reciente';
-        let _allDocs = [];
-        let _listaIdActiva = null;
-        let _likeEnVuelo = false;
 
+        // Verificar si hay link latino para esta película al cargar
+        document.addEventListener('DOMContentLoaded', () => checkLatinoDisponible());
+        // También llamar directo por si DOMContentLoaded ya pasó
+        if (document.readyState !== 'loading') setTimeout(checkLatinoDisponible, 0);
+
+        // ── Rangos de usuario ────────────────────────────────────
         const ADMIN_UID = '41XWZR8OzwdpMHf54UIQEzAEt7s1';
-        const VERIFIED_USERS = [];
-        let miUID_pelicula = null;
+        const VERIFIED_USERS = []; // Agregá UIDs verificados: ['uid1', 'uid2']
+        let miUID_pelicula = null; // UID del usuario logueado en esta página
 
-        // ── ACCENT COLOR ─────────────────────────────────────────
-        var _c = localStorage.getItem('movieM_color');
-        if(_c) document.documentElement.style.setProperty('--accent-color',_c);
-
-        // ── TOAST ─────────────────────────────────────────────────
-        function toast(msg, ok=true) {
-            const t = document.getElementById('toastMsg');
-            const el = document.createElement('div');
-            el.className = `bg-zinc-900 border ${ok?'border-green-500/40':'border-red-500/40'} text-white text-xs font-black uppercase tracking-widest px-5 py-3 rounded-2xl shadow-2xl transition-all duration-300 opacity-0`;
-            el.innerText = msg;
-            t.appendChild(el);
-            requestAnimationFrame(() => { el.style.opacity = '1'; });
-            setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 2500);
-        }
-
-        // ── COMPARTIR ─────────────────────────────────────────────
-        window.compartirContenido = async function() {
-            const url = location.href;
-            const titulo = _tituloActual || 'Película en MovieM';
-            if (navigator.share) {
-                try { await navigator.share({ title: titulo, text: `Mirá "${titulo}" en MovieM`, url }); return; } catch(e) {}
-            }
-            try { await navigator.clipboard.writeText(url); toast('¡Link copiado!'); }
-            catch(e) { prompt('Copiá el link:', url); }
-        };
-
-        // ── SORT COMENTARIOS ──────────────────────────────────────
-        window.setSortMode = function(modo) {
-            _sortMode = modo;
-            document.getElementById('sortBtn_reciente').className = `text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full transition-all ${modo==='reciente'?'bg-red-600 text-white':'text-zinc-400'}`;
-            document.getElementById('sortBtn_populares').className = `text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full transition-all ${modo==='populares'?'bg-red-600 text-white':'text-zinc-400'}`;
-            renderComentarios();
-        };
-
-        // ── COMENTARIOS CON REACCIONES ────────────────────────────
-        function totalLikes(reacciones) {
-            return (reacciones && reacciones['like']) || 0;
-        }
-
-        function renderComentarios() {
-            const contenedor = document.getElementById('listaComentarios');
-            if (!_allDocs.length) {
-                contenedor.innerHTML = '<p class="text-zinc-600 text-sm italic">Nadie ha comentado aún. ¡Sé el primero!</p>';
-                return;
-            }
-            let sorted = [..._allDocs];
-            if (_sortMode === 'populares') {
-                sorted.sort((a,b) => totalLikes(b.data.reacciones) - totalLikes(a.data.reacciones));
-            }
-            contenedor.innerHTML = '';
-            sorted.forEach(item => {
-                const c = item.data, docId = item.id, uid = item.uid;
-                const fecha = c.fecha ? new Date(c.fecha).toLocaleString() : 'Reciente';
-                const badge = getBadge(uid);
-                const esAdmin = miUID_pelicula === ADMIN_UID;
-                const likes = (c.reacciones && c.reacciones['like']) || 0;
-                const misR = c.misReacciones || {};
-                const yaDioLike = miUID_pelicula ? !!misR[miUID_pelicula] : false;
-
-                const div = document.createElement('div');
-                div.className = 'bg-zinc-900/50 p-4 rounded-2xl border border-white/5 shadow-xl fade-in group/comment';
-                div.innerHTML = `
-                    <div class="flex justify-between items-start mb-2 gap-2">
-                        <div class="flex flex-col gap-0.5 min-w-0">
-                            <span class="text-red-600 font-black text-xs uppercase tracking-widest leading-none flex items-center gap-1">
-                                <a href="perfil.html?user=${encodeURIComponent(c.user)}" class="hover:underline">${c.user}</a>${badge}
-                            </span>
-                            <span class="text-[9px] text-zinc-600 font-bold uppercase tracking-tighter">${fecha}</span>
-                        </div>
-                        <div class="flex items-center gap-2 shrink-0">
-                            <span class="text-yellow-500 text-[10px] tracking-widest">${'★'.repeat(c.rating||0)}</span>
-                            ${esAdmin ? `<button onclick="borrarComentarioPelicula('${docId}')" class="opacity-0 group-hover/comment:opacity-100 transition-opacity w-6 h-6 rounded-full bg-red-900/60 hover:bg-red-600 flex items-center justify-center">
-                                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                            </button>` : ''}
-                        </div>
-                    </div>
-                    <p class="text-zinc-400 text-sm leading-relaxed font-medium mb-3">${c.txt}</p>
-                    <button id="like-btn-${docId}"
-                        data-liked="${yaDioLike ? '1' : '0'}"
-                        data-likes="${likes}"
-                        onclick="reaccionar('${docId}')"
-                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-all active:scale-95 select-none
-                        ${yaDioLike ? 'bg-red-600/20 border-red-500/50 text-red-400' : 'bg-zinc-800/60 border-white/5 text-zinc-400 hover:border-white/20 hover:text-white'}">
-                        <svg class="w-3.5 h-3.5 ${yaDioLike ? 'fill-red-400' : 'fill-none'}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
-                        </svg>
-                        ${likes > 0 ? `<span class="like-cnt font-black tabular-nums">${likes}</span>` : '<span class="like-cnt font-black tabular-nums" style="display:none"></span>'}
-                    </button>`;
-                contenedor.appendChild(div);
-            });
-        }
-
-        window.reaccionar = async function(docId) {
-            if (!miUID_pelicula) { toast('Iniciá sesión para reaccionar', false); return; }
-
-            const btn = document.getElementById('like-btn-' + docId);
-            if (!btn || btn.dataset.loading) return;
-            btn.dataset.loading = '1';
-
-            const yaLiked = btn.dataset.liked === '1';
-            const cntEl = btn.querySelector('.like-cnt');
-            const svgPath = btn.querySelector('svg');
-            const likesActuales = parseInt(btn.dataset.likes || '0', 10);
-            const newLikes = yaLiked ? Math.max(0, likesActuales - 1) : likesActuales + 1;
-
-            // Actualizar DOM directo, igual que toggleLike de película
-            if (yaLiked) {
-                btn.dataset.liked = '0';
-                btn.dataset.likes = newLikes;
-                btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-all active:scale-95 select-none bg-zinc-800/60 border-white/5 text-zinc-400 hover:border-white/20 hover:text-white';
-                svgPath.setAttribute('class', 'w-3.5 h-3.5 fill-none');
-            } else {
-                btn.dataset.liked = '1';
-                btn.dataset.likes = newLikes;
-                btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-all active:scale-95 select-none bg-red-600/20 border-red-500/50 text-red-400';
-                svgPath.setAttribute('class', 'w-3.5 h-3.5 fill-red-400');
-            }
-            if (cntEl) {
-                cntEl.innerText = newLikes > 0 ? newLikes : '';
-                cntEl.style.display = newLikes > 0 ? '' : 'none';
-            } else if (newLikes > 0) {
-                const span = document.createElement('span');
-                span.className = 'like-cnt font-black tabular-nums';
-                span.innerText = newLikes;
-                btn.appendChild(span);
-            }
-
-            _likeEnVuelo = true;
+        async function cargarPagina() {
             try {
-                const ref = window.doc(window.db, 'comentarios', docId);
-                const updates = {};
-                updates['reacciones.like'] = yaLiked ? window.increment(-1) : window.increment(1);
-                updates[`misReacciones.${miUID_pelicula}`] = yaLiked ? window.deleteField() : true;
-                await window.updateDoc(ref, updates);
-            } catch(e) {
-                // Revertir si falla
-                btn.dataset.liked = yaLiked ? '1' : '0';
-                btn.dataset.likes = likesActuales;
-                if (cntEl) cntEl.innerText = likesActuales > 0 ? likesActuales : '';
-                console.error(e);
-            } finally {
-                delete btn.dataset.loading;
-                // Liberar flag después de que el snapshot local haya pasado
-                setTimeout(() => { _likeEnVuelo = false; }, 2000);
-            }
-        };
+                const [pRes, cRes] = await Promise.all([
+                    fetch(`https://api.themoviedb.org/3/movie/${movieID}?api_key=${API_KEY}&language=es-ES`),
+                    fetch(`https://api.themoviedb.org/3/movie/${movieID}/credits?api_key=${API_KEY}&language=es-ES`)
+                ]);
+                const peli = await pRes.json();
+                const credits = await cRes.json();
 
+                if(document.getElementById('tituloSkeleton')) document.getElementById('tituloSkeleton').remove();
+                if(document.getElementById('sinopsisSkeleton')) document.getElementById('sinopsisSkeleton').remove();
+                document.getElementById('sinopsis').classList.remove('hidden');
+
+                document.getElementById('titulo').innerText = peli.title;
+                var tmob=document.getElementById('tituloMobile');if(tmob)tmob.innerText=peli.title;
+                document.getElementById('sinopsis').innerText = peli.overview || "Sin descripción disponible.";
+                document.getElementById('anio').innerText = peli.release_date ? peli.release_date.split('-')[0] : "S/F";
+                document.getElementById('voto').innerText = peli.vote_average.toFixed(1);
+                var vm=document.getElementById('votoMobile');if(vm)vm.innerText=peli.vote_average.toFixed(1);
+                var am=document.getElementById('anioMobile');if(am)am.innerText=peli.release_date?peli.release_date.split('-')[0]:'S/F';
+                document.getElementById('sinopsis').innerText = peli.overview || "Sin descripcion disponible.";
+                var sm=document.getElementById('sinopsisMobile');if(sm){sm.innerText=peli.overview||'Sin descripcion.';sm.classList.remove('hidden');var sk=document.getElementById('sinopsisSkeleton');if(sk)sk.remove();}
+                document.getElementById('poster').src = 'https://image.tmdb.org/t/p/w500' + peli.poster_path;
+                document.getElementById('backdrop').style.backgroundImage = `url('https://image.tmdb.org/t/p/original${peli.backdrop_path}')`;
+                
+                if(peli.vote_average > 7.4) document.getElementById('badget-premios').classList.remove('hidden');
+
+                const dir = credits.crew.find(c => c.job === "Director");
+                if(dir) { document.getElementById('director').innerText = `Director: ${dir.name}`; var dm=document.getElementById('directorMobile');if(dm)dm.innerText='Dir: '+dir.name; }
+
+                document.getElementById('reparto').innerHTML = credits.cast.slice(0, 15).map(actor => `
+                    <div onclick="verActor(${actor.id})" class="min-w-[110px] text-center cursor-pointer shrink-0 fade-in">
+                        <div class="w-20 h-20 mx-auto mb-4 overflow-hidden rounded-full border border-zinc-800 hover:border-red-600 transition-all transform hover:scale-110 duration-300">
+                            <img src="${actor.profile_path ? 'https://image.tmdb.org/t/p/w200' + actor.profile_path : 'https://via.placeholder.com/200'}" class="w-full h-full object-cover">
+                        </div>
+                        <p class="text-[10px] font-black text-zinc-200 truncate uppercase tracking-tighter px-1">${actor.name}</p>
+                        <p class="text-[8px] text-zinc-600 truncate italic px-1">${actor.character}</p>
+                    </div>`).join('');
+
+                escucharComentariosNube(); 
+                checkStatus();
+                actualizarHUD();
+                // Guardar duración real para progreso más preciso
+                if (peli.runtime) window._peliculaDuracion = peli.runtime;
+                // Cargar similares
+                cargarSimilares();
+                // Mostrar barra de progreso si ya vio algo
+                actualizarBarraProgreso(leerProgreso());
+            } catch (error) { console.error(error); }
+        }
+
+        // --- HUD DE USUARIO + captura UID ---
+        // Cargar el UID real del usuario logueado lo antes posible
+        window.onAuthStateChanged(window.auth, function(user) {
+            if (user) {
+                miUID_pelicula = user.uid;
+                checkStatus(); // re-check con UID real
+            }
+        });
+
+        function actualizarHUD() {
+            const userActual = localStorage.getItem('usuarioMovieM');
+            const hud = document.getElementById('userHUD');
+            if (userActual && userActual !== 'undefined') {
+                document.getElementById('userNameHUD').innerText = userActual;
+                document.getElementById('userInitial').innerText = userActual.charAt(0).toUpperCase();
+                hud.classList.remove('hidden');
+                hud.classList.add('flex');
+            }
+        }
+
+        // --- FIREBASE LOGIC (COMENTARIOS) ---
+        // Badge SVGs por rango
         function getBadge(uid) {
             if (uid === ADMIN_UID) return '<svg title="Creador" class="w-3.5 h-3.5 text-blue-400 inline-block ml-1 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>';
             if (VERIFIED_USERS.includes(uid)) return '<svg title="Verificado" class="w-3.5 h-3.5 text-yellow-400 inline-block ml-1 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.491 4.491 0 01-3.497-1.307 4.491 4.491 0 01-1.307-3.497A4.49 4.49 0 012.25 12a4.49 4.49 0 011.549-3.397 4.491 4.491 0 011.307-3.497 4.491 4.491 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd"/></svg>';
@@ -425,23 +340,60 @@
         }
 
         function escucharComentariosNube() {
+            const contenedor = document.getElementById('listaComentarios');
             const q = window.query(
-                window.collection(window.db, 'comentarios'),
-                window.where('movieID', '==', movieID),
-                window.orderBy('fecha', 'desc')
+                window.collection(window.db, "comentarios"),
+                window.where("movieID", "==", movieID),
+                window.orderBy("fecha", "desc")
             );
-            window.onSnapshot(q, async snapshot => {
-                const usernames = [...new Set(snapshot.docs.map(d => d.data().user))];
-                const uidMap = {};
-                if (usernames.length) {
-                    try {
-                        const us = await window.getDocs(window.query(window.collection(window.db,'usuarios'), window.where('username','in',usernames.slice(0,10))));
-                        us.forEach(d => { uidMap[d.data().username] = d.id; });
-                    } catch(e) {}
+
+            // Primero buscamos los UIDs de todos los usuarios para poder mostrar badges
+            window.onSnapshot(q, async (snapshot) => {
+                contenedor.innerHTML = "";
+                if (snapshot.empty) {
+                    contenedor.innerHTML = `<p class="text-zinc-600 text-sm italic">Nadie ha comentado aún. ¡Sé el primero!</p>`;
+                    return;
                 }
-                _allDocs = snapshot.docs.map(d => ({ id: d.id, data: d.data(), uid: uidMap[d.data().user]||'' }));
-                // No renderizar si hay un like en vuelo (el DOM ya está actualizado)
-                if (!_likeEnVuelo) renderComentarios();
+
+                // Recolectar usernames únicos y buscar sus UIDs
+                const usernames = [...new Set(snapshot.docs.map(d => d.data().user))];
+                const uidMap = {}; // username → uid
+                try {
+                    const usersSnap = await window.getDocs(
+                        window.query(window.collection(window.db, 'usuarios'), window.where('username', 'in', usernames.slice(0,10)))
+                    );
+                    usersSnap.forEach(d => { uidMap[d.data().username] = d.id; });
+                } catch(e) {}
+
+                snapshot.forEach((docSnap) => {
+                    const c = docSnap.data();
+                    const docId = docSnap.id;
+                    const fechaComentario = c.fecha ? new Date(c.fecha).toLocaleString() : "Reciente";
+                    const uid = uidMap[c.user] || '';
+                    const badge = getBadge(uid);
+                    const esAdmin = miUID_pelicula === ADMIN_UID;
+                    
+                    const div = document.createElement('div');
+                    div.className = 'bg-zinc-900/50 p-5 rounded-2xl border border-white/5 shadow-xl fade-in mb-4 group/comment';
+                    div.innerHTML = `
+                        <div class="flex justify-between items-start mb-3 gap-2">
+                            <div class="flex flex-col gap-1 min-w-0">
+                                <span class="text-red-600 font-black text-xs uppercase tracking-widest leading-none flex items-center gap-1">
+                                    <a href="perfil.html?user=${encodeURIComponent(c.user)}" class="hover:underline">${c.user}</a>${badge}
+                                </span>
+                                <span class="text-[9px] text-zinc-600 font-bold uppercase tracking-tighter">${fechaComentario}</span>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="text-yellow-500 text-[10px] tracking-widest">${"★".repeat(c.rating)}</span>
+                                ${esAdmin ? `<button onclick="borrarComentarioPelicula('${docId}')" class="opacity-0 group-hover/comment:opacity-100 transition-opacity w-6 h-6 rounded-full bg-red-900/60 hover:bg-red-600 flex items-center justify-center" title="Borrar">
+                                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>` : ''}
+                            </div>
+                        </div>
+                        <p class="text-zinc-400 text-sm leading-relaxed font-medium">${c.txt}</p>
+                    `;
+                    contenedor.appendChild(div);
+                });
             });
         }
 
@@ -455,276 +407,92 @@
         window.publicarComentario = async () => {
             const txt = document.getElementById('comentarioTxt').value.trim();
             const userActual = localStorage.getItem('usuarioMovieM');
-            if (!userActual || userActual === 'undefined') return alert('Debes iniciar sesión para comentar.');
-            if (!txt || currentRating === 0) return alert('Por favor, escribe un comentario y selecciona una valoración.');
+            
+            // Corrección: Validación de sesión primero
+            if (!userActual || userActual === 'undefined') {
+                return alert("Debes iniciar sesión para comentar.");
+            }
+            if(!txt || currentRating === 0) {
+                return alert("Por favor, escribe un comentario y selecciona una valoración.");
+            }
+
             try {
-                await window.addDoc(window.collection(window.db, 'comentarios'), {
-                    movieID, user: userActual, txt, rating: currentRating,
-                    fecha: Date.now(), reacciones: {}, misReacciones: {}
+                await window.addDoc(window.collection(window.db, "comentarios"), {
+                    movieID: movieID,
+                    user: userActual,
+                    txt: txt,
+                    rating: currentRating,
+                    fecha: Date.now()
                 });
-                document.getElementById('comentarioTxt').value = '';
+                document.getElementById('comentarioTxt').value = "";
                 window.setRating(0);
-            } catch(e) { alert('Error al publicar.'); }
-        };
-
-        // ── LISTAS ────────────────────────────────────────────────
-        window.abrirModalListas = async function() {
-            if (!miUID_pelicula) { toast('Iniciá sesión para usar listas', false); return; }
-            document.getElementById('modalListas').classList.remove('hidden');
-            document.getElementById('modalListas').classList.add('flex');
-            document.body.style.overflow = 'hidden';
-            await renderListas();
-        };
-        window.cerrarModalListas = function() {
-            document.getElementById('modalListas').classList.add('hidden');
-            document.getElementById('modalListas').classList.remove('flex');
-            document.body.style.overflow = '';
-        };
-        document.getElementById('modalListas').addEventListener('click', e => { if(e.target===e.currentTarget) window.cerrarModalListas(); });
-
-        async function renderListas() {
-            const cont = document.getElementById('listaListasModal');
-            cont.innerHTML = '<p class="text-zinc-600 text-xs text-center py-6 animate-pulse">Cargando...</p>';
-            try {
-                const [snap1, snap2] = await Promise.all([
-                    window.getDocs(window.query(window.collection(window.db,'listas'), window.where('ownerUID','==',miUID_pelicula))),
-                    window.getDocs(window.query(window.collection(window.db,'listas'), window.where('colaboradores','array-contains',miUID_pelicula)))
-                ]);
-                const listas = [];
-                snap1.forEach(d => listas.push({id:d.id,...d.data(),esPropia:true}));
-                snap2.forEach(d => { if(!listas.find(l=>l.id===d.id)) listas.push({id:d.id,...d.data(),esPropia:false}); });
-
-                if (!listas.length) { cont.innerHTML = '<p class="text-zinc-600 text-xs text-center py-6 italic">No tenés listas aún. ¡Creá una abajo!</p>'; return; }
-                cont.innerHTML = '';
-                listas.forEach(lista => {
-                    const items = lista.items || [];
-                    const enLista = items.some(it => it.id === movieID && it.tipo === 'pelicula');
-                    const div = document.createElement('div');
-                    div.className = 'flex items-center gap-3 p-3 rounded-2xl bg-zinc-800/40 border border-white/5 hover:border-white/10 transition';
-                    div.innerHTML = `
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-black uppercase tracking-tight truncate">${lista.nombre}</p>
-                            <p class="text-[9px] text-zinc-500 font-bold mt-0.5">${items.length} ítem${items.length!==1?'s':''} · ${lista.esPropia?'Tuya':'Colaborativa'}</p>
-                        </div>
-                        <div class="flex items-center gap-2 shrink-0">
-                            ${lista.esPropia ? `<button onclick="abrirColabs('${lista.id}','${lista.nombre.replace(/'/g,"\\'")}' )" title="Colaboradores"
-                                class="w-7 h-7 rounded-full bg-zinc-700 hover:bg-zinc-600 flex items-center justify-center transition">
-                                <svg class="w-3.5 h-3.5 text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            </button>` : ''}
-                            <button onclick="toggleItemLista('${lista.id}', ${enLista})"
-                                class="px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition active:scale-95
-                                ${enLista ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-zinc-700 text-zinc-300 hover:bg-red-600 hover:text-white'}">
-                                ${enLista ? '✓ Agregado' : '+ Agregar'}
-                            </button>
-                        </div>`;
-                    cont.appendChild(div);
-                });
-            } catch(e) { cont.innerHTML = '<p class="text-red-500 text-xs text-center py-4">Error al cargar.</p>'; }
-        }
-
-        window.crearNuevaLista = async function() {
-            const nombre = document.getElementById('inputNuevaLista').value.trim();
-            if (!nombre) return;
-            try {
-                await window.addDoc(window.collection(window.db,'listas'), {
-                    nombre, ownerUID: miUID_pelicula, items: [], colaboradores: [], fecha: Date.now()
-                });
-                document.getElementById('inputNuevaLista').value = '';
-                toast('¡Lista creada!');
-                await renderListas();
-            } catch(e) { toast('Error al crear', false); }
-        };
-
-        window.toggleItemLista = async function(listaId, enLista) {
-            try {
-                const ref = window.doc(window.db,'listas',listaId);
-                const snap = await window.getDoc(ref);
-                if (!snap.exists()) return;
-                let items = [...(snap.data().items||[])];
-                if (enLista) {
-                    items = items.filter(it => !(it.id===movieID && it.tipo==='pelicula'));
-                } else {
-                    items.push({ id: movieID, tipo: 'pelicula', titulo: _tituloActual, poster: _posterActual, fecha: Date.now() });
-                }
-                await window.setDoc(ref, {items}, {merge:true});
-                toast(enLista ? 'Quitado de la lista' : '¡Agregado!');
-                await renderListas();
-            } catch(e) { toast('Error', false); }
-        };
-
-        // ── COLABORADORES ─────────────────────────────────────────
-        window.abrirColabs = async function(listaId, nombre) {
-            _listaIdActiva = listaId;
-            document.getElementById('collabListaNombre').innerText = nombre;
-            document.getElementById('modalColabs').classList.remove('hidden');
-            document.getElementById('modalColabs').classList.add('flex');
-            await renderColabs();
-        };
-        window.cerrarModalColabs = function() {
-            document.getElementById('modalColabs').classList.add('hidden');
-            document.getElementById('modalColabs').classList.remove('flex');
-        };
-        document.getElementById('modalColabs').addEventListener('click', e => { if(e.target===e.currentTarget) window.cerrarModalColabs(); });
-
-        async function renderColabs() {
-            const cont = document.getElementById('listaColabs');
-            cont.innerHTML = '<p class="text-zinc-600 text-xs text-center py-4 animate-pulse">Cargando...</p>';
-            try {
-                const snap = await window.getDoc(window.doc(window.db,'listas',_listaIdActiva));
-                const uids = snap.exists() ? (snap.data().colaboradores||[]) : [];
-                if (!uids.length) { cont.innerHTML = '<p class="text-zinc-600 text-xs text-center py-4 italic">Sin colaboradores aún.</p>'; return; }
-                cont.innerHTML = '';
-                for (const uid of uids) {
-                    const u = await window.getDoc(window.doc(window.db,'usuarios',uid));
-                    const udata = u.exists() ? u.data() : {};
-                    const nombre = udata.username || uid;
-                    const div = document.createElement('div');
-                    div.className = 'flex items-center justify-between gap-3 p-3 rounded-2xl bg-zinc-800/40';
-                    div.innerHTML = `
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center font-black text-xs text-white overflow-hidden shrink-0">
-                                ${udata.avatar ? `<img src="${udata.avatar}" class="w-full h-full object-cover">` : nombre.charAt(0).toUpperCase()}
-                            </div>
-                            <span class="text-sm font-bold">${nombre}</span>
-                        </div>
-                        <button onclick="quitarColab('${uid}')" class="text-[9px] text-zinc-500 hover:text-red-400 font-bold uppercase transition">Quitar</button>`;
-                    cont.appendChild(div);
-                }
-            } catch(e) { cont.innerHTML = '<p class="text-red-500 text-xs text-center py-4">Error.</p>'; }
-        }
-
-        window.invitarColaborador = async function() {
-            const username = document.getElementById('inputInvitar').value.trim();
-            if (!username || !_listaIdActiva) return;
-            try {
-                const snap = await window.getDocs(window.query(window.collection(window.db,'usuarios'), window.where('username','==',username)));
-                if (snap.empty) { toast('Usuario no encontrado', false); return; }
-                let uid = ''; snap.forEach(d => uid = d.id);
-                if (uid === miUID_pelicula) { toast('Eres el dueño', false); return; }
-                await window.setDoc(window.doc(window.db,'listas',_listaIdActiva), {colaboradores: window.arrayUnion(uid)}, {merge:true});
-                document.getElementById('inputInvitar').value = '';
-                toast('¡Colaborador agregado!');
-                await renderColabs();
-            } catch(e) { toast('Error al invitar', false); }
-        };
-
-        window.quitarColab = async function(uid) {
-            if (!_listaIdActiva) return;
-            await window.setDoc(window.doc(window.db,'listas',_listaIdActiva), {colaboradores: window.arrayRemove(uid)}, {merge:true});
-            toast('Colaborador quitado');
-            await renderColabs();
-        };
-
-        // ── AUTH ──────────────────────────────────────────────────
-        window.onAuthStateChanged(window.auth, function(user) {
-            if (user) {
-                miUID_pelicula = user.uid;
-                checkStatus();
-                // Si los comentarios ya cargaron sin UID, re-renderizar ahora que lo tenemos
-                if (_allDocs.length > 0) renderComentarios();
+            } catch (e) {
+                console.error("Error Firebase:", e);
+                alert("Error al publicar el comentario.");
             }
-        });
+        };
 
-        // ── HUD ───────────────────────────────────────────────────
-        function actualizarHUD() {
-            const userActual = localStorage.getItem('usuarioMovieM');
-            const hud = document.getElementById('userHUD');
-            if (userActual && userActual !== 'undefined') {
-                document.getElementById('userNameHUD').innerText = userActual;
-                document.getElementById('userInitial').innerText = userActual.charAt(0).toUpperCase();
-                hud.classList.remove('hidden'); hud.classList.add('flex');
-            }
-        }
-
-        // ── CARGAR PÁGINA ─────────────────────────────────────────
-        async function cargarPagina() {
-            try {
-                const [pRes, cRes] = await Promise.all([
-                    fetch(`https://api.themoviedb.org/3/movie/${movieID}?api_key=${API_KEY}&language=es-ES`),
-                    fetch(`https://api.themoviedb.org/3/movie/${movieID}/credits?api_key=${API_KEY}&language=es-ES`)
-                ]);
-                const peli = await pRes.json();
-                const credits = await cRes.json();
-
-                _tituloActual = peli.title || '';
-                _posterActual = peli.poster_path ? 'https://image.tmdb.org/t/p/w500'+peli.poster_path : '';
-
-                if(document.getElementById('tituloSkeleton')) document.getElementById('tituloSkeleton').remove();
-                if(document.getElementById('sinopsisSkeleton')) document.getElementById('sinopsisSkeleton').remove();
-                document.getElementById('sinopsis').classList.remove('hidden');
-
-                document.getElementById('titulo').innerText = peli.title;
-                var tmob=document.getElementById('tituloMobile');if(tmob)tmob.innerText=peli.title;
-                document.getElementById('sinopsis').innerText = peli.overview || 'Sin descripción disponible.';
-                document.getElementById('anio').innerText = peli.release_date ? peli.release_date.split('-')[0] : 'S/F';
-                document.getElementById('voto').innerText = peli.vote_average.toFixed(1);
-                var vm=document.getElementById('votoMobile');if(vm)vm.innerText=peli.vote_average.toFixed(1);
-                var am=document.getElementById('anioMobile');if(am)am.innerText=peli.release_date?peli.release_date.split('-')[0]:'S/F';
-                var sm=document.getElementById('sinopsisMobile');if(sm){sm.innerText=peli.overview||'Sin descripcion.';sm.classList.remove('hidden');var sk=document.getElementById('sinopsisSkeleton');if(sk)sk.remove();}
-                document.getElementById('poster').src = _posterActual;
-                document.getElementById('backdrop').style.backgroundImage = `url('https://image.tmdb.org/t/p/original${peli.backdrop_path}')`;
-                document.title = `MovieM | ${peli.title}`;
-
-                if(peli.vote_average > 7.4) document.getElementById('badget-premios').classList.remove('hidden');
-
-                const dir = credits.crew.find(c => c.job === 'Director');
-                if(dir) { document.getElementById('director').innerText = `Director: ${dir.name}`; var dm=document.getElementById('directorMobile');if(dm)dm.innerText='Dir: '+dir.name; }
-
-                document.getElementById('reparto').innerHTML = credits.cast.slice(0,15).map(actor => `
-                    <div onclick="verActor(${actor.id})" class="min-w-[110px] text-center cursor-pointer shrink-0 fade-in">
-                        <div class="w-20 h-20 mx-auto mb-4 overflow-hidden rounded-full border border-zinc-800 hover:border-red-600 transition-all transform hover:scale-110 duration-300">
-                            <img src="${actor.profile_path ? 'https://image.tmdb.org/t/p/w200'+actor.profile_path : 'https://via.placeholder.com/200'}" class="w-full h-full object-cover">
-                        </div>
-                        <p class="text-[10px] font-black text-zinc-200 truncate uppercase tracking-tighter px-1">${actor.name}</p>
-                        <p class="text-[8px] text-zinc-600 truncate italic px-1">${actor.character}</p>
-                    </div>`).join('');
-
-                escucharComentariosNube();
-                checkStatus();
-                actualizarHUD();
-                if (peli.runtime) window._peliculaDuracion = peli.runtime;
-                cargarSimilares();
-                actualizarBarraProgreso(leerProgreso());
-            } catch(error) { console.error(error); }
-        }
-
-        // ── SISTEMAS DE INTERACCIÓN ───────────────────────────────
+        // --- SISTEMAS DE INTERACCIÓN ---
         async function checkStatus() {
             if (!miUID_pelicula) return;
+
             try {
-                const userDoc = await window.getDoc(window.doc(window.db,'usuarios',miUID_pelicula));
-                if (!userDoc.exists()) return;
-                const data = userDoc.data();
-                if ((data.watchlist||[]).includes(movieID)) {
-                    ['btnWatchlist','btnWatchlistDesktop'].forEach(id => { const b=document.getElementById(id); if(!b)return; b.classList.add('bg-zinc-100','text-black','border-white'); b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5'); });
+                const userRef = window.doc(window.db, "usuarios", miUID_pelicula);
+                const userDoc = await window.getDoc(userRef);
+                
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    if (data.watchlist && data.watchlist.includes(movieID)) {
+                        ['btnWatchlist','btnWatchlistDesktop'].forEach(id => { const b=document.getElementById(id); if(!b)return; b.classList.add('bg-zinc-100','text-black','border-white'); b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5'); });
+                    }
+                    if (data.likes && data.likes.includes(movieID)) {
+                        ['btnLike','btnLikeDesktop'].forEach(id => { const b=document.getElementById(id); if(!b)return; b.classList.add('bg-red-600','border-red-600','text-white'); b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5'); });
+                    }
                 }
-                if ((data.likes||[]).includes(movieID)) {
-                    ['btnLike','btnLikeDesktop'].forEach(id => { const b=document.getElementById(id); if(!b)return; b.classList.add('bg-red-600','border-red-600','text-white'); b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5'); });
-                }
-            } catch(e) { console.error(e); }
+            } catch (e) { console.error("Error al checkear status:", e); }
         }
 
         window.toggleWatchlist = async () => {
-            if (!miUID_pelicula) return alert('Debes iniciar sesión para guardar películas.');
+            if (!miUID_pelicula) return alert("Debes iniciar sesión para guardar películas.");
+
             const btn = document.getElementById('btnWatchlist');
+            const userRef = window.doc(window.db, "usuarios", miUID_pelicula);
             const isSaved = btn.classList.contains('bg-zinc-100');
+
             try {
-                await window.setDoc(window.doc(window.db,'usuarios',miUID_pelicula), {watchlist: isSaved?window.arrayRemove(movieID):window.arrayUnion(movieID)}, {merge:true});
-                ['btnWatchlist','btnWatchlistDesktop'].forEach(id => { const b=document.getElementById(id); if(!b)return; if(!isSaved){b.classList.add('bg-zinc-100','text-black','border-white');b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5');}else{b.classList.remove('bg-zinc-100','text-black','border-white');b.classList.add('bg-zinc-900','text-zinc-400','border-white/5');} });
-            } catch(e) { console.error(e); }
+                await window.setDoc(userRef, { 
+                    watchlist: isSaved ? window.arrayRemove(movieID) : window.arrayUnion(movieID) 
+                }, { merge: true });
+                
+                ['btnWatchlist','btnWatchlistDesktop'].forEach(id => {
+                    const b = document.getElementById(id); if(!b) return;
+                    if(!isSaved){b.classList.add('bg-zinc-100','text-black','border-white');b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5');}
+                    else{b.classList.remove('bg-zinc-100','text-black','border-white');b.classList.add('bg-zinc-900','text-zinc-400','border-white/5');}
+                });
+            } catch (e) { console.error("Error en Watchlist:", e); }
         };
 
         window.toggleLike = async () => {
-            if (!miUID_pelicula) return alert('Debes iniciar sesión para dar like.');
+            if (!miUID_pelicula) return alert("Debes iniciar sesión para dar like.");
+
             const btn = document.getElementById('btnLike');
+            const userRef = window.doc(window.db, "usuarios", miUID_pelicula);
             const isLiked = btn.classList.contains('bg-red-600');
+
             try {
-                await window.setDoc(window.doc(window.db,'usuarios',miUID_pelicula), {likes: isLiked?window.arrayRemove(movieID):window.arrayUnion(movieID)}, {merge:true});
-                ['btnLike','btnLikeDesktop'].forEach(id => { const b=document.getElementById(id); if(!b)return; if(!isLiked){b.classList.add('bg-red-600','border-red-600','text-white');b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5');}else{b.classList.remove('bg-red-600','border-red-600','text-white');b.classList.add('bg-zinc-900','text-zinc-400','border-white/5');} });
-            } catch(e) { console.error(e); }
+                await window.setDoc(userRef, { 
+                    likes: isLiked ? window.arrayRemove(movieID) : window.arrayUnion(movieID) 
+                }, { merge: true });
+                
+                ['btnLike','btnLikeDesktop'].forEach(id => {
+                    const b = document.getElementById(id); if(!b) return;
+                    if(!isLiked){b.classList.add('bg-red-600','border-red-600','text-white');b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5');}
+                    else{b.classList.remove('bg-red-600','border-red-600','text-white');b.classList.add('bg-zinc-900','text-zinc-400','border-white/5');}
+                });
+            } catch (e) { console.error("Error en Like:", e); }
         };
 
-        // ── MODAL ACTORES & TRAILER ───────────────────────────────
+        // --- MODAL ACTORES & TRAILER ---
         window.verActor = async (id) => {
             try {
                 const [resBio, resPelis] = await Promise.all([
@@ -733,12 +501,15 @@
                 ]);
                 const actor = await resBio.json();
                 const créditos = await resPelis.json();
+                
                 document.getElementById('actorNombre').innerText = actor.name;
-                document.getElementById('actorFoto').src = actor.profile_path ? 'https://image.tmdb.org/t/p/w500'+actor.profile_path : 'https://via.placeholder.com/500';
-                document.getElementById('actorInfo').innerText = actor.biography || 'Biografía no disponible.';
-                const pelisValidas = créditos.cast.filter(p => p.poster_path).sort((a,b) => b.popularity-a.popularity).slice(0,15);
+                document.getElementById('actorFoto').src = actor.profile_path ? 'https://image.tmdb.org/t/p/w500' + actor.profile_path : 'https://via.placeholder.com/500';
+                document.getElementById('actorInfo').innerText = actor.biography || "Biografía no disponible.";
+                
+                const pelisValidas = créditos.cast.filter(p => p.poster_path).sort((a, b) => b.popularity - a.popularity).slice(0, 15);
                 const isScrollable = pelisValidas.length > 5;
                 const contenedorPelis = document.getElementById('actorPelisContenedor');
+                
                 const pelisHTML = pelisValidas.map(p => `
                     <div class="w-[85px] group/item cursor-pointer shrink-0" onclick="window.location.href='pelicula.html?id=${p.id}'">
                         <div class="w-[85px] h-[125px] overflow-hidden rounded-xl border border-white/5 group-hover/item:border-red-600 transition-all duration-300 transform group-hover/item:scale-105">
@@ -746,65 +517,151 @@
                         </div>
                         <p class="text-[7px] mt-2 text-zinc-500 truncate w-full text-center uppercase font-bold px-1">${p.title}</p>
                     </div>`).join('');
+
                 contenedorPelis.innerHTML = `
                     ${isScrollable ? `<button onclick="scrollPelis(-300)" class="absolute -left-6 top-[62px] -translate-y-1/2 bg-zinc-900/90 p-2 rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity z-20 hover:bg-red-600 text-white shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>` : ''}
                     <div id="listaPelisActor" class="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-4 px-1">${pelisHTML}</div>
-                    ${isScrollable ? `<button onclick="scrollPelis(300)" class="absolute -right-6 top-[62px] -translate-y-1/2 bg-zinc-900/90 p-2 rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity z-20 hover:bg-red-600 text-white shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>` : ''}`;
+                    ${isScrollable ? `<button onclick="scrollPelis(300)" class="absolute -right-6 top-[62px] -translate-y-1/2 bg-zinc-900/90 p-2 rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity z-20 hover:bg-red-600 text-white shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></button>` : ''}
+                `;
                 document.getElementById('modalActor').classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
-            } catch(error) { console.error(error); }
+                document.body.style.overflow = "hidden";
+            } catch (error) { console.error(error); }
         };
 
-        window.cerrarActor = () => { document.getElementById('modalActor').classList.add('hidden'); document.body.style.overflow = 'auto'; };
-        window.scrollPelis = (distancia) => document.getElementById('listaPelisActor').scrollBy({left:distancia,behavior:'smooth'});
-        window.scrollReparto = (distancia) => document.getElementById('reparto').scrollBy({left:distancia,behavior:'smooth'});
+        window.cerrarActor = () => { document.getElementById('modalActor').classList.add('hidden'); document.body.style.overflow = "auto"; };
+        window.scrollPelis = (distancia) => document.getElementById('listaPelisActor').scrollBy({ left: distancia, behavior: 'smooth' });
+        window.scrollReparto = (distancia) => document.getElementById('reparto').scrollBy({ left: distancia, behavior: 'smooth' });
 
         window.abrirTrailer = async () => {
             try {
                 const res = await fetch(`https://api.themoviedb.org/3/movie/${movieID}/videos?api_key=${API_KEY}`);
                 const data = await res.json();
-                const tr = data.results.find(v => v.type==='Trailer' && v.site==='YouTube');
+                const tr = data.results.find(v => v.type === "Trailer" && v.site === "YouTube");
                 if(tr) {
                     document.getElementById('videoContainer').innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${tr.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>`;
                     document.getElementById('modalVideo').classList.remove('hidden');
-                    document.body.style.overflow = 'hidden';
+                    document.body.style.overflow = "hidden";
                 }
-            } catch(error) { console.error(error); }
+            } catch (error) { console.error(error); }
         };
 
-        window.cerrarTrailer = () => {
-            document.getElementById('modalVideo').classList.add('hidden');
+        window.cerrarTrailer = () => { 
+            document.getElementById('modalVideo').classList.add('hidden'); 
             document.getElementById('videoContainer').innerHTML = '';
-            document.body.style.overflow = 'auto';
+            document.body.style.overflow = "auto";
         };
 
+        // --- OTROS HELPERS ---
         window.setRating = (n) => {
             currentRating = n;
-            document.querySelectorAll('.star').forEach((s,i) => { s.style.color = i<n ? '#eab308' : '#3f3f46'; });
+            document.querySelectorAll('.star').forEach((s, i) => {
+                s.style.color = i < n ? '#eab308' : '#3f3f46';
+            });
         };
 
-        // ── PROGRESO ──────────────────────────────────────────────
-        let progresoTimer = null, progresoInicio = null;
-        function guardarProgreso(p) { try { const pr=JSON.parse(localStorage.getItem('movieM_progress')||'{}'); pr['pelicula_'+movieID]=Math.min(100,Math.max(0,Math.round(p))); localStorage.setItem('movieM_progress',JSON.stringify(pr)); } catch(e){} }
-        function leerProgreso() { try { return JSON.parse(localStorage.getItem('movieM_progress')||'{}')['pelicula_'+movieID]||0; } catch(e){return 0;} }
-        function actualizarBarraProgreso(pct) { const bar=document.getElementById('progresoBar'),wrap=document.getElementById('progresoWrap'),num=document.getElementById('progresoNum'); if(!bar||!wrap)return; if(pct>2){wrap.classList.remove('hidden');bar.style.width=pct+'%';if(num)num.innerText=Math.round(pct)+'%';}else{wrap.classList.add('hidden');} }
+        // ── CONTINUAR VIENDO ───────────────────────────────────────────────────────
+        // Guarda el progreso de reproducción en localStorage
+        // Clave: movieM_progress → { "pelicula_ID": porcentaje }
+        let progresoTimer = null;
+        let progresoInicio = null;
 
-        window.verPelicula = () => {
-            document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
+        function guardarProgreso(porcentaje) {
+            try {
+                const prog = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
+                prog['pelicula_' + movieID] = Math.min(100, Math.max(0, Math.round(porcentaje)));
+                localStorage.setItem('movieM_progress', JSON.stringify(prog));
+            } catch(e) {}
+        }
+
+        function leerProgreso() {
+            try {
+                const prog = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
+                return prog['pelicula_' + movieID] || 0;
+            } catch(e) { return 0; }
+        }
+
+        function actualizarBarraProgreso(pct) {
+            const bar = document.getElementById('progresoBar');
+            const wrap = document.getElementById('progresoWrap');
+            const num  = document.getElementById('progresoNum');
+            if (!bar || !wrap) return;
+            if (pct > 2) {
+                wrap.classList.remove('hidden');
+                bar.style.width = pct + '%';
+                if (num) num.innerText = Math.round(pct) + '%';
+            } else {
+                wrap.classList.add('hidden');
+            }
+        }
+
+        // Links latinos hardcodeados por movie ID
+        const LATINO_LINKS = {
+            '1265609': 'https://vidmoly.biz/embed-cwm9a9a92mn6.html'
+        };
+
+        // Mostrar botón latino si existe para esta peli
+        function checkLatinoDisponible() {
+            if (LATINO_LINKS[String(movieID)]) {
+                const btnMob = document.getElementById('btnLatinoMobile');
+                const btnDesk = document.getElementById('btnLatinoDesktop');
+                if (btnMob) btnMob.classList.remove('hidden');
+                if (btnDesk) btnDesk.classList.remove('hidden');
+            }
+        }
+
+        window.verPelicula = (fuente = 'vidsrc') => {
+            const latinoUrl = LATINO_LINKS[String(movieID)];
+            let src;
+            if (fuente === 'latino' && latinoUrl) {
+                src = latinoUrl;
+            } else {
+                src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
+            }
+
+            // Botones de fuente en el overlay
+            const fuentesBtns = document.getElementById('fuentesBtns');
+            fuentesBtns.innerHTML = '';
+            const btnDefault = document.createElement('button');
+            btnDefault.textContent = '🌐 Por defecto';
+            btnDefault.className = `text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition ${fuente === 'vidsrc' ? 'bg-white/10 border-white/20 text-white' : 'border-white/10 text-white/40 hover:text-white/70'}`;
+            btnDefault.onclick = () => verPelicula('vidsrc');
+            fuentesBtns.appendChild(btnDefault);
+
+            if (latinoUrl) {
+                const btnLat = document.createElement('button');
+                btnLat.textContent = '🇦🇷 Latino';
+                btnLat.className = `text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition ${fuente === 'latino' ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-400' : 'border-white/10 text-white/40 hover:text-yellow-400'}`;
+                btnLat.onclick = () => verPelicula('latino');
+                fuentesBtns.appendChild(btnLat);
+            }
+
+            document.getElementById('movieFrame').src = src;
             document.getElementById('playerOverlay').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+            document.body.style.overflow = "hidden";
             progresoInicio = Date.now();
-            const dur = (window._peliculaDuracion||120)*60*1000;
-            const prev = leerProgreso();
-            progresoTimer = setInterval(() => { const t=Date.now()-progresoInicio; guardarProgreso(prev+(t/dur)*100); actualizarBarraProgreso(Math.min(100,Math.round(prev+(t/dur)*100))); }, 10000);
+            const duracionEstimada = (window._peliculaDuracion || 120) * 60 * 1000;
+            const progresoActual = leerProgreso();
+            progresoTimer = setInterval(() => {
+                const transcurrido = Date.now() - progresoInicio;
+                const pctNuevo = progresoActual + (transcurrido / duracionEstimada) * 100;
+                guardarProgreso(pctNuevo);
+                actualizarBarraProgreso(Math.min(100, Math.round(pctNuevo)));
+            }, 10000);
         };
 
         window.cerrarPelicula = () => {
             document.getElementById('playerOverlay').style.display = 'none';
-            document.getElementById('movieFrame').src = '';
-            document.body.style.overflow = 'auto';
-            if(progresoTimer){clearInterval(progresoTimer);progresoTimer=null;}
-            if(progresoInicio){const dur=(window._peliculaDuracion||120)*60*1000;const t=Date.now()-progresoInicio;guardarProgreso(leerProgreso()+(t/dur)*100);progresoInicio=null;}
+            document.getElementById('movieFrame').src = "";
+            document.body.style.overflow = "auto";
+            if (progresoTimer) { clearInterval(progresoTimer); progresoTimer = null; }
+            // Guardar progreso final
+            if (progresoInicio) {
+                const duracion = (window._peliculaDuracion || 120) * 60 * 1000;
+                const transcurrido = Date.now() - progresoInicio;
+                const actual = leerProgreso();
+                guardarProgreso(actual + (transcurrido / duracion) * 100);
+                progresoInicio = null;
+            }
             actualizarBarraProgreso(leerProgreso());
         };
 
@@ -813,77 +670,35 @@
                 const res = await fetch(`https://api.themoviedb.org/3/movie/${movieID}/similar?api_key=${API_KEY}&language=es-ES&page=1`);
                 const data = await res.json();
                 const fila = document.getElementById('similaresFila');
-                const progress = JSON.parse(localStorage.getItem('movieM_progress')||'{}');
-                const items = (data.results||[]).filter(p=>p.poster_path).slice(0,18);
-                if(!items.length){fila.closest('section').classList.add('hidden');return;}
+                const progress = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
+                const items = (data.results || []).filter(p => p.poster_path).slice(0, 18);
+                if (!items.length) {
+                    fila.closest('section').classList.add('hidden');
+                    return;
+                }
                 fila.innerHTML = items.map(p => {
-                    const prog=progress['pelicula_'+p.id]||0, rating=p.vote_average?p.vote_average.toFixed(1):'', anio=(p.release_date||'').split('-')[0];
-                    return `<div onclick="location.href='pelicula.html?id=${p.id}'" class="min-w-[75px] md:min-w-[100px] shrink-0 cursor-pointer group/sim-card">
+                    const prog = progress['pelicula_' + p.id] || 0;
+                    const rating = p.vote_average ? p.vote_average.toFixed(1) : '';
+                    const anio = (p.release_date || '').split('-')[0];
+                    return `
+                    <div onclick="location.href='pelicula.html?id=${p.id}'"
+                        class="min-w-[75px] md:min-w-[100px] shrink-0 cursor-pointer group/sim-card">
                         <div class="relative rounded-xl overflow-hidden border border-white/5 transition-transform duration-200 group-hover/sim-card:scale-105 mb-1.5">
-                            <img src="https://image.tmdb.org/t/p/w200${p.poster_path}" class="w-full aspect-[2/3] object-cover" loading="lazy">
+                            <img src="https://image.tmdb.org/t/p/w200${p.poster_path}"
+                                 class="w-full aspect-[2/3] object-cover" loading="lazy">
                             <div class="absolute top-1 right-1 flex flex-col gap-0.5 items-end">
-                                ${rating?`<div class="bg-black/80 text-yellow-500 text-[7px] font-black px-1 py-0.5 rounded">⭐ ${rating}</div>`:''}
-                                ${anio?`<div class="bg-black/80 text-zinc-300 text-[7px] font-black px-1 py-0.5 rounded">${anio}</div>`:''}
+                                ${rating ? `<div class="bg-black/80 text-yellow-500 text-[7px] font-black px-1 py-0.5 rounded">⭐ ${rating}</div>` : ''}
+                                ${anio ? `<div class="bg-black/80 text-zinc-300 text-[7px] font-black px-1 py-0.5 rounded">${anio}</div>` : ''}
                             </div>
-                            ${prog>0?`<div class="absolute bottom-0 left-0 right-0 h-1 bg-zinc-800/80"><div class="h-full bg-red-600 rounded-full" style="width:${prog}%"></div></div>`:''}
+                            ${prog > 0 ? `<div class="absolute bottom-0 left-0 right-0 h-1 bg-zinc-800/80"><div class="h-full bg-red-600 rounded-full transition-all" style="width:${prog}%"></div></div>` : ''}
                         </div>
                         <p class="text-[8px] font-bold uppercase tracking-tighter text-zinc-500 truncate">${p.title}</p>
                     </div>`;
                 }).join('');
-            } catch(e) { console.error(e); }
+            } catch(e) { console.error('similares:', e); }
         }
 
         cargarPagina();
     </script>
-<!-- ═══════════════════════════════════════════
-     MODAL LISTAS PERSONALIZADAS
-═══════════════════════════════════════════ -->
-<div id="modalListas" class="fixed inset-0 z-[130] hidden items-end md:items-center justify-center bg-black/80 backdrop-blur-sm">
-    <div class="bg-zinc-900 border border-white/10 w-full max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl flex flex-col max-h-[85vh]">
-        <div class="flex items-center justify-between px-5 py-4 border-b border-white/5 shrink-0">
-            <h4 class="text-xs font-black uppercase tracking-widest" style="color:var(--accent-color,#dc2626)">Mis Listas</h4>
-            <button onclick="cerrarModalListas()" class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition">
-                <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
-        <div id="listaListasModal" class="overflow-y-auto no-scrollbar flex-1 p-4 space-y-2"></div>
-        <div class="p-4 border-t border-white/5 shrink-0 space-y-2">
-            <div class="flex gap-2">
-                <input id="inputNuevaLista" type="text" placeholder="Nueva lista..." maxlength="40"
-                    class="flex-1 bg-zinc-800 border border-zinc-700 focus:border-red-600 text-white text-sm rounded-xl px-3 py-2.5 outline-none transition">
-                <button onclick="crearNuevaLista()"
-                    class="bg-red-600 hover:bg-red-700 text-white font-black text-xs uppercase tracking-widest px-4 py-2.5 rounded-xl transition active:scale-95">Crear</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL COLABORADORES -->
-<div id="modalColabs" class="fixed inset-0 z-[140] hidden items-end md:items-center justify-center bg-black/80 backdrop-blur-sm">
-    <div class="bg-zinc-900 border border-white/10 w-full max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl flex flex-col max-h-[80vh]">
-        <div class="flex items-center justify-between px-5 py-4 border-b border-white/5 shrink-0">
-            <div>
-                <h4 class="text-xs font-black uppercase tracking-widest" style="color:var(--accent-color,#dc2626)">Colaboradores</h4>
-                <p id="collabListaNombre" class="text-[10px] text-zinc-500 mt-0.5 truncate max-w-[220px]"></p>
-            </div>
-            <button onclick="cerrarModalColabs()" class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition">
-                <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
-        <div id="listaColabs" class="overflow-y-auto no-scrollbar flex-1 p-4 space-y-2"></div>
-        <div class="p-4 border-t border-white/5 shrink-0">
-            <div class="flex gap-2">
-                <input id="inputInvitar" type="text" placeholder="Nombre de usuario..."
-                    class="flex-1 bg-zinc-800 border border-zinc-700 focus:border-red-600 text-white text-sm rounded-xl px-3 py-2.5 outline-none transition">
-                <button onclick="invitarColaborador()"
-                    class="bg-zinc-700 hover:bg-zinc-600 text-white font-black text-xs uppercase tracking-widest px-4 py-2.5 rounded-xl transition active:scale-95">Invitar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- TOAST GLOBAL -->
-<div id="toastMsg" class="fixed bottom-24 md:bottom-8 left-1/2 -translate-x-1/2 z-[500] pointer-events-none flex flex-col items-center gap-2"></div>
-
 </body>
 </html>
