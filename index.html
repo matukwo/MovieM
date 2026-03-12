@@ -70,37 +70,36 @@
                 const fila = document.getElementById('continuarFila');
                 const seccion = document.getElementById('sec-continuar');
 
-                // Si no hay documentos o la colección no existe, ocultar sección y salir
                 if (!snap || snap.empty) {
                     seccion.classList.add('hidden');
                     return;
                 }
 
-                // Filtrar solo los documentos que tengan datos válidos para evitar undefined
-                const itemsValidos = snap.docs
-                    .map(doc => doc.data())
-                    .filter(d => d.titulo && d.poster && d.contentId);
+                const itemsValidos = snap.docs.map(doc => doc.data()).filter(d => d.titulo && d.poster);
 
                 if (itemsValidos.length === 0) {
                     seccion.classList.add('hidden');
                     return;
                 }
 
-                // Mostrar sección y renderizar solo los items válidos
                 seccion.classList.remove('hidden');
-                fila.innerHTML = itemsValidos.map(d => `
-                    <div onclick="location.href='pelicula.html?id=${d.contentId}'" class="min-w-[140px] md:min-w-[180px] shrink-0 cursor-pointer group">
-                        <div class="relative rounded-xl overflow-hidden border border-white/10 group-hover:scale-105 transition duration-300">
-                            <img src="${d.poster}" class="w-full aspect-[2/3] object-cover">
-                            <div class="absolute bottom-0 left-0 right-0 h-1.5 bg-zinc-900/80">
-                                <div class="bg-red-600 h-full" style="width: ${d.porcentaje || 0}%"></div>
+                fila.innerHTML = itemsValidos.map(d => {
+                    // Aseguramos que el porcentaje sea un número válido
+                    const progreso = d.porcentaje || 0;
+                    return `
+                        <div onclick="location.href='pelicula.html?id=${d.contentId}'" class="min-w-[140px] md:min-w-[180px] shrink-0 cursor-pointer group">
+                            <div class="relative rounded-xl overflow-hidden border border-white/10 group-hover:scale-105 transition duration-300">
+                                <img src="${d.poster}" class="w-full aspect-[2/3] object-cover">
+                                <div class="absolute bottom-0 left-0 right-0 h-1.5 bg-zinc-900/80">
+                                    <div class="bg-red-600 h-full transition-all duration-500" style="width: ${progreso}%"></div>
+                                </div>
                             </div>
+                            <p class="text-[10px] font-black mt-2 truncate uppercase text-zinc-400 group-hover:text-white">${d.titulo}</p>
                         </div>
-                        <p class="text-[10px] font-black mt-2 truncate uppercase text-zinc-400 group-hover:text-white">${d.titulo}</p>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             } catch(e) { 
-                console.error("Error en cargarContinuar:", e);
+                console.error(e);
                 document.getElementById('sec-continuar').classList.add('hidden');
             }
         }
