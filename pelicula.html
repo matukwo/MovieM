@@ -94,7 +94,6 @@
         document.getElementById('backdrop').style.backgroundImage = `url('https://image.tmdb.org/t/p/original${peli.backdrop_path}')`;
         window._peliculaDuracion = peli.runtime || 120;
         
-        // Cargar link latino si existe
         const snap = await window.getDoc(window.doc(window.db, 'latinoLinks', String(movieID)));
         if (snap.exists()) {
             _latinoUrl = snap.data().url;
@@ -154,7 +153,6 @@
         document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
         progresoInicio = Date.now();
         
-        // Guardar cada 15 segundos
         progresoTimer = setInterval(() => {
             const transcurrido = Date.now() - progresoInicio;
             const duracionMs = (window._peliculaDuracion || 120) * 60 * 1000;
@@ -163,11 +161,18 @@
         }, 15000);
     }
 
-    window.cerrarPelicula = () => {
+    window.cerrarPelicula = async () => {
         clearInterval(progresoTimer);
+        // Guardar por última vez antes de cerrar
+        if (progresoInicio) {
+            const transcurrido = Date.now() - progresoInicio;
+            const duracionMs = (window._peliculaDuracion || 120) * 60 * 1000;
+            const pctSesion = (transcurrido / duracionMs) * 100;
+            await guardarProgreso(_progresoLocal + pctSesion);
+        }
         document.getElementById('playerOverlay').style.display = 'none';
         document.getElementById('movieFrame').src = "";
-        location.reload(); // Recargar para ver el progreso actualizado
+        location.reload(); 
     }
 
     cargarPagina();
