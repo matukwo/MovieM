@@ -435,13 +435,19 @@
 
     function reproducirEpisodio(temp, ep, nombre) {
         epTemp = temp; epNum = ep; epNombre = nombre || '';
+        _modoLatinoSerie = false;
         document.getElementById('serieFrame').src = SERVERS_TV[servidorActivo](serieID, temp, ep);
-        document.getElementById('playerLabel').innerText = `T${temp} · E${ep} — ${epNombre}`;
+        // Resetear botones de fuente al abrir
+        const base = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition';
+        const subBtn = document.getElementById('btnFuenteSubSerie');
+        const latBtn = document.getElementById('btnFuenteLatSerie');
+        if (subBtn) subBtn.className = base + ' bg-white/10 border-white/20 text-white';
+        if (latBtn && _latinoUrlSerie) latBtn.className = base + ' border-white/10 text-white/40 hover:text-yellow-400';
+        document.getElementById('btnRespaldoWrapSerie').classList.add('hidden');
         document.getElementById('playerOverlay').style.display = 'flex';
         document.body.style.overflow = 'hidden';
         document.body.style.position = 'fixed';
         document.body.style.width = '100%';
-        // Guardar en Firestore: último episodio visto por este usuario
         guardarProgresoSerie(temp, ep, nombre);
     }
 
