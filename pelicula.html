@@ -577,17 +577,35 @@
         let progresoInicio = null;
         let _progresoLocal = 0; // cache en memoria
 
+        // ── SISTEMA DE PROGRESO (solo Firestore) ──────────────────────────────────
+        let _firebaseUser = null; // se resuelve una sola vez
+
+        async function getFirebaseUser() {
+            if (_firebaseUser !== null) return _firebaseUser;
+            // Esperar a que firebase-config.js cargue
+            for (let i = 0; i < 50; i++) {
+                if (window.auth && window.onAuthStateChanged) break;
+                await new Promise(r => setTimeout(r, 100));
+            }
+            return new Promise(resolve => {
+                const unsub = window.onAuthStateChanged(window.auth, u => {
+                    unsub();
+                    _firebaseUser = u || null;
+                    console.log('[MovieM] Usuario Firebase:', u ? u.uid : 'NO LOGUEADO');
+                    resolve(_firebaseUser);
+                });
+            });
+        }
+
+        // Iniciar resolución del usuario apenas carga la página
+        getFirebaseUser();
+
         async function guardarProgreso(porcentaje) {
             const pct = Math.min(100, Math.max(0, Math.round(porcentaje)));
             _progresoLocal = pct;
+            const user = await getFirebaseUser();
+            if (!user) { console.warn('[MovieM] guardarProgreso: sin usuario'); return; }
             try {
-                const prog = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
-                prog['pelicula_' + movieID] = pct;
-                localStorage.setItem('movieM_progress', JSON.stringify(prog));
-            } catch(e) {}
-            try {
-                const user = await getFirebaseUser();
-                if (!user) return;
                 const ref = window.doc(window.db, 'usuarios', user.uid, 'continuar', 'pelicula_' + movieID);
                 await window.setDoc(ref, {
                     tipo: 'pelicula',
@@ -595,51 +613,26 @@
                     porcentaje: pct,
                     updatedAt: window.serverTimestamp()
                 }, { merge: true });
-            } catch(e) {}
+                console.log('[MovieM] Progreso guardado:', pct + '%');
+            } catch(e) { console.error('[MovieM] Error guardando progreso:', e); }
         }
 
         async function leerProgreso() {
+            const user = await getFirebaseUser();
+            if (!user) return 0;
             try {
-                const user = await getFirebaseUser();
-                if (user) {
-                    const ref = window.doc(window.db, 'usuarios', user.uid, 'continuar', 'pelicula_' + movieID);
-                    const snap = await window.getDoc(ref);
-                    if (snap.exists()) {
-                        _progresoLocal = snap.data().porcentaje || 0;
-                        return _progresoLocal;
-                    }
+                const ref = window.doc(window.db, 'usuarios', user.uid, 'continuar', 'pelicula_' + movieID);
+                const snap = await window.getDoc(ref);
+                if (snap.exists()) {
+                    _progresoLocal = snap.data().porcentaje || 0;
+                    console.log('[MovieM] Progreso leído:', _progresoLocal + '%');
+                    return _progresoLocal;
                 }
-            } catch(e) {}
-            try {
-                const prog = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
-                _progresoLocal = prog['pelicula_' + movieID] || 0;
-                return _progresoLocal;
-            } catch(e) { return 0; }
+            } catch(e) { console.error('[MovieM] Error leyendo progreso:', e); }
+            return 0;
         }
 
         function leerProgresoSync() { return _progresoLocal; }
-
-        async function waitForFirebase() {
-            for (let i = 0; i < 30; i++) {
-                if (window.db && window.auth && window.onAuthStateChanged) break;
-                await new Promise(r => setTimeout(r, 100));
-            }
-        }
-
-        async function getFirebaseUser() {
-            await waitForFirebase();
-            return new Promise(resolve => {
-                // Si ya hay usuario resuelto, usarlo
-                if (window.auth.currentUser !== undefined) {
-                    // currentUser puede ser null (no logueado) o un user
-                    // Pero justo al iniciar puede ser null aún si no resolvió
-                }
-                const unsub = window.onAuthStateChanged(window.auth, u => {
-                    unsub();
-                    resolve(u);
-                });
-            });
-        }
 
         function actualizarBarraProgreso(pct) {
             const bar = document.getElementById('progresoBar');
