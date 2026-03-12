@@ -16,6 +16,8 @@
         .medal-1{background:linear-gradient(135deg,#f59e0b,#fbbf24)}
         .medal-2{background:linear-gradient(135deg,#9ca3af,#d1d5db)}
         .medal-3{background:linear-gradient(135deg,#b45309,#d97706)}
+        .feedback-tab{cursor:pointer;border:1px solid rgba(255,255,255,0.06)}
+        .active-tab{background-color:var(--accent-color,#dc2626)!important;color:white!important;border-color:transparent}
     </style>
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden">
@@ -26,7 +28,6 @@
         <a href="index.html" class="hover:text-white transition">Inicio</a>
         <a href="peliculas.html" class="hover:text-white transition">Películas</a>
         <a href="series.html" class="hover:text-white transition">Series</a>
-        <a href="tv.html" class="hover:text-white transition">TV en Vivo</a>
         <a href="mi_lista.html" class="hover:text-white transition">Mi Lista</a>
         <a href="comunidad.html" class="text-accent">Comunidad</a>
     </div>
@@ -120,6 +121,63 @@
         </div>
 
     </div>
+
+    <!-- Sección Feedback -->
+    <div class="mt-12 mb-4">
+        <h2 class="text-2xl md:text-3xl font-black italic uppercase tracking-tighter text-white">Tu Opinión</h2>
+        <p class="text-zinc-500 text-xs font-bold uppercase tracking-widest mt-1">Reportá errores, compartí ideas o pedí contenido</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+
+        <!-- Tab selector -->
+        <div class="md:col-span-3 flex gap-2">
+            <button onclick="setTipo('error')" id="tabError" class="feedback-tab active-tab px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all bg-accent text-white">🐛 Reportar Error</button>
+            <button onclick="setTipo('idea')" id="tabIdea" class="feedback-tab px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all bg-zinc-800 text-zinc-400 hover:text-white">💡 Aportar Idea</button>
+            <button onclick="setTipo('solicitud')" id="tabSolicitud" class="feedback-tab px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all bg-zinc-800 text-zinc-400 hover:text-white">🎬 Solicitar Contenido</button>
+        </div>
+
+        <!-- Formulario -->
+        <div class="md:col-span-3 bg-zinc-900/60 rounded-3xl border border-white/5 p-6">
+
+            <!-- Descripción del tipo -->
+            <p id="feedbackDesc" class="text-zinc-400 text-xs mb-5 leading-relaxed">
+                Describí el error que encontraste: en qué página ocurrió, qué estabas haciendo y qué pasó.
+            </p>
+
+            <!-- Título -->
+            <div class="mb-4">
+                <label class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-2 block">Título</label>
+                <input id="feedbackTitulo" type="text" maxlength="100" placeholder="Resumí en una línea..."
+                    class="w-full bg-zinc-800/60 border border-white/8 rounded-2xl px-4 py-3 text-sm text-white placeholder-zinc-600 outline-none focus:border-white/20 transition">
+            </div>
+
+            <!-- Descripción -->
+            <div class="mb-4">
+                <label class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-2 block">Detalle</label>
+                <textarea id="feedbackTexto" rows="4" maxlength="1000" placeholder="Contá todo lo que necesites..."
+                    class="w-full bg-zinc-800/60 border border-white/8 rounded-2xl px-4 py-3 text-sm text-white placeholder-zinc-600 outline-none focus:border-white/20 transition resize-none"></textarea>
+                <p class="text-[9px] text-zinc-600 text-right mt-1"><span id="charCount">0</span>/1000</p>
+            </div>
+
+            <!-- Nombre opcional -->
+            <div class="mb-6">
+                <label class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-2 block">Tu nombre o usuario <span class="text-zinc-600">(opcional)</span></label>
+                <input id="feedbackNombre" type="text" maxlength="50" placeholder="Anónimo si lo dejás vacío..."
+                    class="w-full bg-zinc-800/60 border border-white/8 rounded-2xl px-4 py-3 text-sm text-white placeholder-zinc-600 outline-none focus:border-white/20 transition">
+            </div>
+
+            <!-- Botón enviar -->
+            <button id="btnEnviarFeedback" onclick="enviarFeedback()"
+                class="w-full md:w-auto px-8 py-3 bg-accent rounded-2xl text-sm font-black uppercase tracking-widest text-white hover:opacity-90 active:scale-95 transition-all">
+                Enviar
+            </button>
+
+            <!-- Toast feedback -->
+            <div id="feedbackToast" class="hidden mt-4 px-4 py-3 rounded-2xl text-sm font-bold"></div>
+        </div>
+    </div>
+
 </main>
 
 <!-- BOTTOM NAV MOBILE -->
@@ -129,9 +187,13 @@
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
             <span class="text-[9px] font-black uppercase tracking-widest">Inicio</span>
         </a>
-        <a href="mi_lista.html" class="flex flex-col items-center gap-1 text-zinc-500">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
-            <span class="text-[9px] font-black uppercase tracking-widest">Mi Lista</span>
+        <a href="peliculas.html" class="flex flex-col items-center gap-1 text-zinc-500">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/></svg>
+            <span class="text-[9px] font-black uppercase tracking-widest">Películas</span>
+        </a>
+        <a href="series.html" class="flex flex-col items-center gap-1 text-zinc-500">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.361a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
+            <span class="text-[9px] font-black uppercase tracking-widest">Series</span>
         </a>
         <a href="comunidad.html" class="flex flex-col items-center gap-1 text-accent">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -302,6 +364,89 @@ async function init() {
         console.error(e);
     }
 }
+
+// ── FEEDBACK ──────────────────────────────────────────────────────
+let tipoActual = 'error';
+
+const descripciones = {
+    error: 'Describí el error que encontraste: en qué página ocurrió, qué estabas haciendo y qué pasó.',
+    idea: 'Contanos qué función, mejora o cambio te gustaría ver en MovieM.',
+    solicitud: 'Escribí el nombre de la película o serie que querés que esté disponible.'
+};
+
+window.setTipo = function(tipo) {
+    tipoActual = tipo;
+    document.querySelectorAll('.feedback-tab').forEach(b => {
+        b.classList.remove('active-tab');
+        b.classList.add('bg-zinc-800', 'text-zinc-400');
+        b.classList.remove('text-white');
+    });
+    const tab = document.getElementById('tab' + tipo.charAt(0).toUpperCase() + tipo.slice(1));
+    tab.classList.add('active-tab');
+    tab.classList.remove('bg-zinc-800', 'text-zinc-400');
+    tab.classList.add('text-white');
+    document.getElementById('feedbackDesc').textContent = descripciones[tipo];
+    document.getElementById('feedbackTitulo').value = '';
+    document.getElementById('feedbackTexto').value = '';
+    document.getElementById('charCount').textContent = '0';
+    document.getElementById('feedbackToast').classList.add('hidden');
+};
+
+document.getElementById('feedbackTexto').addEventListener('input', function() {
+    document.getElementById('charCount').textContent = this.value.length;
+});
+
+window.enviarFeedback = async function() {
+    const titulo = document.getElementById('feedbackTitulo').value.trim();
+    const texto = document.getElementById('feedbackTexto').value.trim();
+    const nombre = document.getElementById('feedbackNombre').value.trim() || 'Anónimo';
+    const toast = document.getElementById('feedbackToast');
+    const btn = document.getElementById('btnEnviarFeedback');
+
+    if (!titulo) {
+        toast.className = 'mt-4 px-4 py-3 rounded-2xl text-sm font-bold bg-red-500/20 text-red-400 border border-red-500/20';
+        toast.textContent = 'Por favor escribí un título.';
+        return;
+    }
+    if (!texto) {
+        toast.className = 'mt-4 px-4 py-3 rounded-2xl text-sm font-bold bg-red-500/20 text-red-400 border border-red-500/20';
+        toast.textContent = 'Por favor escribí el detalle.';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
+    const ok = await waitForFirebase();
+    if (!ok) {
+        toast.className = 'mt-4 px-4 py-3 rounded-2xl text-sm font-bold bg-red-500/20 text-red-400 border border-red-500/20';
+        toast.textContent = 'Error de conexión. Intentá de nuevo.';
+        btn.disabled = false; btn.textContent = 'Enviar';
+        return;
+    }
+
+    try {
+        await window.addDoc(window.collection(window.db, 'reportes'), {
+            tipo: tipoActual,
+            titulo,
+            texto,
+            nombre,
+            fecha: window.serverTimestamp ? window.serverTimestamp() : new Date().toISOString(),
+            leido: false
+        });
+        toast.className = 'mt-4 px-4 py-3 rounded-2xl text-sm font-bold bg-green-500/20 text-green-400 border border-green-500/20';
+        toast.textContent = '✓ ¡Gracias! Tu mensaje fue enviado correctamente.';
+        document.getElementById('feedbackTitulo').value = '';
+        document.getElementById('feedbackTexto').value = '';
+        document.getElementById('feedbackNombre').value = '';
+        document.getElementById('charCount').textContent = '0';
+    } catch(e) {
+        toast.className = 'mt-4 px-4 py-3 rounded-2xl text-sm font-bold bg-red-500/20 text-red-400 border border-red-500/20';
+        toast.textContent = 'Error al enviar. Intentá de nuevo.';
+        console.error(e);
+    }
+    btn.disabled = false; btn.textContent = 'Enviar';
+};
 
 init();
 </script>
