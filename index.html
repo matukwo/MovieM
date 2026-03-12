@@ -135,6 +135,17 @@
             <button onclick="scrollFila('continuar',400)"  class="absolute right-2 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
         </section>
 
+        <section id="secLatino" class="mb-10 relative group hidden">
+            <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-1 text-zinc-100 flex items-center gap-3">
+                <span class="w-1 h-6 rounded-full inline-block" style="background:#3b82f6"></span>
+                🇦🇷 Doblaje Latino Disponible
+            </h2>
+            <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-4 ml-4">Películas y series con audio en español latino</p>
+            <button onclick="scrollFila('latino',-400)" class="absolute left-0 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <div class="relative"><div id="latino" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div></div>
+            <button onclick="scrollFila('latino',400)" class="absolute right-2 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
+        </section>
+
         <section class="mb-10 relative group">
             <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 text-zinc-100">Tendencias Ahora</h2>
             <button onclick="scrollFila('tendencias',-400)" class="absolute left-0 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
@@ -466,6 +477,85 @@ async function cargarContinuar(user) {
     }));
   } catch(e) { console.error('cargarContinuar:', e); }
 }
+
+// ── Doblaje Latino Disponible ──────────────────────────────────────────────────
+async function cargarLatino() {
+  try {
+    const sec  = document.getElementById('secLatino');
+    const fila = document.getElementById('latino');
+
+    // Leer películas y series con latino en paralelo
+    const [snapPelis, snapSeries] = await Promise.all([
+      getDocs(collection(db, 'latinoLinks')),
+      getDocs(collection(db, 'latinoSeries'))
+    ]);
+
+    // Películas: una card por doc
+    const peliculas = [];
+    snapPelis.forEach(d => peliculas.push({ tipo: 'pelicula', id: d.id, ...d.data() }));
+
+    // Series: deduplicar por serieID (puede haber muchos episodios)
+    const seriesMap = new Map();
+    snapSeries.forEach(d => {
+      const dat = d.data();
+      if (!seriesMap.has(dat.serieID)) seriesMap.set(dat.serieID, dat);
+    });
+    const series = [...seriesMap.values()].map(s => ({ tipo: 'serie', id: String(s.serieID), ...s }));
+
+    const todos = [...peliculas, ...series];
+    if (!todos.length) { sec.classList.add('hidden'); return; }
+
+    sec.classList.remove('hidden');
+    fila.innerHTML = '';
+
+    // Shuffle para variedad
+    todos.sort(() => Math.random() - 0.5);
+
+    await Promise.all(todos.map(async item => {
+      try {
+        let posterPath = '', nombre = '', url = '';
+
+        if (item.tipo === 'pelicula') {
+          const r = await fetch(`https://api.themoviedb.org/3/movie/${item.id}?api_key=${API_KEY}&language=es-MX`);
+          const p = await r.json();
+          if (!p.poster_path) return;
+          posterPath = p.poster_path;
+          nombre = p.title || item.titulo || '';
+          url = `pelicula.html?id=${item.id}`;
+        } else {
+          const r = await fetch(`https://api.themoviedb.org/3/tv/${item.id}?api_key=${API_KEY}&language=es-MX`);
+          const s = await r.json();
+          if (!s.poster_path) return;
+          posterPath = s.poster_path;
+          nombre = s.name || item.serieName || '';
+          url = `serie.html?id=${item.id}`;
+        }
+
+        const card = document.createElement('div');
+        card.className = 'min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2';
+        card.onclick = () => location.href = url;
+        card.innerHTML = `
+          <div class="relative aspect-[2/3]">
+            <div class="absolute inset-0 rounded-xl skeleton"></div>
+            <img src="${BASE+posterPath}" class="absolute inset-0 w-full h-full object-cover rounded-xl shadow-lg border border-white/5 z-10" loading="lazy" onload="this.previousElementSibling.style.display='none'">
+            <div class="absolute top-1.5 right-1.5 z-20">
+              <div class="bg-blue-600/90 text-white text-[7px] font-black px-1.5 py-0.5 rounded-lg uppercase tracking-widest flex items-center gap-1">
+                🇦🇷 ${item.tipo === 'serie' ? 'SERIE' : 'LAT'}
+              </div>
+            </div>
+          </div>
+          <p class="text-[9px] md:text-[10px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 mt-2">${nombre}</p>
+        `;
+        fila.appendChild(card);
+      } catch(e) {}
+    }));
+
+    // Si quedó vacío (todos fallaron) ocultar
+    if (!fila.children.length) sec.classList.add('hidden');
+  } catch(e) { console.error('cargarLatino:', e); }
+}
+
+cargarLatino();
 
 cargarSeccion('https://api.themoviedb.org/3/trending/movie/week?api_key='+API_KEY+'&language=es-MX','tendencias');
 cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&with_genres=28&language=es-MX','accion');
