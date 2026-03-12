@@ -294,7 +294,7 @@ async function cargarRankComentarios() {
         const conteo = {};
         snap.forEach(d => {
             const user = d.data().user;
-            if (user) conteo[user] = (conteo[user] || 0) + 1;
+            if (user && user.toLowerCase() !== 'invitado') conteo[user] = (conteo[user] || 0) + 1;
         });
 
         const sorted = Object.entries(conteo)
@@ -340,7 +340,7 @@ async function init() {
         const usuarios = [];
         snap.forEach(d => {
             const data = d.data();
-            if (data.username) usuarios.push({ uid: d.id, ...data });
+            if (data.username && data.username.toLowerCase() !== 'invitado') usuarios.push({ uid: d.id, ...data });
         });
 
         await Promise.all([
