@@ -20,6 +20,7 @@
 <nav class="hidden md:grid p-5 grid-cols-3 items-center bg-zinc-950/90 backdrop-blur-md fixed top-0 w-full z-50 border-b border-white/5">
     <div class="flex space-x-6 text-xs font-bold uppercase tracking-widest text-zinc-400">
         <a href="index.html" class="hover:text-white transition">Inicio</a>
+        <a href="peliculas.html" class="hover:text-white transition">Películas</a>
         <a href="series.html" class="text-accent">Series</a>
         <a href="mi_lista.html" class="hover:text-white transition">Mi Lista</a>
     </div>
@@ -77,29 +78,23 @@
     </div>
 
     <div id="contenidoPrincipal">
-        <section class="mb-10 group">
+        <section class="mb-10 relative group">
             <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 text-zinc-100">Tendencias Esta Semana</h2>
-            <div class="relative">
-                <button onclick="scrollFila('tendencias',-400)" class="absolute left-0 top-1/2 -translate-y-1/2 z-40 bg-black/80 p-2.5 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
-                <div id="tendencias" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div>
-                <button onclick="scrollFila('tendencias',400)" class="absolute right-0 top-1/2 -translate-y-1/2 z-40 bg-black/80 p-2.5 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
-            </div>
+            <button onclick="scrollFila('tendencias',-400)" class="absolute left-0 top-10 z-40 bg-black/80 p-2 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <div id="tendencias" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div>
+            <button onclick="scrollFila('tendencias',400)" class="absolute right-2 top-10 z-40 bg-black/80 p-2 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
         </section>
-        <section class="mb-10 group">
+        <section class="mb-10 relative group">
             <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 text-zinc-100">Las Mejor Valoradas</h2>
-            <div class="relative">
-                <button onclick="scrollFila('topRated',-400)" class="absolute left-0 top-1/2 -translate-y-1/2 z-40 bg-black/80 p-2.5 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
-                <div id="topRated" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div>
-                <button onclick="scrollFila('topRated',400)" class="absolute right-0 top-1/2 -translate-y-1/2 z-40 bg-black/80 p-2.5 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
-            </div>
+            <button onclick="scrollFila('topRated',-400)" class="absolute left-0 top-10 z-40 bg-black/80 p-2 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <div id="topRated" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div>
+            <button onclick="scrollFila('topRated',400)" class="absolute right-2 top-10 z-40 bg-black/80 p-2 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
         </section>
-        <section class="mb-10 group">
+        <section class="mb-10 relative group">
             <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 text-zinc-100">En Emisión Ahora</h2>
-            <div class="relative">
-                <button onclick="scrollFila('enEmision',-400)" class="absolute left-0 top-1/2 -translate-y-1/2 z-40 bg-black/80 p-2.5 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
-                <div id="enEmision" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div>
-                <button onclick="scrollFila('enEmision',400)" class="absolute right-0 top-1/2 -translate-y-1/2 z-40 bg-black/80 p-2.5 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
-            </div>
+            <button onclick="scrollFila('enEmision',-400)" class="absolute left-0 top-10 z-40 bg-black/80 p-2 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
+            <div id="enEmision" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-4 scroll-smooth"></div>
+            <button onclick="scrollFila('enEmision',400)" class="absolute right-2 top-10 z-40 bg-black/80 p-2 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg></button>
         </section>
         <section id="seccionFiltrada" class="mb-10 hidden">
             <h2 id="tituloFiltrado" class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 text-zinc-100"></h2>
