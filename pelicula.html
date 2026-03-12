@@ -71,44 +71,53 @@
     const urlParams = new URLSearchParams(window.location.search);
     const movieID = urlParams.get('id');
     let miUID_pelicula = null;
-    let _progresoBase = 0; // Lo que ya estaba guardado
+    let _progresoBase = 0; 
     let progresoInicioSesion = null;
     let progresoTimer = null;
     let _latinoUrl = null;
+    let duracionPeliculaMin = 120; // Valor por defecto por si falla la API
 
     window.onAuthStateChanged(window.auth, (user) => {
         if (user) {
             miUID_pelicula = user.uid;
             leerProgreso().then(pct => {
-                _progresoBase = pct;
-                actualizarBarraProgreso(pct);
+                _progresoBase = parseFloat(pct) || 0;
+                actualizarBarraProgreso(_progresoBase);
             });
         }
     });
 
     async function cargarPagina() {
-        const res = await fetch(`https://api.themoviedb.org/3/movie/${movieID}?api_key=${API_KEY}&language=es-MX`);
-        const peli = await res.json();
-        document.getElementById('titulo').innerText = peli.title;
-        document.getElementById('sinopsis').innerText = peli.overview;
-        document.getElementById('anio').innerText = peli.release_date.split('-')[0];
-        document.getElementById('voto').innerText = peli.vote_average.toFixed(1);
-        document.getElementById('poster').src = 'https://image.tmdb.org/t/p/w500' + peli.poster_path;
-        document.getElementById('backdrop').style.backgroundImage = `url('https://image.tmdb.org/t/p/original${peli.backdrop_path}')`;
-        window._peliculaDuracion = peli.runtime || 120;
-        
-        const snap = await window.getDoc(window.doc(window.db, 'latinoLinks', String(movieID)));
-        if (snap.exists()) {
-            _latinoUrl = snap.data().url;
-            document.getElementById('btnFuenteLat').classList.remove('hidden');
-        }
+        try {
+            const res = await fetch(`https://api.themoviedb.org/3/movie/${movieID}?api_key=${API_KEY}&language=es-MX`);
+            const peli = await res.json();
+            document.getElementById('titulo').innerText = peli.title;
+            document.getElementById('sinopsis').innerText = peli.overview;
+            document.getElementById('anio').innerText = (peli.release_date || "2024").split('-')[0];
+            document.getElementById('voto').innerText = (peli.vote_average || 0).toFixed(1);
+            document.getElementById('poster').src = 'https://image.tmdb.org/t/p/w500' + peli.poster_path;
+            document.getElementById('backdrop').style.backgroundImage = `url('https://image.tmdb.org/t/p/original${peli.backdrop_path}')`;
+            
+            // Guardamos la duración real si existe
+            if(peli.runtime && peli.runtime > 0) duracionPeliculaMin = peli.runtime;
+
+            const snap = await window.getDoc(window.doc(window.db, 'latinoLinks', String(movieID)));
+            if (snap.exists()) {
+                _latinoUrl = snap.data().url;
+                document.getElementById('btnFuenteLat').classList.remove('hidden');
+            }
+        } catch(e) { console.error("Error cargando página:", e); }
     }
 
     async function guardarProgreso(porcentaje) {
         if (!miUID_pelicula) return;
-        const pctFinal = Math.min(100, Math.max(0, Math.round(porcentaje)));
         
-        // Actualizar UI local inmediatamente
+        // Validación para evitar NaN
+        let pctFinal = parseFloat(porcentaje);
+        if (isNaN(pctFinal)) return;
+        
+        pctFinal = Math.min(100, Math.max(0, Math.round(pctFinal)));
+        
         actualizarBarraProgreso(pctFinal);
 
         try {
@@ -120,14 +129,16 @@
                 poster: document.getElementById('poster').src,
                 updatedAt: window.serverTimestamp()
             }, { merge: true });
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error("Error al guardar:", e); }
     }
 
     async function leerProgreso() {
         if (!miUID_pelicula) return 0;
-        const ref = window.doc(window.db, 'usuarios', miUID_pelicula, 'continuar', 'pelicula_' + movieID);
-        const snap = await window.getDoc(ref);
-        return (snap.exists()) ? (snap.data().porcentaje || 0) : 0;
+        try {
+            const ref = window.doc(window.db, 'usuarios', miUID_pelicula, 'continuar', 'pelicula_' + movieID);
+            const snap = await window.getDoc(ref);
+            return (snap.exists()) ? (snap.data().porcentaje || 0) : 0;
+        } catch(e) { return 0; }
     }
 
     function actualizarBarraProgreso(pct) {
@@ -153,10 +164,10 @@
         document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
         progresoInicioSesion = Date.now();
         
-        // Guardado cada 15 segundos calculando incremento sobre la base
+        // Cada 15 segundos calculamos el progreso acumulado
         progresoTimer = setInterval(() => {
             const msVistos = Date.now() - progresoInicioSesion;
-            const duracionMs = (window._peliculaDuracion || 120) * 60 * 1000;
+            const duracionMs = duracionPeliculaMin * 60 * 1000;
             const incrementoPct = (msVistos / duracionMs) * 100;
             guardarProgreso(_progresoBase + incrementoPct);
         }, 15000);
@@ -166,7 +177,7 @@
         clearInterval(progresoTimer);
         if (progresoInicioSesion) {
             const msVistos = Date.now() - progresoInicioSesion;
-            const duracionMs = (window._peliculaDuracion || 120) * 60 * 1000;
+            const duracionMs = duracionPeliculaMin * 60 * 1000;
             const incrementoPct = (msVistos / duracionMs) * 100;
             await guardarProgreso(_progresoBase + incrementoPct);
         }
