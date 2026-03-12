@@ -21,7 +21,6 @@
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden">
 
-<!-- Player overlay -->
 <div id="playerOverlay">
     <div class="w-full flex justify-between items-center px-3 py-2 md:px-4 md:py-3 bg-zinc-950 border-b border-white/5">
         <span class="text-red-600 font-black tracking-tighter text-lg md:text-xl shrink-0">MOVIE<span class="text-white font-light">M</span></span>
@@ -33,7 +32,6 @@
     </div>
     <div class="flex-1 bg-black relative">
         <iframe id="movieFrame" src="" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media"></iframe>
-        <!-- Botón respaldo latino -->
         <div id="btnRespaldoWrap" class="hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-50">
             <button onclick="usarRespaldo()" class="bg-zinc-900/95 border border-yellow-500/30 text-yellow-400 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-xl active:scale-95 hover:bg-zinc-800 transition">
                 ⚠️ ¿No funciona? Probar respaldo
@@ -42,16 +40,13 @@
     </div>
 </div>
 
-<!-- Backdrop -->
 <div id="backdrop" class="fixed inset-0 w-full h-full bg-cover bg-center opacity-20 md:opacity-30 blur-sm -z-10 transition-all duration-700"></div>
 <div class="fixed inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent -z-10"></div>
 
-<!-- Botón volver -->
 <button onclick="location.href='index.html'" class="fixed top-4 left-4 md:top-8 md:left-8 bg-black/50 p-2.5 md:p-3 rounded-full hover:bg-red-600 transition z-50 border border-white/10 shadow-2xl">
     <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
 </button>
 
-<!-- HUD usuario -->
 <div id="userHUD" class="fixed top-4 right-4 md:top-8 md:right-8 z-50 hidden items-center gap-3 bg-black/40 backdrop-blur-md p-1.5 pr-4 rounded-full border border-white/10 shadow-2xl">
     <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-600 flex items-center justify-center font-black text-white border-2 border-white/20 text-sm" id="userInitial">?</div>
     <span id="userNameHUD" class="text-xs font-bold uppercase tracking-widest hidden md:inline">Usuario</span>
@@ -59,15 +54,12 @@
 
 <main class="px-4 md:px-8 pt-16 md:pt-20 pb-8">
 
-    <!-- Info principal -->
     <div class="flex flex-col md:flex-row gap-6 md:gap-12 items-start mb-10 md:mb-16 relative z-0 fade-in">
 
-        <!-- Poster: pequeño y a la izquierda en mobile -->
         <div class="flex gap-4 md:block w-full md:w-80 md:shrink-0">
             <div class="w-28 md:w-full shrink-0">
                 <div id="posterSkeleton" class="w-full aspect-[2/3] rounded-xl md:rounded-2xl skeleton"></div>
                 <img id="poster" src="" class="w-full rounded-xl md:rounded-2xl border border-white/10 shadow-2xl hidden" onload="this.classList.remove('hidden');document.getElementById('posterSkeleton')?.remove()">
-                <!-- Barra de progreso "Continuar viendo" -->
                 <div id="progresoWrap" class="hidden mt-2">
                     <div class="flex items-center justify-between mb-1">
                         <span class="text-[9px] font-black uppercase tracking-widest text-zinc-500">Continuar viendo</span>
@@ -78,7 +70,6 @@
                     </div>
                 </div>
             </div>
-            <!-- Info inline en mobile (al lado del poster) -->
             <div class="flex-1 md:hidden pt-1">
                 <div id="badget-premios-mobile" class="hidden mb-2 inline-flex items-center gap-1.5 bg-yellow-600/20 border border-yellow-600/50 text-yellow-500 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest">
                     <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z"/></svg>
@@ -90,7 +81,6 @@
                     <span class="text-yellow-500 text-sm font-bold">&#11088; <span id="votoMobile">0.0</span></span>
                 </div>
                 <span id="directorMobile" class="text-zinc-500 text-xs italic block mb-3"></span>
-                <!-- Botones mobile compactos -->
                 <div class="flex gap-2 flex-wrap">
                     <button onclick="verPelicula()" class="bg-red-600 text-white px-4 py-2.5 rounded-full font-black text-xs flex items-center gap-1.5 active:scale-95 shadow-lg">
                         <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Ver
@@ -108,7 +98,6 @@
             </div>
         </div>
 
-        <!-- Info desktop (lado derecho) -->
         <div class="flex-1 relative z-10 min-w-0 hidden md:block">
             <div id="badget-premios" class="hidden mb-4 inline-flex items-center gap-2.5 bg-yellow-600/20 border border-yellow-600/50 text-yellow-500 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-lg">
                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z"/></svg>
@@ -144,7 +133,6 @@
         </div>
     </div>
 
-    <!-- Sinopsis mobile (abajo del poster) -->
     <div class="md:hidden mb-8 fade-in">
         <div id="sinopsisSkeleton" class="space-y-2 mb-4">
             <div class="h-3 w-full skeleton rounded"></div>
@@ -154,7 +142,6 @@
         <p id="sinopsisMobile" class="text-sm text-zinc-400 leading-relaxed hidden"></p>
     </div>
 
-    <!-- Reparto -->
     <section class="mb-12 md:mb-20 fade-in group/reparto" style="animation-delay:.2s">
         <h3 class="text-xs md:text-sm font-black uppercase tracking-widest mb-4 md:mb-8 text-zinc-400 flex items-center gap-3">
             Reparto Principal <div class="h-px flex-1 bg-zinc-800/50"></div>
@@ -172,7 +159,6 @@
         </div>
     </section>
 
-    <!-- Películas Similares -->
     <section class="mb-10 md:mb-14 fade-in" style="animation-delay:.35s">
         <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 flex items-center gap-3">
             <span class="w-1 h-6 bg-red-600 rounded-full inline-block"></span>
@@ -184,7 +170,6 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
             </button>
             <div id="similaresFila" class="flex gap-2 md:gap-3 overflow-x-auto no-scrollbar pb-3 scroll-smooth">
-                <!-- skeletons iniciales -->
                 <div class="min-w-[75px] md:min-w-[100px] skeleton rounded-xl aspect-[2/3]"></div>
                 <div class="min-w-[75px] md:min-w-[100px] skeleton rounded-xl aspect-[2/3]"></div>
                 <div class="min-w-[75px] md:min-w-[100px] skeleton rounded-xl aspect-[2/3]"></div>
@@ -199,7 +184,6 @@
         </div>
     </section>
 
-    <!-- Comentarios + Resena -->
     <section class="border-t border-white/5 pt-8 md:pt-12 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 mb-16 fade-in" style="animation-delay:.4s">
         <div class="bg-zinc-900/40 p-6 md:p-10 rounded-2xl md:rounded-3xl border border-white/5 shadow-2xl">
             <h3 class="text-lg md:text-2xl font-bold mb-5 italic">Tu resena en <span class="text-red-600">MovieM</span></h3>
@@ -224,7 +208,6 @@
     </section>
 </main>
 
-<!-- Modal Actor -->
 <div id="modalActor" class="fixed inset-0 z-[110] hidden flex items-end md:items-center justify-center p-0 md:p-6">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-md" onclick="cerrarActor()"></div>
     <div class="relative glass-card px-5 py-6 md:px-10 md:py-10 rounded-t-3xl md:rounded-[45px] w-full max-w-4xl max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl">
@@ -241,7 +224,6 @@
     </div>
 </div>
 
-<!-- Modal Trailer -->
 <div id="modalVideo" class="fixed inset-0 bg-black/95 z-[100] hidden flex items-center justify-center p-2 md:p-4">
     <button onclick="cerrarTrailer()" class="absolute top-4 right-4 md:top-8 md:right-8 text-white text-3xl hover:text-red-600 transition z-10">x</button>
     <div id="videoContainer" class="w-full max-w-5xl aspect-video rounded-xl md:rounded-3xl overflow-hidden shadow-2xl"></div>
@@ -675,6 +657,18 @@
         };
 
         window.cambiarFuente = function(fuente) {
+            // --- NUEVA LÓGICA DE PROGRESO AL CAMBIAR ---
+            if (progresoInicio) {
+                const duracion = (window._peliculaDuracion || 120) * 60 * 1000;
+                const transcurrido = Date.now() - progresoInicio;
+                const pctActual = leerProgresoSync();
+                guardarProgreso(pctActual + (transcurrido / duracion) * 100);
+                
+                // Reiniciamos el inicio al momento del cambio para el nuevo reproductor
+                progresoInicio = Date.now(); 
+            }
+            // -------------------------------------------
+
             const subBtn = document.getElementById('btnFuenteSub');
             const latBtn = document.getElementById('btnFuenteLat');
             const respaldoWrap = document.getElementById('btnRespaldoWrap');
@@ -720,12 +714,12 @@
             document.getElementById('btnRespaldoWrap').classList.add('hidden');
             document.body.style.overflow = "auto";
             if (progresoTimer) { clearInterval(progresoTimer); progresoTimer = null; }
-            // Guardar progreso final
+            // Guardar progreso final asegurando máximo 100%
             if (progresoInicio) {
                 const duracion = (window._peliculaDuracion || 120) * 60 * 1000;
                 const transcurrido = Date.now() - progresoInicio;
-                const pct = leerProgresoSync();
-                guardarProgreso(pct + (transcurrido / duracion) * 100);
+                const pctActual = leerProgresoSync();
+                guardarProgreso(Math.min(100, pctActual + (transcurrido / duracion) * 100));
                 progresoInicio = null;
             }
             actualizarBarraProgreso(leerProgresoSync());
