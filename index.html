@@ -19,7 +19,6 @@
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden">
 
-<!-- NAV DESKTOP -->
 <nav class="hidden md:grid p-5 grid-cols-3 items-center bg-zinc-950/90 backdrop-blur-md fixed top-0 w-full z-50 border-b border-white/5">
     <div class="flex space-x-6 text-xs font-bold uppercase tracking-widest text-zinc-400">
         <a href="index.html" class="hover:text-white transition">Inicio</a>
@@ -49,7 +48,6 @@
     </div>
 </nav>
 
-<!-- NAV MOBILE TOP -->
 <nav class="md:hidden flex items-center justify-between px-4 py-3 bg-zinc-950/90 backdrop-blur-md fixed top-0 w-full z-50 border-b border-white/5">
     <h1 class="text-2xl font-black text-accent tracking-tighter cursor-pointer" onclick="location.href='index.html'">MOVIE<span class="text-white font-light">M</span></h1>
     <div class="flex items-center gap-2">
@@ -68,7 +66,6 @@
     </div>
 </nav>
 
-<!-- BUSQUEDA OVERLAY MOBILE -->
 <div id="searchOverlayMobile" class="fixed inset-0 z-[200] bg-zinc-950 hidden flex-col">
     <div class="flex items-center gap-3 px-4 py-4 border-b border-white/5 pt-safe">
         <div class="relative flex-1">
@@ -80,10 +77,8 @@
     <div id="searchDropdownMobile" class="flex-1 overflow-y-auto no-scrollbar"></div>
 </div>
 
-<!-- TOAST -->
 <div id="toastContainer" class="fixed bottom-24 right-4 z-[300] flex flex-col gap-2 md:bottom-6 md:right-6"></div>
 
-<!-- MODAL LOGIN -->
 <div id="modalLogin" class="fixed inset-0 md:inset-auto md:top-20 md:right-6 z-[150] hidden items-end md:items-start justify-center md:justify-start">
     <div class="absolute inset-0 bg-black/60 md:hidden" id="modalLoginOverlay"></div>
     <div id="modalCard" class="relative bg-zinc-900 border border-white/10 w-full md:w-80 rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto no-scrollbar">
@@ -128,10 +123,8 @@
     </div>
 </div>
 
-<!-- MAIN -->
 <main class="pt-16 md:pt-24 pb-24 md:pb-8 px-4 md:pl-8 md:pr-4">
     <div id="contenidoPrincipal">
-        <!-- Continuar Viendo (se muestra solo si hay progreso guardado) -->
         <section id="secContinuar" class="mb-10 relative group hidden">
             <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-4 text-zinc-100 flex items-center gap-3">
                 <span class="w-1 h-6 bg-red-600 rounded-full inline-block"></span>
@@ -181,7 +174,6 @@
     </div>
 </main>
 
-<!-- BOTTOM NAV MOBILE -->
 <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-zinc-950/95 backdrop-blur-xl border-t border-white/5">
     <div class="flex items-center justify-around py-3 px-2">
         <a href="index.html" class="flex flex-col items-center gap-1 text-accent">
@@ -382,18 +374,21 @@ async function cargarSeccion(url,id){
 
 window.scrollFila=function(id,d){document.getElementById(id).scrollBy({left:d,behavior:'smooth'});};
 var colorG=localStorage.getItem('movieM_color');if(colorG)document.documentElement.style.setProperty('--accent-color',colorG);
-// ── Continuar Viendo ──────────────────────────────────────────────────────────
+
+// ── Continuar Viendo (CORREGIDO) ──────────────────────────────────────────────
 (async function cargarContinuar(){
   try {
     var prog=JSON.parse(localStorage.getItem('movieM_progress')||'{}');
     var pelisConProgreso=Object.entries(prog)
       .filter(function(e){return e[0].startsWith('pelicula_')&&e[1]>2&&e[1]<98;})
-      .sort(function(a,b){return b[1]-a[1]}) // las más avanzadas primero
+      .sort(function(a,b){return b[1]-a[1]}) 
       .slice(0,12);
     if(!pelisConProgreso.length) return;
+    
     document.getElementById('secContinuar').classList.remove('hidden');
     var fila=document.getElementById('continuar');
     fila.innerHTML='';
+
     await Promise.all(pelisConProgreso.map(async function(entry){
       var id=entry[0].replace('pelicula_','');
       var pct=entry[1];
@@ -401,23 +396,42 @@ var colorG=localStorage.getItem('movieM_color');if(colorG)document.documentEleme
         var r=await fetch('https://api.themoviedb.org/3/movie/'+id+'?api_key='+API_KEY+'&language=es-MX');
         var p=await r.json();
         if(!p.poster_path) return;
+
         var card=document.createElement('div');
         card.className='min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2';
         card.onclick=function(){location.href='pelicula.html?id='+id;};
-        var wrap=document.createElement('div');wrap.className='relative';
-        var sk=document.createElement('div');sk.className='absolute inset-0 rounded-xl skeleton';
+
+        var inner=document.createElement('div');
+        inner.className='relative aspect-[2/3]'; 
+
+        var sk=document.createElement('div');
+        sk.className='absolute inset-0 rounded-xl skeleton';
+        
         var im=document.createElement('img');
         im.src=BASE+p.poster_path;
-        im.className='rounded-xl shadow-lg border border-white/5 w-full relative z-10';
+        im.className='absolute inset-0 w-full h-full object-cover rounded-xl shadow-lg border border-white/5 z-10';
         im.loading='lazy';
         im.onload=function(){sk.style.display='none';};
-        var badge=document.createElement('div');badge.className='absolute top-1.5 left-1.5 z-20';
+
+        var badge=document.createElement('div');
+        badge.className='absolute top-1.5 left-1.5 z-20';
         badge.innerHTML='<div class="bg-black/80 text-white text-[8px] font-black px-2 py-0.5 rounded-lg flex items-center gap-1"><svg class="w-2.5 h-2.5 fill-red-500" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>'+Math.round(pct)+'%</div>';
-        var progWrap=document.createElement('div');progWrap.className='absolute bottom-0 left-0 right-0 z-20 px-1.5 pb-1.5';
-        progWrap.innerHTML='<div class="w-full h-1.5 bg-zinc-800/80 rounded-full"><div class="h-full bg-red-600 rounded-full" style="width:'+Math.round(pct)+'%"></div></div>';
-        wrap.appendChild(sk);wrap.appendChild(im);wrap.appendChild(badge);wrap.appendChild(progWrap);
-        var titP=document.createElement('p');titP.className='text-[9px] md:text-[10px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 mt-1';titP.textContent=(p.title||p.name||'');
-        card.appendChild(wrap);card.appendChild(titP);
+
+        var progWrap=document.createElement('div');
+        progWrap.className='absolute bottom-0 left-0 right-0 z-20 px-1 pb-1';
+        progWrap.innerHTML='<div class="w-full h-1 bg-zinc-800/80 rounded-full"><div class="h-full bg-red-600 rounded-full" style="width:'+Math.round(pct)+'%"></div></div>';
+
+        inner.appendChild(sk);
+        inner.appendChild(im);
+        inner.appendChild(badge);
+        inner.appendChild(progWrap);
+
+        var titP=document.createElement('p');
+        titP.className='text-[9px] md:text-[10px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 mt-2';
+        titP.textContent=(p.title||p.name||'');
+
+        card.appendChild(inner);
+        card.appendChild(titP);
         fila.appendChild(card);
       }catch(e){}
     }));
