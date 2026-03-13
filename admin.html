@@ -651,8 +651,9 @@ window.guardarEpisodio = async function() {
         if (url2) data.url2 = url2;
         await window.setDoc(window.doc(window.db,'latinoSeries',docID), data);
         showToast('toastSeries','✓ Guardado correctamente','ok');
-        ['inputSerieID','inputTemporada','inputEpisodio','inputSerieURL','inputSerieURL2'].forEach(i=>document.getElementById(i).value='');
-        document.getElementById('seriePreview').classList.add('hidden');
+        // Solo limpiar episodio y links — mantener serie y temporada
+        ['inputEpisodio','inputSerieURL','inputSerieURL2'].forEach(i=>document.getElementById(i).value='');
+        document.getElementById('inputEpisodio').focus();
         cargarEpisodios();
     } catch(e) { showToast('toastSeries','Error al guardar','error'); console.error(e); }
 };
