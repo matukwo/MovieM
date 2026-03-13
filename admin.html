@@ -628,9 +628,21 @@ window.guardarEpisodio = async function() {
             setTimeout(() => editarEpisodio({ id: docID, ...snapExiste.data() }), 600);
             return;
         }
-        const serieName = document.getElementById('previewSerieName').textContent||'';
+        // Buscar nombre de la serie siempre (por si se escribió el ID a mano)
+        let serieName = document.getElementById('previewSerieName').textContent||'';
         let epName = '';
         try {
+            if (!serieName) {
+                const sr = await fetch(`https://api.themoviedb.org/3/tv/${serieID}?api_key=${API_KEY}&language=es-MX`);
+                const sd = await sr.json();
+                serieName = sd.name||'';
+                if (serieName) {
+                    document.getElementById('previewSerieName').textContent = serieName;
+                    document.getElementById('previewSerieYear').textContent = (sd.first_air_date||'').split('-')[0];
+                    document.getElementById('previewSeriePoster').src = sd.poster_path?`https://image.tmdb.org/t/p/w92${sd.poster_path}`:'';
+                    document.getElementById('seriePreview').classList.remove('hidden');
+                }
+            }
             const er = await fetch(`https://api.themoviedb.org/3/tv/${serieID}/season/${temporada}/episode/${episodio}?api_key=${API_KEY}&language=es-MX`);
             const ed = await er.json();
             epName = ed.name||'';
@@ -674,27 +686,42 @@ window.iniciarCargaMasiva = async function() {
         logEl.scrollTop = logEl.scrollHeight;
     }
 
-    // Parsear líneas: "Titulo (año) | url" o "Titulo | url"
-    const lineas = raw.split('\n').map(l => l.trim()).filter(l => l && l.includes('|'));
-    if (!lineas.length) {
-        logLine('✗ Formato incorrecto. Usá: Película (año) | https://...', 'error');
+    // Parser robusto — acepta "|" o espacio como separador, y URLs sin https://
+    const todasLineas = raw.split('\n').map(l => l.trim()).filter(l => l);
+    const items = [];
+    for (const linea of todasLineas) {
+        let rawTitulo, url;
+        if (linea.includes('|')) {
+            const idx = linea.indexOf('|');
+            rawTitulo = linea.slice(0, idx).trim();
+            url = linea.slice(idx + 1).trim();
+        } else {
+            // La URL siempre es el último "token" — buscar desde el final el primer token con "/"
+            const tokens = linea.split(/\s+/);
+            // Recorrer de atrás hacia adelante hasta encontrar el token que es la URL
+            let urlIdx = -1;
+            for (let i = tokens.length - 1; i >= 0; i--) {
+                if (tokens[i].includes('/')) { urlIdx = i; break; }
+            }
+            if (urlIdx > 0) {
+                rawTitulo = tokens.slice(0, urlIdx).join(' ').trim();
+                url = tokens[urlIdx];
+            }
+        }
+        if (!rawTitulo || !url) continue;
+        if (!url.startsWith('http')) url = 'https://' + url;
+        items.push({ rawTitulo, url });
+    }
+
+    if (!items.length) {
+        logLine('✗ No se pudo leer la lista. Formato: Película (año) | https://... o Película (año) https://...', 'error');
         btn.disabled = false; btn.textContent = '⚡ Iniciar Carga'; return;
     }
 
     let ok = 0;
     const noEncontradas = [];
 
-    for (const linea of lineas) {
-        const partes = linea.split('|');
-        const rawTitulo = partes[0].trim();
-        const url = partes[1]?.trim();
-
-        if (!url || !url.startsWith('http')) {
-            logLine(`✗ Link inválido en: "${rawTitulo}"`, 'error');
-            noEncontradas.push(rawTitulo);
-            continue;
-        }
-
+    for (const { rawTitulo, url } of items) {
         // Extraer año del título si viene entre paréntesis al final
         const matchAnio = rawTitulo.match(/\((\d{4})\)\s*$/);
         const anio = matchAnio ? matchAnio[1] : '';
