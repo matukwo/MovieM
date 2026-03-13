@@ -397,9 +397,12 @@ async function checkExistePelicula(id) {
     try {
         const snap = await window.getDoc(window.doc(window.db, 'latinoLinks', id));
         if (snap.exists()) {
-            // Ya existe → abrir modal de edición directamente
-            showToast('toastPelis', '⚠️ Ya existe — abriendo editor…', 'error');
-            setTimeout(() => editarPelicula({ id, ...snap.data() }), 600);
+            const d = snap.data();
+            if (d.url2) {
+                showToast('toastPelis', '✗ Ya tiene 2 links cargados. Editá o borrá uno primero.', 'error');
+            } else {
+                showToast('toastPelis', '⚠️ Ya tiene 1 link — el nuevo se subirá como respaldo.', 'error');
+            }
         }
     } catch(e) {}
 }
@@ -410,13 +413,27 @@ window.guardarLink = async function() {
     const url2 = document.getElementById('inputEmbedURL2').value.trim();
     if (!id||!url) { showToast('toastPelis','Completá el ID y el link principal','error'); return; }
     try {
-        // Verificar si ya existe
         const snap = await window.getDoc(window.doc(window.db, 'latinoLinks', id));
+
         if (snap.exists()) {
-            showToast('toastPelis', '⚠️ Ya existe — abriendo editor…', 'error');
-            setTimeout(() => editarPelicula({ id, ...snap.data() }), 600);
+            const existente = snap.data();
+
+            // Ya tiene url2 → error, no se puede agregar un tercero
+            if (existente.url2) {
+                showToast('toastPelis', '✗ Ya tiene 2 links. Editá o borrá uno primero.', 'error');
+                return;
+            }
+
+            // Solo tiene url principal → subir el nuevo como respaldo
+            await window.setDoc(window.doc(window.db,'latinoLinks',id), { ...existente, url2: url }, { merge: true });
+            showToast('toastPelis', '✓ Agregado como link de respaldo', 'ok');
+            ['inputMovieID','inputEmbedURL','inputEmbedURL2'].forEach(i=>document.getElementById(i).value='');
+            document.getElementById('peliculaPreview').classList.add('hidden');
+            cargarLinks();
             return;
         }
+
+        // No existe → guardar normalmente
         const titulo = document.getElementById('previewTitle').textContent||'';
         const anio   = document.getElementById('previewYear').textContent||'';
         const data   = { url, titulo, anio, fecha: new Date().toISOString() };
