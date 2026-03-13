@@ -616,8 +616,10 @@ window.guardarEpisodio = async function() {
     const serieID  = document.getElementById('inputSerieID').value.trim();
     const temporada = parseInt(document.getElementById('inputTemporada').value);
     const episodio  = parseInt(document.getElementById('inputEpisodio').value);
-    const url  = document.getElementById('inputSerieURL').value.trim();
-    const url2 = document.getElementById('inputSerieURL2').value.trim();
+    let url  = document.getElementById('inputSerieURL').value.trim();
+    let url2 = document.getElementById('inputSerieURL2').value.trim();
+    if (url && !url.startsWith('http')) url = 'https://' + url;
+    if (url2 && !url2.startsWith('http')) url2 = 'https://' + url2;
     if (!serieID||!temporada||!episodio||!url) { showToast('toastSeries','Completá todos los campos obligatorios','error'); return; }
     try {
         const docID = `${serieID}_t${temporada}_e${episodio}`;
