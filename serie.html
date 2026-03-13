@@ -440,14 +440,17 @@
                 if (window.db && window.getDoc && window.doc) break;
                 await new Promise(r => setTimeout(r, 100));
             }
-            const docID = `${serieID}_t${temp}_e${ep}`;
+            const docID = `${String(serieID)}_t${parseInt(temp)}_e${parseInt(ep)}`;
+            console.log('[Latino Serie] Buscando docID:', docID);
             const snap = await window.getDoc(window.doc(window.db, 'latinoSeries', docID));
+            console.log('[Latino Serie] Existe:', snap.exists());
             if (snap.exists()) {
                 _latinoEpUrl  = snap.data().url;
                 _latinoEpUrl2 = snap.data().url2 || null;
+                console.log('[Latino Serie] URL:', _latinoEpUrl);
                 latBtn.classList.remove('hidden');
             }
-        } catch(e) {}
+        } catch(e) { console.error('[Latino Serie] Error:', e); }
     }
 
     window.cambiarFuenteSerie = function(fuente) {
