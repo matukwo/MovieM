@@ -487,7 +487,6 @@
         if (respWrap) respWrap.classList.add('hidden');
 
         document.getElementById('serieFrame').src = SERVERS_TV[servidorActivo](serieID, temp, ep);
-        document.getElementById('playerLabel').innerText = `T${temp} · E${ep} — ${nombre || ''}`;
         document.getElementById('playerOverlay').style.display = 'flex';
         document.body.style.overflow = 'hidden';
         document.body.style.position = 'fixed';
