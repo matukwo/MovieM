@@ -60,6 +60,7 @@
             </div>
         </div>
         <div class="flex items-center gap-2">
+            <button id="btnFuenteSubSerie" onclick="cambiarFuenteSerie('sub')" class="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition bg-white/10 border-white/20 text-white">📺 Subtitulado</button>
             <button id="btnFuenteLatSerie" onclick="cambiarFuenteSerie('latino')" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">🇦🇷 Latino</button>
             <button onclick="cerrarPlayer()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-3 py-1.5 rounded-full border border-white/5">Cerrar ×</button>
         </div>
@@ -444,16 +445,73 @@
     let servidorActivo = 1;
     let epTemp = 1, epNum = 1, epNombre = '';
 
+    // ── FUENTE LATINO SERIES ──────────────────────────────────────
+    let _latinoEpUrl = null, _latinoEpUrl2 = null;
+
+    async function cargarLatinoEpisodio(temp, ep) {
+        _latinoEpUrl = null; _latinoEpUrl2 = null;
+        const latBtn = document.getElementById('btnFuenteLatSerie');
+        latBtn.classList.add('hidden');
+        try {
+            for (let i = 0; i < 30; i++) {
+                if (window.db && window.getDoc && window.doc) break;
+                await new Promise(r => setTimeout(r, 100));
+            }
+            const docID = `${serieID}_t${temp}_e${ep}`;
+            const snap = await window.getDoc(window.doc(window.db, 'latinoSeries', docID));
+            if (snap.exists()) {
+                _latinoEpUrl  = snap.data().url;
+                _latinoEpUrl2 = snap.data().url2 || null;
+                latBtn.classList.remove('hidden');
+            }
+        } catch(e) {}
+    }
+
+    window.cambiarFuenteSerie = function(fuente) {
+        const base = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition';
+        const subBtn = document.getElementById('btnFuenteSubSerie');
+        const latBtn = document.getElementById('btnFuenteLatSerie');
+        const respWrap = document.getElementById('btnRespaldoWrapSerie');
+        if (fuente === 'sub') {
+            subBtn.className = base + ' bg-white/10 border-white/20 text-white';
+            latBtn.className = base + ' border-white/10 text-white/40 hover:text-yellow-400';
+            if (respWrap) respWrap.classList.add('hidden');
+            document.getElementById('serieFrame').src = SERVERS_TV[servidorActivo](serieID, epTemp, epNum);
+        } else {
+            if (!_latinoEpUrl) return;
+            latBtn.className = base + ' bg-yellow-500/20 border-yellow-500/50 text-yellow-400';
+            subBtn.className = base + ' border-white/10 text-white/40 hover:text-white';
+            document.getElementById('serieFrame').src = _latinoEpUrl;
+            if (_latinoEpUrl2 && respWrap) respWrap.classList.remove('hidden');
+        }
+    };
+
+    window.usarRespaldoSerie = function() {
+        if (!_latinoEpUrl2) return;
+        document.getElementById('serieFrame').src = _latinoEpUrl2;
+        document.getElementById('btnRespaldoWrapSerie').classList.add('hidden');
+    };
+
     function reproducirEpisodio(temp, ep, nombre) {
         epTemp = temp; epNum = ep; epNombre = nombre || '';
+        // Resetear botones de fuente
+        const base = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition';
+        document.getElementById('btnFuenteSubSerie').className = base + ' bg-white/10 border-white/20 text-white';
+        const latBtn = document.getElementById('btnFuenteLatSerie');
+        latBtn.className = base + ' border-white/10 text-white/40 hover:text-yellow-400';
+        latBtn.classList.add('hidden');
+        const respWrap = document.getElementById('btnRespaldoWrapSerie');
+        if (respWrap) respWrap.classList.add('hidden');
+
         document.getElementById('serieFrame').src = SERVERS_TV[servidorActivo](serieID, temp, ep);
-        document.getElementById('playerLabel').innerText = `T${temp} · E${ep} — ${epNombre}`;
+        document.getElementById('playerLabel').innerText = `T${temp} · E${ep} — ${nombre || ''}`;
         document.getElementById('playerOverlay').style.display = 'flex';
         document.body.style.overflow = 'hidden';
         document.body.style.position = 'fixed';
         document.body.style.width = '100%';
-        // Guardar en Firestore: último episodio visto por este usuario
         guardarProgresoSerie(temp, ep, nombre);
+        // Cargar link latino para este episodio
+        cargarLatinoEpisodio(temp, ep);
     }
 
     // ── SISTEMA DE PROGRESO SERIES (solo Firestore) ───────────────────────────
@@ -529,6 +587,10 @@
         document.getElementById('playerOverlay').style.display = 'none';
         document.getElementById('serieFrame').src = '';
         document.getElementById('serverMenu').style.display = 'none';
+        document.getElementById('btnFuenteLatSerie').classList.add('hidden');
+        const respWrap = document.getElementById('btnRespaldoWrapSerie');
+        if (respWrap) respWrap.classList.add('hidden');
+        _latinoEpUrl = null; _latinoEpUrl2 = null;
         document.body.style.overflow = '';
         document.body.style.position = '';
         document.body.style.width = '';
