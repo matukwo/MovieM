@@ -546,25 +546,6 @@
 
     window.verPrimerEpisodio = () => reproducirEpisodio(1, 1, 'Episodio 1');
 
-    window.toggleServerMenu = () => {
-        const menu = document.getElementById('serverMenu');
-        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-    };
-
-    window.cambiarServidor = (num, label) => {
-        servidorActivo = num;
-        document.getElementById('serieFrame').src = SERVERS_TV[num](serieID, epTemp, epNum);
-        document.getElementById('serverLabel').innerText = label;
-        document.getElementById('serverMenu').style.display = 'none';
-        document.querySelectorAll('#serverMenu button').forEach((b,i) => {
-            b.classList.toggle('srv-active', i+1 === num);
-        });
-    };
-
-    document.addEventListener('click', e => {
-        const wrap = document.getElementById('serverDropdownWrap');
-        if (wrap && !wrap.contains(e.target)) document.getElementById('serverMenu').style.display = 'none';
-    });
 
     window.cerrarPlayer = () => {
         document.getElementById('playerOverlay').style.display = 'none';
