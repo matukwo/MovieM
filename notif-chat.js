@@ -58,7 +58,31 @@ function avEl(src, nombre, sz) {
     return `<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:${c};display:flex;align-items:center;justify-content:center;font-weight:900;font-size:${Math.round(sz*.38)}px;color:#fff;flex-shrink:0">${l}</div>`;
 }
 
-// ── UI: inyectar panel una sola vez ───────────────────────────────────
+// ── Palabras bloqueadas ───────────────────────────────────────────────
+const PALABRAS_BLOQUEADAS = [
+    // Insultos en español
+    'idiota','imbecil','imbécil','estupido','estúpido',
+    'inutil','inútil','subnormal','mogolico','mogólico','retrasado',
+    'hijo de puta','concha','conchuda','puto','puta','prostituta',
+    'mierda','culo','pendejo','culero','cabrón','cabron','gilipollas',
+    'marica','maricón','maricon','perra','zorra','forro','otario',
+    'cagón','cagon','malparido','hijueputa','gonorrea',
+    // Insultos en inglés
+    'fuck','shit','bitch','asshole','bastard','cunt','dick','pussy',
+    'nigger','faggot','retard','idiot','moron','loser',
+    // Acoso
+    'mátate','matate','suicídate','suicidate','ándate a morir','andate a morir',
+    'ojalá te mueras','ojala te mueras',
+];
+
+function contienePalabrasBloqueadas(texto) {
+    const lower = texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return PALABRAS_BLOQUEADAS.some(p => {
+        const pNorm = p.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        // Busca la palabra como substring (cubre variantes con espacios o pegada)
+        return lower.includes(pNorm);
+    });
+}
 let uiOk = false;
 function inyectar() {
     if (uiOk) return;
@@ -348,20 +372,30 @@ async function abrirChat(oUID, oNom, oAv) {
 
     if (unsubM) { unsubM(); unsubM = null; }
     const msgs = document.getElementById('mm-msgs');
-    msgs.innerHTML = '';
+    msgs.innerHTML = '<p style="color:#52525b;font-size:11px;text-align:center;padding:30px 0;font-style:italic">Cargando...</p>';
+
+    // Render incremental — solo agrega mensajes nuevos, no re-renderiza todo
+    const renderedIds = new Set();
 
     const q = query(collection(db,'chats',id,'mensajes'), orderBy('fecha','asc'), limit(100));
     unsubM = onSnapshot(q, snap => {
-        msgs.innerHTML = '';
-        snap.forEach(d => {
-            const m = d.data(), yo = m.de === miUID;
-            const w = document.createElement('div');
-            w.style.cssText = `display:flex;flex-direction:column;align-items:${yo?'flex-end':'flex-start'}`;
-            w.innerHTML = `<div class="mmb ${yo?'yo':'el'}">${esc(m.texto)}</div>
-                           <span style="font-size:9px;color:#3f3f46;margin-top:2px;padding:0 3px">${ago(m.fecha)}</span>`;
-            msgs.appendChild(w);
+        let hayNuevos = false;
+        // Primera carga: limpiar el "Cargando..."
+        if (msgs.querySelector('p')) msgs.innerHTML = '';
+
+        snap.docChanges().forEach(change => {
+            if (change.type === 'added' && !renderedIds.has(change.doc.id)) {
+                renderedIds.add(change.doc.id);
+                const m = change.doc.data(), yo = m.de === miUID;
+                const w = document.createElement('div');
+                w.style.cssText = `display:flex;flex-direction:column;align-items:${yo?'flex-end':'flex-start'}`;
+                w.innerHTML = `<div class="mmb ${yo?'yo':'el'}">${esc(m.texto)}</div>
+                               <span style="font-size:9px;color:#3f3f46;margin-top:2px;padding:0 3px">${ago(m.fecha)}</span>`;
+                msgs.appendChild(w);
+                hayNuevos = true;
+            }
         });
-        msgs.scrollTop = msgs.scrollHeight;
+        if (hayNuevos) msgs.scrollTop = msgs.scrollHeight;
     });
 
     setTimeout(() => document.getElementById('mm-in')?.focus(), 100);
@@ -373,6 +407,17 @@ async function enviar() {
     if (!inp) return;
     const txt = inp.value.trim();
     if (!txt || !miUID || !chatUID) return;
+
+    // Filtro de palabras bloqueadas
+    if (contienePalabrasBloqueadas(txt)) {
+        inp.style.borderColor = '#dc2626';
+        inp.placeholder = '⚠️ Mensaje con contenido no permitido';
+        setTimeout(() => {
+            inp.style.borderColor = 'rgba(255,255,255,.1)';
+            inp.placeholder = 'Escribí un mensaje...';
+        }, 2500);
+        return;
+    }
     inp.value = '';
     inp.focus();
 
