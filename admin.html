@@ -59,13 +59,13 @@
     <!-- Tabs -->
     <div class="flex gap-2 mb-6">
         <button id="tabPeliculas" onclick="setTab('peliculas')" class="px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition active:scale-95 bg-white/10 border border-white/20 text-white">
-            🎬 Películas
+            Películas
         </button>
         <button id="tabSeries" onclick="setTab('series')" class="px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition active:scale-95 border border-white/10 text-white/40 hover:text-white">
-            📺 Series
+            Series
         </button>
         <button id="tabCarga" onclick="setTab('carga')" class="px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition active:scale-95 border border-white/10 text-white/40 hover:text-white">
-            ⚡ Carga Masiva
+            Carga Masiva
         </button>
     </div>
 
@@ -73,7 +73,9 @@
     <div id="secPeliculas">
         <div class="bg-zinc-900/60 rounded-3xl border border-white/5 overflow-hidden mb-6">
             <div class="px-6 py-5 border-b border-white/5 flex items-center gap-3">
-                <span class="text-2xl">🇦🇷</span>
+                <div class="w-8 h-8 bg-blue-600/20 border border-blue-600/30 rounded-xl flex items-center justify-center">
+                    <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/></svg>
+                </div>
                 <div>
                     <h3 class="text-sm font-black uppercase tracking-widest">Links Latino — Películas</h3>
                     <p class="text-[9px] text-zinc-500 font-bold uppercase">Embeds en español latino por película</p>
@@ -128,7 +130,9 @@
     <div id="secSeries" class="hidden">
         <div class="bg-zinc-900/60 rounded-3xl border border-white/5 overflow-hidden mb-6">
             <div class="px-6 py-5 border-b border-white/5 flex items-center gap-3">
-                <span class="text-2xl">📺</span>
+                <div class="w-8 h-8 bg-blue-600/20 border border-blue-600/30 rounded-xl flex items-center justify-center">
+                    <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                </div>
                 <div>
                     <h3 class="text-sm font-black uppercase tracking-widest">Links Latino — Series</h3>
                     <p class="text-[9px] text-zinc-500 font-bold uppercase">Embeds por serie · temporada · episodio</p>
@@ -198,7 +202,9 @@
     <div id="secCarga" class="hidden">
         <div class="bg-zinc-900/60 rounded-3xl border border-white/5 overflow-hidden mb-6">
             <div class="px-6 py-5 border-b border-white/5 flex items-center gap-3">
-                <span class="text-2xl">⚡</span>
+                <div class="w-8 h-8 bg-red-600/20 border border-red-600/30 rounded-xl flex items-center justify-center">
+                    <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                </div>
                 <div>
                     <h3 class="text-sm font-black uppercase tracking-widest">Carga Masiva — Películas</h3>
                     <p class="text-[9px] text-zinc-500 font-bold uppercase">Pegá una lista y se suben solas</p>
@@ -211,7 +217,7 @@
                 </label>
                 <textarea id="listaCarga" rows="10" placeholder="Buenos Muchachos (1990) | https://gscdn.cam/video/embed/xxx&#10;El Padrino (1972) | https://embed.com/abc&#10;Interstellar | https://embed.com/xyz" class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600 resize-none font-mono"></textarea>
                 <div class="flex items-center gap-3 mt-4">
-                    <button onclick="iniciarCargaMasiva()" id="btnCargaMasiva" class="px-6 py-2.5 bg-red-600 hover:opacity-90 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition active:scale-95">⚡ Iniciar Carga</button>
+                    <button onclick="iniciarCargaMasiva()" id="btnCargaMasiva" class="px-6 py-2.5 bg-red-600 hover:opacity-90 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition active:scale-95">Iniciar Carga</button>
                     <button onclick="document.getElementById('listaCarga').value='';document.getElementById('logCarga').innerHTML=''" class="px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 rounded-2xl text-xs font-black uppercase tracking-widest transition active:scale-95">Limpiar</button>
                     <span id="toastCarga" class="hidden text-xs font-bold"></span>
                 </div>
@@ -718,7 +724,7 @@ window.iniciarCargaMasiva = async function() {
 
     if (!items.length) {
         logLine('✗ No se pudo leer la lista. Formato: Película (año) | https://... o Película (año) https://...', 'error');
-        btn.disabled = false; btn.textContent = '⚡ Iniciar Carga'; return;
+        btn.disabled = false; btn.textContent = 'Iniciar Carga'; return;
     }
 
     let ok = 0;
@@ -810,7 +816,7 @@ window.iniciarCargaMasiva = async function() {
     }
 
     btn.disabled = false;
-    btn.textContent = '⚡ Iniciar Carga';
+    btn.textContent = 'Iniciar Carga';
     cargarLinks();
 };
 
