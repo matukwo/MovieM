@@ -465,16 +465,18 @@
             document.getElementById('serieFrame').src = SERVERS_TV[servidorActivo](serieID, epTemp, epNum);
         } else {
             if (!_latinoEpUrl) return;
+            const url = _latinoEpUrl.startsWith('http') ? _latinoEpUrl : 'https://' + _latinoEpUrl;
             latBtn.className = base + ' bg-yellow-500/20 border-yellow-500/50 text-yellow-400';
             subBtn.className = base + ' border-white/10 text-white/40 hover:text-white';
-            document.getElementById('serieFrame').src = _latinoEpUrl;
+            document.getElementById('serieFrame').src = url;
             if (_latinoEpUrl2 && respWrap) respWrap.classList.remove('hidden');
         }
     };
 
     window.usarRespaldoSerie = function() {
         if (!_latinoEpUrl2) return;
-        document.getElementById('serieFrame').src = _latinoEpUrl2;
+        const url2 = _latinoEpUrl2.startsWith('http') ? _latinoEpUrl2 : 'https://' + _latinoEpUrl2;
+        document.getElementById('serieFrame').src = url2;
         document.getElementById('btnRespaldoWrapSerie').classList.add('hidden');
     };
 
