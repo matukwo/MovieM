@@ -126,17 +126,17 @@
 </div>
 
 
-<header class="relative h-[70vh] flex items-center px-4 md:px-8 pt-20 overflow-hidden">
+<header class="relative h-[55vh] md:h-[70vh] flex items-end md:items-center px-4 md:px-8 pt-16 pb-8 md:pt-20 md:pb-0 overflow-hidden">
     <div id="heroBackdrop" class="absolute inset-0 bg-cover bg-center -z-10 opacity-40" style="transition: background-image 0.4s ease, opacity 0.4s ease;"></div>
-    <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent -z-10"></div>
-    <div class="max-w-2xl" id="heroContent" style="transition: opacity 0.4s ease, transform 0.4s ease;">
-        <h1 id="heroTitulo" class="text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-none mb-4">Cargando...</h1>
-        <p id="heroSinopsis" class="text-zinc-400 text-sm md:text-lg line-clamp-3 mb-6 font-medium"></p>
-        <div class="flex gap-3">
-            <button id="heroBtn" class="bg-white text-black px-8 py-3 rounded-full font-black uppercase text-sm hover:bg-red-600 hover:text-white transition shadow-xl">Ver ahora</button>
+    <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/50 to-transparent -z-10"></div>
+    <div class="max-w-2xl w-full" id="heroContent" style="transition: opacity 0.4s ease, transform 0.4s ease;">
+        <h1 id="heroTitulo" class="text-3xl md:text-7xl font-black italic uppercase tracking-tighter leading-none mb-2 md:mb-4">Cargando...</h1>
+        <p id="heroSinopsis" class="hidden md:block text-zinc-400 text-sm md:text-lg line-clamp-3 mb-6 font-medium"></p>
+        <div class="flex gap-3 mt-3 md:mt-0">
+            <button id="heroBtn" class="bg-white text-black px-6 md:px-8 py-2.5 md:py-3 rounded-full font-black uppercase text-xs md:text-sm hover:bg-red-600 hover:text-white transition shadow-xl">Ver ahora</button>
         </div>
     </div>
-    <div id="sliderDots" class="absolute bottom-24 left-4 md:left-8 flex gap-2"></div>
+    <div id="sliderDots" class="absolute bottom-6 md:bottom-24 left-4 md:left-8 flex gap-2"></div>
 </header>
 
 <main class="px-4 md:pl-8 md:pr-4 -mt-16 relative z-10 pb-24 md:pb-8">
@@ -154,7 +154,7 @@
         <section id="secLatino" class="mb-10 relative group hidden">
             <h2 class="text-lg md:text-2xl font-black italic uppercase tracking-tighter mb-1 text-zinc-100 flex items-center gap-3">
                 <span class="w-1 h-6 rounded-full inline-block" style="background:#3b82f6"></span>
-                🇦🇷 Doblaje Latino Disponible
+                Doblaje Latino Disponible
             </h2>
             <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-4 ml-4">Películas y series con audio en español latino</p>
             <button onclick="scrollFila('latino',-400)" class="absolute left-0 top-1/2 -translate-y-8 z-40 bg-black/80 p-3 rounded-full hidden md:group-hover:flex border border-white/10 hover:bg-accent transition shadow-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg></button>
@@ -597,7 +597,7 @@ async function cargarLatino() {
             <img src="${BASE+posterPath}" class="absolute inset-0 w-full h-full object-cover rounded-xl shadow-lg border border-white/5 z-10" loading="lazy" onload="this.previousElementSibling.style.display='none'">
             <div class="absolute top-1.5 right-1.5 z-20">
               <div class="bg-blue-600/90 text-white text-[7px] font-black px-1.5 py-0.5 rounded-lg uppercase tracking-widest flex items-center gap-1">
-                🇦🇷 ${item.tipo === 'serie' ? 'SERIE' : 'LAT'}
+                ${item.tipo === 'serie' ? 'LAT · SERIE' : 'LAT'}
               </div>
             </div>
           </div>
