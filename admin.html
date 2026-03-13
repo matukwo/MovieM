@@ -418,9 +418,15 @@ window.guardarLink = async function() {
         if (snap.exists()) {
             const existente = snap.data();
 
-            // Ya tiene url2 → error, no se puede agregar un tercero
+            // Ya tiene url2 → error
             if (existente.url2) {
                 showToast('toastPelis', '✗ Ya tiene 2 links. Editá o borrá uno primero.', 'error');
+                return;
+            }
+
+            // El nuevo link es igual al principal → error
+            if (existente.url === url) {
+                showToast('toastPelis', '✗ Ese link ya está cargado como principal.', 'error');
                 return;
             }
 
