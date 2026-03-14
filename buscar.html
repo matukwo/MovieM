@@ -230,37 +230,60 @@ async function buscar(q) {
     mostrarSkeletons();
 
     try {
-        // Buscar en 3 idiomas en paralelo para encontrar la peli sin importar en qué idioma se escribió
-        const enc = encodeURIComponent(q);
-        const [rMX, rES, rEN, rTvMX, rTvES, rTvEN, usuarios] = await Promise.all([
-            fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=es-MX&query=${enc}&page=1`).then(r => r.json()),
-            fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=es-ES&query=${enc}&page=1`).then(r => r.json()),
-            fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=en-US&query=${enc}&page=1`).then(r => r.json()),
-            fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&language=es-MX&query=${enc}&page=1`).then(r => r.json()),
-            fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&language=es-ES&query=${enc}&page=1`).then(r => r.json()),
-            fetch(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&language=en-US&query=${enc}&page=1`).then(r => r.json()),
-            buscarUsuarios(q),
-        ]);
+        // Generar variantes del query para cubrir títulos con caracteres especiales
+        // ej: "rec" → también busca "[rec]", "rec." etc
+        // ej: "[rec]" → también busca "rec"
+        const variantes = new Set();
+        variantes.add(q.trim());
+        // Sin corchetes, paréntesis, puntos, guiones al principio/fin
+        const limpio = q.replace(/[\[\]():.!?]/g, '').replace(/\s+/g, ' ').trim();
+        if (limpio && limpio !== q) variantes.add(limpio);
+        // Con corchetes si no los tiene (ej: "rec" → "[rec]")
+        if (!q.includes('[')) variantes.add(`[${q.trim()}]`);
+        // Sin signos especiales pero manteniendo palabras
+        const soloLetras = q.replace(/[^\w\sáéíóúüñÁÉÍÓÚÜÑ]/g, '').replace(/\s+/g, ' ').trim();
+        if (soloLetras && soloLetras !== q && soloLetras !== limpio) variantes.add(soloLetras);
 
-        // Mergear sin duplicados (por ID), priorizando es-MX > es-ES > en-US
-        function mergear(a, b, c) {
-            const visto = new Set();
-            const result = [];
-            for (const item of [...(a.results||[]), ...(b.results||[]), ...(c.results||[])]) {
-                if (!item.poster_path) continue;
-                if (visto.has(item.id)) continue;
-                visto.add(item.id);
-                result.push(item);
+        // Buscar todas las variantes en paralelo, en 3 idiomas
+        const fetchVariante = (v, tipo, lang) =>
+            fetch(`https://api.themoviedb.org/3/search/${tipo}?api_key=${API_KEY}&language=${lang}&query=${encodeURIComponent(v)}&page=1`)
+                .then(r => r.json()).catch(() => ({ results: [] }));
+
+        const langs = ['es-MX', 'es-ES', 'en-US'];
+        const tipos = ['movie', 'tv'];
+        const allFetches = [];
+        for (const v of variantes) {
+            for (const lang of langs) {
+                for (const tipo of tipos) {
+                    allFetches.push({ tipo, fetch: fetchVariante(v, tipo, lang) });
+                }
             }
-            return result;
+        }
+        const fetchUsuarios = buscarUsuarios(q);
+        const respuestas = await Promise.all([...allFetches.map(f => f.fetch), fetchUsuarios]);
+        const usuarios = respuestas[respuestas.length - 1];
+
+        // Mergear todos los resultados sin duplicados, por tipo
+        const vistasPelis = new Set(), vistaSeries = new Set();
+        const pelis = [], series = [];
+        for (let i = 0; i < allFetches.length; i++) {
+            const tipo = allFetches[i].tipo;
+            const results = respuestas[i]?.results || [];
+            for (const item of results) {
+                if (!item.poster_path) continue;
+                if (tipo === 'movie' && !vistasPelis.has(item.id)) {
+                    vistasPelis.add(item.id); pelis.push(item);
+                } else if (tipo === 'tv' && !vistaSeries.has(item.id)) {
+                    vistaSeries.add(item.id); series.push(item);
+                }
+            }
         }
 
-        allResults = {
-            peliculas: mergear(rMX, rES, rEN),
-            series:    mergear(rTvMX, rTvES, rTvEN),
-            personas:  usuarios,
-        };
+        // Ordenar por popularidad para que lo más relevante salga primero
+        pelis.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+        series.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
 
+        allResults = { peliculas: pelis, series, personas: usuarios };
         renderResultados();
     } catch(e) {
         console.error('buscar error:', e);
