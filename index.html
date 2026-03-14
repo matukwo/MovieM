@@ -312,54 +312,61 @@ onAuthStateChanged(auth,async function(user){
 async function buscarTodo(q,dropEl){
   dropEl.innerHTML='<p class="text-zinc-600 text-xs p-4 text-center animate-pulse">Buscando...</p>';
   try{
-    var enc=encodeURIComponent(q);
-    var[resPeliMX,resPeliEN,resSeriesMX,resSeriesEN,snapU]=await Promise.all([
-      fetch('https://api.themoviedb.org/3/search/movie?api_key='+API_KEY+'&language=es-MX&query='+enc).then(function(r){return r.json();}),
-      fetch('https://api.themoviedb.org/3/search/movie?api_key='+API_KEY+'&language=en-US&query='+enc).then(function(r){return r.json();}),
-      fetch('https://api.themoviedb.org/3/search/tv?api_key='+API_KEY+'&language=es-MX&query='+enc).then(function(r){return r.json();}),
-      fetch('https://api.themoviedb.org/3/search/tv?api_key='+API_KEY+'&language=en-US&query='+enc).then(function(r){return r.json();}),
-      getDocs(collection(db,'usuarios'))
-    ]);
-    // Mergear películas sin duplicados
-    var visitoPeli=new Set(), mergedPelis=[];
-    [(resPeliMX.results||[]),(resPeliEN.results||[])].forEach(function(arr){
-      arr.forEach(function(p){if(!visitoPeli.has(p.id)){visitoPeli.add(p.id);mergedPelis.push(p);}});
-    });
-    // Mergear series sin duplicados
-    var vistasSeries=new Set(), mergedSeries=[];
-    [(resSeriesMX.results||[]),(resSeriesEN.results||[])].forEach(function(arr){
-      arr.forEach(function(s){if(!vistasSeries.has(s.id)){vistasSeries.add(s.id);mergedSeries.push(s);}});
-    });
-    var pelis=mergedPelis.slice(0,3), series=mergedSeries.slice(0,3), users=[];
-    var vistoU=new Set();
+    const variantes = new Set();
+    variantes.add(q.trim());
+    const limpio = q.replace(/[\[\]():.!?]/g,'').replace(/\s+/g,' ').trim();
+    if (limpio && limpio !== q) variantes.add(limpio);
+    if (!q.includes('[')) variantes.add(`[${q.trim()}]`);
+
+    const fetchV = (v,tipo,lang) =>
+        fetch('https://api.themoviedb.org/3/search/'+tipo+'?api_key='+API_KEY+'&language='+lang+'&query='+encodeURIComponent(v))
+            .then(r=>r.json()).catch(()=>({results:[]}));
+
+    const fetchsPelis=[], fetchsSeries=[];
+    for (const v of variantes){
+        fetchsPelis.push(fetchV(v,'movie','es-MX'), fetchV(v,'movie','en-US'));
+        fetchsSeries.push(fetchV(v,'tv','es-MX'), fetchV(v,'tv','en-US'));
+    }
+    const [snapU,...restos] = await Promise.all([getDocs(collection(db,'usuarios')),...fetchsPelis,...fetchsSeries]);
+    const resPelis=restos.slice(0,fetchsPelis.length);
+    const resSeries=restos.slice(fetchsPelis.length);
+
+    const vpeli=new Set(),vserie=new Set(),pelis=[],series=[];
+    for(const r of resPelis)  for(const p of(r.results||[])) if(!vpeli.has(p.id))  {vpeli.add(p.id);pelis.push(p);}
+    for(const r of resSeries) for(const s of(r.results||[])) if(!vserie.has(s.id)) {vserie.add(s.id);series.push(s);}
+    pelis.sort((a,b)=>(b.popularity||0)-(a.popularity||0));
+    series.sort((a,b)=>(b.popularity||0)-(a.popularity||0));
+
+    const topPelis=pelis.slice(0,3),topSeries=series.slice(0,3),users=[];
+    const vistoU=new Set();
     snapU.forEach(function(d){var u=d.data();if(u.username&&u.username.toLowerCase().indexOf(q.toLowerCase())!==-1&&!vistoU.has(d.id)){vistoU.add(d.id);users.push({uid:d.id,username:u.username,avatar:u.avatar||null});}});
-    users=users.slice(0,2);
+    const topUsers=users.slice(0,2);
     var html='';
-    if(users.length){
+    if(topUsers.length){
       html+='<div class="px-4 pt-3 pb-1"><span class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500">Usuarios</span></div>';
-      users.forEach(function(u){
+      topUsers.forEach(function(u){
         var letra=u.username.charAt(0).toUpperCase();
         var av=u.avatar?'<img src="'+u.avatar+'" class="w-9 h-9 rounded-full object-cover shrink-0">':'<div class="w-9 h-9 rounded-full bg-red-600 flex items-center justify-center text-white font-black text-xs shrink-0">'+letra+'</div>';
         html+='<div class="flex items-center gap-3 px-4 py-3 hover:bg-zinc-800 active:bg-zinc-800 cursor-pointer transition" onclick="location.href=\'perfil.html?user='+encodeURIComponent(u.username)+'\'">'+av+'<div><p class="text-sm font-bold">'+u.username+'</p><p class="text-[9px] text-zinc-500 uppercase font-bold">Perfil</p></div></div>';
       });
     }
-    if(pelis.length){
-      html+='<div class="px-4 pt-3 pb-1'+(users.length?' border-t border-white/5 mt-1':'')+'"><span class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500">Películas</span></div>';
-      pelis.forEach(function(p){
+    if(topPelis.length){
+      html+='<div class="px-4 pt-3 pb-1'+(topUsers.length?' border-t border-white/5 mt-1':'')+'"><span class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500">Películas</span></div>';
+      topPelis.forEach(function(p){
         var poster=p.poster_path?'https://image.tmdb.org/t/p/w92'+p.poster_path:'';
         var anio=p.release_date?p.release_date.split('-')[0]:'';
         html+='<div class="flex items-center gap-3 px-4 py-2.5 hover:bg-zinc-800 active:bg-zinc-800 cursor-pointer transition" onclick="location.href=\'pelicula.html?id='+p.id+'\'">'+(poster?'<img src="'+poster+'" class="w-8 h-12 rounded-lg object-cover shrink-0">':'<div class="w-8 h-12 bg-zinc-700 rounded-lg shrink-0"></div>')+'<div class="flex-1 min-w-0"><p class="text-sm font-bold truncate">'+p.title+'</p><p class="text-[9px] text-zinc-500 uppercase font-bold">'+anio+(p.vote_average?' · ⭐ '+p.vote_average.toFixed(1):'')+'</p></div></div>';
       });
     }
-    if(series.length){
+    if(topSeries.length){
       html+='<div class="px-4 pt-3 pb-1 border-t border-white/5 mt-1"><span class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500">Series</span></div>';
-      series.forEach(function(s){
+      topSeries.forEach(function(s){
         var poster=s.poster_path?'https://image.tmdb.org/t/p/w92'+s.poster_path:'';
         var anio=s.first_air_date?s.first_air_date.split('-')[0]:'';
         html+='<div class="flex items-center gap-3 px-4 py-2.5 hover:bg-zinc-800 active:bg-zinc-800 cursor-pointer transition" onclick="location.href=\'serie.html?id='+s.id+'\'">'+(poster?'<img src="'+poster+'" class="w-8 h-12 rounded-lg object-cover shrink-0">':'<div class="w-8 h-12 bg-zinc-700 rounded-lg shrink-0"></div>')+'<div class="flex-1 min-w-0"><p class="text-sm font-bold truncate">'+s.name+'</p><p class="text-[9px] text-zinc-500 uppercase font-bold">'+anio+(s.vote_average?' · ⭐ '+s.vote_average.toFixed(1):'')+'</p></div></div>';
       });
     }
-    if(!pelis.length&&!series.length&&!users.length)html='<p class="text-zinc-600 text-xs p-6 text-center italic">Sin resultados</p>';
+    if(!topPelis.length&&!topSeries.length&&!topUsers.length)html='<p class="text-zinc-600 text-xs p-6 text-center italic">Sin resultados</p>';
     dropEl.innerHTML=html;
   }catch(e){dropEl.innerHTML='<p class="text-zinc-600 text-xs p-4 text-center">Error</p>';}
 }
