@@ -285,11 +285,7 @@ buscMob.addEventListener('keydown', function(e) {
 
 document.getElementById('btnUsuario').onclick = () => location.href = 'perfil.html';
 
-cargarSeccion(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=es-MX`, 'tendencias');
-cargarSeccion(`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=es-MX`, 'topRated');
-cargarSeccion(`https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}&language=es-MX`, 'enCines');
-
-// Cargar IDs de doblaje latino
+// Cargar IDs de latino PRIMERO, luego renderizar filas
 (async function() {
     for (let i = 0; i < 30; i++) {
         if (window.db && window.getDocs && window.collection) break;
@@ -299,6 +295,10 @@ cargarSeccion(`https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}
         const snap = await window.getDocs(window.collection(window.db, 'latinoLinks'));
         snap.forEach(d => _latinoIDsLocal.add(String(d.id)));
     } catch(e) {}
+    // Recién ahora cargar las filas con los badges correctos
+    cargarSeccion(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=es-MX`, 'tendencias');
+    cargarSeccion(`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=es-MX`, 'topRated');
+    cargarSeccion(`https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}&language=es-MX`, 'enCines');
 })();
 </script>
 </body>
