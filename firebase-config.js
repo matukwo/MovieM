@@ -41,3 +41,6 @@ window.deleteField = deleteField;
 // Auth
 window.auth = auth;
 window.onAuthStateChanged = onAuthStateChanged;
+
+// Disparar evento cuando Firebase está listo — elimina el polling en otros scripts
+window.dispatchEvent(new Event('firebase-ready'));
