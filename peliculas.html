@@ -285,17 +285,38 @@ buscMob.addEventListener('keydown', function(e) {
 
 document.getElementById('btnUsuario').onclick = () => location.href = 'perfil.html';
 
-// Cargar IDs de latino PRIMERO, luego renderizar filas
+// IDs de latino con caché — no bloquea el render en visitas siguientes
+const _CACHE_KEY_P = 'movieM_latinoIDs';
+const _CACHE_TTL_P = 10 * 60 * 1000;
+
 (async function() {
-    for (let i = 0; i < 30; i++) {
-        if (window.db && window.getDocs && window.collection) break;
-        await new Promise(r => setTimeout(r, 100));
-    }
+    // Intentar caché primero
+    try {
+        const raw = localStorage.getItem(_CACHE_KEY_P);
+        if (raw) {
+            const { ids, ts } = JSON.parse(raw);
+            if (Date.now() - ts < _CACHE_TTL_P && Array.isArray(ids)) {
+                ids.forEach(id => _latinoIDsLocal.add(id));
+                // Refrescar en background
+                (async () => {
+                    for (let i = 0; i < 30; i++) { if (window.db && window.getDocs && window.collection) break; await new Promise(r => setTimeout(r, 100)); }
+                    try { const snap = await window.getDocs(window.collection(window.db, 'latinoLinks')); const fresh = []; snap.forEach(d => fresh.push(String(d.id))); localStorage.setItem(_CACHE_KEY_P, JSON.stringify({ ids: fresh, ts: Date.now() })); } catch(e) {}
+                })();
+                // Renderizar inmediatamente
+                cargarSeccion(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=es-MX`, 'tendencias');
+                cargarSeccion(`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=es-MX`, 'topRated');
+                cargarSeccion(`https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}&language=es-MX`, 'enCines');
+                return;
+            }
+        }
+    } catch(e) {}
+    // Sin caché: esperar Firestore
+    for (let i = 0; i < 30; i++) { if (window.db && window.getDocs && window.collection) break; await new Promise(r => setTimeout(r, 100)); }
     try {
         const snap = await window.getDocs(window.collection(window.db, 'latinoLinks'));
-        snap.forEach(d => _latinoIDsLocal.add(String(d.id)));
+        const ids = []; snap.forEach(d => { ids.push(String(d.id)); _latinoIDsLocal.add(String(d.id)); });
+        try { localStorage.setItem(_CACHE_KEY_P, JSON.stringify({ ids, ts: Date.now() })); } catch(e) {}
     } catch(e) {}
-    // Recién ahora cargar las filas con los badges correctos
     cargarSeccion(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=es-MX`, 'tendencias');
     cargarSeccion(`https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=es-MX`, 'topRated');
     cargarSeccion(`https://api.themoviedb.org/3/movie/now_playing?api_key=${API_KEY}&language=es-MX`, 'enCines');
