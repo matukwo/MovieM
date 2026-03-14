@@ -856,12 +856,18 @@ window.iniciarCargaMasiva = async function() {
     logLine(`─────────────────────────────`, 'info');
     logLine(`Guardadas: ${ok} de ${items.length}`, ok > 0 ? 'ok' : 'warn');
     if (noEncontradas.length) {
-        logLine(`Errores (${noEncontradas.length}):`, 'error');
+        logLine(`Errores (${noEncontradas.length}) — quedan en la lista para que los corrijas:`, 'error');
         noEncontradas.forEach(({ raw, razon }) => {
             logLine(`  • "${raw}" — ${razon}`, 'error');
         });
+        // Dejar en el textarea solo los que fallaron, con su URL original
+        const fallidas = items
+            .filter(it => noEncontradas.some(n => n.raw === it.rawTitulo))
+            .map(it => it.rawTitulo + ' | ' + it.url);
+        document.getElementById('listaCarga').value = fallidas.join('\n');
     } else {
         logLine('Sin errores. Todo guardado correctamente.', 'ok');
+        document.getElementById('listaCarga').value = '';
     }
 
     btn.disabled = false;
