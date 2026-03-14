@@ -762,19 +762,64 @@ window.iniciarCargaMasiva = async function() {
             }
         } catch(e) {
             logLine(`✗ Error buscando "${titulo}": ${e.message}`, 'error');
-            noEncontradas.push(rawTitulo);
+            noEncontradas.push({ raw: rawTitulo, razon: `Error de red: ${e.message}` });
             continue;
         }
 
         if (!resultado) {
             logLine(`✗ NO ENCONTRADA: "${titulo}"${anio?` (${anio})`:''} — no se guardó`, 'error');
-            noEncontradas.push(rawTitulo);
+            noEncontradas.push({ raw: rawTitulo, razon: 'No encontrada en TMDB' });
             continue;
         }
 
         const movieID = String(resultado.id);
         const tituloReal = resultado.title;
         const anioReal = (resultado.release_date||'').split('-')[0];
+
+        // ── Validación de coincidencia ─────────────────────────────
+        // Normalizar: minúsculas, sin acentos, sin caracteres especiales
+        function normalizar(s) {
+            return s.toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+                .replace(/[^a-z0-9\s]/g,'')
+                .replace(/\s+/g,' ').trim();
+        }
+        const tituloNorm  = normalizar(titulo);
+        const realNorm    = normalizar(tituloReal);
+        // También verificar título original de TMDB (en inglés)
+        const originalNorm = normalizar(resultado.original_title || '');
+
+        // Similitud: el título buscado debe estar contenido en el real o viceversa,
+        // o compartir al menos el 60% de palabras
+        function similitud(a, b) {
+            if (a === b) return 1;
+            if (b.includes(a) || a.includes(b)) return 1;
+            const wa = new Set(a.split(' ').filter(w => w.length > 2));
+            const wb = new Set(b.split(' ').filter(w => w.length > 2));
+            if (!wa.size) return 0;
+            let comunes = 0;
+            wa.forEach(w => { if (wb.has(w)) comunes++; });
+            return comunes / Math.max(wa.size, wb.size);
+        }
+
+        const simReal     = similitud(tituloNorm, realNorm);
+        const simOriginal = similitud(tituloNorm, originalNorm);
+        const sim         = Math.max(simReal, simOriginal);
+
+        // Validar año si se proporcionó (tolerancia ±1 año)
+        let anioOk = true;
+        if (anio && anioReal) {
+            anioOk = Math.abs(parseInt(anio) - parseInt(anioReal)) <= 1;
+        }
+
+        if (sim < 0.5 || !anioOk) {
+            const razon = sim < 0.5
+                ? `TMDB devolvió "${tituloReal}" (${anioReal}) — títulos muy distintos`
+                : `Año no coincide: buscado ${anio}, TMDB tiene ${anioReal}`;
+            logLine(`✗ RECHAZADA: "${titulo}" → ${razon}`, 'error');
+            noEncontradas.push({ raw: rawTitulo, razon });
+            continue;
+        }
 
         try {
             // Verificar duplicado
@@ -801,18 +846,22 @@ window.iniciarCargaMasiva = async function() {
             ok++;
         } catch(e) {
             logLine(`✗ Error guardando "${tituloReal}": ${e.message}`, 'error');
-            noEncontradas.push(rawTitulo);
+            noEncontradas.push({ raw: rawTitulo, razon: `Error al guardar: ${e.message}` });
         }
 
         await new Promise(r => setTimeout(r, 250));
     }
 
-    // Resumen
+    // ── Resumen final ─────────────────────────────────────────────
     logLine(`─────────────────────────────`, 'info');
-    logLine(`✅ Guardadas: ${ok} de ${lineas.length}`, ok > 0 ? 'ok' : 'warn');
+    logLine(`Guardadas: ${ok} de ${items.length}`, ok > 0 ? 'ok' : 'warn');
     if (noEncontradas.length) {
-        logLine(`⚠️ No encontradas (${noEncontradas.length}) — agregá manualmente:`, 'warn');
-        noEncontradas.forEach(t => logLine(`   • ${t}`, 'warn'));
+        logLine(`Errores (${noEncontradas.length}):`, 'error');
+        noEncontradas.forEach(({ raw, razon }) => {
+            logLine(`  • "${raw}" — ${razon}`, 'error');
+        });
+    } else {
+        logLine('Sin errores. Todo guardado correctamente.', 'ok');
     }
 
     btn.disabled = false;
