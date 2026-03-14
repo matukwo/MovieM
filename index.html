@@ -675,13 +675,41 @@ async function cargarLatino() {
 }
 
 // ── CARGA PRIORIZADA ─────────────────────────────────────────────────────────
-// 0) Primero cargar IDs de latino — son livianos y determinan los badges de TODAS las filas
+// 0) IDs de latino — con caché en localStorage para no bloquear el render
 window._latinoIDs = new Set();
-const _latinoIDsPromise = getDocs(collection(db, 'latinoLinks'))
-    .then(snap => { snap.forEach(d => window._latinoIDs.add(String(d.id))); })
-    .catch(() => {});
 
-// 1) Tendencias: esperar IDs de latino antes de renderizar para que los badges aparezcan
+const _CACHE_KEY = 'movieM_latinoIDs';
+const _CACHE_TTL = 10 * 60 * 1000; // 10 minutos
+
+function _cargarLatinoIDsConCache() {
+    // Intentar cargar desde caché primero
+    try {
+        const raw = localStorage.getItem(_CACHE_KEY);
+        if (raw) {
+            const { ids, ts } = JSON.parse(raw);
+            if (Date.now() - ts < _CACHE_TTL && Array.isArray(ids)) {
+                ids.forEach(id => window._latinoIDs.add(id));
+                // Refrescar en background sin bloquear
+                getDocs(collection(db, 'latinoLinks')).then(snap => {
+                    const fresh = [];
+                    snap.forEach(d => fresh.push(String(d.id)));
+                    localStorage.setItem(_CACHE_KEY, JSON.stringify({ ids: fresh, ts: Date.now() }));
+                }).catch(() => {});
+                return Promise.resolve(); // caché disponible → sin espera
+            }
+        }
+    } catch(e) {}
+    // Sin caché válido → cargar de Firestore y esperar
+    return getDocs(collection(db, 'latinoLinks')).then(snap => {
+        const ids = [];
+        snap.forEach(d => { ids.push(String(d.id)); window._latinoIDs.add(String(d.id)); });
+        try { localStorage.setItem(_CACHE_KEY, JSON.stringify({ ids, ts: Date.now() })); } catch(e) {}
+    }).catch(() => {});
+}
+
+const _latinoIDsPromise = _cargarLatinoIDsConCache();
+
+// 1) Tendencias: esperar IDs antes de renderizar (instantáneo si hay caché)
 _latinoIDsPromise.then(() => {
     cargarSeccion('https://api.themoviedb.org/3/trending/movie/week?api_key='+API_KEY+'&language=es-MX','tendencias').then(() => {
         // 2) Cuando tendencias termina, lanzar latino + resto en paralelo
@@ -694,7 +722,7 @@ _latinoIDsPromise.then(() => {
     });
 });
 
-// 3) Terror y Sorprendeme — lazy, esperan IDs antes de renderizar
+// 3) Terror y Sorprendeme — lazy, esperan caché (instantáneo en visitas siguientes)
 function lazySeccion(elId, fn) {
     let cargado = false;
     const el = document.getElementById(elId);
@@ -716,10 +744,6 @@ lazySeccion('terror', () =>
 lazySeccion('random', () =>
     cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&sort_by=vote_average.desc&vote_count.gte=1000&page='+Math.ceil(Math.random()*5)+'&language=es-MX', 'random')
 );
-
-// Latino: observar la sección anterior (ochenta) para disparar antes de llegar
-// porque secLatino empieza hidden y no intersecta si está display:none
-// Latino carga junto a tendencias (ver bloque de carga priorizada)
 </script>
 <script type="module" src="notif-chat.js"></script>
 </body>
