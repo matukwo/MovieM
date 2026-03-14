@@ -276,20 +276,25 @@ buscMob.addEventListener('keydown', function(e) {
 
 document.getElementById('btnUsuario').onclick = () => location.href = 'perfil.html';
 
-cargarSeccion(`https://api.themoviedb.org/3/trending/tv/week?api_key=${API_KEY}&language=es-ES`, 'tendencias');
-cargarSeccion(`https://api.themoviedb.org/3/tv/top_rated?api_key=${API_KEY}&language=es-ES`, 'topRated');
-cargarSeccion(`https://api.themoviedb.org/3/tv/on_the_air?api_key=${API_KEY}&language=es-ES`, 'enEmision');
-
-// Cargar IDs de doblaje latino
+// Cargar IDs de latino PRIMERO, luego renderizar filas
 (async function() {
     for (let i = 0; i < 30; i++) {
         if (window.db && window.getDocs && window.collection) break;
         await new Promise(r => setTimeout(r, 100));
     }
     try {
-        const snap = await window.getDocs(window.collection(window.db, 'latinoLinks'));
-        snap.forEach(d => _latinoIDsLocal.add(String(d.id)));
+        // Series: revisar tanto latinoLinks (peliculas) como latinoSeries
+        const [snapL, snapS] = await Promise.all([
+            window.getDocs(window.collection(window.db, 'latinoLinks')),
+            window.getDocs(window.collection(window.db, 'latinoSeries')),
+        ]);
+        snapL.forEach(d => _latinoIDsLocal.add(String(d.id)));
+        snapS.forEach(d => { const dat = d.data(); if (dat.serieID) _latinoIDsLocal.add(String(dat.serieID)); });
     } catch(e) {}
+    // Recién ahora cargar las filas
+    cargarSeccion(`https://api.themoviedb.org/3/trending/tv/week?api_key=${API_KEY}&language=es-ES`, 'tendencias');
+    cargarSeccion(`https://api.themoviedb.org/3/tv/top_rated?api_key=${API_KEY}&language=es-ES`, 'topRated');
+    cargarSeccion(`https://api.themoviedb.org/3/tv/on_the_air?api_key=${API_KEY}&language=es-ES`, 'enEmision');
 })();
 </script>
 </body>
