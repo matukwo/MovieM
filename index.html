@@ -313,22 +313,27 @@ async function buscarTodo(q,dropEl){
   dropEl.innerHTML='<p class="text-zinc-600 text-xs p-4 text-center animate-pulse">Buscando...</p>';
   try{
     var enc=encodeURIComponent(q);
-    var[resMX,resES,resEN,snapU]=await Promise.all([
+    var[resPeliMX,resPeliEN,resSeriesMX,resSeriesEN,snapU]=await Promise.all([
       fetch('https://api.themoviedb.org/3/search/movie?api_key='+API_KEY+'&language=es-MX&query='+enc).then(function(r){return r.json();}),
-      fetch('https://api.themoviedb.org/3/search/movie?api_key='+API_KEY+'&language=es-ES&query='+enc).then(function(r){return r.json();}),
       fetch('https://api.themoviedb.org/3/search/movie?api_key='+API_KEY+'&language=en-US&query='+enc).then(function(r){return r.json();}),
+      fetch('https://api.themoviedb.org/3/search/tv?api_key='+API_KEY+'&language=es-MX&query='+enc).then(function(r){return r.json();}),
+      fetch('https://api.themoviedb.org/3/search/tv?api_key='+API_KEY+'&language=en-US&query='+enc).then(function(r){return r.json();}),
       getDocs(collection(db,'usuarios'))
     ]);
-    // Mergear sin duplicados priorizando es-MX
-    var visto=new Set(), merged=[];
-    [(resMX.results||[]),(resES.results||[]),(resEN.results||[])].forEach(function(arr){
-      arr.forEach(function(p){if(!visto.has(p.id)){visto.add(p.id);merged.push(p);}});
+    // Mergear películas sin duplicados
+    var visitoPeli=new Set(), mergedPelis=[];
+    [(resPeliMX.results||[]),(resPeliEN.results||[])].forEach(function(arr){
+      arr.forEach(function(p){if(!visitoPeli.has(p.id)){visitoPeli.add(p.id);mergedPelis.push(p);}});
     });
-    var pelis=merged.slice(0,4),users=[];
-    snapU.forEach(function(d){var u=d.data();if(u.username&&u.username.toLowerCase().indexOf(q.toLowerCase())!==-1)users.push({uid:d.id,username:u.username,avatar:u.avatar||null});});
-    users=users.slice(0,3);
-    snapU.forEach(function(d){var u=d.data();if(u.username&&u.username.toLowerCase().indexOf(q.toLowerCase())!==-1)users.push({uid:d.id,username:u.username,avatar:u.avatar||null});});
-    users=users.slice(0,3);
+    // Mergear series sin duplicados
+    var vistasSeries=new Set(), mergedSeries=[];
+    [(resSeriesMX.results||[]),(resSeriesEN.results||[])].forEach(function(arr){
+      arr.forEach(function(s){if(!vistasSeries.has(s.id)){vistasSeries.add(s.id);mergedSeries.push(s);}});
+    });
+    var pelis=mergedPelis.slice(0,3), series=mergedSeries.slice(0,3), users=[];
+    var vistoU=new Set();
+    snapU.forEach(function(d){var u=d.data();if(u.username&&u.username.toLowerCase().indexOf(q.toLowerCase())!==-1&&!vistoU.has(d.id)){vistoU.add(d.id);users.push({uid:d.id,username:u.username,avatar:u.avatar||null});}});
+    users=users.slice(0,2);
     var html='';
     if(users.length){
       html+='<div class="px-4 pt-3 pb-1"><span class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500">Usuarios</span></div>';
@@ -339,14 +344,22 @@ async function buscarTodo(q,dropEl){
       });
     }
     if(pelis.length){
-      html+='<div class="px-4 pt-3 pb-1'+(users.length?' border-t border-white/5 mt-1':'')+'"><span class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500">Peliculas</span></div>';
+      html+='<div class="px-4 pt-3 pb-1'+(users.length?' border-t border-white/5 mt-1':'')+'"><span class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500">Películas</span></div>';
       pelis.forEach(function(p){
         var poster=p.poster_path?'https://image.tmdb.org/t/p/w92'+p.poster_path:'';
         var anio=p.release_date?p.release_date.split('-')[0]:'';
         html+='<div class="flex items-center gap-3 px-4 py-2.5 hover:bg-zinc-800 active:bg-zinc-800 cursor-pointer transition" onclick="location.href=\'pelicula.html?id='+p.id+'\'">'+(poster?'<img src="'+poster+'" class="w-8 h-12 rounded-lg object-cover shrink-0">':'<div class="w-8 h-12 bg-zinc-700 rounded-lg shrink-0"></div>')+'<div class="flex-1 min-w-0"><p class="text-sm font-bold truncate">'+p.title+'</p><p class="text-[9px] text-zinc-500 uppercase font-bold">'+anio+(p.vote_average?' · ⭐ '+p.vote_average.toFixed(1):'')+'</p></div></div>';
       });
     }
-    if(!pelis.length&&!users.length)html='<p class="text-zinc-600 text-xs p-6 text-center italic">Sin resultados</p>';
+    if(series.length){
+      html+='<div class="px-4 pt-3 pb-1 border-t border-white/5 mt-1"><span class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500">Series</span></div>';
+      series.forEach(function(s){
+        var poster=s.poster_path?'https://image.tmdb.org/t/p/w92'+s.poster_path:'';
+        var anio=s.first_air_date?s.first_air_date.split('-')[0]:'';
+        html+='<div class="flex items-center gap-3 px-4 py-2.5 hover:bg-zinc-800 active:bg-zinc-800 cursor-pointer transition" onclick="location.href=\'serie.html?id='+s.id+'\'">'+(poster?'<img src="'+poster+'" class="w-8 h-12 rounded-lg object-cover shrink-0">':'<div class="w-8 h-12 bg-zinc-700 rounded-lg shrink-0"></div>')+'<div class="flex-1 min-w-0"><p class="text-sm font-bold truncate">'+s.name+'</p><p class="text-[9px] text-zinc-500 uppercase font-bold">'+anio+(s.vote_average?' · ⭐ '+s.vote_average.toFixed(1):'')+'</p></div></div>';
+      });
+    }
+    if(!pelis.length&&!series.length&&!users.length)html='<p class="text-zinc-600 text-xs p-6 text-center italic">Sin resultados</p>';
     dropEl.innerHTML=html;
   }catch(e){dropEl.innerHTML='<p class="text-zinc-600 text-xs p-4 text-center">Error</p>';}
 }
@@ -645,18 +658,30 @@ cargarSeccion('https://api.themoviedb.org/3/trending/movie/week?api_key='+API_KE
     ]);
 });
 
-// 3) Latino se carga solo cuando el usuario llega a esa sección (lazy)
-//    Si ya está visible al entrar, se carga igual
-const _secLatino = document.getElementById('secLatino');
-let _latinoCargado = false;
-const _latinoObserver = new IntersectionObserver((entries) => {
-    if (entries[0].isIntersecting && !_latinoCargado) {
-        _latinoCargado = true;
-        _latinoObserver.disconnect();
-        cargarLatino();
-    }
-}, { rootMargin: '200px' }); // empieza a cargar 200px antes de que sea visible
-_latinoObserver.observe(document.getElementById('secContinuar').nextElementSibling || _secLatino);
+// 3) Terror, Sorprendeme y Latino — lazy, solo cuando el usuario llega
+function lazySeccion(elId, fn) {
+    let cargado = false;
+    const el = document.getElementById(elId);
+    if (!el) return;
+    const obs = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && !cargado) {
+            cargado = true;
+            obs.disconnect();
+            fn();
+        }
+    }, { rootMargin: '200px' });
+    obs.observe(el);
+}
+
+lazySeccion('terror', () =>
+    cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&with_genres=27,53&sort_by=popularity.desc&language=es-MX', 'terror')
+);
+
+lazySeccion('random', () =>
+    cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&sort_by=vote_average.desc&vote_count.gte=1000&page='+Math.ceil(Math.random()*5)+'&language=es-MX', 'random')
+);
+
+lazySeccion('latino', () => cargarLatino());
 </script>
 <script type="module" src="notif-chat.js"></script>
 </body>
