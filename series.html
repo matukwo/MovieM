@@ -139,11 +139,11 @@ function crearCard(serie) {
     const rating = serie.vote_average ? serie.vote_average.toFixed(1) : 'S/R';
     const anio = (serie.first_air_date || serie.release_date || '').split('-')[0] || '';
     const poster = serie.poster_path ? BASE + serie.poster_path : 'https://via.placeholder.com/500x750?text=?';
-    const card = document.createElement('div');
-    card.className = 'min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2';
+    const card = document.createElement('a');
+    card.href = 'serie.html?id=' + serie.id;
+    card.className = 'min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2 block';
     const inner = document.createElement('div'); inner.className = 'relative';
     const img = document.createElement('img'); img.src = poster; img.className = 'rounded-xl shadow-lg mb-1 border border-white/5 w-full'; img.loading = 'lazy';
-    img.onclick = () => location.href = 'serie.html?id=' + serie.id;
     const badge = document.createElement('div');
     badge.className = 'absolute top-1.5 right-1.5 flex flex-col items-end gap-1';
     badge.innerHTML = '<div class="bg-black/80 text-yellow-500 text-[9px] font-black px-1.5 py-0.5 rounded-lg">⭐ '+rating+'</div>'
