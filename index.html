@@ -127,8 +127,8 @@
 
 
 <header id="heroHeader" class="relative h-[52vh] md:h-[70vh] flex items-end md:items-center px-4 md:px-8 pt-16 pb-10 md:pt-20 md:pb-0 overflow-hidden">
-    <div id="heroBackdrop" class="absolute inset-0 bg-cover bg-center -z-10 opacity-40" style="transition: background-image 0.4s ease, opacity 0.4s ease;"></div>
-    <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent -z-10"></div>
+    <div id="heroBackdrop" class="absolute inset-0 bg-cover bg-center -z-10 opacity-60" style="transition: background-image 0.4s ease, opacity 0.4s ease;"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/30 to-transparent -z-10"></div>
     <div class="w-full pb-6 md:pb-0" id="heroContent" style="transition: opacity 0.4s ease, transform 0.4s ease;">
         <h1 id="heroTitulo" class="text-xl md:text-7xl font-black italic uppercase tracking-tighter leading-tight mb-3 md:mb-4 max-w-2xl line-clamp-2 md:line-clamp-1">Cargando...</h1>
         <p id="heroSinopsis" class="hidden md:block text-zinc-400 text-sm md:text-lg line-clamp-3 mb-6 font-medium max-w-2xl"></p>
@@ -394,23 +394,29 @@ function crearCard(peli){
   var poster=peli.poster_path?BASE+peli.poster_path:'https://via.placeholder.com/500x750?text=?';
   var progress=JSON.parse(localStorage.getItem('movieM_progress')||'{}');
   var prog=progress['pelicula_'+peli.id]||0;
-  var card=document.createElement('div');
-  card.className='min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2';
+  var esSerie = !!peli.first_air_date && !peli.release_date;
+  var url = esSerie ? 'serie.html?id='+peli.id : 'pelicula.html?id='+peli.id;
+  var tieneLatino = window._latinoIDs && window._latinoIDs.has(String(peli.id));
+  var card=document.createElement('a');
+  card.href=url;
+  card.className='min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2 block';
   var inner=document.createElement('div');inner.className='relative aspect-[2/3]';
-  // Skeleton placeholder detrás de la imagen
   var skDiv=document.createElement('div');skDiv.className='absolute inset-0 rounded-xl skeleton';
   var img=document.createElement('img');img.src=poster;
   img.className='absolute inset-0 w-full h-full object-cover rounded-xl shadow-lg mb-1 border border-white/5 z-10';
   img.loading='lazy';
   img.onload=function(){skDiv.style.display='none';};
-  img.onclick=function(){location.href='pelicula.html?id='+peli.id;};
   var badge=document.createElement('div');
   badge.className='absolute top-1.5 right-1.5 flex flex-col items-end gap-1 z-20';
   badge.innerHTML='<div class="bg-black/80 text-yellow-500 text-[9px] font-black px-1.5 py-0.5 rounded-lg">⭐ '+puntaje+'</div>'
     +(anio?'<div class="bg-black/80 text-zinc-300 text-[9px] font-black px-1.5 py-0.5 rounded-lg">'+anio+'</div>':'');
-  // Barra de progreso si existe
-  var progBar='';
-  if(prog>2){progBar='<div class="absolute bottom-0 left-0 right-0 z-20 px-1 pb-1"><div class="w-full h-1 bg-zinc-800/80 rounded-full"><div class="h-full bg-red-600 rounded-full" style="width:'+Math.round(prog)+'%"></div></div></div>';}
+  // Badge LAT arriba a la izquierda si tiene doblaje latino
+  if(tieneLatino){
+    var latBadge=document.createElement('div');
+    latBadge.className='absolute top-1.5 left-1.5 z-20';
+    latBadge.innerHTML='<div class="bg-green-700/90 text-white text-[7px] font-black px-1.5 py-0.5 rounded-lg uppercase tracking-widest flex items-center gap-1"><span>🇲🇽</span>LAT</div>';
+    inner.appendChild(latBadge);
+  }
   inner.appendChild(skDiv);inner.appendChild(img);inner.appendChild(badge);
   if(prog>2){var pb=document.createElement('div');pb.className='absolute bottom-0 left-0 right-0 z-20 px-1 pb-1';pb.innerHTML='<div class="w-full h-1 bg-zinc-800/80 rounded-full"><div class="h-full bg-red-600 rounded-full" style="width:'+Math.round(prog)+'%"></div></div>';inner.appendChild(pb);}
   var title=document.createElement('p');title.className='text-[9px] md:text-[10px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 mt-2';title.textContent=peli.title||peli.name;
@@ -533,9 +539,9 @@ async function cargarContinuar(user) {
           const r = await fetch(`https://api.themoviedb.org/3/tv/${item.contentId}?api_key=${API_KEY}&language=es-MX`);
           const s = await r.json();
           if (!s.poster_path) continue;
-          const card = document.createElement('div');
-          card.className = 'min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2';
-          card.onclick = () => location.href = `serie.html?id=${item.contentId}`;
+          const card = document.createElement('a');
+          card.href = 'serie.html?id='+item.contentId;
+          card.className = 'min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2 block';
           card.innerHTML = `
             <div class="relative aspect-[2/3]">
               <div class="absolute inset-0 rounded-xl skeleton"></div>
@@ -552,9 +558,9 @@ async function cargarContinuar(user) {
           const titulo = item.titulo || '';
           const pct = Math.round(item.porcentaje || 0);
           if (!poster) continue;
-          const card = document.createElement('div');
-          card.className = 'min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2';
-          card.onclick = () => location.href = `pelicula.html?id=${item.contentId}`;
+          const card = document.createElement('a');
+          card.href = 'pelicula.html?id='+item.contentId;
+          card.className = 'min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2 block';
           card.innerHTML = `
             <div class="relative aspect-[2/3]">
               <div class="absolute inset-0 rounded-xl skeleton"></div>
@@ -629,9 +635,9 @@ async function cargarLatino() {
           url = `serie.html?id=${item.id}`;
         }
 
-        const card = document.createElement('div');
-        card.className = 'min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2';
-        card.onclick = () => location.href = url;
+        const card = document.createElement('a');
+        card.href = url;
+        card.className = 'min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2 block';
         card.innerHTML = `
           <div class="relative aspect-[2/3]">
             <div class="absolute inset-0 rounded-xl skeleton"></div>
@@ -688,7 +694,27 @@ lazySeccion('random', () =>
     cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&sort_by=vote_average.desc&vote_count.gte=1000&page='+Math.ceil(Math.random()*5)+'&language=es-MX', 'random')
 );
 
-lazySeccion('latino', () => cargarLatino());
+// Cargar IDs de latino al inicio para mostrar badge en cards
+window._latinoIDs = new Set();
+getDocs(collection(db, 'latinoLinks')).then(snap => {
+    snap.forEach(d => window._latinoIDs.add(String(d.id)));
+}).catch(() => {});
+
+// Latino: observar la sección anterior (ochenta) para disparar antes de llegar
+// porque secLatino empieza hidden y no intersecta si está display:none
+(function() {
+    let cargado = false;
+    const trigger = document.getElementById('ochenta') || document.getElementById('secLatino');
+    if (!trigger) return;
+    const obs = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && !cargado) {
+            cargado = true;
+            obs.disconnect();
+            cargarLatino();
+        }
+    }, { rootMargin: '400px' });
+    obs.observe(trigger);
+})();
 </script>
 <script type="module" src="notif-chat.js"></script>
 </body>
