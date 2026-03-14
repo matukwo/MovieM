@@ -585,7 +585,11 @@ async function cargarLatino() {
     // Shuffle para variedad
     todos.sort(() => Math.random() - 0.5);
 
-    await Promise.all(todos.map(async item => {
+    // Fetch de a 4 en paralelo, no todos juntos
+    const chunks = [];
+    for (let i = 0; i < todos.length; i += 4) chunks.push(todos.slice(i, i + 4));
+    for (const chunk of chunks) {
+      await Promise.all(chunk.map(async item => {
       try {
         let posterPath = '', nombre = '', url = '';
 
@@ -623,18 +627,36 @@ async function cargarLatino() {
         fila.appendChild(card);
       } catch(e) {}
     }));
+    } // fin for chunks
 
     // Si quedó vacío (todos fallaron) ocultar
     if (!fila.children.length) sec.classList.add('hidden');
   } catch(e) { console.error('cargarLatino:', e); }
 }
 
-cargarLatino();
+// ── CARGA PRIORIZADA ─────────────────────────────────────────────────────────
+// 1) Tendencias primero — es lo que ve el usuario al entrar (hero + primera fila)
+cargarSeccion('https://api.themoviedb.org/3/trending/movie/week?api_key='+API_KEY+'&language=es-MX','tendencias').then(() => {
+    // 2) Cuando tendencias termina, lanzar el resto en paralelo
+    Promise.all([
+        cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&with_genres=28&language=es-MX','accion'),
+        cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&with_genres=10749&sort_by=vote_average.desc&vote_count.gte=500&language=es-MX','romance'),
+        cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&primary_release_date.gte=1980-01-01&primary_release_date.lte=1989-12-31&sort_by=vote_average.desc&vote_count.gte=300&language=es-MX','ochenta'),
+    ]);
+});
 
-cargarSeccion('https://api.themoviedb.org/3/trending/movie/week?api_key='+API_KEY+'&language=es-MX','tendencias');
-cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&with_genres=28&language=es-MX','accion');
-cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&with_genres=10749&sort_by=vote_average.desc&vote_count.gte=500&language=es-MX','romance');
-cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&primary_release_date.gte=1980-01-01&primary_release_date.lte=1989-12-31&sort_by=vote_average.desc&vote_count.gte=300&language=es-MX','ochenta');
+// 3) Latino se carga solo cuando el usuario llega a esa sección (lazy)
+//    Si ya está visible al entrar, se carga igual
+const _secLatino = document.getElementById('secLatino');
+let _latinoCargado = false;
+const _latinoObserver = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting && !_latinoCargado) {
+        _latinoCargado = true;
+        _latinoObserver.disconnect();
+        cargarLatino();
+    }
+}, { rootMargin: '200px' }); // empieza a cargar 200px antes de que sea visible
+_latinoObserver.observe(document.getElementById('secContinuar').nextElementSibling || _secLatino);
 </script>
 <script type="module" src="notif-chat.js"></script>
 </body>
