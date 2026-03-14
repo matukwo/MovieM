@@ -310,6 +310,9 @@
                 var sm=document.getElementById('sinopsisMobile');if(sm){sm.innerText=peli.overview||'Sin descripcion.';sm.classList.remove('hidden');var sk=document.getElementById('sinopsisSkeleton');if(sk)sk.remove();}
                 document.getElementById('poster').src = 'https://image.tmdb.org/t/p/w500' + peli.poster_path;
                 document.getElementById('backdrop').style.backgroundImage = `url('https://image.tmdb.org/t/p/original${peli.backdrop_path}')`;
+                // Guardar para uso en guardarProgreso sin depender del DOM
+                window._peliPosterURL = 'https://image.tmdb.org/t/p/w500' + peli.poster_path;
+                window._peliTitulo = peli.title;
                 
                 if(peli.vote_average > 7.4) document.getElementById('badget-premios').classList.remove('hidden');
 
@@ -815,10 +818,10 @@ async function guardarProgreso(){
 
     if(!miUID_pelicula) return;
 
-    const titulo = document.getElementById("titulo")?.innerText || "";
-    const poster = document.getElementById("poster")?.src || "";
+    const titulo = window._peliTitulo || document.getElementById("titulo")?.innerText || "";
+    const poster = window._peliPosterURL || document.getElementById("poster")?.src || "";
 
-    if(!titulo || poster.includes("undefined")) return;
+    if(!titulo || !poster || poster.includes("undefined")) return;
 
     const porcentaje = Math.min(100,Math.round((tiempoViendo/5400)*100));
 
@@ -842,7 +845,7 @@ async function guardarProgreso(){
             contentId:String(movieID),
             titulo:titulo,
             poster:poster,
-            porcentaje:porcentaje,
+            porcentaje:Math.max(porcentaje, 1), // mínimo 1% para que aparezca en continuar viendo
             tiempo:tiempoViendo,
             updatedAt:window.serverTimestamp()
         },{merge:true});
