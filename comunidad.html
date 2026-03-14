@@ -202,13 +202,14 @@ if (color) document.documentElement.style.setProperty('--accent-color', color);
 
 document.getElementById('btnUsuario').onclick = () => location.href = 'perfil.html';
 
-// Esperar Firebase
-async function waitForFirebase() {
-    for (let i = 0; i < 50; i++) {
-        if (window.db && window.getDocs && window.collection && window.query && window.orderBy && window.where) return true;
-        await new Promise(r => setTimeout(r, 100));
-    }
-    return false;
+// Esperar Firebase — usando evento en vez de polling
+function waitForFirebase() {
+    return new Promise(resolve => {
+        if (window.db && window.getDocs) { resolve(true); return; }
+        window.addEventListener('firebase-ready', () => resolve(true), { once: true });
+        // fallback por si el evento ya disparó antes de que este script corriera
+        setTimeout(() => { if (window.db) resolve(true); }, 50);
+    });
 }
 
 function getMedalClass(pos) {
