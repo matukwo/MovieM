@@ -3,72 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/png" href="data:image/png;base64,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">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieM | TV en Vivo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         :root { --accent-color: #dc2626; }
-        .text-accent   { color: var(--accent-color); }
-        .bg-accent     { background-color: var(--accent-color); }
-        .border-accent { border-color: var(--accent-color); }
-        .no-scrollbar::-webkit-scrollbar { display:none }
-        .no-scrollbar  { -ms-overflow-style:none; scrollbar-width:none }
-        .live-dot { animation: livepulse 1.4s infinite; }
+        /* Solo lo que Tailwind no puede hacer */
         @keyframes livepulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.35;transform:scale(1.4)} }
-        .canal-card { transition: all .18s ease; cursor:pointer; }
-        .canal-card:hover { background:rgba(39,39,42,.9)!important; transform:translateX(2px); }
+        @keyframes fadeIn    { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes spinA     { to{transform:rotate(360deg)} }
+        .live-dot  { animation: livepulse 1.4s infinite; }
+        .fade-in   { animation: fadeIn .5s ease forwards; opacity:0; }
+        .spin      { animation: spinA 1s linear infinite; }
+        /* Scrollbar oculta */
+        .no-scrollbar::-webkit-scrollbar { display:none; }
+        .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+        /* Cat-btn activo y canal-card activo — usan CSS var, Tailwind no puede hacerlo dinámicamente */
+        .cat-btn.activo  { background:var(--accent-color); color:#fff; border-color:var(--accent-color); }
         .canal-card.activo { border-color:var(--accent-color)!important; background:rgba(220,38,38,.08)!important; }
-        .fade-in { animation: fi .5s ease forwards; opacity:0; }
-        @keyframes fi { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-        #playerWrap {
-            position:relative; background:#000;
-            border-radius:16px; overflow:hidden;
-            border:1px solid rgba(255,255,255,.07);
-            box-shadow:0 25px 60px rgba(0,0,0,.8);
-            aspect-ratio:16/9;
-        }
-        #hlsVideo  { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:#000; display:none; }
-        #iframeEmbed { position:absolute; inset:0; width:100%; height:100%; border:none; display:none; }
-        #playerOverlayBox {
-            position:absolute; inset:0;
-            display:flex; flex-direction:column;
-            align-items:center; justify-content:center;
-            background:#09090b; transition:opacity .4s; z-index:10;
-        }
-        #playerOverlayBox.oculto { opacity:0; pointer-events:none; }
-        .spin { animation: spinA 1s linear infinite; }
-        @keyframes spinA { to{ transform:rotate(360deg) } }
-        .cat-btn { transition:all .2s; }
-        .cat-btn.activo { background:var(--accent-color); color:#fff; border-color:var(--accent-color); }
-        .cats-scroll { scrollbar-width:none; -ms-overflow-style:none; }
-        .cats-scroll::-webkit-scrollbar { display:none; }
     </style>
 </head>
 <body class="bg-zinc-950 text-white font-sans min-h-screen overflow-x-hidden">
 
+<!-- NAV -->
 <nav class="px-4 md:px-6 py-3 flex items-center justify-between bg-zinc-950/90 backdrop-blur-md sticky top-0 w-full z-50 border-b border-white/5">
-    <h1 onclick="location.href='index.html'" class="text-lg md:text-xl font-black italic tracking-tighter cursor-pointer">MOVIE<span class="text-accent">M</span></h1>
+    <h1 onclick="location.href='index.html'" class="text-lg md:text-xl font-black italic tracking-tighter cursor-pointer">
+        MOVIE<span style="color:var(--accent-color)">M</span>
+    </h1>
     <div class="flex items-center gap-3">
         <div class="flex items-center gap-1.5 bg-red-600/10 border border-red-600/30 px-3 py-1.5 rounded-full">
             <span class="w-2 h-2 rounded-full bg-red-500 live-dot"></span>
             <span class="text-[10px] font-black uppercase tracking-widest text-red-400">En Vivo</span>
         </div>
-        <button onclick="location.href='tv.html'" class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-white transition">← Canales</button>
+        <button onclick="location.href='index.html'" class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-white transition">← Inicio</button>
     </div>
 </nav>
 
 <main class="max-w-7xl mx-auto px-3 md:px-6 pt-5 pb-28 md:pb-8">
     <div class="flex flex-col lg:flex-row gap-5 md:gap-6">
 
-        <!-- PLAYER + INFO -->
+        <!-- ── PLAYER + INFO ── -->
         <div class="flex-1 min-w-0 fade-in">
-            <div id="playerWrap" class="mb-4">
-                <video id="hlsVideo" playsinline webkit-playsinline></video>
-                <iframe id="iframeEmbed" allowfullscreen webkitallowfullscreen mozallowfullscreen
+
+            <!-- Player -->
+            <div id="playerWrap" class="relative bg-black rounded-2xl overflow-hidden border border-white/[.07] shadow-[0_25px_60px_rgba(0,0,0,.8)] aspect-video mb-4">
+                <video id="hlsVideo" class="absolute inset-0 w-full h-full object-contain bg-black hidden" playsinline webkit-playsinline></video>
+                <iframe id="iframeEmbed" class="absolute inset-0 w-full h-full border-0 hidden"
+                    allowfullscreen webkitallowfullscreen mozallowfullscreen
                     allow="autoplay; encrypted-media; fullscreen" referrerpolicy="no-referrer"></iframe>
-                <div id="playerOverlayBox">
+                <div id="playerOverlay" class="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950 transition-opacity duration-300 z-10">
                     <div id="overlayContent" class="flex flex-col items-center text-center px-6">
                         <svg class="w-16 h-16 text-zinc-800 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.361a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
@@ -79,10 +63,11 @@
             </div>
 
             <!-- Info canal -->
-            <div class="flex items-center gap-4 mb-5">
+            <div class="flex items-center gap-4 mb-4">
                 <div class="w-14 h-14 rounded-2xl overflow-hidden bg-white flex items-center justify-center p-1.5 shrink-0 shadow-lg">
-                    <img id="logoImg" src="" alt="" class="max-w-full max-h-full object-contain" onerror="this.style.display='none';document.getElementById('logoFallback').style.display='flex'">
-                    <span id="logoFallback" style="display:none;align-items:center;justify-content:center;width:100%;height:100%;font-size:22px;font-weight:900;color:#dc2626;"></span>
+                    <img id="logoImg" src="" alt="" class="max-w-full max-h-full object-contain"
+                         onerror="this.style.display='none';document.getElementById('logoFallback').style.display='flex'">
+                    <span id="logoFallback" class="hidden w-full h-full items-center justify-center text-2xl font-black" style="color:var(--accent-color)"></span>
                 </div>
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 mb-0.5 flex-wrap">
@@ -94,22 +79,31 @@
                     </div>
                     <p id="categoriaCanal" class="text-zinc-500 text-xs font-bold uppercase tracking-widest">Seleccioná un canal para comenzar</p>
                 </div>
-                <button onclick="toggleFullscreen()" class="shrink-0 bg-zinc-800 hover:bg-accent p-2.5 rounded-xl transition border border-white/5 active:scale-95">
+                <button onclick="toggleFullscreen()" class="shrink-0 bg-zinc-800 hover:bg-zinc-700 p-2.5 rounded-xl transition border border-white/5 active:scale-95">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
                     </svg>
                 </button>
             </div>
 
-            <!-- Botones de señal alternativa -->
+            <!-- Señales alternativas (solo visible si hay embed2) -->
             <div id="senalesWrap" class="hidden mb-4">
-                <p class="text-[9px] font-black uppercase tracking-[.25em] text-zinc-500 mb-2 flex items-center gap-2"><span class="w-4 h-px bg-accent inline-block"></span>Señales disponibles</p>
+                <p class="text-[9px] font-black uppercase tracking-[.25em] text-zinc-500 mb-2 flex items-center gap-2">
+                    <span class="w-4 h-px inline-block" style="background:var(--accent-color)"></span>Señales disponibles
+                </p>
                 <div class="flex gap-2 flex-wrap">
-                    <button id="btnSenal1" onclick="cambiarSenal(1)" class="px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border transition active:scale-95 bg-accent border-accent text-white">📡 Señal 1</button>
-                    <button id="btnSenal2" onclick="cambiarSenal(2)" class="px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10 text-zinc-400 hover:border-accent hover:text-white transition active:scale-95">📡 Señal 2</button>
+                    <button id="btnSenal1" onclick="cambiarSenal(1)"
+                        class="px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border transition active:scale-95">
+                        📡 Señal 1
+                    </button>
+                    <button id="btnSenal2" onclick="cambiarSenal(2)"
+                        class="px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border transition active:scale-95">
+                        📡 Señal 2
+                    </button>
                 </div>
             </div>
 
+            <!-- Aviso -->
             <div class="bg-zinc-900/40 border border-white/5 rounded-xl px-4 py-3 flex gap-3 text-xs text-zinc-500 items-start">
                 <svg class="w-4 h-4 shrink-0 mt-0.5 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -118,18 +112,18 @@
             </div>
         </div>
 
-        <!-- SIDEBAR -->
+        <!-- ── SIDEBAR ── -->
         <aside class="w-full lg:w-72 shrink-0 fade-in" style="animation-delay:.1s">
             <div class="relative mb-3">
                 <input id="searchInput" oninput="filtrarCanales()" type="text" placeholder="Buscar canal..."
-                    class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 outline-none focus:border-accent transition pr-8">
+                    class="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 pr-9 text-sm text-white placeholder-zinc-600 outline-none focus:border-red-600 transition">
                 <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
             </div>
-            <div id="categorias" class="flex gap-2 mb-3 overflow-x-auto cats-scroll pb-1"></div>
+            <div id="categorias" class="flex gap-2 mb-3 overflow-x-auto no-scrollbar pb-1"></div>
             <p class="text-[10px] font-black uppercase tracking-[.25em] text-zinc-500 mb-3 flex items-center gap-2">
-                <span class="w-4 h-px bg-accent"></span>
+                <span class="w-4 h-px inline-block" style="background:var(--accent-color)"></span>
                 <span id="sidebarLabel">Canales</span>
             </p>
             <div id="sidebar" class="space-y-1.5 lg:overflow-y-auto no-scrollbar lg:max-h-[calc(100vh-300px)]"></div>
@@ -148,7 +142,7 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
             <span class="text-[9px] font-black uppercase tracking-widest">Mi Lista</span>
         </a>
-        <a href="tv.html" class="flex flex-col items-center gap-1 text-accent">
+        <a href="tv.html" class="flex flex-col items-center gap-1" style="color:var(--accent-color)">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.361a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
             <span class="text-[9px] font-black uppercase tracking-widest">TV</span>
         </a>
@@ -160,45 +154,231 @@
 </nav>
 
 <script>
+// ── Tema ─────────────────────────────────────────────────────────────────────
 var saved = localStorage.getItem('movieM_color');
 if (saved) document.documentElement.style.setProperty('--accent-color', saved);
 
-// ─── CANALES ─────────────────────────────────────────────────────────────────
+// ── CANALES ───────────────────────────────────────────────────────────────────
+// type: "hls"    → usa hls.js con reintentos por proxy si falla
+// type: "iframe" → carga en iframe directo
+// embed2 (opcional) → segunda señal para el mismo canal
 var CANALES = [
-    {"id":"el-trece","nombre":"El Trece","logo":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAnCAYAAACYNs/UAAABCGlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGA8wQAELAYMDLl5JUVB7k4KEZFRCuwPGBiBEAwSk4sLGHADoKpv1yBqL+viUYcLcKakFicD6Q9ArFIEtBxopAiQLZIOYWuA2EkQtg2IXV5SUAJkB4DYRSFBzkB2CpCtkY7ETkJiJxcUgdT3ANk2uTmlyQh3M/Ck5oUGA2kOIJZhKGYIYnBncAL5H6IkfxEDg8VXBgbmCQixpJkMDNtbGRgkbiHEVBYwMPC3MDBsO48QQ4RJQWJRIliIBYiZ0tIYGD4tZ2DgjWRgEL7AwMAVDQsIHG5TALvNnSEfCNMZchhSgSKeDHkMyQx6QJYRgwGDIYMZAKbWPz9HbOBQAAADQElEQVR42u2aTVrbSBCG32q1LAnnAcJDDpCZFRuWXGCy4QKcY3IfdhyAc2RuEGYHmWe8IZNh/KO/7pqFaGGI84PBxgbVzrbU7n5VX3VVtWRr67W+e/cbppcQ/fWJDx/+4JMxxIDywk3h1zShnySIEc7/G3JlDNubWxR5TlEWWFAGfw/wxhB9/sxEBCMC+uLxgcC/zjEuShAoVFHvmUzG1HXdXJKmG5rnkwa3sfTSFKt6T+/Tp1/p9CcRjDFffTdz5qqoKt77mb87hUAjEkGgvTZJEqyI0O+/CqPhfwKeqt6ZkKyO6lTp9Xpsb79uVaSqVHWFiKB3lBXHMXmec3V1NROylZv1hTuNMe04limiz8XqumY0GraLnAUuWFVVrRzn0Zad5wk3HrhanndLdnXFZKxEcQyqVFX1TYA/kjiPDXA9Yr8QmYjYxqh6nHMLU5l9yDRX1TxQ1hVFVbYxa1H2LD0wSHJeWd7HDJ11AF88wGVI7dnGQGttm5iWZbl2MJ8IoLaldkgvdKpqWCeITwLQmKj1ulAlqDbeKCLfrQxePECvno10gyzbwNU1URRRO4eqYowhiiK+fPmHuq7XwhOXDtCIYTQaMRwOCV2zwCnI2hizNjJ+EglPJ7nTnNZxM+7ywA5gB7AD2AHsbPm78E1H+uvdVJUfdoAXs7uH/9XVBRgqhzzPr6sJjyp4765hKsZExHH83VJuEeacR6RJxlcaoHOO9+9/Z29vj+PjY87Pz3nzZpeiKMmyjMvLSy4uLogiO9MTF9EhFhF2d3cpioLxeLK0RHyuQyUR4ejoiIODA87O/uTk5IQse0VkStI0JcsKNje3m4QZwatv6l8xOO9ozqEfsTWhjde/ffsLg8GA4XC00Db+rQeXZX2975OuqpLDw0P29/c5PT3l48czrLWAoOoxxpAkKd77Ni6F8sx7T1EUC/FAay3e+6Uc04bz53sDDJbnOaqOLOuTJMl1XJN28Gnp3j2XDd7hvX+09lUYf9kA7bw37+zs0Ov1bkv7GqDzDmOimy1ZAkiD975tZeX5ZCH9v2W+KDC3B4ZFPyRdWVSgX0YK9SAPfKxJ6jN4A6yrRDqAHcAOYAewsw5gB3BN7X9e4p+Qrt+z6wAAAABJRU5ErkJggg==","cat":"General","pais":"🇦🇷",
-     "embed":"https://hlsplayer.net/embed?type=m3u8&src=https://livetrx01.vodgc.net/eltrecetv/index.m3u8"},
-    {"id":"tn","nombre":"TN","logo":"data:image/png;base64,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","cat":"Noticias","pais":"🇦🇷",
-     "embed":"https://hlsplayer.net/embed?type=m3u8&src=https://live-01-01-tn.vodgc.net/TN24/index_TN24_1080.m3u8"},
-    {"id":"espn","nombre":"ESPN","logo":"data:image/png;base64,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","cat":"Deportes","pais":"🌎",
-     "embed":"https://nebunexa.life/cvatt.html?get=RVNQTjJIRA&lang=1"},
-    {"id":"tyc-sports","nombre":"TyC Sports","logo":"data:image/png;base64,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","cat":"Deportes","pais":"🇦🇷",
-     "embed":"https://www.nebunexa.life/cvatt.html?get=VHlDU3BvcnQ&lang=1",
-     "embed2":"https://nebunexa.life/tok.html?get=VHlDU3BvcnQ"}
+    {
+        "id": "el-trece", "nombre": "El Trece", "cat": "General", "pais": "🇦🇷",
+        "logo": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAnCAYAAACYNs/UAAABCGlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGA8wQAELAYMDLl5JUVB7k4KEZFRCuwPGBiBEAwSk4sLGHADoKpv1yBqL+viUYcLcKakFicD6Q9ArFIEtBxopAiQLZIOYWuA2EkQtg2IXV5SUAJkB4DYRSFBzkB2CpCtkY7ETkJiJxcUgdT3ANk2uTmlyQh3M/Ck5oUGA2kOIJZhKGYIYnBncAL5H6IkfxEDg8VXBgbmCQixpJkMDNtbGRgkbiHEVBYwMPC3MDBsO48QQ4RJQWJRIliIBYiZ0tIYGD4tZ2DgjWRgEL7AwMAVDQsIHG5TALvNnSEfCNMZchhSgSKeDHkMyQx6QJYRgwGDIYMZAKbWPz9HbOBQAAADQElEQVR42u2aTVrbSBCG32q1LAnnAcJDDpCZFRuWXGCy4QKcY3IfdhyAc2RuEGYHmWe8IZNh/KO/7pqFaGGI84PBxgbVzrbU7n5VX3VVtWRr67W+e/cbppcQ/fWJDx/+4JMxxIDywk3h1zShnySIEc7/G3JlDNubWxR5TlEWWFAGfw/wxhB9/sxEBCMC+uLxgcC/zjEuShAoVFHvmUzG1HXdXJKmG5rnkwa3sfTSFKt6T+/Tp1/p9CcRjDFffTdz5qqoKt77mb87hUAjEkGgvTZJEqyI0O+/CqPhfwKeqt6ZkKyO6lTp9Xpsb79uVaSqVHWFiKB3lBXHMXmec3V1NROylZv1hTuNMe04limiz8XqumY0GraLnAUuWFVVrRzn0Zad5wk3HrhanndLdnXFZKxEcQyqVFX1TYA/kjiPDXA9Yr8QmYjYxqh6nHMLU5l9yDRX1TxQ1hVFVbYxa1H2LD0wSHJeWd7HDJ11AF88wGVI7dnGQGttm5iWZbl2MJ8IoLaldkgvdKpqWCeITwLQmKj1ulAlqDbeKCLfrQxePECvno10gyzbwNU1URRRO4eqYowhiiK+fPmHuq7XwhOXDtCIYTQaMRwOCV2zwCnI2hizNjJ+EglPJ7nTnNZxM+7ywA5gB7AD2AHsbPm78E1H+uvdVJUfdoAXs7uH/9XVBRgqhzzPr6sJjyp4765hKsZExHH83VJuEeacR6RJxlcaoHOO9+9/Z29vj+PjY87Pz3nzZpeiKMmyjMvLSy4uLogiO9MTF9EhFhF2d3cpioLxeLK0RHyuQyUR4ejoiIODA87O/uTk5IQse0VkStI0JcsKNje3m4QZwatv6l8xOO9ozqEfsTWhjde/ffsLg8GA4XC00Db+rQeXZX2975OuqpLDw0P29/c5PT3l48czrLWAoOoxxpAkKd77Ni6F8sx7T1EUC/FAay3e+6Uc04bz53sDDJbnOaqOLOuTJMl1XJN28Gnp3j2XDd7hvX+09lUYf9kA7bw37+zs0Ov1bkv7GqDzDmOimy1ZAkiD975tZeX5ZCH9v2W+KDC3B4ZFPyRdWVSgX0YK9SAPfKxJ6jN4A6yrRDqAHcAOYAewsw5gB3BN7X9e4p+Qrt+z6wAAAABJRU5ErkJggg==",
+        "type": "hls",
+        "url": "https://livetrx01.vodgc.net/eltrecetv/index.m3u8"
+    },
+    {
+        "id": "tn", "nombre": "TN", "cat": "Noticias", "pais": "🇦🇷",
+        "logo": "data:image/png;base64,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",
+        "type": "hls",
+        "url": "https://live-01-01-tn.vodgc.net/TN24/index_TN24_1080.m3u8"
+    },
+    {
+        "id": "espn", "nombre": "ESPN", "cat": "Deportes", "pais": "🌎",
+        "logo": "data:image/png;base64,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",
+        "type": "iframe",
+        "url": "https://nebunexa.life/cvatt.html?get=RVNQTjJIRA&lang=1"
+    },
+    {
+        "id": "tyc-sports", "nombre": "TyC Sports", "cat": "Deportes", "pais": "🇦🇷",
+        "logo": "data:image/png;base64,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",
+        "type": "iframe",
+        "url": "https://www.nebunexa.life/cvatt.html?get=VHlDU3BvcnQ&lang=1",
+        "embed2": "https://nebunexa.life/tok.html?get=VHlDU3BvcnQ"
+    }
 ];
 
-// ─── PROXIES CORS (reintentos automáticos si el stream directo falla) ─────────
+// ── PROXIES CORS (solo para type:"hls") ───────────────────────────────────────
 var CORS_PROXIES = [
-    function(url){ return 'https://corsproxy.io/?' + encodeURIComponent(url); },
-    function(url){ return 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url); },
-    function(url){ return 'https://thingproxy.freeboard.io/fetch/' + url; }
+    function(u){ return 'https://corsproxy.io/?' + encodeURIComponent(u); },
+    function(u){ return 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u); }
 ];
 
-var categorias = [...new Set(CANALES.map(function(c){ return c.cat; }))];
-var catActiva  = 'Todos';
+// ── Estado ───────────────────────────────────────────────────────────────────
+var categorias  = [...new Set(CANALES.map(function(c){ return c.cat; }))];
+var catActiva   = 'Todos';
 var canalActual = null;
 var hlsInstance = null;
 
-// ─── CATEGORIAS ───────────────────────────────────────────────────────────────
+// ── UI helpers ────────────────────────────────────────────────────────────────
+function accentClass(active) {
+    return active
+        ? 'px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border transition active:scale-95 text-white'
+        : 'px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10 text-zinc-400 hover:text-white transition active:scale-95';
+}
+
+function setAccentBtn(el, active) {
+    el.className = accentClass(active);
+    el.style.background     = active ? 'var(--accent-color)' : '';
+    el.style.borderColor    = active ? 'var(--accent-color)' : '';
+}
+
+function showOverlay(content) {
+    document.getElementById('overlayContent').innerHTML = content;
+    var o = document.getElementById('playerOverlay');
+    o.style.opacity = '1';
+    o.style.pointerEvents = 'auto';
+}
+
+function hideOverlay() {
+    var o = document.getElementById('playerOverlay');
+    o.style.opacity = '0';
+    o.style.pointerEvents = 'none';
+}
+
+function showSpinner(txt) {
+    showOverlay(
+        '<svg class="spin w-10 h-10 mb-4" style="color:var(--accent-color)" fill="none" viewBox="0 0 24 24">'
+      + '<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>'
+      + '<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>'
+      + '</svg>'
+      + '<p class="text-zinc-400 text-sm font-bold uppercase tracking-widest">' + (txt || 'Conectando...') + '</p>'
+    );
+}
+
+function showError(msg) {
+    showOverlay(
+        '<svg class="w-12 h-12 text-zinc-700 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">'
+      + '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>'
+      + '</svg>'
+      + '<p class="text-zinc-300 text-sm mb-1 font-bold">Sin señal</p>'
+      + '<p class="text-zinc-600 text-xs mb-5 max-w-xs text-center">' + (msg || 'El canal está offline o no disponible.') + '</p>'
+      + '<button onclick="cargarCanal(canalActual)" class="bg-zinc-800 hover:bg-zinc-700 border border-white/10 text-white px-6 py-2.5 rounded-full font-black text-xs uppercase tracking-widest transition">↺ Reintentar</button>'
+    );
+}
+
+// ── CARGAR HLS con reintentos por proxy ───────────────────────────────────────
+function cargarHLS(url, intentos) {
+    intentos = intentos || 0;
+    var video  = document.getElementById('hlsVideo');
+    var iframe = document.getElementById('iframeEmbed');
+    iframe.style.display = 'none'; iframe.src = '';
+    video.style.display  = 'block';
+
+    // Construir la URL a intentar
+    var target = intentos === 0 ? url : CORS_PROXIES[intentos - 1](url);
+    var label  = intentos === 0 ? 'directo' : 'proxy ' + intentos;
+    showSpinner('Conectando (' + label + ')...');
+
+    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+
+    if (Hls.isSupported()) {
+        hlsInstance = new Hls({ enableWorker: true, lowLatencyMode: true });
+        hlsInstance.loadSource(target);
+        hlsInstance.attachMedia(video);
+        hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
+            video.play().catch(function(){});
+            hideOverlay();
+        });
+        hlsInstance.on(Hls.Events.ERROR, function(e, data) {
+            if (data.fatal) {
+                hlsInstance.destroy(); hlsInstance = null;
+                if (intentos < CORS_PROXIES.length) {
+                    cargarHLS(url, intentos + 1);
+                } else {
+                    showError('Fallaron el stream directo y ' + CORS_PROXIES.length + ' proxies.');
+                }
+            }
+        });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Safari nativo
+        video.src = target;
+        video.play().catch(function(){});
+        hideOverlay();
+    } else {
+        showError('Tu navegador no soporta HLS.');
+    }
+}
+
+// ── CARGAR IFRAME ─────────────────────────────────────────────────────────────
+function cargarIframe(url) {
+    var video  = document.getElementById('hlsVideo');
+    var iframe = document.getElementById('iframeEmbed');
+    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+    video.style.display  = 'none';
+    iframe.style.display = 'block';
+    showSpinner('Cargando...');
+    iframe.src = url;
+    iframe.onload = function() { hideOverlay(); };
+}
+
+// ── CARGAR CANAL (despacha según type) ────────────────────────────────────────
+function cargarCanal(canal) {
+    if (!canal) return;
+    canalActual = canal;
+
+    // Actualizar info
+    document.getElementById('nombreCanal').innerText    = canal.nombre;
+    document.getElementById('categoriaCanal').innerText = canal.cat + ' · ' + canal.pais;
+    var img = document.getElementById('logoImg');
+    var lf  = document.getElementById('logoFallback');
+    img.style.display = ''; lf.style.display = 'none';
+    img.src = canal.logo;
+    lf.innerText = canal.nombre.charAt(0);
+    document.title = 'MovieM | ' + canal.nombre;
+
+    // Badge live
+    var lb = document.getElementById('liveBadge');
+    lb.classList.remove('hidden'); lb.classList.add('flex');
+
+    // Marcar card activo
+    document.querySelectorAll('.canal-card').forEach(function(el) {
+        el.classList.toggle('activo', el.dataset.id === canal.id);
+    });
+
+    // Señales alternativas
+    var sw = document.getElementById('senalesWrap');
+    if (canal.embed2) {
+        sw.classList.remove('hidden');
+        setAccentBtn(document.getElementById('btnSenal1'), true);
+        setAccentBtn(document.getElementById('btnSenal2'), false);
+    } else {
+        sw.classList.add('hidden');
+    }
+
+    // Despachar por tipo
+    if (canal.type === 'hls') {
+        cargarHLS(canal.url, 0);
+    } else {
+        cargarIframe(canal.url);
+    }
+}
+
+// ── CAMBIAR SEÑAL ─────────────────────────────────────────────────────────────
+function cambiarSenal(num) {
+    if (!canalActual || !canalActual.embed2) return;
+    var url = num === 1 ? canalActual.url : canalActual.embed2;
+    setAccentBtn(document.getElementById('btnSenal1'), num === 1);
+    setAccentBtn(document.getElementById('btnSenal2'), num === 2);
+    cargarIframe(url);
+}
+window.cambiarSenal = cambiarSenal;
+
+// ── FULLSCREEN ────────────────────────────────────────────────────────────────
+function toggleFullscreen() {
+    var wrap = document.getElementById('playerWrap');
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        (wrap.requestFullscreen || wrap.webkitRequestFullscreen).call(wrap);
+    } else {
+        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    }
+}
+window.toggleFullscreen = toggleFullscreen;
+
+// ── CATEGORIAS ────────────────────────────────────────────────────────────────
 function renderCategorias() {
     var wrap = document.getElementById('categorias');
     wrap.innerHTML = '';
     ['Todos'].concat(categorias).forEach(function(cat) {
         var btn = document.createElement('button');
-        btn.className = 'cat-btn shrink-0 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-white/10 text-zinc-400' + (cat === catActiva ? ' activo' : '');
+        btn.className = 'cat-btn shrink-0 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-white/10 text-zinc-400 transition';
+        if (cat === catActiva) btn.classList.add('activo');
         btn.innerText = cat;
         btn.onclick = function() {
             catActiva = cat;
-            document.querySelectorAll('.cat-btn').forEach(function(b){ b.classList.remove('activo'); });
+            document.querySelectorAll('.cat-btn').forEach(function(b) { b.classList.remove('activo'); });
             btn.classList.add('activo');
             filtrarCanales();
         };
@@ -206,19 +386,18 @@ function renderCategorias() {
     });
 }
 
-// ─── FILTRAR ──────────────────────────────────────────────────────────────────
+// ── FILTRAR ───────────────────────────────────────────────────────────────────
 function filtrarCanales() {
     var q = document.getElementById('searchInput').value.toLowerCase().trim();
     var lista = CANALES.filter(function(c) {
-        var okCat = catActiva === 'Todos' || c.cat === catActiva;
-        var okQ   = !q || c.nombre.toLowerCase().includes(q) || c.cat.toLowerCase().includes(q);
-        return okCat && okQ;
+        return (catActiva === 'Todos' || c.cat === catActiva)
+            && (!q || c.nombre.toLowerCase().includes(q) || c.cat.toLowerCase().includes(q));
     });
     document.getElementById('sidebarLabel').innerText = lista.length + ' canal' + (lista.length !== 1 ? 'es' : '');
     renderSidebar(lista);
 }
 
-// ─── SIDEBAR ──────────────────────────────────────────────────────────────────
+// ── SIDEBAR ───────────────────────────────────────────────────────────────────
 function renderSidebar(lista) {
     var sb = document.getElementById('sidebar');
     sb.innerHTML = '';
@@ -228,12 +407,15 @@ function renderSidebar(lista) {
     }
     lista.forEach(function(c) {
         var div = document.createElement('div');
-        div.className = 'canal-card flex items-center gap-3 bg-zinc-900/50 border border-white/5 rounded-2xl p-3 active:scale-95' + (canalActual && canalActual.id === c.id ? ' activo' : '');
+        div.className = 'canal-card flex items-center gap-3 bg-zinc-900/50 border border-white/5 rounded-2xl p-3 cursor-pointer transition-all hover:bg-zinc-800/90 hover:translate-x-0.5 active:scale-95'
+                      + (canalActual && canalActual.id === c.id ? ' activo' : '');
         div.dataset.id = c.id;
         div.onclick = function() { cargarCanal(c); };
         div.innerHTML =
             '<div class="w-10 h-10 rounded-xl overflow-hidden bg-white flex items-center justify-center p-1 shrink-0">'
-          +   '<img src="' + c.logo + '" class="max-w-full max-h-full object-contain" loading="lazy" onerror="this.style.opacity='0.3'">'
+          +   '<img src="' + c.logo + '" class="max-w-full max-h-full object-contain" loading="lazy"'
+          +   ' onerror="this.style.display='none';this.nextSibling.style.display='flex'">'
+          +   '<span style="display:none;align-items:center;justify-content:center;width:100%;height:100%;font-size:16px;font-weight:900;color:var(--accent-color)">' + c.nombre.charAt(0) + '</span>'
           + '</div>'
           + '<div class="flex-1 min-w-0">'
           +   '<p class="text-xs font-black uppercase tracking-tight truncate">' + c.pais + ' ' + c.nombre + '</p>'
@@ -244,139 +426,7 @@ function renderSidebar(lista) {
     });
 }
 
-// ─── OVERLAY ──────────────────────────────────────────────────────────────────
-function showSpinner(txt) {
-    document.getElementById('overlayContent').innerHTML =
-        '<svg class="spin w-10 h-10 text-accent mb-4" fill="none" viewBox="0 0 24 24">'
-      + '<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>'
-      + '<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>'
-      + '</svg>'
-      + '<p class="text-zinc-400 text-sm font-bold uppercase tracking-widest">' + (txt||'Conectando...') + '</p>';
-    document.getElementById('playerOverlayBox').classList.remove('oculto');
-}
-
-function showError(canal) {
-    var html =
-        '<svg class="w-12 h-12 text-zinc-700 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">'
-      + '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>'
-      + '</svg>'
-      + '<p class="text-zinc-300 text-sm mb-1 font-bold">Sin señal</p>'
-      + '<p class="text-zinc-600 text-xs mb-5 max-w-xs text-center">El canal está offline o bloqueado por CORS.<br>Se probaron el stream directo y 3 proxies.</p>'
-      + '<button onclick="cargarCanal(canalActual)" class="bg-zinc-800 hover:bg-accent border border-white/10 text-white px-6 py-2.5 rounded-full font-black text-xs uppercase tracking-widest transition">↺ Reintentar</button>';
-    document.getElementById('overlayContent').innerHTML = html;
-    document.getElementById('playerOverlayBox').classList.remove('oculto');
-}
-
-function hideOverlay() {
-    document.getElementById('playerOverlayBox').classList.add('oculto');
-}
-
-// ─── CARGAR CANAL — iframe directo ───────────────────────────────────────────
-function cargarCanal(canal) {
-    canalActual = canal;
-    document.getElementById('nombreCanal').innerText    = canal.nombre;
-    document.getElementById('categoriaCanal').innerText = canal.cat + ' · ' + canal.pais;
-    document.getElementById('logoImg').src              = canal.logo;
-    document.getElementById('logoImg').style.display     = '';
-    var lf = document.getElementById('logoFallback');
-    if (lf) { lf.style.display = 'none'; lf.innerText = canal.nombre.charAt(0); }
-    document.title = 'MovieM | ' + canal.nombre;
-    var lb = document.getElementById('liveBadge');
-    lb.classList.remove('hidden'); lb.classList.add('flex');
-    document.querySelectorAll('.canal-card').forEach(function(el) {
-        el.classList.toggle('activo', el.dataset.id === canal.id);
-    });
-
-    // ── Modo IPTV con Cloudflare Worker proxy ─────────────────────
-    if (canal.proxy && canal.stream) {
-        var proxyUrl = canal.proxy + '?url=' + encodeURIComponent(canal.stream);
-        var video = document.getElementById('hlsVideo');
-        var fr2 = document.getElementById('iframeEmbed');
-        fr2.style.display = 'none'; fr2.src = '';
-        video.style.display = 'block';
-        showSpinner('Conectando stream...');
-        if (typeof Hls !== 'undefined' && Hls.isSupported()) {
-            if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
-            hlsInstance = new Hls({ enableWorker: true, lowLatencyMode: true });
-            hlsInstance.loadSource(proxyUrl);
-            hlsInstance.attachMedia(video);
-            hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
-                video.play().catch(function(){});
-                hideOverlay();
-            });
-            hlsInstance.on(Hls.Events.ERROR, function(e, data) {
-                if (data.fatal) showError(canal);
-            });
-        } else if (video.canPlayType('video/mp2t') || video.canPlayType('application/vnd.apple.mpegurl')) {
-            video.src = proxyUrl;
-            video.play().catch(function(){});
-            hideOverlay();
-        } else {
-            showError(canal);
-        }
-        return;
-    }
-
-    // ── Modo embed iframe normal ───────────────────────────────────
-    if (!canal.embed) { showError(canal); return; }
-    showSpinner('Cargando...');
-    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
-    document.getElementById('hlsVideo').style.display = 'none';
-
-    // Mostrar/ocultar botones de señal alternativa
-    var senalesWrap = document.getElementById('senalesWrap');
-    if (canal.embed2) {
-        senalesWrap.style.display = 'block';
-        senalesWrap.classList.remove('hidden');
-        // Resetear botones: señal 1 activa
-        document.getElementById('btnSenal1').className = 'px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border transition active:scale-95 bg-accent border-accent text-white';
-        document.getElementById('btnSenal2').className = 'px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10 text-zinc-400 hover:border-accent hover:text-white transition active:scale-95';
-    } else {
-        senalesWrap.style.display = 'none';
-        senalesWrap.classList.add('hidden');
-    }
-
-    var fr = document.getElementById('iframeEmbed');
-    fr.src = canal.embed;
-    fr.style.display = 'block';
-    fr.onload = function() { hideOverlay(); };
-}
-
-// ─── CAMBIAR SEÑAL ────────────────────────────────────────────────────────────
-function cambiarSenal(num) {
-    if (!canalActual) return;
-    var url = num === 1 ? canalActual.embed : canalActual.embed2;
-    if (!url) return;
-    showSpinner('Cambiando señal...');
-    var fr = document.getElementById('iframeEmbed');
-    fr.src = url;
-    fr.onload = function() { hideOverlay(); };
-    // Actualizar estado de botones
-    var cls1 = num === 1
-        ? 'px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border transition active:scale-95 bg-accent border-accent text-white'
-        : 'px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10 text-zinc-400 hover:border-accent hover:text-white transition active:scale-95';
-    var cls2 = num === 2
-        ? 'px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border transition active:scale-95 bg-accent border-accent text-white'
-        : 'px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10 text-zinc-400 hover:border-accent hover:text-white transition active:scale-95';
-    document.getElementById('btnSenal1').className = cls1;
-    document.getElementById('btnSenal2').className = cls2;
-}
-window.cambiarSenal = cambiarSenal;
-
-// ─── FULLSCREEN ───────────────────────────────────────────────────────────────
-function toggleFullscreen() {
-    var wrap = document.getElementById('playerWrap');
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-        if (wrap.requestFullscreen) wrap.requestFullscreen();
-        else if (wrap.webkitRequestFullscreen) wrap.webkitRequestFullscreen();
-    } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-    }
-}
-window.toggleFullscreen = toggleFullscreen;
-
-// ─── INIT ─────────────────────────────────────────────────────────────────────
+// ── INIT ─────────────────────────────────────────────────────────────────────
 renderCategorias();
 filtrarCanales();
 </script>
