@@ -21,17 +21,11 @@
         .fade-in { animation: fi .5s ease forwards; opacity: 0; }
         @keyframes fi { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
-        /* ── Nivel / XP ── */
-        .xp-bar-track { background: rgba(255,255,255,.06); border-radius: 999px; overflow: hidden; height: 6px; }
-        .xp-bar-fill  { height: 100%; border-radius: 999px; background: var(--accent-color, #dc2626);
-                        transition: width 1.2s cubic-bezier(.4,0,0,1); }
-        /* ── Logros ── */
-        .logro-card { transition: transform .2s, box-shadow .2s; }
-        .logro-card:hover { transform: translateY(-2px); }
-        .logro-card.bloqueado { filter: grayscale(1); opacity: .35; }
-        /* ── Nivel badge animado ── */
-        @keyframes levelPop { 0%{transform:scale(1)} 40%{transform:scale(1.25)} 100%{transform:scale(1)} }
-        .level-pop { animation: levelPop .4s ease; }
+        .xp-bar-track { background:rgba(255,255,255,.06); border-radius:999px; overflow:hidden; height:6px; }
+        .xp-bar-fill  { height:100%; border-radius:999px; background:var(--accent,#dc2626); transition:width 1.2s cubic-bezier(.4,0,0,1); }
+        .logro-card   { transition:transform .2s; cursor:default; }
+        .logro-card:hover { transform:translateY(-2px); }
+        .logro-card.bloqueado { filter:grayscale(1); opacity:.35; }
     </style>
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden pb-24 md:pb-0">
@@ -239,22 +233,20 @@
         <aside class="space-y-6">
 
             <!-- Nivel & XP -->
-            <section id="secNivel" class="bg-zinc-900/30 p-5 rounded-2xl border border-white/5 shadow-lg hidden">
-                <div class="flex items-center gap-3 mb-4">
-                    <div id="nivelBadge" class="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-black shrink-0 shadow-lg" style="background:var(--accent-color,#dc2626)">1</div>
+            <section id="secNivel" class="hidden bg-zinc-900/30 p-5 rounded-2xl border border-white/5 shadow-lg">
+                <div class="flex items-center gap-3 mb-3">
+                    <div id="nivelBadge" class="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-black shrink-0 shadow-lg" style="background:var(--accent,#dc2626)">👁️</div>
                     <div class="flex-1 min-w-0">
-                        <p id="nivelNombre" class="text-xs font-black uppercase tracking-widest text-white truncate">Espectador</p>
-                        <p id="nivelXPLabel" class="text-[9px] text-zinc-500 font-bold uppercase tracking-widest mt-0.5">0 / 50 XP</p>
+                        <p id="nivelNombre" class="text-xs font-black uppercase tracking-widest text-white">Espectador</p>
+                        <p id="nivelXPLabel" class="text-[9px] text-zinc-500 font-bold mt-0.5">0 XP · Nivel 1</p>
                     </div>
                 </div>
-                <div class="xp-bar-track mb-1">
-                    <div id="xpBarFill" class="xp-bar-fill" style="width:0%"></div>
-                </div>
-                <p id="xpDetalle" class="text-[8px] text-zinc-600 uppercase tracking-widest font-bold mt-2">Calificá películas para ganar XP</p>
+                <div class="xp-bar-track mb-1"><div id="xpBarFill" class="xp-bar-fill" style="width:0%"></div></div>
+                <p id="xpDetalle" class="text-[8px] text-zinc-600 uppercase tracking-widest font-bold mt-1">Calificá películas para ganar XP</p>
             </section>
 
             <!-- Logros -->
-            <section id="secLogros" class="bg-zinc-900/30 p-5 rounded-2xl border border-white/5 shadow-lg hidden">
+            <section id="secLogros" class="hidden bg-zinc-900/30 p-5 rounded-2xl border border-white/5 shadow-lg">
                 <h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-4 italic">Logros</h3>
                 <div id="logrosGrid" class="grid grid-cols-3 gap-2"></div>
             </section>
@@ -449,7 +441,7 @@
         document.getElementById('contSeguidores').innerText = segs;
         document.getElementById('contSiguiendo').innerText = sig;
 
-        actoresLocal   = data.actores||[];
+        actoresLocal    = data.actores||[];
         directoresLocal = data.directores||[];
         favoritasLocal  = data.favoritas||[null,null,null,null];
 
@@ -487,7 +479,7 @@
         }
         renderizarActores();
         renderizarDirectores();
-        await cargarNivelYLogros(data);
+        cargarNivelYLogros(data);
         cargarComentarios();
     }
 
@@ -813,141 +805,6 @@
         }
     }
 
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // ── DIRECTORES FAVORITOS ─────────────────────────────────────────────────
-    // ─────────────────────────────────────────────────────────────────────────
-    function renderizarDirectores() {
-        var c = document.getElementById('directorCarousel');
-        if (!directoresLocal.length) {
-            c.innerHTML = '<div class="min-w-full h-full flex flex-col items-center justify-center gap-1 text-zinc-600 text-[9px] font-bold uppercase italic">'
-                + '<svg class="w-8 h-8 mb-1 text-zinc-800" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.361a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>'
-                + 'Sin directores</div>';
-            return;
-        }
-        c.innerHTML = directoresLocal.map(function(d) {
-            var src = d.foto && d.foto.startsWith('http') ? d.foto : 'https://image.tmdb.org/t/p/w200' + d.foto;
-            return '<div class="min-w-full flex flex-col items-center justify-center h-full">'
-                + '<div class="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 overflow-hidden mb-2 shadow-xl shrink-0" style="border-color:var(--accent-color,#dc2626)">'
-                +   '<img src="' + src + '" class="w-full h-full object-cover" loading="lazy"'
-                +   ' onerror="this.parentElement.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:20px;font-weight:900;color:var(--accent-color,#dc2626)\'>' + d.nombre.charAt(0) + '</div>'">'
-                + '</div>'
-                + '<p class="text-[9px] font-black text-white uppercase tracking-widest truncate w-full px-2 text-center">' + d.nombre + '</p>'
-                + '<p class="text-[8px] text-zinc-600 font-bold uppercase tracking-widest">Director</p>'
-                + (isMiPerfil ? '<button onclick="eliminarDirector()" class="text-[8px] text-zinc-600 mt-1 hover:text-red-500 uppercase font-bold">Quitar</button>' : '')
-                + '</div>';
-        }).join('');
-        document.getElementById('directorCarousel').style.transform = 'translateX(-' + (directorIndex * 100) + '%)';
-    }
-    window.eliminarDirector = async function() {
-        directoresLocal.splice(directorIndex, 1);
-        directorIndex = 0;
-        await guardarDato('directores', directoresLocal);
-        renderizarDirectores();
-    };
-    window.nextDirector = function() { directorIndex = directorIndex < directoresLocal.length - 1 ? directorIndex + 1 : 0; document.getElementById('directorCarousel').style.transform = 'translateX(-' + (directorIndex * 100) + '%)'; };
-    window.prevDirector = function() { directorIndex = directorIndex > 0 ? directorIndex - 1 : directoresLocal.length - 1; document.getElementById('directorCarousel').style.transform = 'translateX(-' + (directorIndex * 100) + '%)'; };
-    window.abrirBuscadorDirector = function() { tipoBusq = 'director'; mostrarModal('Agregar Director'); };
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // ── SISTEMA DE NIVELES Y LOGROS ──────────────────────────────────────────
-    // ─────────────────────────────────────────────────────────────────────────
-    var NIVELES = [
-        { nivel:1,  nombre:'Espectador',    xpMin:0,   xpMax:50,   emoji:'👁️'  },
-        { nivel:2,  nombre:'Cinéfilo',      xpMin:50,  xpMax:150,  emoji:'🎬'  },
-        { nivel:3,  nombre:'Crítico',       xpMin:150, xpMax:300,  emoji:'✍️'  },
-        { nivel:4,  nombre:'Guionista',     xpMin:300, xpMax:500,  emoji:'📝'  },
-        { nivel:5,  nombre:'Director',      xpMin:500, xpMax:800,  emoji:'🎥'  },
-        { nivel:6,  nombre:'Productor',     xpMin:800, xpMax:1200, emoji:'💼'  },
-        { nivel:7,  nombre:'Maestro',       xpMin:1200,xpMax:1800, emoji:'🏆'  },
-        { nivel:8,  nombre:'Leyenda',       xpMin:1800,xpMax:2500, emoji:'⭐'  },
-        { nivel:9,  nombre:'Icono',         xpMin:2500,xpMax:9999, emoji:'🌟'  },
-    ];
-
-    var LOGROS_DEF = [
-        { id:'primer_comentario', nombre:'Primer Aplauso',   desc:'Escribí tu primer comentario',        emoji:'💬', xp:10,  check: function(d){ return (d.totalComentarios||0) >= 1; } },
-        { id:'10_comentarios',    nombre:'Crítico Activo',   desc:'10 comentarios escritos',              emoji:'✍️', xp:25,  check: function(d){ return (d.totalComentarios||0) >= 10; } },
-        { id:'primer_favorita',   nombre:'Primera Joya',     desc:'Guardaste una película favorita',      emoji:'💎', xp:10,  check: function(d){ return (d.favoritas||[]).some(function(f){ return f!=null; }); } },
-        { id:'4_favoritas',       nombre:'Coleccionista',    desc:'4 películas favoritas guardadas',       emoji:'🗃️', xp:20,  check: function(d){ return (d.favoritas||[]).filter(function(f){ return f!=null; }).length >= 4; } },
-        { id:'primer_actor',      nombre:'Fan de Actores',   desc:'Agregaste tu primer actor favorito',   emoji:'⭐', xp:10,  check: function(d){ return (d.actores||[]).length >= 1; } },
-        { id:'primer_director',   nombre:'Fan de Directores','desc':'Agregaste tu primer director fav',   emoji:'🎬', xp:10,  check: function(d){ return (d.directores||[]).length >= 1; } },
-        { id:'seguidor',          nombre:'Social',           desc:'Seguís a alguien',                     emoji:'👥', xp:5,   check: function(d){ return (d.siguiendo||[]).length >= 1; } },
-        { id:'5_seguidores',      nombre:'Influencer',       desc:'5 personas te siguen',                 emoji:'📣', xp:30,  check: function(d){ return (d.seguidores||[]).length >= 5; } },
-        { id:'bio',               nombre:'Me Presento',      desc:'Agregaste una bio a tu perfil',        emoji:'📖', xp:5,   check: function(d){ return !!(d.bio && d.bio.trim()); } },
-        { id:'avatar',            nombre:'Cara Conocida',    desc:'Subiste una foto de perfil',           emoji:'🖼️', xp:5,   check: function(d){ return !!(d.avatar && d.avatar.startsWith('data:')||d.avatar&&d.avatar.startsWith('http')); } },
-        { id:'lista_10',          nombre:'Lista de Deseos',  desc:'10 títulos en tu lista',               emoji:'📋', xp:20,  check: function(d){ return ((d.watchlist||[]).length + (d.seriesWatchlist||[]).length) >= 10; } },
-    ];
-
-    async function calcularXP(data) {
-        // XP base: comentarios x5, favoritas x8, actores x5, directores x5, seguidores x3
-        var xp = 0;
-        xp += (data.totalComentarios || 0) * 5;
-        xp += (data.favoritas||[]).filter(function(f){ return f!=null; }).length * 8;
-        xp += (data.actores||[]).length * 5;
-        xp += (data.directores||[]).length * 5;
-        xp += Math.min((data.seguidores||[]).length, 50) * 3;
-        xp += (data.bio && data.bio.trim()) ? 10 : 0;
-        xp += (data.avatar) ? 10 : 0;
-        xp += ((data.watchlist||[]).length + (data.seriesWatchlist||[]).length) * 2;
-        // Logros desbloqueados suman su XP
-        LOGROS_DEF.forEach(function(l) {
-            if (l.check(data)) xp += l.xp;
-        });
-        return xp;
-    }
-
-    async function cargarNivelYLogros(data) {
-        var xp = await calcularXP(data);
-
-        // Encontrar nivel actual
-        var nivelData = NIVELES[0];
-        for (var i = NIVELES.length - 1; i >= 0; i--) {
-            if (xp >= NIVELES[i].xpMin) { nivelData = NIVELES[i]; break; }
-        }
-
-        // Mostrar sección
-        document.getElementById('secNivel').classList.remove('hidden');
-        document.getElementById('secLogros').classList.remove('hidden');
-
-        // Actualizar badge
-        var badge = document.getElementById('nivelBadge');
-        badge.textContent = nivelData.emoji;
-        badge.title = 'Nivel ' + nivelData.nivel;
-
-        document.getElementById('nivelNombre').textContent = nivelData.nombre;
-
-        var xpActual = xp - nivelData.xpMin;
-        var xpTotal  = nivelData.xpMax - nivelData.xpMin;
-        var pct      = nivelData.nivel === 9 ? 100 : Math.min(100, Math.round((xpActual / xpTotal) * 100));
-
-        document.getElementById('nivelXPLabel').textContent = xp + ' XP — Nivel ' + nivelData.nivel;
-        document.getElementById('xpDetalle').textContent = nivelData.nivel < 9
-            ? 'Faltan ' + (nivelData.xpMax - xp) + ' XP para ' + (NIVELES[nivelData.nivel] ? NIVELES[nivelData.nivel].nombre : 'el máximo')
-            : '¡Nivel máximo alcanzado!';
-
-        // Animar barra
-        setTimeout(function() {
-            document.getElementById('xpBarFill').style.width = pct + '%';
-        }, 300);
-
-        // Renderizar logros
-        var logrosGrid = document.getElementById('logrosGrid');
-        logrosGrid.innerHTML = '';
-        LOGROS_DEF.forEach(function(l) {
-            var desbloqueado = l.check(data);
-            var div = document.createElement('div');
-            div.className = 'logro-card ' + (desbloqueado ? '' : 'bloqueado')
-                + ' bg-zinc-900 border border-white/5 rounded-xl p-2 flex flex-col items-center gap-1 text-center cursor-default';
-            div.title = l.nombre + ': ' + l.desc;
-            div.innerHTML = '<span class="text-xl leading-none">' + l.emoji + '</span>'
-                + '<p class="text-[7px] font-black uppercase tracking-widest text-zinc-400 leading-tight">' + l.nombre + '</p>'
-                + (desbloqueado ? '<p class="text-[7px] text-accent font-bold">+' + l.xp + ' XP</p>' : '<p class="text-[7px] text-zinc-700 font-bold">Bloqueado</p>');
-            logrosGrid.appendChild(div);
-        });
-    }
-
-    // ─────────────────────────────────────────────────────────────────────────
-
     // Cerrar modal al tocar el fondo
     document.getElementById('modalSeguidos').addEventListener('click', function(e) {
         if (e.target === this) cerrarModalSeguidos();
@@ -1047,6 +904,122 @@ document.getElementById('modalEditarPerfil').addEventListener('click', function(
         };
     }, 100);
 })();
+
+    // ── DIRECTORES FAVORITOS ─────────────────────────────────────────────────
+    function renderizarDirectores() {
+        var c = document.getElementById('directorCarousel');
+        if (!directoresLocal.length) {
+            c.innerHTML = '<div class="min-w-full h-full flex items-center justify-center text-zinc-600 text-[9px] font-bold uppercase italic">Sin directores</div>';
+            return;
+        }
+        c.innerHTML = directoresLocal.map(function(d, i) {
+            var src = d.foto && d.foto.startsWith('http') ? d.foto : 'https://image.tmdb.org/t/p/w200' + d.foto;
+            return '<div class="min-w-full flex flex-col items-center justify-center h-full">'
+                + '<div class="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 overflow-hidden mb-2 shadow-xl shrink-0" style="border-color:var(--accent,#dc2626)">'
+                + '<img src="' + src + '" class="w-full h-full object-cover" loading="lazy">'
+                + '</div>'
+                + '<p class="text-[9px] font-black text-white uppercase tracking-widest truncate w-full px-2 text-center">' + d.nombre + '</p>'
+                + '<p class="text-[8px] text-zinc-600 font-bold uppercase tracking-widest">Director</p>'
+                + (isMiPerfil ? '<button onclick="eliminarDirector()" class="text-[8px] text-zinc-600 mt-1 hover:text-red-500 uppercase font-bold">Quitar</button>' : '')
+                + '</div>';
+        }).join('');
+        document.getElementById('directorCarousel').style.transform = 'translateX(-' + (directorIndex * 100) + '%)';
+    }
+    window.eliminarDirector = async function() {
+        directoresLocal.splice(directorIndex, 1);
+        directorIndex = 0;
+        await guardarDato('directores', directoresLocal);
+        renderizarDirectores();
+    };
+    window.nextDirector = function() {
+        directorIndex = directorIndex < directoresLocal.length - 1 ? directorIndex + 1 : 0;
+        document.getElementById('directorCarousel').style.transform = 'translateX(-' + (directorIndex * 100) + '%)';
+    };
+    window.prevDirector = function() {
+        directorIndex = directorIndex > 0 ? directorIndex - 1 : directoresLocal.length - 1;
+        document.getElementById('directorCarousel').style.transform = 'translateX(-' + (directorIndex * 100) + '%)';
+    };
+    window.abrirBuscadorDirector = function() { tipoBusq = 'director'; mostrarModal('Agregar Director'); };
+
+    // ── NIVELES Y LOGROS ─────────────────────────────────────────────────────
+    var NIVELES = [
+        {nivel:1, nombre:'Espectador',  emoji:'👁️',  xpMin:0,    xpMax:50   },
+        {nivel:2, nombre:'Cinéfilo',    emoji:'🎬',  xpMin:50,   xpMax:150  },
+        {nivel:3, nombre:'Crítico',     emoji:'✍️',  xpMin:150,  xpMax:300  },
+        {nivel:4, nombre:'Guionista',   emoji:'📝',  xpMin:300,  xpMax:500  },
+        {nivel:5, nombre:'Director',    emoji:'🎥',  xpMin:500,  xpMax:800  },
+        {nivel:6, nombre:'Productor',   emoji:'💼',  xpMin:800,  xpMax:1200 },
+        {nivel:7, nombre:'Maestro',     emoji:'🏆',  xpMin:1200, xpMax:1800 },
+        {nivel:8, nombre:'Leyenda',     emoji:'⭐',  xpMin:1800, xpMax:2500 },
+        {nivel:9, nombre:'Icono',       emoji:'🌟',  xpMin:2500, xpMax:9999 }
+    ];
+
+    var LOGROS = [
+        {id:'primer_comentario', nombre:'Primer Aplauso',   emoji:'💬', xp:10, desc:'Escribi tu primer comentario',      check:function(d){ return (d.totalComentarios||0)>=1; }},
+        {id:'diez_comentarios',  nombre:'Critico Activo',   emoji:'✍️', xp:25, desc:'10 comentarios escritos',            check:function(d){ return (d.totalComentarios||0)>=10; }},
+        {id:'primer_favorita',   nombre:'Primera Joya',     emoji:'💎', xp:10, desc:'Guardaste una pelicula favorita',    check:function(d){ return (d.favoritas||[]).some(function(f){return f!=null;}); }},
+        {id:'cuatro_favoritas',  nombre:'Coleccionista',    emoji:'🗃️', xp:20, desc:'4 peliculas favoritas guardadas',    check:function(d){ return (d.favoritas||[]).filter(function(f){return f!=null;}).length>=4; }},
+        {id:'primer_actor',      nombre:'Fan de Actores',   emoji:'⭐', xp:10, desc:'Agregaste tu primer actor favorito', check:function(d){ return (d.actores||[]).length>=1; }},
+        {id:'primer_director',   nombre:'Fan Directores',   emoji:'🎬', xp:10, desc:'Agregaste un director favorito',     check:function(d){ return (d.directores||[]).length>=1; }},
+        {id:'seguidor',          nombre:'Social',           emoji:'👥', xp:5,  desc:'Seguis a alguien',                   check:function(d){ return (d.siguiendo||[]).length>=1; }},
+        {id:'cinco_seguidores',  nombre:'Influencer',       emoji:'📣', xp:30, desc:'5 personas te siguen',               check:function(d){ return (d.seguidores||[]).length>=5; }},
+        {id:'bio',               nombre:'Me Presento',      emoji:'📖', xp:5,  desc:'Agregaste una bio',                  check:function(d){ return !!(d.bio&&d.bio.trim()); }},
+        {id:'avatar',            nombre:'Cara Conocida',    emoji:'🖼️', xp:5,  desc:'Subiste foto de perfil',             check:function(d){ return !!(d.avatar); }},
+        {id:'lista_diez',        nombre:'Lista de Deseos',  emoji:'📋', xp:20, desc:'10 titulos en tu lista',             check:function(d){ return ((d.watchlist||[]).length+(d.seriesWatchlist||[]).length)>=10; }}
+    ];
+
+    function calcularXP(data) {
+        var xp = 0;
+        xp += (data.totalComentarios||0) * 5;
+        xp += (data.favoritas||[]).filter(function(f){return f!=null;}).length * 8;
+        xp += (data.actores||[]).length * 5;
+        xp += (data.directores||[]).length * 5;
+        xp += Math.min((data.seguidores||[]).length, 50) * 3;
+        xp += (data.bio&&data.bio.trim()) ? 10 : 0;
+        xp += data.avatar ? 10 : 0;
+        xp += ((data.watchlist||[]).length + (data.seriesWatchlist||[]).length) * 2;
+        LOGROS.forEach(function(l){ if(l.check(data)) xp += l.xp; });
+        return xp;
+    }
+
+    function cargarNivelYLogros(data) {
+        try {
+            var xp = calcularXP(data);
+            var nivelData = NIVELES[0];
+            for (var i = NIVELES.length-1; i >= 0; i--) {
+                if (xp >= NIVELES[i].xpMin) { nivelData = NIVELES[i]; break; }
+            }
+            document.getElementById('secNivel').classList.remove('hidden');
+            document.getElementById('secLogros').classList.remove('hidden');
+            document.getElementById('nivelBadge').textContent = nivelData.emoji;
+            document.getElementById('nivelNombre').textContent = nivelData.nombre;
+            document.getElementById('nivelXPLabel').textContent = xp + ' XP · Nivel ' + nivelData.nivel;
+            var xpAct = xp - nivelData.xpMin;
+            var xpTot = nivelData.xpMax - nivelData.xpMin;
+            var pct   = nivelData.nivel===9 ? 100 : Math.min(100, Math.round(xpAct/xpTot*100));
+            document.getElementById('xpDetalle').textContent = nivelData.nivel<9
+                ? 'Faltan ' + (nivelData.xpMax-xp) + ' XP para ' + NIVELES[nivelData.nivel].nombre
+                : 'Nivel maximo alcanzado!';
+            setTimeout(function(){ document.getElementById('xpBarFill').style.width = pct+'%'; }, 400);
+
+            var grid = document.getElementById('logrosGrid');
+            grid.innerHTML = '';
+            LOGROS.forEach(function(l) {
+                var ok = l.check(data);
+                var div = document.createElement('div');
+                div.className = 'logro-card bg-zinc-900 border border-white/5 rounded-xl p-2 flex flex-col items-center gap-1 text-center' + (ok?'':' bloqueado');
+                div.title = l.nombre + ': ' + l.desc;
+                div.innerHTML = '<span class="text-xl leading-none">' + l.emoji + '</span>'
+                    + '<p class="text-[7px] font-black uppercase tracking-widest text-zinc-400 leading-tight">' + l.nombre + '</p>'
+                    + (ok ? '<p class="text-[7px] font-bold" style="color:var(--accent,#dc2626)">+' + l.xp + ' XP</p>'
+                          : '<p class="text-[7px] text-zinc-700 font-bold">Bloqueado</p>');
+                grid.appendChild(div);
+            });
+        } catch(e) {
+            console.warn('cargarNivelYLogros error:', e);
+        }
+    }
+
 </script>
 </body>
 </html>
