@@ -100,6 +100,15 @@
                 </button>
             </div>
 
+            <!-- Botones de señal alternativa -->
+            <div id="senalesWrap" class="hidden mb-4">
+                <p class="text-[9px] font-black uppercase tracking-[.25em] text-zinc-500 mb-2 flex items-center gap-2"><span class="w-4 h-px bg-accent inline-block"></span>Señales disponibles</p>
+                <div class="flex gap-2 flex-wrap">
+                    <button id="btnSenal1" onclick="cambiarSenal(1)" class="px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border transition active:scale-95 bg-accent border-accent text-white">📡 Señal 1</button>
+                    <button id="btnSenal2" onclick="cambiarSenal(2)" class="px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10 text-zinc-400 hover:border-accent hover:text-white transition active:scale-95">📡 Señal 2</button>
+                </div>
+            </div>
+
             <div class="bg-zinc-900/40 border border-white/5 rounded-xl px-4 py-3 flex gap-3 text-xs text-zinc-500 items-start">
                 <svg class="w-4 h-4 shrink-0 mt-0.5 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -159,11 +168,11 @@ var CANALES = [
      "embed":"https://hlsplayer.net/embed?type=m3u8&src=https://livetrx01.vodgc.net/eltrecetv/index.m3u8"},
     {"nombre":"TN","logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/TN_todo_noticias_logo.svg/2560px-TN_todo_noticias_logo.svg.png","cat":"Noticias","pais":"🇦🇷",
      "embed":"https://hlsplayer.net/embed?type=m3u8&src=https://live-01-01-tn.vodgc.net/TN24/index_TN24_1080.m3u8"},
-    {"nombre":"Canal IPTV","logo":"https://files.catbox.moe/finwuj.png","cat":"General","pais":"🇦🇷",
-     "stream":"http://mundo2.pro:80/live/Clienteehhdhd/73773hdhdh2/361001.ts",
-     "proxy":"https://iptv-proxy.matukwo.workers.dev"},
     {"nombre":"ESPN","logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/ESPN_wordmark.svg/2560px-ESPN_wordmark.svg.png","cat":"Deportes","pais":"🌎",
-     "embed":"https://nebunexa.life/cvatt.html?get=RVNQTjJIRA&lang=1"}
+     "embed":"https://nebunexa.life/cvatt.html?get=RVNQTjJIRA&lang=1"},
+    {"nombre":"TyC Sports","logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/TyC_Sports_logo.svg/2560px-TyC_Sports_logo.svg.png","cat":"Deportes","pais":"🇦🇷",
+     "embed":"https://www.nebunexa.life/cvatt.html?get=VHlDU3BvcnQ&lang=1",
+     "embed2":"https://nebunexa.life/tok.html?get=VHlDU3BvcnQ"}
 ];
 
 // ─── PROXIES CORS (reintentos automáticos si el stream directo falla) ─────────
@@ -309,11 +318,46 @@ function cargarCanal(canal) {
     showSpinner('Cargando...');
     if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
     document.getElementById('hlsVideo').style.display = 'none';
+
+    // Mostrar/ocultar botones de señal alternativa
+    var senalesWrap = document.getElementById('senalesWrap');
+    if (canal.embed2) {
+        senalesWrap.style.display = 'block';
+        senalesWrap.classList.remove('hidden');
+        // Resetear botones: señal 1 activa
+        document.getElementById('btnSenal1').className = 'px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border transition active:scale-95 bg-accent border-accent text-white';
+        document.getElementById('btnSenal2').className = 'px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10 text-zinc-400 hover:border-accent hover:text-white transition active:scale-95';
+    } else {
+        senalesWrap.style.display = 'none';
+        senalesWrap.classList.add('hidden');
+    }
+
     var fr = document.getElementById('iframeEmbed');
     fr.src = canal.embed;
     fr.style.display = 'block';
     fr.onload = function() { hideOverlay(); };
 }
+
+// ─── CAMBIAR SEÑAL ────────────────────────────────────────────────────────────
+function cambiarSenal(num) {
+    if (!canalActual) return;
+    var url = num === 1 ? canalActual.embed : canalActual.embed2;
+    if (!url) return;
+    showSpinner('Cambiando señal...');
+    var fr = document.getElementById('iframeEmbed');
+    fr.src = url;
+    fr.onload = function() { hideOverlay(); };
+    // Actualizar estado de botones
+    var cls1 = num === 1
+        ? 'px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border transition active:scale-95 bg-accent border-accent text-white'
+        : 'px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10 text-zinc-400 hover:border-accent hover:text-white transition active:scale-95';
+    var cls2 = num === 2
+        ? 'px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border transition active:scale-95 bg-accent border-accent text-white'
+        : 'px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10 text-zinc-400 hover:border-accent hover:text-white transition active:scale-95';
+    document.getElementById('btnSenal1').className = cls1;
+    document.getElementById('btnSenal2').className = cls2;
+}
+window.cambiarSenal = cambiarSenal;
 
 // ─── FULLSCREEN ───────────────────────────────────────────────────────────────
 function toggleFullscreen() {
