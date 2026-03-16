@@ -81,7 +81,8 @@
             <!-- Info canal -->
             <div class="flex items-center gap-4 mb-5">
                 <div class="w-14 h-14 rounded-2xl overflow-hidden bg-white flex items-center justify-center p-1.5 shrink-0 shadow-lg">
-                    <img id="logoImg" src="" alt="" class="max-w-full max-h-full object-contain">
+                    <img id="logoImg" src="" alt="" class="max-w-full max-h-full object-contain" onerror="this.style.display='none';document.getElementById('logoFallback').style.display='flex'">
+                    <span id="logoFallback" style="display:none;align-items:center;justify-content:center;width:100%;height:100%;font-size:22px;font-weight:900;color:#dc2626;"></span>
                 </div>
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 mb-0.5 flex-wrap">
@@ -113,7 +114,7 @@
                 <svg class="w-4 h-4 shrink-0 mt-0.5 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <span>Si el stream HLS falla, el canal carga automáticamente su embed de YouTube como respaldo. Los canales internacionales (DW, France 24) funcionan directo sin fallback.</span>
+                <span>Si algún servidor falla o no funciona, por favor reportar el problema.</span>
             </div>
         </div>
 
@@ -164,13 +165,13 @@ if (saved) document.documentElement.style.setProperty('--accent-color', saved);
 
 // ─── CANALES ─────────────────────────────────────────────────────────────────
 var CANALES = [
-    {"nombre":"El Trece","logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Canal_Trece_logo.svg/320px-Canal_Trece_logo.svg.png","cat":"General","pais":"🇦🇷",
+    {"nombre":"El Trece","logo":"https://logo.clearbit.com/eltrecetv.com.ar","cat":"General","pais":"🇦🇷",
      "embed":"https://hlsplayer.net/embed?type=m3u8&src=https://livetrx01.vodgc.net/eltrecetv/index.m3u8"},
-    {"nombre":"TN","logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/TN_todo_noticias_logo.svg/2560px-TN_todo_noticias_logo.svg.png","cat":"Noticias","pais":"🇦🇷",
+    {"nombre":"TN","logo":"https://logo.clearbit.com/tn.com.ar","cat":"Noticias","pais":"🇦🇷",
      "embed":"https://hlsplayer.net/embed?type=m3u8&src=https://live-01-01-tn.vodgc.net/TN24/index_TN24_1080.m3u8"},
-    {"nombre":"ESPN","logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/ESPN_wordmark.svg/2560px-ESPN_wordmark.svg.png","cat":"Deportes","pais":"🌎",
+    {"nombre":"ESPN","logo":"https://logo.clearbit.com/espn.com","cat":"Deportes","pais":"🌎",
      "embed":"https://nebunexa.life/cvatt.html?get=RVNQTjJIRA&lang=1"},
-    {"nombre":"TyC Sports","logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/TyC_Sports_logo.svg/2560px-TyC_Sports_logo.svg.png","cat":"Deportes","pais":"🇦🇷",
+    {"nombre":"TyC Sports","logo":"https://logo.clearbit.com/tycsports.com","cat":"Deportes","pais":"🇦🇷",
      "embed":"https://www.nebunexa.life/cvatt.html?get=VHlDU3BvcnQ&lang=1",
      "embed2":"https://nebunexa.life/tok.html?get=VHlDU3BvcnQ"}
 ];
@@ -232,7 +233,7 @@ function renderSidebar(lista) {
         div.onclick = function() { cargarCanal(c); };
         div.innerHTML =
             '<div class="w-10 h-10 rounded-xl overflow-hidden bg-white flex items-center justify-center p-1 shrink-0">'
-          +   '<img src="' + c.logo + '" class="max-w-full max-h-full object-contain" loading="lazy" onerror="this.style.display=\'none\'">'
+          +   '<img src="' + c.logo + '" class="max-w-full max-h-full object-contain" loading="lazy" onerror="this.style.opacity='0.3'">'
           + '</div>'
           + '<div class="flex-1 min-w-0">'
           +   '<p class="text-xs font-black uppercase tracking-tight truncate">' + c.pais + ' ' + c.nombre + '</p>'
@@ -276,6 +277,9 @@ function cargarCanal(canal) {
     document.getElementById('nombreCanal').innerText    = canal.nombre;
     document.getElementById('categoriaCanal').innerText = canal.cat + ' · ' + canal.pais;
     document.getElementById('logoImg').src              = canal.logo;
+    document.getElementById('logoImg').style.display     = '';
+    var lf = document.getElementById('logoFallback');
+    if (lf) { lf.style.display = 'none'; lf.innerText = canal.nombre.charAt(0); }
     document.title = 'MovieM | ' + canal.nombre;
     var lb = document.getElementById('liveBadge');
     lb.classList.remove('hidden'); lb.classList.add('flex');
