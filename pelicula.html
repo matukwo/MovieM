@@ -3,6 +3,53 @@
 <head>
 
 <script>
+
+    // ── Sistema de proxy anti-publicidad ─────────────────────────────────────
+    // Codifica cualquier URL de embed en base64 y la pasa por el player propio
+    // El player intermediario bloquea todos los scripts de publicidad del embed
+    var MOVIEM_PROXY_BASE = 'https://moviem-player.blogspot.com';
+
+    function proxyUrl(url) {
+        if (!url) return url;
+        // Si ya es una URL del proxy, no volver a encodear
+        if (url.includes('moviem-player.blogspot.com')) return url;
+        // Si es un video directo (.m3u8, .mp4), también pasar por el proxy para HLS limpio
+        try {
+            var encoded = btoa(unescape(encodeURIComponent(url)));
+            return MOVIEM_PROXY_BASE + '/?r=' + encoded;
+        } catch(e) {
+            return url; // fallback: usar URL original
+        }
+    }
+
+    // Sobrescribir el setter del iframe para interceptar cualquier src que se asigne
+    // y pasarlo por el proxy automáticamente
+    (function() {
+        var frame = document.getElementById('movieFrame');
+        if (!frame) return;
+        var _origSrc = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, 'src');
+        if (!_origSrc) return;
+
+        // Reactivar el shield al cambiar fuente
+        var _nativeSetter = _origSrc.set;
+        Object.defineProperty(frame, 'src', {
+            set: function(val) {
+                if (val && val !== '' && !val.includes('moviem-player.blogspot.com')) {
+                    val = proxyUrl(val);
+                }
+                _nativeSetter.call(this, val);
+                // Reactivar click shield
+                var shield = document.getElementById('clickShield');
+                if (shield && val) shield.style.display = 'flex';
+            },
+            get: function() {
+                return _origSrc.get.call(this);
+            },
+            configurable: true
+        });
+    })();
+    // ─────────────────────────────────────────────────────────────────────────
+
 // ── Click shield: elimina el overlay al primer click intencional ─────────────
 function activarPlayer() {
     var shield = document.getElementById('clickShield');
