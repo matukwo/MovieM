@@ -3,6 +3,30 @@
 <head>
 
 <script>
+// ── Click shield: elimina el overlay al primer click intencional ─────────────
+function activarPlayer() {
+    var shield = document.getElementById('clickShield');
+    if (shield) {
+        shield.style.display = 'none';
+        // Reaparecer el shield si cambia la fuente (para absorber el nuevo primer click)
+    }
+}
+// Reactivar el shield cada vez que se cambia de fuente/servidor
+var _origSetSrc = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, 'src');
+if (_origSetSrc) {
+    Object.defineProperty(HTMLIFrameElement.prototype, 'src', {
+        set: function(val) {
+            _origSetSrc.set.call(this, val);
+            if (this.id === 'movieFrame' && val) {
+                var shield = document.getElementById('clickShield');
+                if (shield) shield.style.display = 'flex';
+            }
+        },
+        get: function() { return _origSetSrc.get.call(this); }
+    });
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ── Bloqueador de popups y redirecciones maliciosas ───────────────────────────
 (function() {
     var blockedDomains = [
@@ -140,6 +164,12 @@
     </div>
     <div class="flex-1 bg-black relative">
         <iframe id="movieFrame" src="" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+        <!-- Overlay anti-popup: absorbe el primer click del iframe que abre tabs -->
+        <div id="clickShield" onclick="activarPlayer()" style="
+            position:absolute; inset:0; z-index:20; cursor:pointer;
+            display:flex; align-items:center; justify-content:center;
+            background:rgba(0,0,0,0.01);">
+        </div>
         <!-- Botón respaldo latino -->
         <div id="btnRespaldoWrap" class="hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-50">
             <button onclick="usarRespaldo()" class="bg-zinc-900/95 border border-yellow-500/30 text-yellow-400 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-xl active:scale-95 hover:bg-zinc-800 transition">
