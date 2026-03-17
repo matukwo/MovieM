@@ -295,9 +295,10 @@ async function crearNotif(para, tipo, datos) {
 function cargarChats() {
     const el = document.getElementById('mm-ll');
     el.innerHTML = '<p style="color:#52525b;font-size:11px;text-align:center;padding:40px 0;font-style:italic">Cargando...</p>';
-    if (unsubL) { unsubL(); unsubL = null; }
+    if (unsubL) { unsubL = null; }
     const q = query(collection(db,'chats'), where('participantes','array-contains',miUID), limit(30));
-    unsubL = onSnapshot(q, snap => {
+    // Lista de chats: getDocs (no necesita tiempo real, se refresca al abrir el panel)
+    getDocs(q).then(snap => {
         if (snap.empty) { el.innerHTML = '<p style="color:#52525b;font-size:11px;text-align:center;padding:40px 16px;font-style:italic">Sin conversaciones.<br><span style="font-size:10px">Visitá un perfil → Mensaje.</span></p>'; return; }
         const docs = [];
         snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
@@ -330,7 +331,7 @@ function cargarChats() {
             div.addEventListener('click', () => abrirChat(otro, nom, src));
             el.appendChild(div);
         });
-    }, err => { el.innerHTML = '<p style="color:#52525b;font-size:11px;text-align:center;padding:40px 0">Error: ' + (err.code||err.message) + '</p>'; console.error(err); });
+    }).catch(err => { el.innerHTML = '<p style="color:#52525b;font-size:11px;text-align:center;padding:40px 0">Error: ' + (err.code||err.message) + '</p>'; console.error(err); });
 }
 
 // ── Abrir chat ────────────────────────────────────────────────────────
