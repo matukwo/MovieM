@@ -1,117 +1,677 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MovieM - Extractor Pro</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <style>
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); }
-        #video-player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JSON Generator — TMDB</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Source+Code+Pro&display=swap" rel="stylesheet"/>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    :root {
+      --main: #2196F3;
+      --main-dark: #1565C0;
+      --dark1: #000;
+      --dark2: #1a1a1a;
+      --dark3: #222;
+      --border: #1d2021;
+      --accent: #2196F3;
+      --font-ui: "Oswald", sans-serif;
+      --font-code: "Source Code Pro", monospace;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--dark1);
+      font-family: var(--font-ui);
+    }
+
+    /* ── Layout ── */
+    .generator {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ── */
+    .get-data {
+      padding: 28px 24px;
+      border-right: 1px solid var(--border);
+      height: 100vh;
+      overflow-y: auto;
+      background: #0a0a0a;
+      position: sticky;
+      top: 0;
+    }
+
+    .get-data::-webkit-scrollbar { width: 4px; }
+    .get-data::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+    /* ── Brand header ── */
+    .main-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 30px;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--main) 0%, var(--main-dark) 100%);
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .brand-text {
+      line-height: 1.1;
+    }
+    .brand-text span {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      opacity: 0.45;
+      font-weight: 400;
+    }
+    .brand-text strong {
+      font-size: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+
+    /* ── Info boxes ── */
+    .info-box {
+      margin-bottom: 24px;
+    }
+
+    .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      opacity: 0.45;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    /* ── Type selector ── */
+    .tipo {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .tipo input[type="radio"] { display: none; }
+
+    .tipo label {
+      text-align: center;
+      font-size: 15px;
+      font-weight: 700;
+      background: var(--dark3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 13px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      font-family: var(--font-ui);
+    }
+
+    .tipo label:hover {
+      background: #2a2a2a;
+    }
+
+    .tipo input[type="radio"]:checked + label {
+      background: linear-gradient(135deg, var(--main) 0%, var(--main-dark) 100%);
+      border-color: rgba(255,255,255,0.1);
+    }
+
+    /* ── Inputs ── */
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 6px;
+      outline: none;
+      font-size: 16px;
+      background: var(--dark3);
+      color: #fff;
+      border: 1px solid transparent;
+      font-family: var(--font-ui);
+      transition: border-color 0.2s;
+    }
+
+    input[type="number"]::placeholder,
+    input[type="text"]::placeholder {
+      color: rgba(250,250,250,0.3);
+    }
+
+    input[type="number"]:focus,
+    input[type="text"]:focus {
+      border-color: var(--main);
+    }
+
+    /* Remove number input arrows */
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    input[type=number] { -moz-appearance: textfield; }
+
+    /* ── Season selector ── */
+    #season-selector {
+      display: none;
+    }
+
+    /* ── Generate button ── */
+    .btn-generate {
+      width: 100%;
+      background: linear-gradient(135deg, var(--main) 0%, var(--main-dark) 100%);
+      color: #fff;
+      padding: 14px 24px;
+      cursor: pointer;
+      border: none;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 6px;
+      font-family: var(--font-ui);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: opacity 0.2s, transform 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-generate:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-generate:active {
+      transform: translateY(0);
+    }
+
+    /* ── TMDB badge ── */
+    .tmdb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      padding: 10px 14px;
+      background: var(--dark2);
+      border-radius: 6px;
+      font-size: 12px;
+      opacity: 0.6;
+    }
+    .tmdb i { color: var(--main); }
+
+    /* ── Data preview ── */
+    .data-preview {
+      display: none;
+      grid-gap: 14px;
+      grid-template-columns: 90px 1fr;
+      align-items: start;
+      margin-top: 24px;
+      padding: 14px;
+      background: var(--dark2);
+      border-radius: 8px;
+      border: 1px solid #2a2a2a;
+    }
+
+    .data-preview img {
+      width: 100%;
+      border-radius: 6px;
+      object-fit: cover;
+      aspect-ratio: 2/3;
+    }
+
+    .general-info {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .general-info h2 {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.3;
+      word-wrap: break-word;
+    }
+
+    .general-info p {
+      font-size: 12px;
+      opacity: 0.6;
+      line-height: 1.4;
+    }
+
+    /* ── Output panel ── */
+    .final-js {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .output-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .output-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      opacity: 0.4;
+      font-weight: 600;
+    }
+
+    .btn-copy {
+      background: var(--dark3);
+      color: #fff;
+      padding: 8px 18px;
+      cursor: pointer;
+      border: 1px solid #333;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 5px;
+      font-family: var(--font-ui);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: auto;
+    }
+
+    .btn-copy:hover {
+      background: #2a2a2a;
+      border-color: #444;
+    }
+
+    .html-final {
+      display: block;
+      flex: 1;
+      min-height: calc(100vh - 130px);
+      overflow-y: scroll;
+      overflow-x: hidden;
+      background: var(--dark2);
+      border-radius: 8px;
+      padding: 20px;
+      color: rgba(255,255,255,0.75);
+      font-family: var(--font-code);
+      font-size: 13px;
+      line-height: 1.6;
+      border: 1px solid #1e1e1e;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .html-final::-webkit-scrollbar { width: 4px; }
+    .html-final::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+    /* Empty state */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 16px;
+      opacity: 0.2;
+      pointer-events: none;
+    }
+
+    .empty-state i {
+      font-size: 48px;
+    }
+
+    .empty-state p {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 20px 0;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 700px) {
+      .generator {
+        grid-template-columns: 1fr;
+      }
+      .get-data {
+        height: auto;
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .final-js {
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
-<body class="bg-zinc-950 text-white font-sans min-h-screen flex flex-col items-center p-6">
+<body>
 
-    <header class="mb-10 text-center">
-        <h1 class="text-4xl font-black tracking-tighter text-blue-500 italic">MOVIEM <span class="text-white">EXTRACTOR</span></h1>
-        <p class="text-zinc-500 text-sm">Limpia el video de publicidad y obtén el enlace directo</p>
-    </header>
+<div class="generator">
 
-    <main class="w-full max-w-4xl space-y-6">
-        <div class="glass p-6 rounded-2xl border border-white/10">
-            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 mb-2">URL del Video (Embed)</label>
-            <div class="flex gap-2">
-                <input type="text" id="urlInput" placeholder="Pega el link aquí (ej. gscdn.cam...)" 
-                    class="flex-1 bg-zinc-900 border border-white/10 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition">
-                <button onclick="procesarVideo()" id="btnExtraer"
-                    class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg font-bold text-sm transition active:scale-95">
-                    LIMPIAR VIDEO
-                </button>
-            </div>
-            <p id="status" class="mt-3 text-xs text-zinc-500 italic"></p>
-        </div>
+  <!-- ── SIDEBAR ── -->
+  <aside class="get-data">
 
-        <div id="playerContainer" class="hidden glass p-4 rounded-2xl border border-white/10 animate-pulse">
-            <video id="video-player" controls></video>
-            
-            <div class="mt-4 p-4 bg-black/40 rounded-lg">
-                <label class="block text-[10px] font-bold text-blue-400 uppercase mb-1">Enlace Directo Detectado:</label>
-                <div class="flex items-center gap-2">
-                    <input type="text" id="resultLink" readonly 
-                        class="w-full bg-transparent text-xs text-zinc-300 border-none focus:outline-none select-all">
-                    <button onclick="copyLink()" class="text-xs bg-white/10 px-3 py-1 rounded hover:bg-white/20">Copiar</button>
-                </div>
-            </div>
-        </div>
-    </main>
+    <div class="main-title">
+      <div class="brand-icon">
+        <i class="fa-solid fa-film"></i>
+      </div>
+      <div class="brand-text">
+        <span>TMDB</span>
+        <strong>JSON Generator</strong>
+      </div>
+    </div>
 
-    <script>
-        async function procesarVideo() {
-            const urlInput = document.getElementById('urlInput').value;
-            const status = document.getElementById('status');
-            const btn = document.getElementById('btnExtraer');
-            const playerContainer = document.getElementById('playerContainer');
-            const video = document.getElementById('video-player');
-            
-            if (!urlInput) return alert("Por favor, pega un link.");
+    <!-- Type selector -->
+    <div class="info-box">
+      <span class="label">Tipo de contenido</span>
+      <div class="tipo">
+        <input type="radio" id="movie" name="type" value="movie" checked/>
+        <label for="movie"><i class="fa-solid fa-clapperboard"></i> Película</label>
 
-            // Reset UI
-            status.innerText = "Analizando el sitio y saltando publicidad...";
-            btn.disabled = true;
-            playerContainer.classList.add('hidden');
+        <input type="radio" id="serie" name="type" value="serie"/>
+        <label for="serie"><i class="fa-solid fa-tv"></i> Serie</label>
+      </div>
+    </div>
 
+    <!-- ID input -->
+    <div class="info-box">
+      <span class="label">ID de TMDB</span>
+      <input
+        type="number"
+        id="numero"
+        placeholder="Ej: 550, 1396, 278…"
+      />
+    </div>
+
+    <!-- Season selector (series only) -->
+    <div class="info-box" id="season-selector">
+      <span class="label">Número de temporada</span>
+      <input
+        type="number"
+        id="numeroTemporada"
+        placeholder="Ej: 1"
+        value="1"
+        min="1"
+      />
+    </div>
+
+    <button class="btn-generate" onclick="generar()">
+      <i class="fa-solid fa-bolt"></i> Generar JSON
+    </button>
+
+    <div class="divider"></div>
+
+    <!-- Data preview -->
+    <div class="data-preview">
+      <img id="info-poster" src="" alt="Poster" style="display:none"/>
+      <div class="general-info">
+        <h2 id="info-title" style="display:none"></h2>
+        <p id="info-seasons" style="display:none"></p>
+        <p id="info-year" style="display:none"></p>
+      </div>
+    </div>
+
+    <div class="tmdb">
+      <i class="fa-solid fa-circle-info"></i>
+      Datos obtenidos via The Movie Database API
+    </div>
+
+  </aside>
+
+  <!-- ── OUTPUT PANEL ── -->
+  <main class="final-js">
+    <div class="output-header">
+      <span class="output-title">Resultado JSON</span>
+      <button class="btn-copy" id="copiar">
+        Copiar JSON <i class="fa-solid fa-copy"></i>
+      </button>
+    </div>
+
+    <pre class="html-final" id="html-final"><div class="empty-state">
+  <i class="fa-solid fa-code"></i>
+  <p>El JSON aparecerá aquí</p>
+</div></pre>
+  </main>
+
+</div>
+
+<script>
+// ── Inline generator.js ──
+
+let isSerie = document.getElementById('serie');
+let isMovie = document.getElementById('movie');
+
+let types = document.querySelectorAll('input[type=radio][name=type]');
+
+types.forEach(type => {
+    type.addEventListener('change', () =>{
+        if (type.value == "movie") {
+            document.getElementById('season-selector').style.display = "none";
+        } else if (type.value == "serie"){
+            document.getElementById('season-selector').style.display = "block";
+        }
+    })
+})
+
+const API_KEY = 'c71d55c790adcb0fa9ea6ebcbc9a61a7';
+const BASE_URL = 'https://api.themoviedb.org/3';
+const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p';
+
+function generarId(titulo) {
+    if (!titulo) return '';
+    return titulo
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+}
+
+function generar() {
+    let itemId = document.getElementById('numero').value;
+    let language = "es-MX";
+    let seasonNumber = document.getElementById('numeroTemporada').value;
+
+    const cargarDatos = async() => {
+        const template = document.getElementById('html-final');
+        const btnCopiar = document.getElementById('copiar');
+        const dataPreview = document.querySelector('.data-preview');
+
+        if (dataPreview) dataPreview.style.display = 'none';
+
+        const newBtnCopiar = btnCopiar.cloneNode(true);
+        btnCopiar.parentNode.replaceChild(newBtnCopiar, btnCopiar);
+
+        if (isSerie.checked) {
             try {
-                // Usamos un proxy para poder leer el HTML de la web de video
-                // Nota: 'allorigins' es un proxy gratuito para desarrollo
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(urlInput)}`;
-                const response = await fetch(proxyUrl);
-                const data = await response.json();
-                const html = data.contents;
+                const respuestaSerie = await fetch(`${BASE_URL}/tv/${itemId}?api_key=${API_KEY}&language=${language}`);
 
-                // Buscamos el patrón del .m3u8 en el código fuente
-                // Esta regex busca URLs que terminen en .m3u8 incluso si tienen tokens
-                const regexM3U8 = /"(https?:\/\/[^"]+\.m3u8[^"]*)"|'(https?:\/\/[^']+\.m3u8[^']*)'/g;
-                let matches = [];
-                let match;
-                while ((match = regexM3U8.exec(html)) !== null) {
-                    matches.push(match[1] || match[2]);
-                }
+                if (respuestaSerie.status === 200) {
+                    const datos = await respuestaSerie.json();
+                    const respuestaCredits = await fetch(`${BASE_URL}/tv/${itemId}/credits?api_key=${API_KEY}&language=${language}`);
+                    const credits = respuestaCredits.status === 200 ? await respuestaCredits.json() : { crew: [], cast: [] };
 
-                if (matches.length > 0) {
-                    const finalLink = matches[0].replace(/\\/g, ''); // Limpiar escapes de JS
-                    
-                    status.innerText = "¡Video extraído con éxito!";
-                    document.getElementById('resultLink').value = finalLink;
-                    playerContainer.classList.remove('hidden');
-                    
-                    // Cargar en el reproductor HLS
-                    if (Hls.isSupported()) {
-                        const hls = new Hls();
-                        hls.loadSource(finalLink);
-                        hls.attachMedia(video);
-                        hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-                    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                        video.src = finalLink;
-                        video.addEventListener('loadedmetadata', () => video.play());
+                    const categorias = datos.genres.map(genre => genre.name);
+                    const paises = datos.production_countries.map(country => country.name);
+                    const año = datos.first_air_date ? datos.first_air_date.slice(0, 4) : '';
+                    const creadores = datos.created_by ? datos.created_by.map(creator => creator.name) : [];
+                    const directores = credits.crew
+                        .filter(person => person.job === 'Director' || person.job === 'Executive Producer')
+                        .slice(0, 3)
+                        .map(person => person.name);
+                    const directoresFinal = creadores.length > 0 ? creadores : directores;
+                    const actores = credits.cast.slice(0, 10).map(actor => actor.name);
+
+                    const jsonData = {
+                        id: generarId(datos.name),
+                        titulo: datos.name,
+                        portada: datos.poster_path ? `${IMAGE_BASE_URL}/w500${datos.poster_path}` : '',
+                        banner: datos.backdrop_path ? `${IMAGE_BASE_URL}/w1280${datos.backdrop_path}` : '',
+                        categorias: categorias,
+                        descripcion: datos.overview || '',
+                        año: año,
+                        pais: paises,
+                        director: directoresFinal,
+                        actores: actores,
+                        calificacion: datos.vote_average ? parseFloat(datos.vote_average.toFixed(1)) : 0,
+                        videomp4: "video.mp4"
+                    };
+
+                    const jsonString = JSON.stringify(jsonData, null, 2);
+                    template.textContent = jsonString;
+
+                    const genPoster = document.getElementById('info-poster');
+                    const genTitle = document.getElementById('info-title');
+                    const genSeasons = document.getElementById('info-seasons');
+                    const genYear = document.getElementById('info-year');
+                    const dataPreviewEl = document.querySelector('.data-preview');
+
+                    if (dataPreviewEl) dataPreviewEl.style.display = 'grid';
+                    if (genPoster) {
+                        if (jsonData.portada) { genPoster.setAttribute('src', jsonData.portada); genPoster.style.display = 'block'; }
+                        else { genPoster.style.display = 'none'; }
                     }
+                    if (genTitle) { genTitle.innerText = jsonData.titulo || ''; genTitle.style.display = jsonData.titulo ? 'block' : 'none'; }
+                    if (genSeasons) {
+                        const seasonsText = datos.number_of_seasons + (datos.number_of_seasons === 1 ? ' Temporada' : ' Temporadas');
+                        genSeasons.innerText = seasonsText;
+                        genSeasons.style.display = datos.number_of_seasons ? 'block' : 'none';
+                    }
+                    if (genYear) { genYear.innerText = jsonData.año || ''; genYear.style.display = jsonData.año ? 'block' : 'none'; }
+
+                    newBtnCopiar.addEventListener('click', () => {
+                        navigator.clipboard.writeText(jsonString).then(() => {
+                            newBtnCopiar.innerHTML = '¡Copiado! <i class="fa-solid fa-check"></i>';
+                            setTimeout(() => { newBtnCopiar.innerHTML = 'Copiar JSON <i class="fa-solid fa-copy"></i>'; }, 2000);
+                        }).catch(err => console.error('Error al copiar:', err));
+                    });
+
+                } else if (respuestaSerie.status === 401) {
+                    template.textContent = 'Error: Clave API incorrecta';
+                    if (dataPreview) dataPreview.style.display = 'none';
+                } else if (respuestaSerie.status === 404) {
+                    template.textContent = 'Error: Serie no encontrada';
+                    if (dataPreview) dataPreview.style.display = 'none';
                 } else {
-                    status.innerText = "No se encontró el archivo de video. El sitio puede estar protegido.";
+                    template.textContent = `Error: ${respuestaSerie.status} - ${respuestaSerie.statusText}`;
+                    if (dataPreview) dataPreview.style.display = 'none';
                 }
             } catch (error) {
-                status.innerText = "Error de conexión con el servidor.";
+                template.textContent = `Error: ${error.message}`;
+                if (dataPreview) dataPreview.style.display = 'none';
                 console.error(error);
-            } finally {
-                btn.disabled = false;
+            }
+
+        } else if (isMovie.checked) {
+            try {
+                const respuestaPelicula = await fetch(`${BASE_URL}/movie/${itemId}?api_key=${API_KEY}&language=${language}`);
+
+                if (respuestaPelicula.status === 200) {
+                    const datos = await respuestaPelicula.json();
+                    const respuestaCredits = await fetch(`${BASE_URL}/movie/${itemId}/credits?api_key=${API_KEY}&language=${language}`);
+                    const credits = respuestaCredits.status === 200 ? await respuestaCredits.json() : { crew: [], cast: [] };
+
+                    const categorias = datos.genres.map(genre => genre.name);
+                    const paises = datos.production_countries.map(country => country.name);
+                    const año = datos.release_date ? datos.release_date.slice(0, 4) : '';
+                    const directores = credits.crew.filter(person => person.job === 'Director').map(person => person.name);
+                    const actores = credits.cast.slice(0, 10).map(actor => actor.name);
+
+                    const jsonData = {
+                        id: generarId(datos.title),
+                        titulo: datos.title,
+                        portada: datos.poster_path ? `${IMAGE_BASE_URL}/w500${datos.poster_path}` : '',
+                        banner: datos.backdrop_path ? `${IMAGE_BASE_URL}/w1280${datos.backdrop_path}` : '',
+                        categorias: categorias,
+                        descripcion: datos.overview || '',
+                        año: año,
+                        pais: paises,
+                        director: directores,
+                        actores: actores,
+                        calificacion: datos.vote_average ? parseFloat(datos.vote_average.toFixed(1)) : 0,
+                        videomp4: "video.mp4"
+                    };
+
+                    const jsonString = JSON.stringify(jsonData, null, 2);
+                    template.textContent = jsonString;
+
+                    const genPoster = document.getElementById('info-poster');
+                    const genTitle = document.getElementById('info-title');
+                    const genSeasons = document.getElementById('info-seasons');
+                    const genYear = document.getElementById('info-year');
+                    const dataPreviewEl = document.querySelector('.data-preview');
+
+                    if (dataPreviewEl) dataPreviewEl.style.display = 'grid';
+                    if (genPoster) {
+                        if (jsonData.portada) { genPoster.setAttribute('src', jsonData.portada); genPoster.style.display = 'block'; }
+                        else { genPoster.style.display = 'none'; }
+                    }
+                    if (genTitle) { genTitle.innerText = jsonData.titulo || ''; genTitle.style.display = jsonData.titulo ? 'block' : 'none'; }
+                    if (genSeasons) { genSeasons.innerText = ''; genSeasons.style.display = 'none'; }
+                    if (genYear) { genYear.innerText = jsonData.año || ''; genYear.style.display = jsonData.año ? 'block' : 'none'; }
+
+                    newBtnCopiar.addEventListener('click', () => {
+                        navigator.clipboard.writeText(jsonString).then(() => {
+                            newBtnCopiar.innerHTML = '¡Copiado! <i class="fa-solid fa-check"></i>';
+                            setTimeout(() => { newBtnCopiar.innerHTML = 'Copiar JSON <i class="fa-solid fa-copy"></i>'; }, 2000);
+                        }).catch(err => console.error('Error al copiar:', err));
+                    });
+
+                } else if (respuestaPelicula.status === 401) {
+                    template.textContent = 'Error: Clave API incorrecta';
+                    if (dataPreview) dataPreview.style.display = 'none';
+                } else if (respuestaPelicula.status === 404) {
+                    template.textContent = 'Error: Película no encontrada';
+                    if (dataPreview) dataPreview.style.display = 'none';
+                } else {
+                    template.textContent = `Error: ${respuestaPelicula.status} - ${respuestaPelicula.statusText}`;
+                    if (dataPreview) dataPreview.style.display = 'none';
+                }
+            } catch (error) {
+                template.textContent = `Error: ${error.message}`;
+                if (dataPreview) dataPreview.style.display = 'none';
+                console.error(error);
             }
         }
+    }
 
-        function copyLink() {
-            const copyText = document.getElementById("resultLink");
-            copyText.select();
-            document.execCommand("copy");
-            alert("Enlace copiado al portapapeles");
-        }
-    </script>
+    cargarDatos();
+}
+</script>
+
 </body>
 </html>
