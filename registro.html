@@ -1,1 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieM - Extractor Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); }
+        #video-player { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; }
+    </style>
+</head>
+<body class="bg-zinc-950 text-white font-sans min-h-screen flex flex-col items-center p-6">
 
+    <header class="mb-10 text-center">
+        <h1 class="text-4xl font-black tracking-tighter text-blue-500 italic">MOVIEM <span class="text-white">EXTRACTOR</span></h1>
+        <p class="text-zinc-500 text-sm">Limpia el video de publicidad y obtén el enlace directo</p>
+    </header>
+
+    <main class="w-full max-w-4xl space-y-6">
+        <div class="glass p-6 rounded-2xl border border-white/10">
+            <label class="block text-xs font-bold uppercase tracking-widest text-zinc-400 mb-2">URL del Video (Embed)</label>
+            <div class="flex gap-2">
+                <input type="text" id="urlInput" placeholder="Pega el link aquí (ej. gscdn.cam...)" 
+                    class="flex-1 bg-zinc-900 border border-white/10 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition">
+                <button onclick="procesarVideo()" id="btnExtraer"
+                    class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg font-bold text-sm transition active:scale-95">
+                    LIMPIAR VIDEO
+                </button>
+            </div>
+            <p id="status" class="mt-3 text-xs text-zinc-500 italic"></p>
+        </div>
+
+        <div id="playerContainer" class="hidden glass p-4 rounded-2xl border border-white/10 animate-pulse">
+            <video id="video-player" controls></video>
+            
+            <div class="mt-4 p-4 bg-black/40 rounded-lg">
+                <label class="block text-[10px] font-bold text-blue-400 uppercase mb-1">Enlace Directo Detectado:</label>
+                <div class="flex items-center gap-2">
+                    <input type="text" id="resultLink" readonly 
+                        class="w-full bg-transparent text-xs text-zinc-300 border-none focus:outline-none select-all">
+                    <button onclick="copyLink()" class="text-xs bg-white/10 px-3 py-1 rounded hover:bg-white/20">Copiar</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        async function procesarVideo() {
+            const urlInput = document.getElementById('urlInput').value;
+            const status = document.getElementById('status');
+            const btn = document.getElementById('btnExtraer');
+            const playerContainer = document.getElementById('playerContainer');
+            const video = document.getElementById('video-player');
+            
+            if (!urlInput) return alert("Por favor, pega un link.");
+
+            // Reset UI
+            status.innerText = "Analizando el sitio y saltando publicidad...";
+            btn.disabled = true;
+            playerContainer.classList.add('hidden');
+
+            try {
+                // Usamos un proxy para poder leer el HTML de la web de video
+                // Nota: 'allorigins' es un proxy gratuito para desarrollo
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(urlInput)}`;
+                const response = await fetch(proxyUrl);
+                const data = await response.json();
+                const html = data.contents;
+
+                // Buscamos el patrón del .m3u8 en el código fuente
+                // Esta regex busca URLs que terminen en .m3u8 incluso si tienen tokens
+                const regexM3U8 = /"(https?:\/\/[^"]+\.m3u8[^"]*)"|'(https?:\/\/[^']+\.m3u8[^']*)'/g;
+                let matches = [];
+                let match;
+                while ((match = regexM3U8.exec(html)) !== null) {
+                    matches.push(match[1] || match[2]);
+                }
+
+                if (matches.length > 0) {
+                    const finalLink = matches[0].replace(/\\/g, ''); // Limpiar escapes de JS
+                    
+                    status.innerText = "¡Video extraído con éxito!";
+                    document.getElementById('resultLink').value = finalLink;
+                    playerContainer.classList.remove('hidden');
+                    
+                    // Cargar en el reproductor HLS
+                    if (Hls.isSupported()) {
+                        const hls = new Hls();
+                        hls.loadSource(finalLink);
+                        hls.attachMedia(video);
+                        hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+                    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                        video.src = finalLink;
+                        video.addEventListener('loadedmetadata', () => video.play());
+                    }
+                } else {
+                    status.innerText = "No se encontró el archivo de video. El sitio puede estar protegido.";
+                }
+            } catch (error) {
+                status.innerText = "Error de conexión con el servidor.";
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function copyLink() {
+            const copyText = document.getElementById("resultLink");
+            copyText.select();
+            document.execCommand("copy");
+            alert("Enlace copiado al portapapeles");
+        }
+    </script>
+</body>
+</html>
