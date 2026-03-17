@@ -295,15 +295,30 @@ window.cerrarSesion=async function(){await signOut(auth);notificar('Sesion cerra
 
 onAuthStateChanged(auth,async function(user){
   if(user){
-    var snap=await getDoc(doc(db,'usuarios',user.uid)),data=snap.exists()?snap.data():{};
+    var data = {};
+    var PROFILE_KEY = 'movieM_profile_' + user.uid;
+    try {
+      var raw = sessionStorage.getItem(PROFILE_KEY);
+      if (raw) { data = JSON.parse(raw); }
+    } catch(e) {}
+    if (!data.username) {
+      var snap=await getDoc(doc(db,'usuarios',user.uid));
+      data=snap.exists()?snap.data():{};
+      try { sessionStorage.setItem(PROFILE_KEY, JSON.stringify(data)); } catch(e) {}
+    }
     var nombre=data.username||user.email.split('@')[0];
     var storedUID=localStorage.getItem('movieM_uid');
-    if(storedUID&&storedUID!==user.uid)localStorage.removeItem('movieM_avatar');
+    if(storedUID&&storedUID!==user.uid){localStorage.removeItem('movieM_avatar');sessionStorage.removeItem(PROFILE_KEY);}
     localStorage.setItem('movieM_uid',user.uid);localStorage.setItem('usuarioMovieM',nombre);
     var color=data.color||localStorage.getItem('movieM_color')||'#dc2626';
     document.documentElement.style.setProperty('--accent-color',color);
     setAvatarUI(nombre,data.avatar||null);
     cargarContinuar(user);
+    if (!document.querySelector('script[src="notif-chat.js"]')) {
+        var s = document.createElement('script');
+        s.type = 'module'; s.src = 'notif-chat.js';
+        document.body.appendChild(s);
+    }
   } else {
     document.getElementById('contenidoLogin').classList.remove('hidden');
     document.getElementById('perfilActivo').classList.add('hidden');
@@ -498,14 +513,27 @@ function iniciarSlider() {
 }
 
 async function cargarSeccion(url, id) {
+  const CACHE_KEY = 'movieM_tmdb_' + id;
+  const CACHE_TTL = 10 * 60 * 1000;
   try {
-    const r = await fetch(url);
-    const d = await r.json();
+    let results = null;
+    try {
+      const raw = localStorage.getItem(CACHE_KEY);
+      if (raw) {
+        const { data, ts } = JSON.parse(raw);
+        if (Date.now() - ts < CACHE_TTL) results = data;
+      }
+    } catch(e) {}
+    if (!results) {
+      const r = await fetch(url);
+      const d = await r.json();
+      results = d.results || [];
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ data: results, ts: Date.now() })); } catch(e) {}
+    }
     const c = document.getElementById(id);
-    if (d.results) d.results.forEach(p => c.appendChild(crearCard(p)));
-    // Alimentar el slider con tendencias
-    if (id === 'tendencias' && d.results && d.results.length) {
-        peliculasSlider = d.results;
+    if (c && results.length) results.forEach(p => c.appendChild(crearCard(p)));
+    if (id === 'tendencias' && results.length) {
+        peliculasSlider = results;
         iniciarSlider();
     }
   } catch(e) { console.error(e); }
@@ -542,11 +570,17 @@ async function cargarContinuar(user) {
     sec.classList.remove('hidden');
     fila.innerHTML = '';
 
-    for (const item of items) {
+    const itemsSeries = items.filter(it => it.tipo === 'serie');
+    const itemsPelis  = items.filter(it => it.tipo !== 'serie');
+    const seriesData = await Promise.all(
+      itemsSeries.map(item =>
+        fetch(`https://api.themoviedb.org/3/tv/${item.contentId}?api_key=${API_KEY}&language=es-MX`)
+          .then(r => r.json()).catch(() => null)
+      )
+    );
+    itemsSeries.forEach((item, i) => {
       try {
-        if (item.tipo === 'serie') {
-          const r = await fetch(`https://api.themoviedb.org/3/tv/${item.contentId}?api_key=${API_KEY}&language=es-MX`);
-          const s = await r.json();
+        const s = seriesData[i];
           if (!s.poster_path) continue;
           const card = document.createElement('a');
           card.href = 'serie.html?id='+item.contentId;
@@ -561,8 +595,11 @@ async function cargarContinuar(user) {
             <p class="text-[9px] md:text-[10px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 mt-2">${s.name || item.nombre || ''}</p>
           `;
           fila.appendChild(card);
-        } else {
-          // Películas: usar titulo y poster guardados en Firestore — sin llamar a TMDB
+      } catch(e) { console.error('card error serie:', e); }
+    });
+    itemsPelis.forEach(item => {
+      try {
+        {
           const poster = item.poster || '';
           const titulo = item.titulo || '';
           const pct = Math.round(item.porcentaje || 0);
@@ -581,8 +618,8 @@ async function cargarContinuar(user) {
           `;
           fila.appendChild(card);
         }
-      } catch(e) { console.error('card error:', e); }
-    }
+      } catch(e) { console.error('card error peli:', e); }
+    });
     if (!fila.children.length) sec.classList.add('hidden');
   } catch(e) { console.error('cargarContinuar:', e); }
 }
@@ -745,6 +782,6 @@ lazySeccion('random', () =>
     cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&sort_by=vote_average.desc&vote_count.gte=1000&page='+Math.ceil(Math.random()*5)+'&language=es-MX', 'random')
 );
 </script>
-<script type="module" src="notif-chat.js"></script>
+<!-- notif-chat se carga solo si hay usuario -->
 </body>
 </html>
