@@ -38,9 +38,7 @@
                     val = proxyUrl(val);
                 }
                 _nativeSetter.call(this, val);
-                // Reactivar click shield
-                var shield = document.getElementById('clickShield');
-                if (shield && val) shield.style.display = 'flex';
+                // sandbox bloquea popups nativamente
             },
             get: function() {
                 return _origSrc.get.call(this);
@@ -50,27 +48,9 @@
     })();
     // ─────────────────────────────────────────────────────────────────────────
 
-// ── Click shield: elimina el overlay al primer click intencional ─────────────
+// ── Shield simplificado: el sandbox del iframe hace el trabajo principal ─────
 function activarPlayer() {
-    var shield = document.getElementById('clickShield');
-    if (shield) {
-        shield.style.display = 'none';
-        // Reaparecer el shield si cambia la fuente (para absorber el nuevo primer click)
-    }
-}
-// Reactivar el shield cada vez que se cambia de fuente/servidor
-var _origSetSrc = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, 'src');
-if (_origSetSrc) {
-    Object.defineProperty(HTMLIFrameElement.prototype, 'src', {
-        set: function(val) {
-            _origSetSrc.set.call(this, val);
-            if (this.id === 'movieFrame' && val) {
-                var shield = document.getElementById('clickShield');
-                if (shield) shield.style.display = 'flex';
-            }
-        },
-        get: function() { return _origSetSrc.get.call(this); }
-    });
+    // Ya no necesitamos lógica especial — el sandbox bloquea popups nativamente
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -210,12 +190,14 @@ if (_origSetSrc) {
         <button onclick="cerrarPelicula()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/5 shrink-0">Cerrar x</button>
     </div>
     <div class="flex-1 bg-black relative">
-        <iframe id="movieFrame" src="" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media"></iframe>
-        <!-- Overlay anti-popup: absorbe el primer click del iframe que abre tabs -->
-        <div id="clickShield" onclick="activarPlayer()" style="
+        <iframe id="movieFrame" src="" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-modals"></iframe>
+        <!-- Shield anti-popup: capa permanente con botón play -->
+        <div id="clickShield" style="
             position:absolute; inset:0; z-index:20; cursor:pointer;
             display:flex; align-items:center; justify-content:center;
-            background:rgba(0,0,0,0.01);">
+            background:transparent; pointer-events:none;">
+            <!-- El shield es transparente y no intercepta clicks en modo activo -->
         </div>
         <!-- Botón respaldo latino -->
         <div id="btnRespaldoWrap" class="hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-50">
@@ -930,7 +912,7 @@ if (_origSetSrc) {
 
         window.usarRespaldo = function() {
             if (!_latinoUrl2) return;
-            document.getElementById('movieFrame').src = _latinoUrl2;
+            document.getElementById('movieFrame').src = proxyUrl(_latinoUrl2);
             document.getElementById('btnRespaldoWrap').classList.add('hidden');
         };
 
@@ -952,11 +934,11 @@ if (_origSetSrc) {
                 subBtn.className = base + ' bg-white/10 border-white/20 text-white';
                 latBtn.className = base + ' border-white/10 text-white/40 hover:text-yellow-400';
                 respaldoWrap.classList.add('hidden');
-                document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
+                document.getElementById('movieFrame').src = proxyUrl(`https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`);
             } else {
                 latBtn.className = base + ' bg-yellow-500/20 border-yellow-500/50 text-yellow-400';
                 subBtn.className = base + ' border-white/10 text-white/40 hover:text-white';
-                document.getElementById('movieFrame').src = _latinoUrl;
+                document.getElementById('movieFrame').src = proxyUrl(_latinoUrl);
                 if (_latinoUrl2) respaldoWrap.classList.remove('hidden');
             }
         };
@@ -967,7 +949,7 @@ if (_origSetSrc) {
             if (!latBtn.classList.contains('hidden')) {
                 latBtn.className = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400';
             }
-            document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
+            document.getElementById('movieFrame').src = proxyUrl(`https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`);
             document.getElementById('playerOverlay').style.display = 'flex';
             document.body.style.overflow = "hidden";
             progresoInicio = Date.now();
