@@ -1,162 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
-<script>
-
-    // ── Sistema de proxy anti-publicidad ─────────────────────────────────────
-    // Codifica cualquier URL de embed en base64 y la pasa por el player propio
-    // El player intermediario bloquea todos los scripts de publicidad del embed
-    var MOVIEM_PROXY_BASE = 'https://moviem-player.blogspot.com';
-
-    function proxyUrl(url) {
-        if (!url) return url;
-        // Si ya es una URL del proxy, no volver a encodear
-        if (url.includes('moviem-player.blogspot.com')) return url;
-        // Si es un video directo (.m3u8, .mp4), también pasar por el proxy para HLS limpio
-        try {
-            var encoded = btoa(unescape(encodeURIComponent(url)));
-            return MOVIEM_PROXY_BASE + '/?r=' + encoded;
-        } catch(e) {
-            return url; // fallback: usar URL original
-        }
-    }
-
-    // Sobrescribir el setter del iframe para interceptar cualquier src que se asigne
-    // y pasarlo por el proxy automáticamente
-    (function() {
-        var frame = document.getElementById('movieFrame');
-        if (!frame) return;
-        var _origSrc = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, 'src');
-        if (!_origSrc) return;
-
-        // Reactivar el shield al cambiar fuente
-        var _nativeSetter = _origSrc.set;
-        Object.defineProperty(frame, 'src', {
-            set: function(val) {
-                if (val && val !== '' && !val.includes('moviem-player.blogspot.com')) {
-                    val = proxyUrl(val);
-                }
-                _nativeSetter.call(this, val);
-                // sandbox bloquea popups nativamente
-            },
-            get: function() {
-                return _origSrc.get.call(this);
-            },
-            configurable: true
-        });
-    })();
-    // ─────────────────────────────────────────────────────────────────────────
-
-// ── Shield simplificado: el sandbox del iframe hace el trabajo principal ─────
-function activarPlayer() {
-    // Ya no necesitamos lógica especial — el sandbox bloquea popups nativamente
-}
-// ─────────────────────────────────────────────────────────────────────────────
-
-// ── Bloqueador de popups y redirecciones maliciosas ───────────────────────────
-(function() {
-    var blockedDomains = [
-        'cdn.pla3.com', 'cdn.pmuls.com', 'cdn.aucey.com',
-        'g0st.com', 'personal-sexy-survey.com', '1xlite-69889.bar',
-        'acscdn.com', 'aclib.js', 'go.ad2up.com',
-        'popads.net', 'popcash.net', 'propellerads.com',
-        'adsterra.com', 'hilltopads.net', 'trafficjunky.com',
-        'exoclick.com', 'juicyads.com', 'plugrush.com',
-        'trafficfactory.biz', 'realsrv.com', 'adbull.me',
-        'pornhub.com', 'xvideos.com', 'xhamster.com'
-    ];
-
-    function isBlocked(url) {
-        try {
-            var u = new URL(url, location.href);
-            return blockedDomains.some(function(d) {
-                return u.hostname.includes(d) || u.href.includes(d);
-            });
-        } catch(e) { return false; }
-    }
-
-    // Bloquear window.open (popups)
-    var _open = window.open;
-    window.open = function(url, name, specs) {
-        if (!url || isBlocked(url)) {
-            console.warn('[BLOQUEADO popup]', url);
-            return null;
-        }
-        return _open.call(window, url, name, specs);
-    };
-
-    // Bloquear location.assign
-    var _assign = window.location.assign.bind(window.location);
-    window.location.assign = function(url) {
-        if (isBlocked(url)) { console.warn('[BLOQUEADO assign]', url); return; }
-        return _assign(url);
-    };
-
-    // Bloquear location.replace
-    var _replace = window.location.replace.bind(window.location);
-    window.location.replace = function(url) {
-        if (isBlocked(url)) { console.warn('[BLOQUEADO replace]', url); return; }
-        return _replace(url);
-    };
-
-    // Bloquear location.href
-    try {
-        Object.defineProperty(window.location, 'href', {
-            set: function(url) {
-                if (isBlocked(url)) { console.warn('[BLOQUEADO href]', url); return; }
-                window.location.assign(url);
-            }
-        });
-    } catch(e) {}
-
-    // MutationObserver: elimina iframes/scripts de dominios bloqueados
-    // que se inyecten dinámicamente (típico de ads de embeds)
-    var observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            mutation.addedNodes.forEach(function(node) {
-                if (!node.tagName) return;
-                var tag = node.tagName.toUpperCase();
-                if (tag === 'IFRAME' || tag === 'SCRIPT') {
-                    var src = node.src || node.getAttribute('src') || '';
-                    if (isBlocked(src)) {
-                        console.warn('[BLOQUEADO DOM]', src);
-                        node.remove();
-                        return;
-                    }
-                }
-                // Bloquear también popunders via innerHTML
-                if (tag === 'DIV' || tag === 'SPAN') {
-                    var iframes = node.querySelectorAll('iframe, script');
-                    iframes.forEach(function(el) {
-                        var s = el.src || '';
-                        if (isBlocked(s)) {
-                            console.warn('[BLOQUEADO sub-DOM]', s);
-                            el.remove();
-                        }
-                    });
-                }
-            });
-        });
-    });
-    observer.observe(document.documentElement, { childList: true, subtree: true });
-
-    // Bloquear clicks que abren nuevas pestañas en dominios bloqueados
-    document.addEventListener('click', function(e) {
-        var el = e.target.closest('a[target="_blank"], a[target="new"]');
-        if (el) {
-            var href = el.href || '';
-            if (isBlocked(href)) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.warn('[BLOQUEADO click]', href);
-            }
-        }
-    }, true);
-
-})();
-</script>
-
     <meta charset="UTF-8">
     <link rel="icon" type="image/png" href="data:image/png;base64,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">
 
@@ -190,15 +34,7 @@ function activarPlayer() {
         <button onclick="cerrarPelicula()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/5 shrink-0">Cerrar x</button>
     </div>
     <div class="flex-1 bg-black relative">
-        <iframe id="movieFrame" src="" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-modals"></iframe>
-        <!-- Shield anti-popup: capa permanente con botón play -->
-        <div id="clickShield" style="
-            position:absolute; inset:0; z-index:20; cursor:pointer;
-            display:flex; align-items:center; justify-content:center;
-            background:transparent; pointer-events:none;">
-            <!-- El shield es transparente y no intercepta clicks en modo activo -->
-        </div>
+        <iframe id="movieFrame" src="" class="w-full h-full" allowfullscreen allow="autoplay; encrypted-media"></iframe>
         <!-- Botón respaldo latino -->
         <div id="btnRespaldoWrap" class="hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-50">
             <button onclick="usarRespaldo()" class="bg-zinc-900/95 border border-yellow-500/30 text-yellow-400 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-xl active:scale-95 hover:bg-zinc-800 transition">
@@ -492,7 +328,7 @@ function activarPlayer() {
                         <p class="text-[8px] text-zinc-600 truncate italic px-1">${actor.character}</p>
                     </div>`).join('');
 
-                escucharComentariosNube(true); 
+                escucharComentariosNube(); 
                 checkStatus();
                 actualizarHUD();
                 // Guardar duración real para progreso más preciso
@@ -539,68 +375,31 @@ function activarPlayer() {
             return '';
         }
 
-        let _unsubComentarios = null;
-        let _lastComDoc = null;
-        const _COMENTARIOS_LIMIT = 20;
-
-        async function escucharComentariosNube(reset) {
+        function escucharComentariosNube() {
             const contenedor = document.getElementById('listaComentarios');
-            if (reset) {
-                _lastComDoc = null;
-                contenedor.innerHTML = '<p class="text-zinc-500 text-sm italic animate-pulse">Cargando comentarios...</p>';
-                // Limpiar suscripción anterior
-                if (_unsubComentarios) { _unsubComentarios(); _unsubComentarios = null; }
-            }
-
-            // Usar getDocs con limit en lugar de onSnapshot (ahorra lecturas)
-            let q = window.query(
+            const q = window.query(
                 window.collection(window.db, "comentarios"),
                 window.where("movieID", "==", movieID),
-                window.orderBy("fecha", "desc"),
-                window.limit(_COMENTARIOS_LIMIT)
-            );
-            if (_lastComDoc) q = window.query(
-                window.collection(window.db, "comentarios"),
-                window.where("movieID", "==", movieID),
-                window.orderBy("fecha", "desc"),
-                window.startAfter(_lastComDoc),
-                window.limit(_COMENTARIOS_LIMIT)
+                window.orderBy("fecha", "desc")
             );
 
-            try {
-                const snapshot = await window.getDocs(q);
-                if (reset) contenedor.innerHTML = '';
-
-                if (snapshot.empty && reset) {
+            // Primero buscamos los UIDs de todos los usuarios para poder mostrar badges
+            window.onSnapshot(q, async (snapshot) => {
+                contenedor.innerHTML = "";
+                if (snapshot.empty) {
                     contenedor.innerHTML = `<p class="text-zinc-600 text-sm italic">Nadie ha comentado aún. ¡Sé el primero!</p>`;
                     return;
                 }
-                if (snapshot.empty) return;
 
-                _lastComDoc = snapshot.docs[snapshot.docs.length - 1];
-
-                // Recolectar usernames únicos para badges
+                // Recolectar usernames únicos y buscar sus UIDs
                 const usernames = [...new Set(snapshot.docs.map(d => d.data().user))];
-                const uidMap = {};
+                const uidMap = {}; // username → uid
                 try {
-                    // Cache de username→uid en sessionStorage (toda la sesión)
-                    const BADGE_CACHE_KEY = 'movieM_uidMap';
-                    let cachedMap = {};
-                    try { cachedMap = JSON.parse(sessionStorage.getItem(BADGE_CACHE_KEY) || '{}'); } catch(e) {}
-                    const missing = usernames.slice(0,10).filter(u => !(u in cachedMap));
-                    if (missing.length) {
-                        const usersSnap = await window.getDocs(
-                            window.query(window.collection(window.db, 'usuarios'), window.where('username', 'in', missing))
-                        );
-                        usersSnap.forEach(d => { cachedMap[d.data().username] = d.id; });
-                        try { sessionStorage.setItem(BADGE_CACHE_KEY, JSON.stringify(cachedMap)); } catch(e) {}
-                    }
-                    usernames.slice(0,10).forEach(u => { if (cachedMap[u]) uidMap[u] = cachedMap[u]; });
+                    const usersSnap = await window.getDocs(
+                        window.query(window.collection(window.db, 'usuarios'), window.where('username', 'in', usernames.slice(0,10)))
+                    );
+                    usersSnap.forEach(d => { uidMap[d.data().username] = d.id; });
                 } catch(e) {}
-
-                // Eliminar botón "Ver más" anterior si existe
-                const oldBtn = document.getElementById('btnVerMasComentarios');
-                if (oldBtn) oldBtn.remove();
 
                 snapshot.forEach((docSnap) => {
                     const c = docSnap.data();
@@ -609,6 +408,7 @@ function activarPlayer() {
                     const uid = uidMap[c.user] || '';
                     const badge = getBadge(uid);
                     const esAdmin = miUID_pelicula === ADMIN_UID;
+                    
                     const div = document.createElement('div');
                     div.className = 'bg-zinc-900/50 p-5 rounded-2xl border border-white/5 shadow-xl fade-in mb-4 group/comment';
                     div.innerHTML = `
@@ -619,29 +419,18 @@ function activarPlayer() {
                                 </span>
                                 <span class="text-[9px] text-zinc-600 font-bold uppercase tracking-tighter">${fechaComentario}</span>
                             </div>
-                            <div class="flex items-center gap-1 shrink-0">
-                                ${esAdmin || c.user === (window._currentUser||'') ? `<button onclick="eliminarComentario('${docId}')" class="opacity-0 group-hover/comment:opacity-100 text-[9px] text-zinc-600 hover:text-red-500 font-bold uppercase transition">Eliminar</button>` : ''}
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="text-yellow-500 text-[10px] tracking-widest">${"★".repeat(c.rating)}</span>
+                                ${esAdmin ? `<button onclick="borrarComentarioPelicula('${docId}')" class="opacity-0 group-hover/comment:opacity-100 transition-opacity w-6 h-6 rounded-full bg-red-900/60 hover:bg-red-600 flex items-center justify-center" title="Borrar">
+                                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>` : ''}
                             </div>
                         </div>
-                        <div class="flex gap-1 mb-3">${'★'.repeat(c.rating||0)}${'☆'.repeat(5-(c.rating||0))}</div>
                         <p class="text-zinc-400 text-sm leading-relaxed font-medium">${c.txt}</p>
                     `;
                     contenedor.appendChild(div);
                 });
-
-                // Botón "Ver más" si hay exactamente limit resultados
-                if (snapshot.docs.length === _COMENTARIOS_LIMIT) {
-                    const btn = document.createElement('button');
-                    btn.id = 'btnVerMasComentarios';
-                    btn.className = 'w-full py-3 mt-2 bg-zinc-900 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white hover:border-accent transition active:scale-95';
-                    btn.textContent = 'Ver más comentarios';
-                    btn.onclick = () => escucharComentariosNube(false);
-                    contenedor.appendChild(btn);
-                }
-            } catch(e) {
-                console.error('Error cargando comentarios:', e);
-                if (reset) contenedor.innerHTML = '<p class="text-zinc-600 text-sm italic">Error al cargar comentarios.</p>';
-            }
+            });
         }
 
         window.borrarComentarioPelicula = async function(docId) {
@@ -912,7 +701,7 @@ function activarPlayer() {
 
         window.usarRespaldo = function() {
             if (!_latinoUrl2) return;
-            document.getElementById('movieFrame').src = proxyUrl(_latinoUrl2);
+            document.getElementById('movieFrame').src = _latinoUrl2;
             document.getElementById('btnRespaldoWrap').classList.add('hidden');
         };
 
@@ -934,11 +723,11 @@ function activarPlayer() {
                 subBtn.className = base + ' bg-white/10 border-white/20 text-white';
                 latBtn.className = base + ' border-white/10 text-white/40 hover:text-yellow-400';
                 respaldoWrap.classList.add('hidden');
-                document.getElementById('movieFrame').src = proxyUrl(`https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`);
+                document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
             } else {
                 latBtn.className = base + ' bg-yellow-500/20 border-yellow-500/50 text-yellow-400';
                 subBtn.className = base + ' border-white/10 text-white/40 hover:text-white';
-                document.getElementById('movieFrame').src = proxyUrl(_latinoUrl);
+                document.getElementById('movieFrame').src = _latinoUrl;
                 if (_latinoUrl2) respaldoWrap.classList.remove('hidden');
             }
         };
@@ -949,7 +738,7 @@ function activarPlayer() {
             if (!latBtn.classList.contains('hidden')) {
                 latBtn.className = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400';
             }
-            document.getElementById('movieFrame').src = proxyUrl(`https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`);
+            document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
             document.getElementById('playerOverlay').style.display = 'flex';
             document.body.style.overflow = "hidden";
             progresoInicio = Date.now();
