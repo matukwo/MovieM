@@ -6,7 +6,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieM | Inicio</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com" defer></script>
     <style>
         .no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
         .input-premium{background:rgba(24,24,27,.8);border:1px solid rgba(63,63,70,.5);transition:all .3s ease}
@@ -20,6 +20,65 @@
     </style>
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden">
+<!-- ── Banner uBlock Origin ─────────────────────────────────────── -->
+<div id="ublockBanner" style="display:none" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[999] w-[calc(100%-2rem)] max-w-xl">
+    <div class="bg-zinc-900 border border-white/10 rounded-2xl shadow-2xl px-5 py-4 flex items-center gap-4">
+        <!-- Icono escudo -->
+        <div class="shrink-0 w-10 h-10 rounded-xl bg-red-600/10 border border-red-600/30 flex items-center justify-center">
+            <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+        </div>
+        <div class="flex-1 min-w-0">
+            <p class="text-xs font-black uppercase tracking-widest text-white mb-0.5">Disfrutá MovieM sin publicidad</p>
+            <p class="text-[10px] text-zinc-400 leading-snug">Instalá <span class="text-white font-bold">uBlock Origin</span> y bloqueá los ads de los canales de TV en vivo.</p>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+            <a id="ublockLink" href="#" target="_blank" rel="noopener"
+               class="text-[9px] font-black uppercase tracking-widest bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-xl transition active:scale-95 whitespace-nowrap">
+                Instalar gratis
+            </a>
+            <button onclick="cerrarBannerUblock()" class="text-zinc-600 hover:text-white transition p-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // Solo mostrar si el usuario nunca lo cerró
+    if (localStorage.getItem('movieM_ublock_dismissed')) return;
+
+    // Detectar navegador y dar el link correcto
+    var ua = navigator.userAgent.toLowerCase();
+    var link = 'https://ublockorigin.com'; // fallback
+    if (ua.indexOf('firefox') > -1) {
+        link = 'https://addons.mozilla.org/firefox/addon/ublock-origin/';
+    } else if (ua.indexOf('edg') > -1) {
+        link = 'https://microsoftedge.microsoft.com/addons/detail/ublock-origin/odfafepnkmbhccpbejgmiehpchacaeak';
+    } else if (ua.indexOf('chrome') > -1 || ua.indexOf('chromium') > -1) {
+        link = 'https://chromewebstore.google.com/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm';
+    }
+    document.getElementById('ublockLink').href = link;
+
+    // Mostrar con un pequeño delay para no interrumpir la carga
+    setTimeout(function() {
+        var banner = document.getElementById('ublockBanner');
+        if (banner) banner.style.display = 'block';
+    }, 3000);
+})();
+
+function cerrarBannerUblock() {
+    document.getElementById('ublockBanner').style.display = 'none';
+    localStorage.setItem('movieM_ublock_dismissed', '1');
+}
+</script>
+<!-- ───────────────────────────────────────────────────────────────── -->
+
+
 
 <nav class="hidden md:grid p-5 grid-cols-3 items-center bg-zinc-950/90 backdrop-blur-md fixed top-0 w-full z-50 border-b border-white/5">
     <div class="flex space-x-6 text-xs font-bold uppercase tracking-widest text-zinc-400">
@@ -295,15 +354,32 @@ window.cerrarSesion=async function(){await signOut(auth);notificar('Sesion cerra
 
 onAuthStateChanged(auth,async function(user){
   if(user){
-    var snap=await getDoc(doc(db,'usuarios',user.uid)),data=snap.exists()?snap.data():{};
+    // Cache del perfil propio en sessionStorage (evita getDoc en cada recarga)
+    var data = {};
+    var PROFILE_KEY = 'movieM_profile_' + user.uid;
+    try {
+      var raw = sessionStorage.getItem(PROFILE_KEY);
+      if (raw) { data = JSON.parse(raw); }
+    } catch(e) {}
+    if (!data.username) {
+      var snap=await getDoc(doc(db,'usuarios',user.uid));
+      data=snap.exists()?snap.data():{};
+      try { sessionStorage.setItem(PROFILE_KEY, JSON.stringify(data)); } catch(e) {}
+    }
     var nombre=data.username||user.email.split('@')[0];
     var storedUID=localStorage.getItem('movieM_uid');
-    if(storedUID&&storedUID!==user.uid)localStorage.removeItem('movieM_avatar');
+    if(storedUID&&storedUID!==user.uid){localStorage.removeItem('movieM_avatar');sessionStorage.removeItem(PROFILE_KEY);}
     localStorage.setItem('movieM_uid',user.uid);localStorage.setItem('usuarioMovieM',nombre);
     var color=data.color||localStorage.getItem('movieM_color')||'#dc2626';
     document.documentElement.style.setProperty('--accent-color',color);
     setAvatarUI(nombre,data.avatar||null);
     cargarContinuar(user);
+    // Cargar chat/notifs solo si está logueado
+    if (!document.querySelector('script[src="notif-chat.js"]')) {
+        var s = document.createElement('script');
+        s.type = 'module'; s.src = 'notif-chat.js';
+        document.body.appendChild(s);
+    }
   } else {
     document.getElementById('contenidoLogin').classList.remove('hidden');
     document.getElementById('perfilActivo').classList.add('hidden');
@@ -498,14 +574,35 @@ function iniciarSlider() {
 }
 
 async function cargarSeccion(url, id) {
+  const CACHE_KEY = 'movieM_tmdb_' + id;
+  const CACHE_TTL = 10 * 60 * 1000; // 10 minutos
   try {
-    const r = await fetch(url);
-    const d = await r.json();
+    let results = null;
+    // Intentar servir desde cache primero
+    try {
+      const raw = localStorage.getItem(CACHE_KEY);
+      if (raw) {
+        const { data, ts } = JSON.parse(raw);
+        if (Date.now() - ts < CACHE_TTL) {
+          results = data;
+        }
+      }
+    } catch(e) {}
+
+    if (!results) {
+      const r = await fetch(url);
+      const d = await r.json();
+      results = d.results || [];
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ data: results, ts: Date.now() })); } catch(e) {}
+    }
+
     const c = document.getElementById(id);
-    if (d.results) d.results.forEach(p => c.appendChild(crearCard(p)));
+    if (c && results.length) {
+      results.forEach(p => c.appendChild(crearCard(p)));
+    }
     // Alimentar el slider con tendencias
-    if (id === 'tendencias' && d.results && d.results.length) {
-        peliculasSlider = d.results;
+    if (id === 'tendencias' && results.length) {
+        peliculasSlider = results;
         iniciarSlider();
     }
   } catch(e) { console.error(e); }
@@ -542,11 +639,24 @@ async function cargarContinuar(user) {
     sec.classList.remove('hidden');
     fila.innerHTML = '';
 
-    for (const item of items) {
+    // Separar series y películas
+    const itemsSeries = items.filter(it => it.tipo === 'serie');
+    const itemsPelis  = items.filter(it => it.tipo !== 'serie');
+
+    // Fetchear todas las series EN PARALELO (en vez de una por una)
+    const seriesData = await Promise.all(
+      itemsSeries.map(item =>
+        fetch(`https://api.themoviedb.org/3/tv/${item.contentId}?api_key=${API_KEY}&language=es-MX`)
+          .then(r => r.json())
+          .catch(() => null)
+      )
+    );
+
+    // Renderizar series
+    itemsSeries.forEach((item, i) => {
       try {
-        if (item.tipo === 'serie') {
-          const r = await fetch(`https://api.themoviedb.org/3/tv/${item.contentId}?api_key=${API_KEY}&language=es-MX`);
-          const s = await r.json();
+        const s = seriesData[i];
+        if (!s || !s.poster_path) return;
           if (!s.poster_path) continue;
           const card = document.createElement('a');
           card.href = 'serie.html?id='+item.contentId;
@@ -561,7 +671,13 @@ async function cargarContinuar(user) {
             <p class="text-[9px] md:text-[10px] text-center truncate w-full font-bold uppercase tracking-tighter text-zinc-500 mt-2">${s.name || item.nombre || ''}</p>
           `;
           fila.appendChild(card);
-        } else {
+      } catch(e) { console.error('card error serie:', e); }
+    });
+
+    // Renderizar películas (no necesitan fetch - poster ya guardado en Firestore)
+    itemsPelis.forEach(item => {
+      try {
+        {
           // Películas: usar titulo y poster guardados en Firestore — sin llamar a TMDB
           const poster = item.poster || '';
           const titulo = item.titulo || '';
@@ -581,8 +697,8 @@ async function cargarContinuar(user) {
           `;
           fila.appendChild(card);
         }
-      } catch(e) { console.error('card error:', e); }
-    }
+      } catch(e) { console.error('card error peli:', e); }
+    });
     if (!fila.children.length) sec.classList.add('hidden');
   } catch(e) { console.error('cargarContinuar:', e); }
 }
@@ -745,6 +861,6 @@ lazySeccion('random', () =>
     cargarSeccion('https://api.themoviedb.org/3/discover/movie?api_key='+API_KEY+'&sort_by=vote_average.desc&vote_count.gte=1000&page='+Math.ceil(Math.random()*5)+'&language=es-MX', 'random')
 );
 </script>
-<script type="module" src="notif-chat.js"></script>
+<!-- notif-chat se carga dinámicamente solo si hay usuario -->
 </body>
 </html>
