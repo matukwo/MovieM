@@ -5,116 +5,130 @@
     <link rel="icon" type="image/png" href="data:image/png;base64,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">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MovieM | Buscar</title>
+    <title>MovieM | Mi Lista</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script type="module" src="firebase-config.js"></script>
     <style>
-        :root { --accent-color: #dc2626; }
-        .text-accent  { color: var(--accent-color); }
-        .bg-accent    { background-color: var(--accent-color); }
-        .border-accent{ border-color: var(--accent-color); }
-        .ring-accent  { --tw-ring-color: var(--accent-color); }
-        .no-scrollbar::-webkit-scrollbar { display:none }
-        .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-        .fade-up { animation: fadeUp .35s ease forwards; opacity:0; }
-        @keyframes pulse-bg { 0%{background:rgba(39,39,42,.5)} 50%{background:rgba(63,63,70,.5)} 100%{background:rgba(39,39,42,.5)} }
-        .skeleton { animation: pulse-bg 1.5s infinite; }
-        .card-hover { transition: transform .2s, box-shadow .2s; }
-        .card-hover:hover { transform: scale(1.04); box-shadow: 0 20px 40px rgba(0,0,0,.7); }
-        .filter-btn { transition: all .2s; }
-        .filter-btn.active { background-color: var(--accent-color); color:#fff; border-color: var(--accent-color); }
-        .progress-bar { height:3px; background:var(--accent-color); border-radius:999px; transition: width .3s; }
+        .no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
+        .text-accent{color:var(--accent-color,#dc2626)}.bg-accent{background-color:var(--accent-color,#dc2626)}
+        .fade-in{animation:fadeIn .6s ease forwards;opacity:0}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .skeleton{animation:pulse 1.5s infinite ease-in-out}
+        @keyframes pulse{0%{background-color:rgba(39,39,42,.6)}50%{background-color:rgba(63,63,70,.6)}100%{background-color:rgba(39,39,42,.6)}}
     </style>
 </head>
-<body class="bg-zinc-950 text-white font-sans min-h-screen overflow-x-hidden">
+<body class="bg-zinc-950 text-white font-sans min-h-screen">
 
-<!-- NAV -->
-<nav class="px-4 md:px-8 py-3 flex items-center gap-3 bg-zinc-950/95 backdrop-blur-md sticky top-0 z-50 border-b border-white/5">
-    <button onclick="location.href='index.html'"
-        class="shrink-0 w-9 h-9 flex items-center justify-center rounded-full bg-zinc-800 border border-white/10 hover:bg-accent transition active:scale-95">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-        </svg>
-    </button>
-    <h1 onclick="location.href='index.html'" class="text-lg font-black italic tracking-tighter cursor-pointer shrink-0">
-        MOVIE<span class="text-accent">M</span>
-    </h1>
-    <!-- Search bar -->
-    <div class="relative flex-1 max-w-2xl">
-        <input type="text" id="searchInput" autofocus placeholder="Películas, series, personas..."
-            class="w-full bg-zinc-900 border border-zinc-700 focus:border-accent text-white text-sm rounded-full py-2.5 px-4 pl-10 outline-none transition ring-0 focus:ring-2 ring-accent/30">
-        <svg class="absolute left-3 top-3 w-4 h-4 text-zinc-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-        </svg>
-        <button id="btnClearSearch" class="absolute right-3 top-2.5 text-zinc-500 hover:text-white transition hidden">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-        </button>
+<nav class="fixed top-0 w-full z-50 bg-zinc-950/90 backdrop-blur-xl border-b border-white/5 px-4 md:px-8 py-4">
+    <div class="flex justify-between items-center max-w-6xl mx-auto">
+        <h1 onclick="location.href='index.html'" class="text-xl md:text-2xl font-black italic tracking-tighter cursor-pointer">MOVIE<span class="text-accent">M</span></h1>
+        <button onclick="location.href='index.html'" class="text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-white transition">&larr; Volver</button>
     </div>
 </nav>
 
-<main class="max-w-7xl mx-auto px-4 md:px-8 pt-6 pb-28 md:pb-12">
+<main class="max-w-6xl mx-auto px-4 md:px-8 pt-24 pb-28 md:pb-12">
 
-    <!-- Estado vacío / inicio -->
-    <div id="emptyState" class="flex flex-col items-center justify-center py-24 text-center">
-        <div class="w-20 h-20 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center mb-5">
-            <svg class="w-10 h-10 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
+    <div id="estadoCargando" class="fade-in">
+        <div class="h-9 w-36 skeleton rounded-xl mb-3"></div>
+        <div class="h-4 w-56 skeleton rounded mb-10"></div>
+        <div class="grid grid-cols-3 md:grid-cols-6 gap-3 md:gap-6">
+            <div class="aspect-[2/3] skeleton rounded-2xl"></div>
+            <div class="aspect-[2/3] skeleton rounded-2xl"></div>
+            <div class="aspect-[2/3] skeleton rounded-2xl"></div>
+            <div class="aspect-[2/3] skeleton rounded-2xl hidden md:block"></div>
+            <div class="aspect-[2/3] skeleton rounded-2xl hidden md:block"></div>
+            <div class="aspect-[2/3] skeleton rounded-2xl hidden md:block"></div>
         </div>
-        <p class="text-zinc-600 text-lg font-black italic uppercase tracking-tighter mb-2">Buscá algo</p>
-        <p class="text-zinc-700 text-xs uppercase tracking-widest font-bold">Películas · Series · Personas</p>
     </div>
 
-    <!-- Resultados -->
-    <div id="resultsWrap" class="hidden">
-
-        <!-- Filtros -->
-        <div class="flex gap-2 mb-6 overflow-x-auto no-scrollbar pb-1">
-            <button class="filter-btn active shrink-0 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border border-white/10 text-zinc-400" data-filter="todo">Todo</button>
-            <button class="filter-btn shrink-0 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border border-white/10 text-zinc-400" data-filter="pelicula">Películas</button>
-            <button class="filter-btn shrink-0 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border border-white/10 text-zinc-400" data-filter="serie">Series</button>
-            <button class="filter-btn shrink-0 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border border-white/10 text-zinc-400" data-filter="usuario">Usuarios</button>
-            <!-- Géneros -->
-            <button class="filter-btn shrink-0 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border border-white/10 text-zinc-400" data-filter="accion">Acción</button>
-            <button class="filter-btn shrink-0 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border border-white/10 text-zinc-400" data-filter="terror">Terror</button>
-            <button class="filter-btn shrink-0 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border border-white/10 text-zinc-400" data-filter="comedia">Comedia</button>
+    <div id="estadoNoLogin" class="hidden flex-col items-center justify-center py-24 text-center fade-in">
+        <div class="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mb-5 border border-white/5">
+            <svg class="w-7 h-7 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
         </div>
+        <h3 class="text-xl font-black uppercase tracking-tighter mb-2">Inicia sesion</h3>
+        <p class="text-zinc-500 text-sm mb-6">Necesitas una cuenta para guardar peliculas.</p>
+        <button onclick="location.href='index.html'" class="bg-accent text-white px-8 py-3 rounded-full font-black uppercase text-xs tracking-widest">Ir al inicio</button>
+    </div>
 
-        <!-- Recuento -->
-        <p id="resultCount" class="text-[10px] font-black uppercase tracking-widest text-zinc-600 mb-5"></p>
-
-        <!-- Sección personas -->
-        <section id="secPersonas" class="mb-8 hidden">
-            <h2 class="text-sm font-black uppercase tracking-widest text-zinc-500 mb-4 flex items-center gap-2">
-                <span class="w-1 h-4 bg-accent rounded-full inline-block"></span> Usuarios
-            </h2>
-            <div id="gridPersonas" class="flex gap-3 flex-wrap"></div>
-        </section>
-
-        <!-- Sección series -->
-        <section id="secSeries" class="mb-8 hidden">
-            <h2 class="text-sm font-black uppercase tracking-widest text-zinc-500 mb-4 flex items-center gap-2">
-                <span class="w-1 h-4 bg-accent rounded-full inline-block"></span> Series
-            </h2>
-            <div id="gridSeries" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3 md:gap-4"></div>
-        </section>
-
-        <!-- Sección películas -->
-        <section id="secPeliculas" class="mb-8 hidden">
-            <h2 class="text-sm font-black uppercase tracking-widest text-zinc-500 mb-4 flex items-center gap-2">
-                <span class="w-1 h-4 bg-accent rounded-full inline-block"></span> Películas
-            </h2>
-            <div id="gridPeliculas" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3 md:gap-4"></div>
-        </section>
-
-        <!-- Sin resultados -->
-        <div id="noResults" class="hidden flex flex-col items-center py-20 text-center">
-            <p class="text-zinc-600 font-black italic uppercase text-xl tracking-tighter mb-2">Sin resultados</p>
-            <p class="text-zinc-700 text-xs uppercase tracking-widest">Intentá con otro término</p>
+    <div id="estadoVacio" class="hidden flex-col items-center justify-center py-24 text-center fade-in">
+        <div class="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mb-5 border border-white/5">
+            <svg class="w-7 h-7 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
         </div>
+        <h3 class="text-xl font-black uppercase tracking-tighter mb-2">Tu lista esta vacia</h3>
+        <p class="text-zinc-500 text-sm mb-6">Guarda peliculas desde su pagina de detalle.</p>
+        <button onclick="location.href='index.html'" class="bg-accent text-white px-8 py-3 rounded-full font-black uppercase text-xs tracking-widest">Explorar Peliculas</button>
+    </div>
+
+    <div id="contenidoLista" class="hidden fade-in">
+        <header class="mb-8">
+            <h2 class="text-2xl md:text-4xl font-black italic uppercase tracking-tighter mb-1">Mi Lista</h2>
+            <p id="subtitleLista" class="text-zinc-500 text-sm"></p>
+        </header>
+
+        <!-- LISTAS PERSONALIZADAS -->
+        <section id="secListas" class="mb-10 hidden">
+            <div class="flex items-center justify-between mb-5">
+                <h3 class="text-base md:text-xl font-black italic uppercase tracking-tighter flex items-center gap-2">
+                    <span class="w-1 h-5 bg-accent rounded-full inline-block"></span> Mis Listas
+                    <span id="cntListas" class="text-xs font-bold text-zinc-500 normal-case italic tracking-normal"></span>
+                </h3>
+                <button onclick="location.href='index.html'" class="text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-accent transition">+ Crear desde contenido</button>
+            </div>
+            <div id="gridListas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+        </section>
+
+        <!-- PELÍCULAS -->
+        <section id="secPeliculas" class="mb-10 hidden">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-base md:text-xl font-black italic uppercase tracking-tighter flex items-center gap-2">
+                    <span class="w-1 h-5 bg-accent rounded-full inline-block"></span> Películas
+                    <span id="cntPelis" class="text-xs font-bold text-zinc-500 normal-case italic tracking-normal"></span>
+                </h3>
+                <div class="flex gap-2">
+                    <button id="btnPrevPelis" onclick="scrollCarrusel('filaPelis',-1)"
+                        class="w-9 h-9 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center hover:bg-accent transition active:scale-95 disabled:opacity-30">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <button id="btnNextPelis" onclick="scrollCarrusel('filaPelis',1)"
+                        class="w-9 h-9 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center hover:bg-accent transition active:scale-95 disabled:opacity-30">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="relative overflow-hidden">
+                <div id="filaPelis" class="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth pb-2"
+                     style="scroll-snap-type:x mandatory;" onscroll="actualizarFades('pelis')">
+                </div>
+                <div id="fadeLPelis" class="pointer-events-none absolute left-0 top-0 bottom-2 w-12 bg-gradient-to-r from-zinc-950 to-transparent opacity-0 transition-opacity"></div>
+                <div id="fadeRPelis" class="pointer-events-none absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-zinc-950 to-transparent transition-opacity"></div>
+            </div>
+        </section>
+
+        <!-- SERIES -->
+        <section id="secSeries" class="mb-10 hidden">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-base md:text-xl font-black italic uppercase tracking-tighter flex items-center gap-2">
+                    <span class="w-1 h-5 bg-accent rounded-full inline-block"></span> Series
+                    <span id="cntSeries" class="text-xs font-bold text-zinc-500 normal-case italic tracking-normal"></span>
+                </h3>
+                <div class="flex gap-2">
+                    <button id="btnPrevSeries" onclick="scrollCarrusel('filaSeries',-1)"
+                        class="w-9 h-9 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center hover:bg-accent transition active:scale-95 disabled:opacity-30">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <button id="btnNextSeries" onclick="scrollCarrusel('filaSeries',1)"
+                        class="w-9 h-9 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center hover:bg-accent transition active:scale-95 disabled:opacity-30">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="relative overflow-hidden">
+                <div id="filaSeries" class="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth pb-2"
+                     style="scroll-snap-type:x mandatory;" onscroll="actualizarFades('series')">
+                </div>
+                <div id="fadeLSeries" class="pointer-events-none absolute left-0 top-0 bottom-2 w-12 bg-gradient-to-r from-zinc-950 to-transparent opacity-0 transition-opacity"></div>
+                <div id="fadeRSeries" class="pointer-events-none absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-zinc-950 to-transparent transition-opacity"></div>
+            </div>
+        </section>
     </div>
 </main>
 
@@ -125,285 +139,87 @@
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
             <span class="text-[9px] font-black uppercase tracking-widest">Inicio</span>
         </a>
-        <a href="buscar.html" class="flex flex-col items-center gap-1 text-accent">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            <span class="text-[9px] font-black uppercase tracking-widest">Buscar</span>
+        <a href="mi_lista.html" class="flex flex-col items-center gap-1 text-accent">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+            <span class="text-[9px] font-black uppercase tracking-widest">Mi Lista</span>
         </a>
-        <a href="series.html" class="flex flex-col items-center gap-1 text-zinc-500">
+        <a href="#" class="flex flex-col items-center gap-1 text-zinc-500">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.361a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
             <span class="text-[9px] font-black uppercase tracking-widest">Series</span>
         </a>
-        <a href="tv.html" class="flex flex-col items-center gap-1 text-zinc-500">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            <span class="text-[9px] font-black uppercase tracking-widest">TV</span>
-        </a>
         <a href="perfil.html" class="flex flex-col items-center gap-1 text-zinc-500">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-            <span class="text-[9px] font-black uppercase tracking-widest">Perfil</span>
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            <span class="text-[9px] font-black uppercase tracking-widest">Cuenta</span>
         </a>
     </div>
 </nav>
 
 <script type="module">
-const API_KEY = '86dfc26f9d7b8c9957129a1d7a173ddc';
-var FLAG_MX_GLOBAL = 'data:image/webp;base64,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';
-const IMG = 'https://image.tmdb.org/t/p/w500';
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import{getFirestore,doc,getDoc,getDocs,collection,query,where}from"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+const app=initializeApp({apiKey:"AIzaSyAn5N7m7EhICK2aZG4Nx8DIW9RZd9kK1DA",authDomain:"moviem-5b73d.firebaseapp.com",projectId:"moviem-5b73d",storageBucket:"moviem-5b73d.firebasestorage.app",messagingSenderId:"843796138544",appId:"1:843796138544:web:c2bde9b39d437b84d97bf5"});
+const auth=getAuth(app),db=getFirestore(app),API_KEY='86dfc26f9d7b8c9957129a1d7a173ddc';
+const IMG='https://image.tmdb.org/t/p/w500'
+var FLAG_MX_GLOBAL = 'data:image/webp;base64,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';;
+var color=localStorage.getItem('movieM_color');if(color)document.documentElement.style.setProperty('--accent-color',color);
 
-// Color accent
-const savedColor = localStorage.getItem('movieM_color');
-if (savedColor) document.documentElement.style.setProperty('--accent-color', savedColor);
+function mostrar(id){['estadoCargando','estadoNoLogin','estadoVacio','contenidoLista'].forEach(function(s){var el=document.getElementById(s);el.classList.add('hidden');el.classList.remove('flex');});var el=document.getElementById(id);el.classList.remove('hidden');if(id==='estadoNoLogin'||id==='estadoVacio')el.classList.add('flex');}
 
-// Leer query de URL
-const params = new URLSearchParams(location.search);
-const qInit  = (params.get('q') || '').trim();
-const input  = document.getElementById('searchInput');
-if (qInit) {
-    input.value = qInit;
-    document.getElementById('btnClearSearch').classList.remove('hidden');
-}
+var CARD_W=140;
+window.scrollCarrusel=function(filaId,dir){var fila=document.getElementById(filaId);if(!fila)return;fila.scrollBy({left:dir*CARD_W*3,behavior:'smooth'});setTimeout(function(){actualizarFades(filaId==='filaPelis'?'pelis':'series');},350);};
+window.actualizarFades=function(tipo){var filaId=tipo==='pelis'?'filaPelis':'filaSeries';var fila=document.getElementById(filaId);if(!fila)return;var atLeft=fila.scrollLeft<=10;var atRight=fila.scrollLeft>=fila.scrollWidth-fila.clientWidth-10;document.getElementById('fadeL'+(tipo==='pelis'?'Pelis':'Series')).style.opacity=atLeft?'0':'1';document.getElementById('fadeR'+(tipo==='pelis'?'Pelis':'Series')).style.opacity=atRight?'0':'1';var prevBtn=document.getElementById('btnPrev'+(tipo==='pelis'?'Pelis':'Series'));var nextBtn=document.getElementById('btnNext'+(tipo==='pelis'?'Pelis':'Series'));if(prevBtn)prevBtn.disabled=atLeft;if(nextBtn)nextBtn.disabled=atRight;};
 
-let timer = null;
-let filtroActivo = 'todo';
-let allResults = { peliculas: [], series: [], personas: [] };
-
-const GENEROS = { accion: 28, terror: 27, comedia: 35 };
-
-// ── Filtros ────────────────────────────────────────────────────────────────────
-document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        filtroActivo = btn.dataset.filter;
-        renderResultados();
-    });
-});
-
-// ── Input ──────────────────────────────────────────────────────────────────────
-input.addEventListener('input', () => {
-    const q = input.value.trim();
-    document.getElementById('btnClearSearch').classList.toggle('hidden', !q);
-    clearTimeout(timer);
-    if (q.length < 2) { mostrarVacio(); return; }
-    timer = setTimeout(() => buscar(q), 350);
-});
-
-input.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && input.value.trim().length >= 2) buscar(input.value.trim());
-});
-
-document.getElementById('btnClearSearch').addEventListener('click', () => {
-    input.value = '';
-    input.focus();
-    document.getElementById('btnClearSearch').classList.add('hidden');
-    mostrarVacio();
-});
-
-function mostrarVacio() {
-    document.getElementById('emptyState').classList.remove('hidden');
-    document.getElementById('resultsWrap').classList.add('hidden');
-}
-
-// ── Usuarios Firebase (usa window.db del firebase-config.js) ──────────────────
-async function buscarUsuarios(q) {
-    // Esperar a que firebase-config.js termine de inicializar window.db
-    for (let i = 0; i < 20; i++) {
-        if (window.db && window.getDocs && window.collection) break;
-        await new Promise(r => setTimeout(r, 100));
-    }
-    if (!window.db) return [];
-    try {
-        const snap = await window.getDocs(window.collection(window.db, 'usuarios'));
-        const usuarios = [];
-        snap.forEach(d => {
-            const u = d.data();
-            if (u.username && u.username.toLowerCase().includes(q.toLowerCase())) {
-                usuarios.push({ uid: d.id, username: u.username, avatar: u.avatar || null, color: u.color || '#dc2626' });
-            }
-        });
-        return usuarios.slice(0, 10);
-    } catch(e) { console.error('buscarUsuarios:', e); return []; }
-}
-
-// ── Buscar ─────────────────────────────────────────────────────────────────────
-async function buscar(q) {
-    document.getElementById('emptyState').classList.add('hidden');
-    document.getElementById('resultsWrap').classList.remove('hidden');
-    mostrarSkeletons();
-
-    try {
-        // Generar variantes del query para cubrir títulos con caracteres especiales
-        // ej: "rec" → también busca "[rec]", "rec." etc
-        // ej: "[rec]" → también busca "rec"
-        const variantes = new Set();
-        variantes.add(q.trim());
-        // Sin corchetes, paréntesis, puntos, guiones al principio/fin
-        const limpio = q.replace(/[\[\]():.!?]/g, '').replace(/\s+/g, ' ').trim();
-        if (limpio && limpio !== q) variantes.add(limpio);
-        // Con corchetes si no los tiene (ej: "rec" → "[rec]")
-        if (!q.includes('[')) variantes.add(`[${q.trim()}]`);
-        // Sin signos especiales pero manteniendo palabras
-        const soloLetras = q.replace(/[^\w\sáéíóúüñÁÉÍÓÚÜÑ]/g, '').replace(/\s+/g, ' ').trim();
-        if (soloLetras && soloLetras !== q && soloLetras !== limpio) variantes.add(soloLetras);
-
-        // Buscar todas las variantes en paralelo, en 3 idiomas
-        const fetchVariante = (v, tipo, lang) =>
-            fetch(`https://api.themoviedb.org/3/search/${tipo}?api_key=${API_KEY}&language=${lang}&query=${encodeURIComponent(v)}&page=1`)
-                .then(r => r.json()).catch(() => ({ results: [] }));
-
-        const langs = ['es-MX', 'es-ES', 'en-US'];
-        const tipos = ['movie', 'tv'];
-        const allFetches = [];
-        for (const v of variantes) {
-            for (const lang of langs) {
-                for (const tipo of tipos) {
-                    allFetches.push({ tipo, fetch: fetchVariante(v, tipo, lang) });
-                }
-            }
-        }
-        const fetchUsuarios = buscarUsuarios(q);
-        const respuestas = await Promise.all([...allFetches.map(f => f.fetch), fetchUsuarios]);
-        const usuarios = respuestas[respuestas.length - 1];
-
-        // Mergear todos los resultados sin duplicados, por tipo
-        const vistasPelis = new Set(), vistaSeries = new Set();
-        const pelis = [], series = [];
-        for (let i = 0; i < allFetches.length; i++) {
-            const tipo = allFetches[i].tipo;
-            const results = respuestas[i]?.results || [];
-            for (const item of results) {
-                if (!item.poster_path) continue;
-                if (tipo === 'movie' && !vistasPelis.has(item.id)) {
-                    vistasPelis.add(item.id); pelis.push(item);
-                } else if (tipo === 'tv' && !vistaSeries.has(item.id)) {
-                    vistaSeries.add(item.id); series.push(item);
-                }
-            }
-        }
-
-        // Ordenar por popularidad para que lo más relevante salga primero
-        pelis.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
-        series.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
-
-        allResults = { peliculas: pelis, series, personas: usuarios };
-        renderResultados();
-    } catch(e) {
-        console.error('buscar error:', e);
-        document.getElementById('noResults').classList.remove('hidden');
-    }
-}
-
-// ── Render ─────────────────────────────────────────────────────────────────────
-async function renderResultados() {
-    await _latinoIDsPromise;
-    let pelis   = allResults.peliculas;
-    let series  = allResults.series;
-    let personas = allResults.personas;
-
-    if (filtroActivo === 'pelicula') { series = []; personas = []; }
-    if (filtroActivo === 'serie')    { pelis = [];  personas = []; }
-    if (filtroActivo === 'usuario')  { pelis = [];  series = []; }
-    if (['accion','terror','comedia'].includes(filtroActivo)) {
-        const gId = GENEROS[filtroActivo];
-        pelis  = pelis.filter(p  => (p.genre_ids||[]).includes(gId));
-        series = series.filter(s => (s.genre_ids||[]).includes(gId));
-        personas = [];
-    }
-
-    const total = pelis.length + series.length + personas.length;
-    document.getElementById('resultCount').innerText = total + ' resultado' + (total !== 1 ? 's' : '');
-    document.getElementById('noResults').classList.toggle('hidden', total > 0);
-
-    // Usuarios
-    const secP = document.getElementById('secPersonas');
-    const gridP = document.getElementById('gridPersonas');
-    gridP.innerHTML = '';
-    const personasFiltradas = (filtroActivo === 'todo' || filtroActivo === 'usuario') ? personas : [];
-    if (personasFiltradas.length) {
-        secP.classList.remove('hidden');
-        personasFiltradas.forEach((u, i) => {
-            const letra = u.username.charAt(0).toUpperCase();
-            const card = document.createElement('div');
-            card.className = 'flex items-center gap-3 bg-zinc-900/60 border border-white/5 rounded-2xl px-4 py-3 cursor-pointer hover:border-accent/40 hover:bg-zinc-800/60 transition fade-up';
-            card.style.animationDelay = (i * 40) + 'ms';
-            card.onclick = () => location.href = `perfil.html?user=${encodeURIComponent(u.username)}`;
-            card.innerHTML = `
-                <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 flex items-center justify-center font-black text-white text-sm" style="background:${u.color}">
-                    ${u.avatar ? `<img src="${u.avatar}" class="w-full h-full object-cover">` : letra}
-                </div>
-                <div class="min-w-0">
-                    <p class="text-sm font-black uppercase tracking-tighter truncate">${u.username}</p>
-                    <p class="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">Usuario MovieM</p>
-                </div>
-                <svg class="w-4 h-4 text-zinc-600 ml-auto shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>`;
-            gridP.appendChild(card);
-        });
-    } else { secP.classList.add('hidden'); }
-
-    // Películas
-    const secPelis = document.getElementById('secPeliculas');
-    const gridPelis = document.getElementById('gridPeliculas');
-    gridPelis.innerHTML = '';
-    if (pelis.length) {
-        secPelis.classList.remove('hidden');
-        const progress = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
-        pelis.forEach((p, i) => gridPelis.appendChild(crearCard(p, 'pelicula', i, progress)));
-    } else { secPelis.classList.add('hidden'); }
-
-    // Series
-    const secSer = document.getElementById('secSeries');
-    const gridSer = document.getElementById('gridSeries');
-    gridSer.innerHTML = '';
-    if (series.length) {
-        secSer.classList.remove('hidden');
-        const progress = JSON.parse(localStorage.getItem('movieM_progress') || '{}');
-        series.forEach((s, i) => gridSer.appendChild(crearCard(s, 'serie', i, progress)));
-    } else { secSer.classList.add('hidden'); }
-}
-
-function crearCard(item, tipo, idx, progress) {
-    const esPeli = tipo === 'pelicula';
-    const id     = item.id;
-    const titulo = item.title || item.name || '';
-    const anio   = (item.release_date || item.first_air_date || '').split('-')[0];
-    const rating  = item.vote_average ? item.vote_average.toFixed(1) : 'S/R';
-    const poster  = IMG + item.poster_path;
-    const href    = esPeli ? `pelicula.html?id=${id}` : `serie.html?id=${id}`;
-    const prog    = progress[`${tipo}_${id}`] || 0;
-
-    const div = document.createElement('div');
-    div.className = 'fade-up cursor-pointer';
-    div.style.animationDelay = (idx * 40) + 'ms';
-    div.onclick = () => location.href = href;
-    div.innerHTML = `
-        <div class="relative rounded-xl overflow-hidden border border-white/5 card-hover mb-1.5">
-            <img src="${poster}" alt="${titulo}" class="w-full aspect-[2/3] object-cover" loading="lazy"
-                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns%3D%22http%3A//www.w3.org/2000/svg%22 width%3D%22200%22 height%3D%22300%22%3E%3Crect width%3D%22200%22 height%3D%22300%22 fill%3D%22%2327272a%22/%3E%3Ctext x%3D%22100%22 y%3D%22150%22 fill%3D%22%2352525b%22 font-size%3D%2240%22 text-anchor%3D%22middle%22 dominant-baseline%3D%22middle%22%3E%3F%3C/text%3E%3C/svg%3E'">
-            <div class="absolute top-1.5 right-1.5 flex flex-col items-end gap-1">
-                <div class="bg-black/80 text-yellow-500 text-[8px] font-black px-1.5 py-0.5 rounded-lg">⭐ ${rating}</div>
-                ${anio ? `<div class="bg-black/80 text-zinc-300 text-[8px] font-black px-1.5 py-0.5 rounded-lg">${anio}</div>` : ''}
-                ${!esPeli ? `<div class="bg-accent/90 text-white text-[7px] font-black px-1.5 py-0.5 rounded-lg uppercase">Serie</div>` : ''}
-            </div>
-            ${(window._latinoIDs && window._latinoIDs.has(String(id))) ? `<div class="absolute top-1.5 left-1.5 z-30"><div class="flex items-center gap-0.5 bg-black/70 rounded-lg px-1 py-0.5"><img src="${FLAG_MX_GLOBAL}" class="w-3.5 h-3.5 object-contain" alt="LAT"><span class="text-white text-[7px] font-black uppercase tracking-widest">LAT</span></div></div>` : ''}
-            ${prog > 0 ? `<div class="absolute bottom-0 left-0 right-0 h-1 bg-zinc-800"><div class="progress-bar" style="width:${prog}%"></div></div>` : ''}
-        </div>
-        <p class="text-[9px] font-bold uppercase tracking-tighter text-zinc-500 truncate px-0.5">${titulo}</p>`;
+function crearCard(item,tipo){
+    var id=item.id,titulo=item.title||item.name||'',anio=(item.release_date||item.first_air_date||'').split('-')[0],rating=item.vote_average?item.vote_average.toFixed(1):'-',poster=item.poster_path?IMG+item.poster_path:'https://via.placeholder.com/500x750?text=?',href=tipo==='pelicula'?'pelicula.html?id='+id:'serie.html?id='+id;
+    var div=document.createElement('div');div.className='shrink-0 group cursor-pointer';div.style.cssText='width:calc((100% - 4*0.75rem)/5);min-width:110px;max-width:160px;scroll-snap-align:start';div.onclick=function(){location.href=href;};
+    var latBadge = (window._latinoIDs && window._latinoIDs.has(String(id))) ? '<div class="absolute top-1.5 left-1.5 z-30"><div class="flex items-center gap-0.5 bg-black/70 rounded-lg px-1 py-0.5"><img src="'+FLAG_MX_GLOBAL+'" class="w-3.5 h-3.5 object-contain" alt="LAT"><span class="text-white text-[7px] font-black uppercase tracking-widest">LAT</span></div></div>' : '';
+    div.innerHTML='<div class="relative aspect-[2/3] overflow-hidden rounded-xl border border-white/5 group-hover:border-accent transition-all duration-300 shadow-xl mb-1.5"><img src="'+poster+'" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy"><div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2"><span class="text-yellow-500 text-[10px] font-bold">&#11088; '+rating+'</span></div>'+latBadge+'</div><p class="text-[10px] font-bold truncate uppercase tracking-tighter group-hover:text-accent transition">'+titulo+'</p><p class="text-[9px] text-zinc-600 font-bold">'+anio+'</p>';
     return div;
 }
 
-function mostrarSkeletons() {
-    ['gridPeliculas','gridSeries'].forEach(id => {
-        document.getElementById(id).innerHTML = Array(12).fill(0).map(() =>
-            `<div class="rounded-xl skeleton aspect-[2/3]"></div>`).join('');
-    });
-    document.getElementById('secPeliculas').classList.remove('hidden');
-    document.getElementById('secSeries').classList.remove('hidden');
-    document.getElementById('secPersonas').classList.add('hidden');
-    document.getElementById('noResults').classList.add('hidden');
+function crearCardLista(lista) {
+    const items = lista.items || [];
+    const preview = items.slice(0,3);
+    const div = document.createElement('div');
+    div.className = 'bg-zinc-900/50 border border-white/5 rounded-2xl p-4 hover:border-accent/30 transition cursor-pointer group';
+    div.onclick = function() { abrirDetalleLista(lista.id, lista.nombre); };
+    const previewHTML = preview.map(it => `<div class="w-10 h-14 rounded-lg overflow-hidden border border-white/5 shrink-0"><img src="${it.poster||'https://via.placeholder.com/80x120?text=?'}" class="w-full h-full object-cover"></div>`).join('');
+    div.innerHTML = `
+        <div class="flex items-start gap-3 mb-3">
+            <div class="flex gap-1">${previewHTML || '<div class="w-10 h-14 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-600 shrink-0"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h10"/></svg></div>'}</div>
+        </div>
+        <h4 class="font-black uppercase tracking-tight text-sm truncate group-hover:text-accent transition">${lista.nombre}</h4>
+        <p class="text-[10px] text-zinc-500 font-bold mt-1">${items.length} ítem${items.length!==1?'s':''} · ${lista.esPropia?'Tuya':'Colaborativa'}</p>`;
+    return div;
 }
 
-// ── Arrancar si hay query en URL ───────────────────────────────────────────────
+// Modal detalle lista
+window.abrirDetalleLista = function(listaId, nombre) {
+    document.getElementById('modalDetalleLista').classList.remove('hidden');
+    document.getElementById('modalDetalleLista').classList.add('flex');
+    document.getElementById('detalleListaNombre').innerText = nombre;
+    document.getElementById('detalleListaGrid').innerHTML = '<p class="text-zinc-600 text-xs animate-pulse">Cargando...</p>';
+    getDoc(doc(db,'listas',listaId)).then(snap => {
+        if (!snap.exists()) return;
+        const items = snap.data().items || [];
+        const grid = document.getElementById('detalleListaGrid');
+        if (!items.length) { grid.innerHTML='<p class="text-zinc-600 text-xs italic">Lista vacía.</p>'; return; }
+        grid.innerHTML='';
+        items.forEach(it => {
+            const d = document.createElement('div');
+            d.className='relative group cursor-pointer';
+            d.onclick=function(){location.href=(it.tipo==='pelicula'?'pelicula.html':'serie.html')+'?id='+it.id;};
+            d.innerHTML=`<div class="aspect-[2/3] rounded-xl overflow-hidden border border-white/5 group-hover:border-accent transition">
+                <img src="${it.poster||'https://via.placeholder.com/200x300?text=?'}" class="w-full h-full object-cover">
+            </div>
+            <p class="text-[9px] font-bold uppercase tracking-tighter mt-1 truncate">${it.titulo||''}</p>`;
+            grid.appendChild(d);
+        });
+    });
+};
 
-// ── Latino IDs con caché ──────────────────────────────────────────────────────
+// ── Latino IDs ──
 window._latinoIDs = new Set();
 
 const _CACHE_KEY = 'movieM_latinoIDs';
@@ -437,8 +253,63 @@ function _cargarLatinoIDsConCache() {
 
 const _latinoIDsPromise = _cargarLatinoIDsConCache();
 
-if (qInit.length >= 2) buscar(qInit);
-else mostrarVacio();
+onAuthStateChanged(auth,async function(user){
+    if(!user){mostrar('estadoNoLogin');return;}
+    try{
+        var snap=await getDoc(doc(db,'usuarios',user.uid));
+        if(!snap.exists()){mostrar('estadoVacio');return;}
+        var data=snap.data();
+        if(data.color)document.documentElement.style.setProperty('--accent-color',data.color);
+
+        var watchlist=data.watchlist||[],seriesWatchlist=data.seriesWatchlist||[];
+
+        // Cargar listas personalizadas (propias + colaborativas)
+        const [snapListas1, snapListas2] = await Promise.all([
+            getDocs(query(collection(db,'listas'),where('ownerUID','==',user.uid))),
+            getDocs(query(collection(db,'listas'),where('colaboradores','array-contains',user.uid)))
+        ]);
+        const listas=[];
+        snapListas1.forEach(d=>listas.push({id:d.id,...d.data(),esPropia:true}));
+        snapListas2.forEach(d=>{if(!listas.find(l=>l.id===d.id))listas.push({id:d.id,...d.data(),esPropia:false});});
+        if(listas.length){
+            document.getElementById('secListas').classList.remove('hidden');
+            document.getElementById('cntListas').innerText='('+listas.length+')';
+            var grid=document.getElementById('gridListas'); grid.innerHTML='';
+            listas.forEach(function(l){grid.appendChild(crearCardLista(l));});
+        }
+
+        if(!watchlist.length&&!seriesWatchlist.length&&!listas.length){mostrar('estadoVacio');return;}
+        if(!watchlist.length&&!seriesWatchlist.length){mostrar('contenidoLista');return;}
+
+        var[pelis,series]=await Promise.all([
+            Promise.all(watchlist.map(function(id){return fetch('https://api.themoviedb.org/3/movie/'+id+'?api_key='+API_KEY+'&language=es-ES').then(function(r){return r.json();});})),
+            Promise.all(seriesWatchlist.map(function(id){return fetch('https://api.themoviedb.org/3/tv/'+id+'?api_key='+API_KEY+'&language=es-ES').then(function(r){return r.json();});}))
+        ]);
+        pelis=pelis.filter(function(p){return p&&!p.status_code;});
+        series=series.filter(function(s){return s&&!s.status_code;});
+        var total=pelis.length+series.length;
+        document.getElementById('subtitleLista').innerText=total+' elemento'+(total!==1?'s':'')+' guardado'+(total!==1?'s':'');
+        // Esperar IDs de latino antes de renderizar cards
+        await _latinoIDsPromise;
+        if(pelis.length){document.getElementById('secPeliculas').classList.remove('hidden');document.getElementById('cntPelis').innerText='('+pelis.length+')';var filaPelis=document.getElementById('filaPelis');filaPelis.innerHTML='';pelis.forEach(function(p){filaPelis.appendChild(crearCard(p,'pelicula'));});setTimeout(function(){actualizarFades('pelis');},100);}
+        if(series.length){document.getElementById('secSeries').classList.remove('hidden');document.getElementById('cntSeries').innerText='('+series.length+')';var filaSeries=document.getElementById('filaSeries');filaSeries.innerHTML='';series.forEach(function(s){filaSeries.appendChild(crearCard(s,'serie'));});setTimeout(function(){actualizarFades('series');},100);}
+        mostrar('contenidoLista');
+    }catch(e){console.error(e);mostrar('estadoVacio');}
+});
 </script>
+<!-- Modal Detalle Lista -->
+<div id="modalDetalleLista" class="fixed inset-0 z-[130] hidden items-end md:items-center justify-center bg-black/80 backdrop-blur-sm">
+    <div class="bg-zinc-900 border border-white/10 w-full max-w-2xl rounded-t-3xl md:rounded-3xl shadow-2xl flex flex-col max-h-[90vh]">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-white/5 shrink-0">
+            <h4 id="detalleListaNombre" class="text-sm font-black uppercase tracking-widest text-accent truncate max-w-[70%]"></h4>
+            <button onclick="document.getElementById('modalDetalleLista').classList.add('hidden');document.getElementById('modalDetalleLista').classList.remove('flex');"
+                class="w-8 h-8 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition">
+                <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div id="detalleListaGrid" class="overflow-y-auto no-scrollbar flex-1 p-4 grid grid-cols-3 md:grid-cols-5 gap-3"></div>
+    </div>
+</div>
+
 </body>
 </html>
