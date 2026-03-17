@@ -328,7 +328,7 @@
                         <p class="text-[8px] text-zinc-600 truncate italic px-1">${actor.character}</p>
                     </div>`).join('');
 
-                escucharComentariosNube(); 
+                escucharComentariosNube(true); 
                 checkStatus();
                 actualizarHUD();
                 // Guardar duración real para progreso más preciso
@@ -375,31 +375,59 @@
             return '';
         }
 
-        function escucharComentariosNube() {
+        let _unsubComentarios = null;
+        let _lastComDoc = null;
+        const _COMENTARIOS_LIMIT = 20;
+
+        async function escucharComentariosNube(reset) {
             const contenedor = document.getElementById('listaComentarios');
-            const q = window.query(
+            if (reset) {
+                _lastComDoc = null;
+                contenedor.innerHTML = '<p class="text-zinc-500 text-sm italic animate-pulse">Cargando comentarios...</p>';
+                // Limpiar suscripción anterior
+                if (_unsubComentarios) { _unsubComentarios(); _unsubComentarios = null; }
+            }
+
+            // Usar getDocs con limit en lugar de onSnapshot (ahorra lecturas)
+            let q = window.query(
                 window.collection(window.db, "comentarios"),
                 window.where("movieID", "==", movieID),
-                window.orderBy("fecha", "desc")
+                window.orderBy("fecha", "desc"),
+                window.limit(_COMENTARIOS_LIMIT)
+            );
+            if (_lastComDoc) q = window.query(
+                window.collection(window.db, "comentarios"),
+                window.where("movieID", "==", movieID),
+                window.orderBy("fecha", "desc"),
+                window.startAfter(_lastComDoc),
+                window.limit(_COMENTARIOS_LIMIT)
             );
 
-            // Primero buscamos los UIDs de todos los usuarios para poder mostrar badges
-            window.onSnapshot(q, async (snapshot) => {
-                contenedor.innerHTML = "";
-                if (snapshot.empty) {
+            try {
+                const snapshot = await window.getDocs(q);
+                if (reset) contenedor.innerHTML = '';
+
+                if (snapshot.empty && reset) {
                     contenedor.innerHTML = `<p class="text-zinc-600 text-sm italic">Nadie ha comentado aún. ¡Sé el primero!</p>`;
                     return;
                 }
+                if (snapshot.empty) return;
 
-                // Recolectar usernames únicos y buscar sus UIDs
+                _lastComDoc = snapshot.docs[snapshot.docs.length - 1];
+
+                // Recolectar usernames únicos para badges
                 const usernames = [...new Set(snapshot.docs.map(d => d.data().user))];
-                const uidMap = {}; // username → uid
+                const uidMap = {};
                 try {
                     const usersSnap = await window.getDocs(
                         window.query(window.collection(window.db, 'usuarios'), window.where('username', 'in', usernames.slice(0,10)))
                     );
                     usersSnap.forEach(d => { uidMap[d.data().username] = d.id; });
                 } catch(e) {}
+
+                // Eliminar botón "Ver más" anterior si existe
+                const oldBtn = document.getElementById('btnVerMasComentarios');
+                if (oldBtn) oldBtn.remove();
 
                 snapshot.forEach((docSnap) => {
                     const c = docSnap.data();
@@ -408,7 +436,6 @@
                     const uid = uidMap[c.user] || '';
                     const badge = getBadge(uid);
                     const esAdmin = miUID_pelicula === ADMIN_UID;
-                    
                     const div = document.createElement('div');
                     div.className = 'bg-zinc-900/50 p-5 rounded-2xl border border-white/5 shadow-xl fade-in mb-4 group/comment';
                     div.innerHTML = `
@@ -419,18 +446,29 @@
                                 </span>
                                 <span class="text-[9px] text-zinc-600 font-bold uppercase tracking-tighter">${fechaComentario}</span>
                             </div>
-                            <div class="flex items-center gap-2 shrink-0">
-                                <span class="text-yellow-500 text-[10px] tracking-widest">${"★".repeat(c.rating)}</span>
-                                ${esAdmin ? `<button onclick="borrarComentarioPelicula('${docId}')" class="opacity-0 group-hover/comment:opacity-100 transition-opacity w-6 h-6 rounded-full bg-red-900/60 hover:bg-red-600 flex items-center justify-center" title="Borrar">
-                                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                                </button>` : ''}
+                            <div class="flex items-center gap-1 shrink-0">
+                                ${esAdmin || c.user === (window._currentUser||'') ? `<button onclick="eliminarComentario('${docId}')" class="opacity-0 group-hover/comment:opacity-100 text-[9px] text-zinc-600 hover:text-red-500 font-bold uppercase transition">Eliminar</button>` : ''}
                             </div>
                         </div>
+                        <div class="flex gap-1 mb-3">${'★'.repeat(c.rating||0)}${'☆'.repeat(5-(c.rating||0))}</div>
                         <p class="text-zinc-400 text-sm leading-relaxed font-medium">${c.txt}</p>
                     `;
                     contenedor.appendChild(div);
                 });
-            });
+
+                // Botón "Ver más" si hay exactamente limit resultados
+                if (snapshot.docs.length === _COMENTARIOS_LIMIT) {
+                    const btn = document.createElement('button');
+                    btn.id = 'btnVerMasComentarios';
+                    btn.className = 'w-full py-3 mt-2 bg-zinc-900 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white hover:border-accent transition active:scale-95';
+                    btn.textContent = 'Ver más comentarios';
+                    btn.onclick = () => escucharComentariosNube(false);
+                    contenedor.appendChild(btn);
+                }
+            } catch(e) {
+                console.error('Error cargando comentarios:', e);
+                if (reset) contenedor.innerHTML = '<p class="text-zinc-600 text-sm italic">Error al cargar comentarios.</p>';
+            }
         }
 
         window.borrarComentarioPelicula = async function(docId) {
