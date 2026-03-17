@@ -94,20 +94,20 @@
             <div id="gridPersonas" class="flex gap-3 flex-wrap"></div>
         </section>
 
-        <!-- Sección películas -->
-        <section id="secPeliculas" class="mb-8 hidden">
-            <h2 class="text-sm font-black uppercase tracking-widest text-zinc-500 mb-4 flex items-center gap-2">
-                <span class="w-1 h-4 bg-accent rounded-full inline-block"></span> Películas
-            </h2>
-            <div id="gridPeliculas" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3 md:gap-4"></div>
-        </section>
-
         <!-- Sección series -->
         <section id="secSeries" class="mb-8 hidden">
             <h2 class="text-sm font-black uppercase tracking-widest text-zinc-500 mb-4 flex items-center gap-2">
                 <span class="w-1 h-4 bg-accent rounded-full inline-block"></span> Series
             </h2>
             <div id="gridSeries" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3 md:gap-4"></div>
+        </section>
+
+        <!-- Sección películas -->
+        <section id="secPeliculas" class="mb-8 hidden">
+            <h2 class="text-sm font-black uppercase tracking-widest text-zinc-500 mb-4 flex items-center gap-2">
+                <span class="w-1 h-4 bg-accent rounded-full inline-block"></span> Películas
+            </h2>
+            <div id="gridPeliculas" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-3 md:gap-4"></div>
         </section>
 
         <!-- Sin resultados -->
@@ -212,15 +212,30 @@ async function buscarUsuarios(q) {
     }
     if (!window.db) return [];
     try {
-        const snap = await window.getDocs(window.collection(window.db, 'usuarios'));
-        const usuarios = [];
-        snap.forEach(d => {
-            const u = d.data();
-            if (u.username && u.username.toLowerCase().includes(q.toLowerCase())) {
-                usuarios.push({ uid: d.id, username: u.username, avatar: u.avatar || null, color: u.color || '#dc2626' });
+        // Cache de usuarios en sessionStorage (30 seg) — evita getDocs repetidos mientras se tipea
+        const CACHE_KEY = 'movieM_usuarios_buscar';
+        const CACHE_TTL = 30 * 1000; // 30 segundos
+        let allUsers = null;
+        try {
+            const raw = sessionStorage.getItem(CACHE_KEY);
+            if (raw) {
+                const { data, ts } = JSON.parse(raw);
+                if (Date.now() - ts < CACHE_TTL) allUsers = data;
             }
-        });
-        return usuarios.slice(0, 10);
+        } catch(e) {}
+
+        if (!allUsers) {
+            const snap = await window.getDocs(window.collection(window.db, 'usuarios'));
+            allUsers = [];
+            snap.forEach(d => {
+                const u = d.data();
+                if (u.username && u.username.toLowerCase() !== 'invitado')
+                    allUsers.push({ uid: d.id, username: u.username, avatar: u.avatar||null, color: u.color||'#dc2626' });
+            });
+            try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: allUsers, ts: Date.now() })); } catch(e) {}
+        }
+
+        return allUsers.filter(u => u.username.toLowerCase().includes(q.toLowerCase())).slice(0, 10);
     } catch(e) { console.error('buscarUsuarios:', e); return []; }
 }
 
