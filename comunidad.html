@@ -290,40 +290,54 @@ async function cargarRankListas(usuarios) {
     });
 }
 
+async function _fetchRankComentariosData() {
+    const snap = await window.getDocs(window.collection(window.db, 'comentarios'));
+    const conteo = {};
+    snap.forEach(d => {
+        const user = d.data().user;
+        if (user && user.toLowerCase() !== 'invitado') conteo[user] = (conteo[user]||0)+1;
+    });
+    const sorted = Object.entries(conteo).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    const usernames = sorted.map(([u])=>u);
+    const avatarMap = {};
+    if (usernames.length) {
+        try {
+            const usSnap = await window.getDocs(window.query(window.collection(window.db,'usuarios'),window.where('username','in',usernames.slice(0,10))));
+            usSnap.forEach(d=>{ avatarMap[d.data().username]=d.data().avatar||null; });
+        } catch(e) {}
+    }
+    return sorted.map(([username,count])=>({username,count,avatar:avatarMap[username]||null}));
+}
+
+function _renderRankComentarios(cont, data) {
+    cont.innerHTML = '';
+    if (!data.length) { cont.innerHTML='<p class="text-zinc-600 text-xs text-center py-6 italic">Sin comentarios aún.</p>'; return; }
+    data.forEach((item,i)=>cont.appendChild(renderRankCard(i,item.username,item.avatar,item.count,item.count===1?'comentario':'comentarios')));
+}
+
 async function cargarRankComentarios() {
     const cont = document.getElementById('rankComentarios');
+    const KEY = 'movieM_rankComentarios', TTL = 5*60*1000;
     try {
-        const snap = await window.getDocs(window.collection(window.db, 'comentarios'));
-        const conteo = {};
-        snap.forEach(d => {
-            const user = d.data().user;
-            if (user && user.toLowerCase() !== 'invitado') conteo[user] = (conteo[user] || 0) + 1;
-        });
-
-        const sorted = Object.entries(conteo)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 10);
-
-        cont.innerHTML = '';
-        if (!sorted.length) {
-            cont.innerHTML = '<p class="text-zinc-600 text-xs text-center py-6 italic">Sin comentarios aún.</p>';
-            return;
-        }
-
-        // Buscar avatars para los top users
-        const usernames = sorted.map(([u]) => u);
-        const avatarMap = {};
+        // 1. Intentar caché
         try {
-            // Buscar en lotes de 10 (límite de 'in')
-            const usSnap = await window.getDocs(
-                window.query(window.collection(window.db, 'usuarios'), window.where('username', 'in', usernames.slice(0, 10)))
-            );
-            usSnap.forEach(d => { avatarMap[d.data().username] = d.data().avatar || null; });
+            const raw = localStorage.getItem(KEY);
+            if (raw) {
+                const {data,ts} = JSON.parse(raw);
+                if (Date.now()-ts < TTL) {
+                    _renderRankComentarios(cont, data);
+                    // Refrescar en background sin bloquear
+                    _fetchRankComentariosData().then(fresh=>{
+                        try { localStorage.setItem(KEY, JSON.stringify({data:fresh,ts:Date.now()})); } catch(e){}
+                    }).catch(()=>{});
+                    return;
+                }
+            }
         } catch(e) {}
-
-        sorted.forEach(([username, count], i) => {
-            cont.appendChild(renderRankCard(i, username, avatarMap[username] || null, count, count === 1 ? 'comentario' : 'comentarios'));
-        });
+        // 2. Sin caché → fetch fresco
+        const data = await _fetchRankComentariosData();
+        try { localStorage.setItem(KEY, JSON.stringify({data,ts:Date.now()})); } catch(e){}
+        _renderRankComentarios(cont, data);
     } catch(e) {
         cont.innerHTML = '<p class="text-red-500 text-xs text-center py-6">Error al cargar.</p>';
     }
@@ -338,19 +352,51 @@ async function init() {
         return;
     }
 
+    const KEY_USR = 'movieM_rankUsuarios', TTL = 5*60*1000;
     try {
-        const snap = await window.getDocs(window.collection(window.db, 'usuarios'));
-        const usuarios = [];
-        snap.forEach(d => {
-            const data = d.data();
-            if (data.username && data.username.toLowerCase() !== 'invitado') usuarios.push({ uid: d.id, ...data });
-        });
+        let usuarios = null;
+
+        // Intentar caché de usuarios
+        try {
+            const raw = localStorage.getItem(KEY_USR);
+            if (raw) {
+                const {data, ts} = JSON.parse(raw);
+                if (Date.now() - ts < TTL) usuarios = data;
+            }
+        } catch(e) {}
+
+        if (!usuarios) {
+            const snap = await window.getDocs(window.collection(window.db, 'usuarios'));
+            usuarios = [];
+            snap.forEach(d => {
+                const data = d.data();
+                if (data.username && data.username.toLowerCase() !== 'invitado')
+                    usuarios.push({ uid: d.id, username: data.username, avatar: data.avatar||null,
+                                    seguidores: data.seguidores||[], watchlist: data.watchlist||[],
+                                    seriesWatchlist: data.seriesWatchlist||[] });
+            });
+            try { localStorage.setItem(KEY_USR, JSON.stringify({data: usuarios, ts: Date.now()})); } catch(e) {}
+        }
 
         await Promise.all([
             cargarRankSeguidores(usuarios),
             cargarRankListas(usuarios),
             cargarRankComentarios()
         ]);
+
+        // Refrescar usuarios en background para próxima visita
+        window.getDocs(window.collection(window.db, 'usuarios')).then(snap => {
+            const fresh = [];
+            snap.forEach(d => {
+                const data = d.data();
+                if (data.username && data.username.toLowerCase() !== 'invitado')
+                    fresh.push({ uid: d.id, username: data.username, avatar: data.avatar||null,
+                                 seguidores: data.seguidores||[], watchlist: data.watchlist||[],
+                                 seriesWatchlist: data.seriesWatchlist||[] });
+            });
+            try { localStorage.setItem(KEY_USR, JSON.stringify({data: fresh, ts: Date.now()})); } catch(e) {}
+        }).catch(()=>{});
+
     } catch(e) {
         console.error(e);
     }
