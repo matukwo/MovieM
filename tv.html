@@ -169,13 +169,13 @@ var CANALES = [
      "type":"hls","url":"https://live-01-01-tn.vodgc.net/TN24/index_TN24_1080.m3u8"},
     {"id":"a24","nombre":"A24","cat":"Noticias","pais":"🇦🇷",
      "logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/A24_logo.svg/240px-A24_logo.svg.png",
-     "type":"youtube","url":"https://www.youtube.com/embed/ArKbAx1K-2U"},
+     "type":"youtube","url":"https://www.youtube-nocookie.com/embed/ArKbAx1K-2U"},
     {"id":"cronica","nombre":"Crónica","cat":"Noticias","pais":"🇦🇷",
      "logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Cronica_TV_logo.svg/240px-Cronica_TV_logo.svg.png",
-     "type":"youtube","url":"https://www.youtube.com/embed/JC7f3EUDaqw"},
+     "type":"youtube","url":"https://www.youtube-nocookie.com/embed/JC7f3EUDaqw"},
     {"id":"lanacion","nombre":"LN+","cat":"Noticias","pais":"🇦🇷",
      "logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/LN%2B_logo.svg/240px-LN%2B_logo.svg.png",
-     "type":"youtube","url":"https://www.youtube.com/embed/DVZ2rJQb_0g"},
+     "type":"youtube","url":"https://www.youtube-nocookie.com/embed/DVZ2rJQb_0g"},
     {"id":"espn","nombre":"ESPN","cat":"Deportes","pais":"🌎",
      "logo":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/ESPN_wordmark.svg/240px-ESPN_wordmark.svg.png",
      "type":"iframe","url":"https://nebunexa.life/cvatt.html?get=RVNQTjJIRA&lang=1"},
@@ -312,7 +312,9 @@ function cargarCanal(canal) {
     if (canal.type === 'youtube') {
         video.style.display = 'none'; video.src = '';
         frame.style.display = 'block';
-        frame.src = canal.url + '?autoplay=1&mute=0';
+        // YouTube: usar youtube-nocookie para evitar restricciones
+        var ytUrl = canal.url.replace('youtube.com', 'youtube-nocookie.com');
+        frame.src = ytUrl + '?autoplay=1&rel=0&modestbranding=1';
         hideOverlay();
         return;
     }
