@@ -29,7 +29,11 @@
         <span class="text-red-600 font-black tracking-tighter text-lg md:text-xl shrink-0">MOVIE<span class="text-white font-light">M</span></span>
         <div id="fuentesBtns" class="flex gap-2">
             <button id="btnFuenteSub" onclick="cambiarFuente('sub')" class="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition bg-white/10 border-white/20 text-white">Subtitulado</button>
-            <button id="btnFuenteLat" onclick="cambiarFuente('latino')" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">Latino</button>
+            <button id="btnSrv1" onclick="cambiarFuente(1)" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">Servidor 1</button>
+            <button id="btnSrv2" onclick="cambiarFuente(2)" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">Servidor 2</button>
+            <button id="btnSrv3" onclick="cambiarFuente(3)" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">Servidor 3</button>
+            <button id="btnSrv4" onclick="cambiarFuente(4)" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">Servidor 4</button>
+            <button id="btnSrv5" onclick="cambiarFuente(5)" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">Servidor 5</button>
         </div>
         <button onclick="cerrarPelicula()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/5 shrink-0">Cerrar x</button>
     </div>
@@ -106,6 +110,9 @@
                     <button id="btnLike" onclick="toggleLike()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78v0z"/></svg>
                     </button>
+                    <button id="btnVisto" onclick="toggleVisto()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95" title="Marcar como vista">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    </button>
                     <button onclick="compartir()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95" title="Compartir">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
                     </button>
@@ -147,6 +154,9 @@
                 </button>
                 <button id="btnLikeDesktop" onclick="toggleLike()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95" title="Me gusta">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78v0z"/></svg>
+                </button>
+                <button id="btnVistoDesktop" onclick="toggleVisto()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95" title="Marcar como vista">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                 </button>
                 <button onclick="compartir()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95" title="Compartir">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
@@ -484,6 +494,9 @@
                     if (data.likes && data.likes.includes(movieID)) {
                         ['btnLike','btnLikeDesktop'].forEach(id => { const b=document.getElementById(id); if(!b)return; b.classList.add('bg-red-600','border-red-600','text-white'); b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5'); });
                     }
+                    if (data.visto && data.visto.some(v => String(v.id) === String(movieID))) {
+                        actualizarBtnVisto(true);
+                    }
                 }
             } catch (e) { console.error("Error al checkear status:", e); }
         }
@@ -532,6 +545,43 @@
             t.style.opacity = '1';
             clearTimeout(t._timer);
             t._timer = setTimeout(() => { t.style.opacity = '0'; }, 2000);
+        }
+
+        window.toggleVisto = async () => {
+            if (!miUID_pelicula) return alert('Debes iniciar sesión.');
+            const btn = document.getElementById('btnVisto');
+            const isVisto = btn.classList.contains('text-green-500');
+            try {
+                const userRef = window.doc(window.db, 'usuarios', miUID_pelicula);
+                const snap = await window.getDoc(userRef);
+                const data = snap.exists() ? snap.data() : {};
+                let visto = data.visto || [];
+                if (isVisto) {
+                    visto = visto.filter(v => String(v.id) !== String(movieID));
+                } else {
+                    const titulo = document.getElementById('titulo')?.innerText || document.getElementById('tituloMobile')?.innerText || '';
+                    const poster = document.getElementById('poster')?.src || '';
+                    visto = visto.filter(v => String(v.id) !== String(movieID));
+                    visto.push({ id: String(movieID), tipo: 'pelicula', titulo, poster, fecha: Date.now() });
+                }
+                await window.setDoc(userRef, { visto }, { merge: true });
+                actualizarBtnVisto(!isVisto);
+            } catch(e) { console.error(e); }
+        };
+
+        function actualizarBtnVisto(visto) {
+            ['btnVisto','btnVistoDesktop'].forEach(id => {
+                const b = document.getElementById(id); if (!b) return;
+                if (visto) {
+                    b.classList.add('text-green-500','border-green-500/50','bg-green-500/10');
+                    b.classList.remove('text-zinc-400','bg-zinc-900','border-white/5');
+                    b.title = 'Vista ✓';
+                } else {
+                    b.classList.remove('text-green-500','border-green-500/50','bg-green-500/10');
+                    b.classList.add('text-zinc-400','bg-zinc-900','border-white/5');
+                    b.title = 'Marcar como vista';
+                }
+            });
         }
 
         window.toggleLike = async () => {
@@ -681,8 +731,7 @@
 
         // Cargar link latino desde Firestore
         // Link latino desde Firestore
-        let _latinoUrl = null;
-        let _latinoUrl2 = null;
+        let _latinoUrls = [null,null,null,null,null];
         async function cargarLatinoLink() {
             try {
                 for (let i = 0; i < 30; i++) {
@@ -691,9 +740,14 @@
                 }
                 const snap = await window.getDoc(window.doc(window.db, 'latinoLinks', String(movieID)));
                 if (snap.exists()) {
-                    _latinoUrl = snap.data().url;
-                    _latinoUrl2 = snap.data().url2 || null;
-                    document.getElementById('btnFuenteLat').classList.remove('hidden');
+                    const d = snap.data();
+                    _latinoUrls = [d.url, d.url2||null, d.url3||null, d.url4||null, d.url5||null];
+                    _latinoUrls.forEach(function(u, i) {
+                        if (u) {
+                            var btn = document.getElementById('btnSrv' + (i+1));
+                            if (btn) btn.classList.remove('hidden');
+                        }
+                    });
                 }
             } catch(e) { console.log('Sin link latino para esta película'); }
         }
@@ -706,37 +760,45 @@
         };
 
         window.cambiarFuente = function(fuente) {
-            // Al cambiar de fuente: guardar progreso acumulado y reiniciar cronómetro
             if (progresoInicio) {
                 const duracionMs = (window._peliculaDuracion || 120) * 60 * 1000;
                 const incremento = ((Date.now() - progresoInicio) / duracionMs) * 100;
-                const pctActual = _progresoBase + incremento;
-                _progresoBase = pctActual; // actualizar base
-                guardarProgreso(pctActual);
-                progresoInicio = Date.now(); // reiniciar cronómetro
+                _progresoBase += incremento;
+                guardarProgreso(_progresoBase);
+                progresoInicio = Date.now();
             }
-            const subBtn = document.getElementById('btnFuenteSub');
-            const latBtn = document.getElementById('btnFuenteLat');
-            const respaldoWrap = document.getElementById('btnRespaldoWrap');
-            const base = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition';
+            const base  = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition';
+            const off   = base + ' border-white/10 text-white/40 hover:text-yellow-400';
+            const offW  = base + ' border-white/10 text-white/40 hover:text-white';
+            const activ = base + ' bg-yellow-500/20 border-yellow-500/50 text-yellow-400';
+
+            // Resetear todos los botones
+            document.getElementById('btnFuenteSub').className = offW;
+            for (var i = 1; i <= 5; i++) {
+                var b = document.getElementById('btnSrv'+i);
+                if (b) b.className = off;
+            }
+            document.getElementById('btnRespaldoWrap').classList.add('hidden');
+
             if (fuente === 'sub') {
-                subBtn.className = base + ' bg-white/10 border-white/20 text-white';
-                latBtn.className = base + ' border-white/10 text-white/40 hover:text-yellow-400';
-                respaldoWrap.classList.add('hidden');
+                document.getElementById('btnFuenteSub').className = base + ' bg-white/10 border-white/20 text-white';
                 document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
             } else {
-                latBtn.className = base + ' bg-yellow-500/20 border-yellow-500/50 text-yellow-400';
-                subBtn.className = base + ' border-white/10 text-white/40 hover:text-white';
-                document.getElementById('movieFrame').src = _latinoUrl;
-                if (_latinoUrl2) respaldoWrap.classList.remove('hidden');
+                // fuente es número 1-5
+                var idx = fuente - 1;
+                var url = _latinoUrls[idx];
+                if (!url) return;
+                var btn = document.getElementById('btnSrv' + fuente);
+                if (btn) btn.className = activ;
+                document.getElementById('movieFrame').src = url;
             }
         };
 
         window.verPelicula = () => {
             document.getElementById('btnFuenteSub').className = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition bg-white/10 border-white/20 text-white';
-            const latBtn = document.getElementById('btnFuenteLat');
-            if (!latBtn.classList.contains('hidden')) {
-                latBtn.className = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400';
+            for (var i = 1; i <= 5; i++) {
+                var b = document.getElementById('btnSrv'+i);
+                if (b) b.className = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400';
             }
             document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
             document.getElementById('playerOverlay').style.display = 'flex';
