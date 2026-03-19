@@ -20,12 +20,6 @@
         .sk-circle{border-radius:9999px!important}
         .fade-in { animation: fi .5s ease forwards; opacity: 0; }
         @keyframes fi { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-
-        .xp-bar-track { background:rgba(255,255,255,.06); border-radius:999px; overflow:hidden; height:6px; }
-        .xp-bar-fill  { height:100%; border-radius:999px; background:var(--accent,#dc2626); transition:width 1.2s cubic-bezier(.4,0,0,1); }
-        .logro-card   { transition:transform .2s; cursor:default; }
-        .logro-card:hover { transform:translateY(-2px); }
-        .logro-card.bloqueado { filter:grayscale(1); opacity:.35; }
     </style>
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden pb-24 md:pb-0">
@@ -231,26 +225,6 @@
 
         <!-- Sidebar -->
         <aside class="space-y-6">
-
-            <!-- Nivel & XP -->
-            <section id="secNivel" class="hidden bg-zinc-900/30 p-5 rounded-2xl border border-white/5 shadow-lg">
-                <div class="flex items-center gap-3 mb-3">
-                    <div id="nivelBadge" class="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-black shrink-0 shadow-lg" style="background:var(--accent,#dc2626)">👁️</div>
-                    <div class="flex-1 min-w-0">
-                        <p id="nivelNombre" class="text-xs font-black uppercase tracking-widest text-white">Espectador</p>
-                        <p id="nivelXPLabel" class="text-[9px] text-zinc-500 font-bold mt-0.5">0 XP · Nivel 1</p>
-                    </div>
-                </div>
-                <div class="xp-bar-track mb-1"><div id="xpBarFill" class="xp-bar-fill" style="width:0%"></div></div>
-                <p id="xpDetalle" class="text-[8px] text-zinc-600 uppercase tracking-widest font-bold mt-1">Calificá películas para ganar XP</p>
-            </section>
-
-            <!-- Logros -->
-            <section id="secLogros" class="hidden bg-zinc-900/30 p-5 rounded-2xl border border-white/5 shadow-lg">
-                <h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-4 italic">Logros</h3>
-                <div id="logrosGrid" class="grid grid-cols-3 gap-2"></div>
-            </section>
-
             <!-- Actores favoritos -->
             <section class="bg-zinc-900/30 p-5 md:p-6 rounded-2xl md:rounded-3xl border border-white/5 text-center relative overflow-hidden group shadow-lg min-h-[180px] md:min-h-[220px] flex flex-col">
                 <h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-4 italic">Actores Favoritos</h3>
@@ -265,25 +239,35 @@
                 </button>
                 <button id="btnAgregarActor" class="hidden mt-4 text-[9px] font-black uppercase tracking-widest text-accent hover:underline" onclick="abrirBuscadorActor()">+ Agregar Actor</button>
             </section>
-
-            <!-- Directores favoritos -->
-            <section class="bg-zinc-900/30 p-5 md:p-6 rounded-2xl md:rounded-3xl border border-white/5 text-center relative overflow-hidden group shadow-lg min-h-[180px] md:min-h-[220px] flex flex-col">
-                <h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-4 italic">Directores Favoritos</h3>
-                <div class="relative overflow-hidden flex-1">
-                    <div id="directorCarousel" class="flex h-full"></div>
-                </div>
-                <button onclick="prevDirector()" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition z-10">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
-                </button>
-                <button onclick="nextDirector()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition z-10">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg>
-                </button>
-                <button id="btnAgregarDirector" class="hidden mt-4 text-[9px] font-black uppercase tracking-widest text-accent hover:underline" onclick="abrirBuscadorDirector()">+ Agregar Director</button>
-            </section>
-
-        </aside>
+        <!-- Películas/Series Vistas -->
+        <section id="secVistas" class="bg-zinc-900/30 p-5 md:p-6 rounded-2xl md:rounded-3xl border border-white/5 shadow-lg fade-in">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 italic">Vistas</h3>
+                <span id="contVistas" class="text-xs font-black text-accent">0</span>
+            </div>
+            <div id="gridVistas" class="grid grid-cols-3 gap-2"></div>
+            <p id="sinVistas" class="text-[10px] text-zinc-600 italic text-center py-4">Ninguna todavía.</p>
+            <button id="btnVerTodasVistas" class="hidden mt-3 w-full text-[9px] font-black uppercase tracking-widest text-zinc-500 hover:text-accent transition" onclick="verTodasVistas()">Ver todas →</button>
+        </section>
+    </aside>
     </div>
 </main>
+
+<!-- Modal todas las vistas -->
+<div id="modalTodasVistas" class="fixed inset-0 z-[400] flex items-end md:items-center justify-center bg-black/80 hidden px-0 md:px-4">
+    <div class="bg-zinc-900 border border-white/10 w-full max-w-3xl rounded-t-3xl md:rounded-3xl shadow-2xl flex flex-col max-h-[85vh]">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-white/5 shrink-0">
+            <h4 class="text-sm font-black uppercase tracking-widest text-white flex items-center gap-2">
+                <span class="w-1 h-4 bg-accent rounded-full inline-block"></span>
+                Vistas <span id="modalContVistas" class="text-accent"></span>
+            </h4>
+            <button onclick="cerrarModalVistas()" class="text-zinc-500 hover:text-white transition p-1">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div id="gridTodasVistas" class="overflow-y-auto flex-1 p-4 grid grid-cols-3 md:grid-cols-5 gap-3 no-scrollbar"></div>
+    </div>
+</div>
 
 <!-- Bottom nav mobile -->
 <nav class="fixed bottom-0 w-full md:hidden bg-zinc-950/95 backdrop-blur-md border-t border-white/5 z-50">
@@ -318,7 +302,6 @@
     const paramUser = params.get('user');
     let miUID=null, miUsername=null, perfilUID=null, perfilUsername=null, isMiPerfil=false;
     let actorIndex=0, actoresLocal=[], favoritasLocal=[null,null,null,null], slotSel=null, tipoBusq='peli';
-    let directorIndex=0, directoresLocal=[];
 
     // ── UID del creador/admin de la página ────────────────────────
     // Reemplazá este valor con tu UID real de Firebase (lo encontrás en Firebase Console → Authentication)
@@ -441,16 +424,14 @@
         document.getElementById('contSeguidores').innerText = segs;
         document.getElementById('contSiguiendo').innerText = sig;
 
-        actoresLocal    = data.actores||[];
-        directoresLocal = data.directores||[];
-        favoritasLocal  = data.favoritas||[null,null,null,null];
+        actoresLocal = data.actores||[];
+        favoritasLocal = data.favoritas||[null,null,null,null];
 
         if (isMiPerfil) {
             var oe = document.getElementById('overlayEdit');
             oe.classList.remove('hidden'); oe.classList.add('flex');
             document.getElementById('btnEditarBio').classList.remove('hidden');
             document.getElementById('btnAgregarActor').classList.remove('hidden');
-            document.getElementById('btnAgregarDirector').classList.remove('hidden');
             document.getElementById('btnSeccionColor').classList.remove('hidden');
             document.getElementById('btnBell').classList.remove('hidden');
             document.getElementById('btnEditarPerfil').classList.remove('hidden');
@@ -478,9 +459,8 @@
             }
         }
         renderizarActores();
-        renderizarDirectores();
-        cargarNivelYLogros(data);
         cargarComentarios();
+        cargarVistas(data.visto || []);
     }
 
     // ── Panel ajustes toggle ──────────────────────────────────────
@@ -601,7 +581,6 @@
             d.onclick = async function() {
                 if (tipoBusq==='peli') { favoritasLocal[slotSel]={poster:img,id:item.id}; await guardarDato('favoritas',favoritasLocal); renderizarFavs(true); }
                 else if (tipoBusq==='actor') { actoresLocal.push({nombre:item.name,foto:img}); await guardarDato('actores',actoresLocal); actorIndex=actoresLocal.length-1; renderizarActores(); moverCarrusel(); }
-                else if (tipoBusq==='director') { directoresLocal.push({nombre:item.name,foto:img}); await guardarDato('directores',directoresLocal); directorIndex=directoresLocal.length-1; renderizarDirectores(); }
                 else { await guardarDato('avatar','https://image.tmdb.org/t/p/w500'+img); document.getElementById('userAvatarFrame').innerHTML='<img src="https://image.tmdb.org/t/p/w500'+img+'" class="w-full h-full object-cover">'; }
                 cerrarModalBusqueda();
             };
@@ -644,6 +623,72 @@
     window.nextActor = function(){ actorIndex = actorIndex<actoresLocal.length-1 ? actorIndex+1 : 0; moverCarrusel(); };
     window.prevActor = function(){ actorIndex = actorIndex>0 ? actorIndex-1 : actoresLocal.length-1; moverCarrusel(); };
     function moverCarrusel(){ document.getElementById('actorCarousel').style.transform='translateX(-'+(actorIndex*100)+'%)'; }
+
+    // ── Vistas ────────────────────────────────────────────────────
+    function cargarVistas(vistas) {
+        const grid     = document.getElementById('gridVistas');
+        const sinEl    = document.getElementById('sinVistas');
+        const contEl   = document.getElementById('contVistas');
+        const btnTodas = document.getElementById('btnVerTodasVistas');
+        if (!grid) return;
+
+        contEl.textContent = vistas.length;
+        document.getElementById('modalContVistas').textContent = '(' + vistas.length + ')';
+
+        if (!vistas.length) {
+            grid.innerHTML = '';
+            sinEl.classList.remove('hidden');
+            btnTodas.classList.add('hidden');
+            return;
+        }
+
+        sinEl.classList.add('hidden');
+        const recientes = [...vistas].sort((a,b) => (b.fecha||0)-(a.fecha||0)).slice(0, 9);
+        grid.innerHTML = '';
+        recientes.forEach(function(v) {
+            const poster = v.poster || '';
+            const href = (v.tipo === 'serie' ? 'serie' : 'pelicula') + '.html?id=' + v.id;
+            const div = document.createElement('div');
+            div.className = 'aspect-[2/3] rounded-xl overflow-hidden border border-white/5 cursor-pointer hover:border-accent/40 transition group';
+            div.onclick = () => location.href = href;
+            div.innerHTML = poster
+                ? '<img src="' + poster + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">'
+                : '<div class="w-full h-full bg-zinc-800 flex items-center justify-center text-zinc-600 text-xs font-bold">' + (v.titulo||'?').charAt(0) + '</div>';
+            grid.appendChild(div);
+        });
+
+        if (vistas.length > 9) btnTodas.classList.remove('hidden');
+        else btnTodas.classList.add('hidden');
+
+        // Rellenar el modal con todas
+        const gridTodas = document.getElementById('gridTodasVistas');
+        if (gridTodas) {
+            gridTodas.innerHTML = '';
+            [...vistas].sort((a,b) => (b.fecha||0)-(a.fecha||0)).forEach(function(v) {
+                const poster = v.poster || '';
+                const href = (v.tipo === 'serie' ? 'serie' : 'pelicula') + '.html?id=' + v.id;
+                const div = document.createElement('div');
+                div.className = 'aspect-[2/3] rounded-xl overflow-hidden border border-white/5 cursor-pointer hover:border-accent/40 transition';
+                div.onclick = () => location.href = href;
+                div.innerHTML = poster
+                    ? '<img src="' + poster + '" class="w-full h-full object-cover" loading="lazy">'
+                    : '<div class="w-full h-full bg-zinc-800 flex items-center justify-center text-zinc-600 text-xs font-bold">' + (v.titulo||'?').charAt(0) + '</div>';
+                gridTodas.appendChild(div);
+            });
+        }
+    }
+
+    window.verTodasVistas = function() {
+        document.getElementById('modalTodasVistas').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    };
+    window.cerrarModalVistas = function() {
+        document.getElementById('modalTodasVistas').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    };
+    document.getElementById('modalTodasVistas').addEventListener('click', function(e) {
+        if (e.target === this) window.cerrarModalVistas();
+    });
 
     // ── Comentarios ───────────────────────────────────────────────
     async function cargarComentarios() {
@@ -904,122 +949,6 @@ document.getElementById('modalEditarPerfil').addEventListener('click', function(
         };
     }, 100);
 })();
-
-    // ── DIRECTORES FAVORITOS ─────────────────────────────────────────────────
-    function renderizarDirectores() {
-        var c = document.getElementById('directorCarousel');
-        if (!directoresLocal.length) {
-            c.innerHTML = '<div class="min-w-full h-full flex items-center justify-center text-zinc-600 text-[9px] font-bold uppercase italic">Sin directores</div>';
-            return;
-        }
-        c.innerHTML = directoresLocal.map(function(d, i) {
-            var src = d.foto && d.foto.startsWith('http') ? d.foto : 'https://image.tmdb.org/t/p/w200' + d.foto;
-            return '<div class="min-w-full flex flex-col items-center justify-center h-full">'
-                + '<div class="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 overflow-hidden mb-2 shadow-xl shrink-0" style="border-color:var(--accent,#dc2626)">'
-                + '<img src="' + src + '" class="w-full h-full object-cover" loading="lazy">'
-                + '</div>'
-                + '<p class="text-[9px] font-black text-white uppercase tracking-widest truncate w-full px-2 text-center">' + d.nombre + '</p>'
-                + '<p class="text-[8px] text-zinc-600 font-bold uppercase tracking-widest">Director</p>'
-                + (isMiPerfil ? '<button onclick="eliminarDirector()" class="text-[8px] text-zinc-600 mt-1 hover:text-red-500 uppercase font-bold">Quitar</button>' : '')
-                + '</div>';
-        }).join('');
-        document.getElementById('directorCarousel').style.transform = 'translateX(-' + (directorIndex * 100) + '%)';
-    }
-    window.eliminarDirector = async function() {
-        directoresLocal.splice(directorIndex, 1);
-        directorIndex = 0;
-        await guardarDato('directores', directoresLocal);
-        renderizarDirectores();
-    };
-    window.nextDirector = function() {
-        directorIndex = directorIndex < directoresLocal.length - 1 ? directorIndex + 1 : 0;
-        document.getElementById('directorCarousel').style.transform = 'translateX(-' + (directorIndex * 100) + '%)';
-    };
-    window.prevDirector = function() {
-        directorIndex = directorIndex > 0 ? directorIndex - 1 : directoresLocal.length - 1;
-        document.getElementById('directorCarousel').style.transform = 'translateX(-' + (directorIndex * 100) + '%)';
-    };
-    window.abrirBuscadorDirector = function() { tipoBusq = 'director'; mostrarModal('Agregar Director'); };
-
-    // ── NIVELES Y LOGROS ─────────────────────────────────────────────────────
-    var NIVELES = [
-        {nivel:1, nombre:'Espectador',  emoji:'👁️',  xpMin:0,    xpMax:50   },
-        {nivel:2, nombre:'Cinéfilo',    emoji:'🎬',  xpMin:50,   xpMax:150  },
-        {nivel:3, nombre:'Crítico',     emoji:'✍️',  xpMin:150,  xpMax:300  },
-        {nivel:4, nombre:'Guionista',   emoji:'📝',  xpMin:300,  xpMax:500  },
-        {nivel:5, nombre:'Director',    emoji:'🎥',  xpMin:500,  xpMax:800  },
-        {nivel:6, nombre:'Productor',   emoji:'💼',  xpMin:800,  xpMax:1200 },
-        {nivel:7, nombre:'Maestro',     emoji:'🏆',  xpMin:1200, xpMax:1800 },
-        {nivel:8, nombre:'Leyenda',     emoji:'⭐',  xpMin:1800, xpMax:2500 },
-        {nivel:9, nombre:'Icono',       emoji:'🌟',  xpMin:2500, xpMax:9999 }
-    ];
-
-    var LOGROS = [
-        {id:'primer_comentario', nombre:'Primer Aplauso',   emoji:'💬', xp:10, desc:'Escribi tu primer comentario',      check:function(d){ return (d.totalComentarios||0)>=1; }},
-        {id:'diez_comentarios',  nombre:'Critico Activo',   emoji:'✍️', xp:25, desc:'10 comentarios escritos',            check:function(d){ return (d.totalComentarios||0)>=10; }},
-        {id:'primer_favorita',   nombre:'Primera Joya',     emoji:'💎', xp:10, desc:'Guardaste una pelicula favorita',    check:function(d){ return (d.favoritas||[]).some(function(f){return f!=null;}); }},
-        {id:'cuatro_favoritas',  nombre:'Coleccionista',    emoji:'🗃️', xp:20, desc:'4 peliculas favoritas guardadas',    check:function(d){ return (d.favoritas||[]).filter(function(f){return f!=null;}).length>=4; }},
-        {id:'primer_actor',      nombre:'Fan de Actores',   emoji:'⭐', xp:10, desc:'Agregaste tu primer actor favorito', check:function(d){ return (d.actores||[]).length>=1; }},
-        {id:'primer_director',   nombre:'Fan Directores',   emoji:'🎬', xp:10, desc:'Agregaste un director favorito',     check:function(d){ return (d.directores||[]).length>=1; }},
-        {id:'seguidor',          nombre:'Social',           emoji:'👥', xp:5,  desc:'Seguis a alguien',                   check:function(d){ return (d.siguiendo||[]).length>=1; }},
-        {id:'cinco_seguidores',  nombre:'Influencer',       emoji:'📣', xp:30, desc:'5 personas te siguen',               check:function(d){ return (d.seguidores||[]).length>=5; }},
-        {id:'bio',               nombre:'Me Presento',      emoji:'📖', xp:5,  desc:'Agregaste una bio',                  check:function(d){ return !!(d.bio&&d.bio.trim()); }},
-        {id:'avatar',            nombre:'Cara Conocida',    emoji:'🖼️', xp:5,  desc:'Subiste foto de perfil',             check:function(d){ return !!(d.avatar); }},
-        {id:'lista_diez',        nombre:'Lista de Deseos',  emoji:'📋', xp:20, desc:'10 titulos en tu lista',             check:function(d){ return ((d.watchlist||[]).length+(d.seriesWatchlist||[]).length)>=10; }}
-    ];
-
-    function calcularXP(data) {
-        var xp = 0;
-        xp += (data.totalComentarios||0) * 5;
-        xp += (data.favoritas||[]).filter(function(f){return f!=null;}).length * 8;
-        xp += (data.actores||[]).length * 5;
-        xp += (data.directores||[]).length * 5;
-        xp += Math.min((data.seguidores||[]).length, 50) * 3;
-        xp += (data.bio&&data.bio.trim()) ? 10 : 0;
-        xp += data.avatar ? 10 : 0;
-        xp += ((data.watchlist||[]).length + (data.seriesWatchlist||[]).length) * 2;
-        LOGROS.forEach(function(l){ if(l.check(data)) xp += l.xp; });
-        return xp;
-    }
-
-    function cargarNivelYLogros(data) {
-        try {
-            var xp = calcularXP(data);
-            var nivelData = NIVELES[0];
-            for (var i = NIVELES.length-1; i >= 0; i--) {
-                if (xp >= NIVELES[i].xpMin) { nivelData = NIVELES[i]; break; }
-            }
-            document.getElementById('secNivel').classList.remove('hidden');
-            document.getElementById('secLogros').classList.remove('hidden');
-            document.getElementById('nivelBadge').textContent = nivelData.emoji;
-            document.getElementById('nivelNombre').textContent = nivelData.nombre;
-            document.getElementById('nivelXPLabel').textContent = xp + ' XP · Nivel ' + nivelData.nivel;
-            var xpAct = xp - nivelData.xpMin;
-            var xpTot = nivelData.xpMax - nivelData.xpMin;
-            var pct   = nivelData.nivel===9 ? 100 : Math.min(100, Math.round(xpAct/xpTot*100));
-            document.getElementById('xpDetalle').textContent = nivelData.nivel<9
-                ? 'Faltan ' + (nivelData.xpMax-xp) + ' XP para ' + NIVELES[nivelData.nivel].nombre
-                : 'Nivel maximo alcanzado!';
-            setTimeout(function(){ document.getElementById('xpBarFill').style.width = pct+'%'; }, 400);
-
-            var grid = document.getElementById('logrosGrid');
-            grid.innerHTML = '';
-            LOGROS.forEach(function(l) {
-                var ok = l.check(data);
-                var div = document.createElement('div');
-                div.className = 'logro-card bg-zinc-900 border border-white/5 rounded-xl p-2 flex flex-col items-center gap-1 text-center' + (ok?'':' bloqueado');
-                div.title = l.nombre + ': ' + l.desc;
-                div.innerHTML = '<span class="text-xl leading-none">' + l.emoji + '</span>'
-                    + '<p class="text-[7px] font-black uppercase tracking-widest text-zinc-400 leading-tight">' + l.nombre + '</p>'
-                    + (ok ? '<p class="text-[7px] font-bold" style="color:var(--accent,#dc2626)">+' + l.xp + ' XP</p>'
-                          : '<p class="text-[7px] text-zinc-700 font-bold">Bloqueado</p>');
-                grid.appendChild(div);
-            });
-        } catch(e) {
-            console.warn('cargarNivelYLogros error:', e);
-        }
-    }
-
 </script>
 </body>
 </html>
