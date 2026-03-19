@@ -581,7 +581,7 @@ async function cargarContinuar(user) {
     itemsSeries.forEach((item, i) => {
       try {
         const s = seriesData[i];
-          if (!s.poster_path) continue;
+          if (!s || !s.poster_path) return;
           const card = document.createElement('a');
           card.href = 'serie.html?id='+item.contentId;
           card.className = 'min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2 block';
@@ -603,7 +603,7 @@ async function cargarContinuar(user) {
           const poster = item.poster || '';
           const titulo = item.titulo || '';
           const pct = Math.round(item.porcentaje || 0);
-          if (!poster) continue;
+          if (!poster) return;
           const card = document.createElement('a');
           card.href = 'pelicula.html?id='+item.contentId;
           card.className = 'min-w-[120px] md:min-w-[180px] cursor-pointer active:scale-95 md:hover:scale-105 transition-transform duration-300 relative group mb-2 block';
