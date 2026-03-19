@@ -44,7 +44,11 @@
         <span class="text-red-600 font-black tracking-tighter text-lg md:text-xl shrink-0">MOVIE<span class="text-white font-light">M</span></span>
         <div class="flex gap-2">
             <button id="btnFuenteSubSerie" onclick="cambiarFuenteSerie('sub')" class="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition bg-white/10 border-white/20 text-white">Subtitulado</button>
-            <button id="btnFuenteLatSerie" onclick="cambiarFuenteSerie('latino')" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">Latino</button>
+            <button id="srvBtn1" onclick="cambiarFuenteSerie(1)" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">Servidor 1</button>
+            <button id="srvBtn2" onclick="cambiarFuenteSerie(2)" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">Servidor 2</button>
+            <button id="srvBtn3" onclick="cambiarFuenteSerie(3)" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">Servidor 3</button>
+            <button id="srvBtn4" onclick="cambiarFuenteSerie(4)" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">Servidor 4</button>
+            <button id="srvBtn5" onclick="cambiarFuenteSerie(5)" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">Servidor 5</button>
         </div>
         <button onclick="cerrarPlayer()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/5 shrink-0">Cerrar ×</button>
     </div>
@@ -111,6 +115,9 @@
                     <button id="btnLike" onclick="toggleLike()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
                     </button>
+                    <button id="btnVisto" onclick="toggleVisto()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95" title="Marcar como vista">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    </button>
                     <button onclick="compartir()" class="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 active:scale-95" title="Compartir">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
                     </button>
@@ -153,6 +160,9 @@
                 </button>
                 <button id="btnLikeDesktop" onclick="toggleLike()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                </button>
+                <button id="btnVistoDesktop" onclick="toggleVisto()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95" title="Marcar como vista">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                 </button>
                 <button onclick="compartir()" class="w-14 h-14 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95" title="Compartir">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
@@ -338,7 +348,7 @@
                     <p class="text-[8px] text-zinc-600 truncate italic px-1">${actor.character}</p>
                 </div>`).join('');
 
-            escucharComentarios(true);
+            escucharComentarios();
             actualizarHUD();
             checkStatus();
 
@@ -432,7 +442,7 @@
     let _latinoEpUrl = null, _latinoEpUrl2 = null;
 
     async function cargarLatinoEpisodio(temp, ep) {
-        _latinoEpUrl = null; _latinoEpUrl2 = null;
+        _latinoEpUrls = [null,null,null,null,null];
         const latBtn = document.getElementById('btnFuenteLatSerie');
         latBtn.classList.add('hidden');
         try {
@@ -447,6 +457,7 @@
             if (snap.exists()) {
                 _latinoEpUrl  = snap.data().url;
                 _latinoEpUrl2 = snap.data().url2 || null;
+                _latinoUrl3   = snap.data().url3 || null;
                 console.log('[Latino Serie] URL:', _latinoEpUrl);
                 latBtn.classList.remove('hidden');
             }
@@ -454,22 +465,28 @@
     }
 
     window.cambiarFuenteSerie = function(fuente) {
-        const base = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition';
-        const subBtn = document.getElementById('btnFuenteSubSerie');
-        const latBtn = document.getElementById('btnFuenteLatSerie');
+        const base  = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition';
+        const off   = base + ' border-white/10 text-white/40 hover:text-yellow-400';
+        const offW  = base + ' border-white/10 text-white/40 hover:text-white';
+        const activ = base + ' bg-yellow-500/20 border-yellow-500/50 text-yellow-400';
         const respWrap = document.getElementById('btnRespaldoWrapSerie');
+
+        // Resetear todos
+        document.getElementById('btnFuenteSubSerie').className = offW;
+        for (var i = 1; i <= 5; i++) { var b = document.getElementById('srvBtn'+i); if(b) b.className = off; }
+        if (respWrap) respWrap.classList.add('hidden');
+
         if (fuente === 'sub') {
-            subBtn.className = base + ' bg-white/10 border-white/20 text-white';
-            latBtn.className = base + ' border-white/10 text-white/40 hover:text-yellow-400';
-            if (respWrap) respWrap.classList.add('hidden');
+            document.getElementById('btnFuenteSubSerie').className = base + ' bg-white/10 border-white/20 text-white';
             document.getElementById('serieFrame').src = SERVERS_TV[servidorActivo](serieID, epTemp, epNum);
         } else {
-            if (!_latinoEpUrl) return;
-            const url = _latinoEpUrl.startsWith('http') ? _latinoEpUrl : 'https://' + _latinoEpUrl;
-            latBtn.className = base + ' bg-yellow-500/20 border-yellow-500/50 text-yellow-400';
-            subBtn.className = base + ' border-white/10 text-white/40 hover:text-white';
+            var idx = fuente - 1;
+            var url = _latinoEpUrls[idx];
+            if (!url) return;
+            url = url.startsWith('http') ? url : 'https://' + url;
+            var btn = document.getElementById('srvBtn' + fuente);
+            if (btn) btn.className = activ;
             document.getElementById('serieFrame').src = url;
-            if (_latinoEpUrl2 && respWrap) respWrap.classList.remove('hidden');
         }
     };
 
@@ -557,7 +574,7 @@
         const respWrap = document.getElementById('btnRespaldoWrapSerie');
         if (respWrap) respWrap.classList.add('hidden');
         document.getElementById('btnFuenteLatSerie').classList.add('hidden');
-        _latinoEpUrl = null; _latinoEpUrl2 = null;
+        _latinoEpUrls = [null,null,null,null,null];
         document.body.style.overflow = '';
         document.body.style.position = '';
         document.body.style.width = '';
@@ -575,78 +592,35 @@
     }
 
     // ── COMENTARIOS ───────────────────────────────────────────────
-    let _lastComDocSerie = null;
-    const _COM_LIMIT = 20;
-
-    async function escucharComentarios(reset) {
+    function escucharComentarios() {
         const contenedor = document.getElementById('listaComentarios');
-        if (reset) {
-            _lastComDocSerie = null;
-            contenedor.innerHTML = '<p class="text-zinc-500 text-sm italic animate-pulse">Cargando comentarios...</p>';
-        }
-
-        let q;
-        if (_lastComDocSerie) {
-            q = window.query(
-                window.collection(window.db, 'comentarios'),
-                window.where('movieID', '==', 'tv-' + serieID),
-                window.orderBy('fecha', 'desc'),
-                window.startAfter(_lastComDocSerie),
-                window.limit(_COM_LIMIT)
-            );
-        } else {
-            q = window.query(
-                window.collection(window.db, 'comentarios'),
-                window.where('movieID', '==', 'tv-' + serieID),
-                window.orderBy('fecha', 'desc'),
-                window.limit(_COM_LIMIT)
-            );
-        }
-
-        try {
-            const snapshot = await window.getDocs(q);
-            if (reset) contenedor.innerHTML = '';
-
-            if (snapshot.empty && reset) {
+        const q = window.query(
+            window.collection(window.db, 'comentarios'),
+            window.where('movieID', '==', 'tv-' + serieID),
+            window.orderBy('fecha', 'desc')
+        );
+        window.onSnapshot(q, snapshot => {
+            contenedor.innerHTML = '';
+            if (snapshot.empty) {
                 contenedor.innerHTML = '<p class="text-zinc-600 text-sm italic">Nadie comentó aún. ¡Sé el primero!</p>';
                 return;
             }
-            if (snapshot.empty) return;
-
-            _lastComDocSerie = snapshot.docs[snapshot.docs.length - 1];
-
-            const oldBtn = document.getElementById('btnVerMasComentariosSerie');
-            if (oldBtn) oldBtn.remove();
-
             snapshot.forEach(d => {
                 const c = d.data();
                 const fecha = c.fecha ? new Date(c.fecha).toLocaleString() : 'Reciente';
-                const div = document.createElement('div');
-                div.className = 'bg-zinc-900/50 p-6 rounded-2xl border border-white/5 shadow-xl fade-in mb-4';
-                div.innerHTML = `
-                    <div class="flex justify-between items-center mb-3">
-                        <div class="flex flex-col gap-1">
-                            <a href="perfil.html?user=${encodeURIComponent(c.user)}" class="text-red-600 font-black text-xs uppercase tracking-widest hover:underline">${c.user}</a>
-                            <span class="text-[9px] text-zinc-600 font-bold uppercase">${fecha}</span>
+                contenedor.innerHTML += `
+                    <div class="bg-zinc-900/50 p-6 rounded-2xl border border-white/5 shadow-xl fade-in mb-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-red-600 font-black text-xs uppercase tracking-widest">${c.user}</span>
+                                <span class="text-[9px] text-zinc-600 font-bold uppercase">${fecha}</span>
+                            </div>
+                            <span class="text-yellow-500 text-[10px]">${'★'.repeat(c.rating)}</span>
                         </div>
-                        <span class="text-yellow-500 text-[10px]">${'★'.repeat(c.rating||0)}</span>
-                    </div>
-                    <p class="text-zinc-400 text-sm leading-relaxed">${c.txt}</p>`;
-                contenedor.appendChild(div);
+                        <p class="text-zinc-400 text-sm leading-relaxed">${c.txt}</p>
+                    </div>`;
             });
-
-            if (snapshot.docs.length === _COM_LIMIT) {
-                const btn = document.createElement('button');
-                btn.id = 'btnVerMasComentariosSerie';
-                btn.className = 'w-full py-3 mt-2 bg-zinc-900 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white hover:border-accent transition active:scale-95';
-                btn.textContent = 'Ver más comentarios';
-                btn.onclick = () => escucharComentarios(false);
-                contenedor.appendChild(btn);
-            }
-        } catch(e) {
-            console.error('Error comentarios serie:', e);
-            if (reset) contenedor.innerHTML = '<p class="text-zinc-600 text-sm italic">Error al cargar comentarios.</p>';
-        }
+        });
     }
 
     window.publicarComentario = async () => {
@@ -679,6 +653,9 @@
             if ((data.seriesLikes||[]).includes(serieID)) {
                 ['btnLike','btnLikeDesktop'].forEach(id => { const b=document.getElementById(id); if(!b)return; b.classList.add('bg-red-600','border-red-600','text-white'); b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5'); });
             }
+            if ((data.visto||[]).some(v => String(v.id) === String(serieID))) {
+                actualizarBtnVisto(true);
+            }
         } catch(e) { console.error(e); }
     }
 
@@ -691,6 +668,43 @@
             ['btnWatchlist','btnWatchlistDesktop'].forEach(id => { const b=document.getElementById(id); if(!b)return; if(!isSaved){b.classList.add('bg-zinc-100','text-black','border-white');b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5');}else{b.classList.remove('bg-zinc-100','text-black','border-white');b.classList.add('bg-zinc-900','text-zinc-400','border-white/5');} });
         } catch(e) { console.error(e); }
     };
+
+    window.toggleVisto = async () => {
+        if (!miUID_serie) return alert('Debes iniciar sesión.');
+        const btn = document.getElementById('btnVisto');
+        const isVisto = btn.classList.contains('text-green-500');
+        try {
+            const userRef = window.doc(window.db, 'usuarios', miUID_serie);
+            const snap = await window.getDoc(userRef);
+            const data = snap.exists() ? snap.data() : {};
+            let visto = data.visto || [];
+            if (isVisto) {
+                visto = visto.filter(v => String(v.id) !== String(serieID));
+            } else {
+                const nombre = serieData ? serieData.name : document.getElementById('titulo')?.innerText || '';
+                const poster = serieData ? 'https://image.tmdb.org/t/p/w500' + serieData.poster_path : '';
+                visto = visto.filter(v => String(v.id) !== String(serieID));
+                visto.push({ id: String(serieID), tipo: 'serie', titulo: nombre, poster, fecha: Date.now() });
+            }
+            await window.setDoc(userRef, { visto }, { merge: true });
+            actualizarBtnVisto(!isVisto);
+        } catch(e) { console.error(e); }
+    };
+
+    function actualizarBtnVisto(visto) {
+        ['btnVisto','btnVistoDesktop'].forEach(id => {
+            const b = document.getElementById(id); if (!b) return;
+            if (visto) {
+                b.classList.add('text-green-500','border-green-500/50','bg-green-500/10');
+                b.classList.remove('text-zinc-400','bg-zinc-900','border-white/5');
+                b.title = 'Vista ✓';
+            } else {
+                b.classList.remove('text-green-500','border-green-500/50','bg-green-500/10');
+                b.classList.add('text-zinc-400','bg-zinc-900','border-white/5');
+                b.title = 'Marcar como vista';
+            }
+        });
+    }
 
     window.toggleLike = async () => {
         if (!miUID_serie) return alert('Debes iniciar sesión.');
