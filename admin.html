@@ -457,7 +457,36 @@ window.guardarLink = async function() {
         if (snap.exists()) {
             const existente = snap.data();
 
-            // Ya tiene url2 → error
+            // Si el link existente (url o url2) es de gscdn.cam → reemplazarlo con el nuevo
+            const urlExistente = existente.url || '';
+            const url2Existente = existente.url2 || '';
+            const esGscdn_url  = urlExistente.includes('gscdn.cam');
+            const esGscdn_url2 = url2Existente.includes('gscdn.cam');
+
+            if (esGscdn_url) {
+                // Reemplazar el link principal por el nuevo
+                const data = { ...existente, url };
+                if (url2) data.url2 = url2;
+                await window.setDoc(window.doc(window.db,'latinoLinks',id), data);
+                showToast('toastPelis','✓ Link de gscdn.cam reemplazado por el nuevo','ok');
+                ['inputMovieID','inputEmbedURL','inputEmbedURL2'].forEach(i=>document.getElementById(i).value='');
+                document.getElementById('peliculaPreview').classList.add('hidden');
+                cargarLinks();
+                return;
+            }
+
+            if (esGscdn_url2) {
+                // Reemplazar el link de respaldo por el nuevo
+                const data = { ...existente, url2: url };
+                await window.setDoc(window.doc(window.db,'latinoLinks',id), data);
+                showToast('toastPelis','✓ Respaldo de gscdn.cam reemplazado por el nuevo','ok');
+                ['inputMovieID','inputEmbedURL','inputEmbedURL2'].forEach(i=>document.getElementById(i).value='');
+                document.getElementById('peliculaPreview').classList.add('hidden');
+                cargarLinks();
+                return;
+            }
+
+            // Ya tiene url2 (ninguno es gscdn) → error
             if (existente.url2) {
                 showToast('toastPelis', '✗ Ya tiene 2 links. Editá o borrá uno primero.', 'error');
                 return;
@@ -490,8 +519,7 @@ window.guardarLink = async function() {
         document.getElementById('peliculaPreview').classList.add('hidden');
         cargarLinks();
     } catch(e) { showToast('toastPelis','Error al guardar','error'); }
-};
-
+}
 window.borrarLink = async function(id) {
     if (!confirm(`¿Borrar el link de la película ID ${id}?`)) return;
     try {
@@ -620,54 +648,82 @@ window.onSerieIDChange = function() {
 };
 
 window.guardarEpisodio = async function() {
-    const serieID  = document.getElementById('inputSerieID').value.trim();
+    const serieID   = document.getElementById('inputSerieID').value.trim();
     const temporada = parseInt(document.getElementById('inputTemporada').value);
     const episodio  = parseInt(document.getElementById('inputEpisodio').value);
     let url  = document.getElementById('inputSerieURL').value.trim();
     let url2 = document.getElementById('inputSerieURL2').value.trim();
-    if (url && !url.startsWith('http')) url = 'https://' + url;
+    if (url  && !url.startsWith('http'))  url  = 'https://' + url;
     if (url2 && !url2.startsWith('http')) url2 = 'https://' + url2;
     if (!serieID||!temporada||!episodio||!url) { showToast('toastSeries','Completá todos los campos obligatorios','error'); return; }
     try {
         const docID = `${serieID}_t${temporada}_e${episodio}`;
-        // Verificar si ya existe
         const snapExiste = await window.getDoc(window.doc(window.db, 'latinoSeries', docID));
+
         if (snapExiste.exists()) {
+            const existente = snapExiste.data();
+            const esGscdn_url  = (existente.url  || '').includes('gscdn.cam');
+            const esGscdn_url2 = (existente.url2 || '').includes('gscdn.cam');
+
+            if (esGscdn_url) {
+                // Reemplazar link principal por el nuevo
+                const data = { ...existente, url }; delete data.id;
+                if (url2) data.url2 = url2; else delete data.url2;
+                await window.setDoc(window.doc(window.db, 'latinoSeries', docID), data);
+                showToast('toastSeries', '✓ Link de gscdn.cam reemplazado por el nuevo', 'ok');
+                ['inputEpisodio','inputSerieURL','inputSerieURL2'].forEach(i=>document.getElementById(i).value='');
+                document.getElementById('inputEpisodio').focus();
+                cargarEpisodios();
+                return;
+            }
+
+            if (esGscdn_url2) {
+                // Reemplazar respaldo por el nuevo
+                const data = { ...existente, url2: url }; delete data.id;
+                await window.setDoc(window.doc(window.db, 'latinoSeries', docID), data);
+                showToast('toastSeries', '✓ Respaldo de gscdn.cam reemplazado por el nuevo', 'ok');
+                ['inputEpisodio','inputSerieURL','inputSerieURL2'].forEach(i=>document.getElementById(i).value='');
+                document.getElementById('inputEpisodio').focus();
+                cargarEpisodios();
+                return;
+            }
+
+            // Ninguno es gscdn → abrir editor
             showToast('toastSeries', '⚠️ Ya existe — abriendo editor…', 'error');
-            setTimeout(() => editarEpisodio({ id: docID, ...snapExiste.data() }), 600);
+            setTimeout(() => editarEpisodio({ id: docID, ...existente }), 600);
             return;
         }
-        // Buscar nombre de la serie siempre (por si se escribió el ID a mano)
-        let serieName = document.getElementById('previewSerieName').textContent||'';
+
+        // No existe → guardar normalmente
+        let serieName = document.getElementById('previewSerieName').textContent || '';
         let epName = '';
         try {
             if (!serieName) {
                 const sr = await fetch(`https://api.themoviedb.org/3/tv/${serieID}?api_key=${API_KEY}&language=es-MX`);
                 const sd = await sr.json();
-                serieName = sd.name||'';
+                serieName = sd.name || '';
                 if (serieName) {
                     document.getElementById('previewSerieName').textContent = serieName;
                     document.getElementById('previewSerieYear').textContent = (sd.first_air_date||'').split('-')[0];
-                    document.getElementById('previewSeriePoster').src = sd.poster_path?`https://image.tmdb.org/t/p/w92${sd.poster_path}`:'';
+                    document.getElementById('previewSeriePoster').src = sd.poster_path ? `https://image.tmdb.org/t/p/w92${sd.poster_path}` : '';
                     document.getElementById('seriePreview').classList.remove('hidden');
                 }
             }
             const er = await fetch(`https://api.themoviedb.org/3/tv/${serieID}/season/${temporada}/episode/${episodio}?api_key=${API_KEY}&language=es-MX`);
             const ed = await er.json();
-            epName = ed.name||'';
-        } catch(e){}
+            epName = ed.name || '';
+        } catch(e) {}
+
         const data = { serieID, temporada, episodio, url, serieName, epName, fecha: new Date().toISOString() };
         if (url2) data.url2 = url2;
-        await window.setDoc(window.doc(window.db,'latinoSeries',docID), data);
-        showToast('toastSeries','✓ Guardado correctamente','ok');
+        await window.setDoc(window.doc(window.db, 'latinoSeries', docID), data);
+        showToast('toastSeries', '✓ Guardado correctamente', 'ok');
         try { localStorage.removeItem('movieM_latinoSeriesIDs'); } catch(e) {}
-        // Solo limpiar episodio y links — mantener serie y temporada
         ['inputEpisodio','inputSerieURL','inputSerieURL2'].forEach(i=>document.getElementById(i).value='');
         document.getElementById('inputEpisodio').focus();
         cargarEpisodios();
     } catch(e) { showToast('toastSeries','Error al guardar','error'); console.error(e); }
-};
-
+}
 window.borrarEpisodio = async function(id) {
     if (!confirm('¿Borrar este episodio?')) return;
     try {
