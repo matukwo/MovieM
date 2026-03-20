@@ -9,9 +9,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module" src="firebase-config.js"></script>
     <style>
-        .star{cursor:pointer;transition:color .2s ease}
-        #starRating:hover .star{color:#ca8a04}
-        #starRating .star:hover~.star{color:#3f3f46!important}
+        /* Estrellas con media estrella */
+        .star-wrap { position:relative; display:inline-block; cursor:pointer; }
+        .star-full, .star-half { transition: color .15s; }
+        .star-full { color: #3f3f46; }
+        .star-half-overlay {
+            position:absolute; top:0; left:0; width:50%; height:100%;
+            overflow:hidden; pointer-events:none;
+        }
+        .star-half-overlay .star-half { color: #3f3f46; }
         .no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
         .glass-card{background:rgba(255,255,255,.04);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 60px -15px rgba(0,0,0,.8)}
         @keyframes pulse-bg{0%{background-color:rgba(39,39,42,.5)}50%{background-color:rgba(63,63,70,.5)}100%{background-color:rgba(39,39,42,.5)}}
@@ -682,10 +688,32 @@
         // --- OTROS HELPERS ---
         window.setRating = (n) => {
             currentRating = n;
-            document.querySelectorAll('.star').forEach((s, i) => {
-                s.style.color = i < n ? '#eab308' : '#3f3f46';
-            });
+            renderStars(n);
         };
+        window.hoverRating = (n) => { renderStars(n); };
+        window.leaveRating = () => { renderStars(currentRating); };
+        function renderStars(val) {
+            document.querySelectorAll('#starRating .star-wrap').forEach(function(wrap) {
+                var v = parseFloat(wrap.dataset.val);
+                var full = wrap.querySelector('.star-full');
+                var halfOv = wrap.querySelector('.star-half-overlay');
+                var halfStar = halfOv ? halfOv.querySelector('.star-half') : null;
+                if (halfOv) {
+                    // slot de media estrella
+                    if (val >= v) {
+                        // la mitad izquierda está llena
+                        if (halfStar) halfStar.style.color = '#eab308';
+                        full.style.color = '#3f3f46';
+                    } else {
+                        if (halfStar) halfStar.style.color = '#3f3f46';
+                        full.style.color = '#3f3f46';
+                    }
+                } else {
+                    // slot de estrella entera
+                    full.style.color = val >= v ? '#eab308' : '#3f3f46';
+                }
+            });
+        }
 
         // ── SISTEMA DE PROGRESO ────────────────────────────────────────────────────
         let progresoTimer = null;
