@@ -819,31 +819,70 @@ window.iniciarCargaMasiva = async function() {
         logEl.scrollTop = logEl.scrollHeight;
     }
 
-    // Parser robusto — acepta "|" o espacio como separador, y URLs sin https://
-    const todasLineas = raw.split('\n').map(l => l.trim()).filter(l => l);
+    // Parser robusto:
+    // Formato 1 (una línea):  Título (año) | url1 | url2 | url3
+    // Formato 2 (multilínea): Título (año)
+    //                         url1
+    //                         url2
+    //                         url3
+    //                         (línea vacía o nuevo título)
+    const todasLineas = raw.split('\n').map(l => l.trim());
     const items = [];
-    for (const linea of todasLineas) {
-        let rawTitulo, url;
+
+    function esUrl(s) { return s && (s.startsWith('http') || s.startsWith('//') || s.includes('/')); }
+    function esTitulo(s) { return s && !esUrl(s) && s.length > 1; }
+
+    let i = 0;
+    while (i < todasLineas.length) {
+        const linea = todasLineas[i];
+        if (!linea) { i++; continue; }
+
+        // Formato con | → Título | url1 | url2 | url3
         if (linea.includes('|')) {
-            const idx = linea.indexOf('|');
-            rawTitulo = linea.slice(0, idx).trim();
-            url = linea.slice(idx + 1).trim();
-        } else {
-            // La URL siempre es el último "token" — buscar desde el final el primer token con "/"
-            const tokens = linea.split(/\s+/);
-            // Recorrer de atrás hacia adelante hasta encontrar el token que es la URL
-            let urlIdx = -1;
-            for (let i = tokens.length - 1; i >= 0; i--) {
-                if (tokens[i].includes('/')) { urlIdx = i; break; }
+            const partes = linea.split('|').map(p => p.trim()).filter(p => p);
+            const rawTitulo = partes[0];
+            const urls = partes.slice(1).filter(esUrl).map(u => u.startsWith('http') ? u : 'https://' + u);
+            if (rawTitulo && urls.length) {
+                items.push({ rawTitulo, url: urls[0], extras: urls.slice(1) });
             }
-            if (urlIdx > 0) {
-                rawTitulo = tokens.slice(0, urlIdx).join(' ').trim();
-                url = tokens[urlIdx];
-            }
+            i++; continue;
         }
-        if (!rawTitulo || !url) continue;
-        if (!url.startsWith('http')) url = 'https://' + url;
-        items.push({ rawTitulo, url });
+
+        // Detectar si la línea es un título (no es URL)
+        if (esTitulo(linea) && !esUrl(linea)) {
+            const rawTitulo = linea;
+            const urls = [];
+            i++;
+            // Recolectar URLs siguientes hasta línea vacía o nuevo título
+            while (i < todasLineas.length) {
+                const sig = todasLineas[i].trim();
+                if (!sig) { i++; break; } // línea vacía = fin del bloque
+                if (esTitulo(sig) && !esUrl(sig)) break; // nuevo título = fin del bloque
+                if (esUrl(sig)) {
+                    let u = sig;
+                    if (!u.startsWith('http')) u = 'https://' + u;
+                    urls.push(u);
+                }
+                i++;
+            }
+            if (rawTitulo && urls.length) {
+                items.push({ rawTitulo, url: urls[0], extras: urls.slice(1) });
+            }
+            continue;
+        }
+
+        // Línea suelta con URL y título junto (Título url)
+        const tokens = linea.split(/\s+/);
+        let urlIdx = -1;
+        for (let j = tokens.length - 1; j >= 0; j--) {
+            if (tokens[j].includes('/')) { urlIdx = j; break; }
+        }
+        if (urlIdx > 0) {
+            let url = tokens[urlIdx];
+            if (!url.startsWith('http')) url = 'https://' + url;
+            items.push({ rawTitulo: tokens.slice(0, urlIdx).join(' ').trim(), url, extras: [] });
+        }
+        i++;
     }
 
     if (!items.length) {
@@ -958,14 +997,32 @@ window.iniciarCargaMasiva = async function() {
                     logLine(`⚠️ "${tituloReal}" ya tiene ese link como principal — omitida`, 'warn');
                     continue;
                 }
-                // Tiene solo 1 link → agregar como respaldo
-                await window.setDoc(window.doc(window.db,'latinoLinks',movieID), { ...ex, url2: url }, { merge: true });
-                logLine(`✓ [ID:${movieID}] "${tituloReal}" → agregado como respaldo`, 'ok');
+                // Tiene links → agregar extras en slots libres
+                const slots = ['url','url2','url3','url4','url5'];
+                const toAdd = [url, ...(item.extras||[])].filter(Boolean);
+                const update = { ...ex };
+                let added = 0;
+                for (const newUrl of toAdd) {
+                    const libre = slots.find(s => !update[s]);
+                    if (!libre) break;
+                    update[libre] = newUrl; added++;
+                }
+                if (added) {
+                    await window.setDoc(window.doc(window.db,'latinoLinks',movieID), update);
+                    logLine(`✓ [ID:${movieID}] "${tituloReal}" → ${added} servidor${added>1?'es':''}  agregado${added>1?'s':''}`, 'ok');
+                } else {
+                    logLine(`⚠️ "${tituloReal}" ya tiene 5 servidores — omitida`, 'warn');
+                }
             } else {
-                await window.setDoc(window.doc(window.db,'latinoLinks',movieID), {
-                    url, titulo: tituloReal, anio: anioReal, fecha: new Date().toISOString()
-                });
-                logLine(`✓ [ID:${movieID}] "${tituloReal}" (${anioReal}) → guardada`, 'ok');
+                const dataNew = { url, titulo: tituloReal, anio: anioReal, fecha: new Date().toISOString() };
+                const extras = item.extras || [];
+                if (extras[0]) dataNew.url2 = extras[0];
+                if (extras[1]) dataNew.url3 = extras[1];
+                if (extras[2]) dataNew.url4 = extras[2];
+                if (extras[3]) dataNew.url5 = extras[3];
+                await window.setDoc(window.doc(window.db,'latinoLinks',movieID), dataNew);
+                const srvCount = 1 + extras.filter(Boolean).length;
+                logLine(`✓ [ID:${movieID}] "${tituloReal}" (${anioReal}) → guardada con ${srvCount} servidor${srvCount>1?'es':''}`, 'ok');
             }
             ok++;
         } catch(e) {
