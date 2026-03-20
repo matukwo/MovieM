@@ -644,9 +644,14 @@
             var d = document.createElement('div'); d.className='flex items-center gap-3 p-2.5 hover:bg-zinc-800 rounded-xl cursor-pointer active:scale-95 transition';
             d.innerHTML = '<img src="https://image.tmdb.org/t/p/w92'+img+'" class="w-8 h-12 rounded-lg object-cover"><span class="text-sm font-bold">'+( item.title||item.name)+'</span>';
             d.onclick = async function() {
-                if (tipoBusq==='peli') { favoritasLocal[slotSel]={poster:img,id:item.id}; await guardarDato('favoritas',favoritasLocal); renderizarFavs(true); }
-                else if (tipoBusq==='actor') { actoresLocal.push({nombre:item.name,foto:img}); await guardarDato('actores',actoresLocal); actorIndex=actoresLocal.length-1; renderizarActores(); moverCarrusel(); }
-                else if (tipoBusq==='director') { directoresLocal.push({nombre:item.name,foto:img}); await guardarDato('directores',directoresLocal); directorIndex=directoresLocal.length-1; renderizarDirectores(); moverCarruselDirector(); }
+                if (tipoBusq==='peli') {
+                    if (favoritasLocal.some(function(f){ return f && String(f.id)===String(item.id); })) {
+                        cerrarModalBusqueda(); return; // ya está en favoritas
+                    }
+                    favoritasLocal[slotSel]={poster:img,id:item.id}; await guardarDato('favoritas',favoritasLocal); renderizarFavs(true);
+                }
+                else if (tipoBusq==='actor') { if(actoresLocal.some(function(a){return a.nombre===item.name;})){cerrarModalBusqueda();return;} actoresLocal.push({nombre:item.name,foto:img}); await guardarDato('actores',actoresLocal); actorIndex=actoresLocal.length-1; renderizarActores(); moverCarrusel('next'); }
+                else if (tipoBusq==='director') { if(directoresLocal.some(function(d){return d.nombre===item.name;})){cerrarModalBusqueda();return;} directoresLocal.push({nombre:item.name,foto:img}); await guardarDato('directores',directoresLocal); directorIndex=directoresLocal.length-1; renderizarDirectores(); moverCarruselDirector('next'); }
                 else { await guardarDato('avatar','https://image.tmdb.org/t/p/w500'+img); document.getElementById('userAvatarFrame').innerHTML='<img src="https://image.tmdb.org/t/p/w500'+img+'" class="w-full h-full object-cover">'; }
                 cerrarModalBusqueda();
             };
@@ -661,7 +666,7 @@
                 var src = f.poster.startsWith('http') ? f.poster : 'https://image.tmdb.org/t/p/w500'+f.poster;
                 return '<div class="aspect-[2/3] bg-zinc-900 rounded-xl border border-white/10 overflow-hidden cursor-pointer group relative active:scale-95 transition" onclick="location.href=\'pelicula.html?id='+f.id+'\'">'
                     +'<img src="'+src+'" class="w-full h-full object-cover">'
-                    +(editable?'<div onclick="event.stopPropagation();quitarFav('+i+')" class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center text-[9px] font-bold uppercase">Quitar</div>':'')
+                    // sin overlay quitar — se gestiona desde editar perfil
                     +'</div>';
             }
             return '<div class="aspect-[2/3] bg-zinc-900/60 rounded-xl border border-dashed border-white/10 flex flex-col items-center justify-center gap-2'+(editable?' cursor-pointer hover:border-accent hover:bg-zinc-800/60 transition group/slot':'')+'" '+(editable?'onclick="abrirBuscadorFav('+i+')"':'')+' >'
