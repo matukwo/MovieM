@@ -316,17 +316,32 @@
     </div>
 </nav>
 
-<script type="module" src="firebase-config.js"></script>
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, arrayUnion, arrayRemove, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const FB = {apiKey:"AIzaSyAn5N7m7EhICK2aZG4Nx8DIW9RZd9kK1DA",authDomain:"moviem-5b73d.firebaseapp.com",projectId:"moviem-5b73d",storageBucket:"moviem-5b73d.firebasestorage.app",messagingSenderId:"843796138544",appId:"1:843796138544:web:c2bde9b39d437b84d97bf5"};
-    const app = initializeApp(FB);
+    const app = getApps().length ? getApps()[0] : initializeApp(FB);
     const auth = getAuth(app);
     const db = getFirestore(app);
     const API = '86dfc26f9d7b8c9957129a1d7a173ddc';
+
+    // Exponer para scripts no-module (guardarEditarPerfil, etc.)
+    window.db = db;
+    window.doc = doc;
+    window.setDoc = setDoc;
+    window.getDoc = getDoc;
+    window.getDocs = getDocs;
+    window.collection = collection;
+    window.query = query;
+    window.where = where;
+    window.arrayUnion = arrayUnion;
+    window.arrayRemove = arrayRemove;
+    window.deleteDoc = deleteDoc;
+    window.auth = auth;
+    window.onAuthStateChanged = onAuthStateChanged;
+    window.dispatchEvent(new Event('firebase-ready'));
 
     const params = new URLSearchParams(location.search);
     const paramUser = params.get('user');
@@ -351,31 +366,26 @@
     onAuthStateChanged(auth, async function(user) {
         if (user) {
             miUID = user.uid;
-            // Intentar caché de sessionStorage para no hacer getDoc en cada visita
-            var cached = null;
             try {
-                var raw = sessionStorage.getItem('movieM_miPerfil_' + miUID);
-                if (raw) cached = JSON.parse(raw);
-            } catch(e) {}
-            if (cached) {
-                miUsername = cached.username || user.email.split('@')[0];
-                // Refrescar en background
-                getDoc(doc(db,'usuarios',miUID)).then(function(snap) {
-                    if (snap.exists()) {
-                        miUsername = snap.data().username || miUsername;
-                        try { sessionStorage.setItem('movieM_miPerfil_' + miUID, JSON.stringify(snap.data())); } catch(e) {}
-                    }
-                }).catch(function(){});
-            } else {
-                var snap = await getDoc(doc(db,'usuarios',miUID));
-                miUsername = snap.exists() ? snap.data().username : user.email.split('@')[0];
-                try { if (snap.exists()) sessionStorage.setItem('movieM_miPerfil_' + miUID, JSON.stringify(snap.data())); } catch(e) {}
+                var snap = await getDoc(doc(db, 'usuarios', miUID));
+                miUsername = snap.exists() ? (snap.data().username || user.email.split('@')[0]) : user.email.split('@')[0];
+            } catch(e) {
+                miUsername = user.email.split('@')[0];
             }
         }
         if (paramUser) { await buscarPorUsername(paramUser); }
         else if (miUID) { perfilUID=miUID; perfilUsername=miUsername; isMiPerfil=true; cargarPerfil(); }
         else { location.href='index.html'; }
     });
+
+    // Timeout de seguridad — si en 8s no cargó, forzar recarga sin caché
+    setTimeout(function() {
+        var nameEl = document.getElementById('profileName');
+        if (nameEl && nameEl.classList.contains('sk')) {
+            sessionStorage.clear();
+            location.reload();
+        }
+    }, 8000);
 
     async function buscarPorUsername(u) {
         var snap = await getDocs(query(collection(db,'usuarios'), where('username','==',u)));
@@ -386,29 +396,11 @@
     }
 
     async function cargarPerfil() {
-        // Intentar caché primero para render instantáneo
         var data = {};
-        var cacheKey = 'movieM_perfil_' + perfilUID;
         try {
-            var raw = sessionStorage.getItem(cacheKey);
-            if (raw) data = JSON.parse(raw);
-        } catch(e) {}
-
-        // Fetch en background (o esperar si no hay caché)
-        var fetchPromise = getDoc(doc(db,'usuarios',perfilUID)).then(function(snap) {
-            if (snap.exists()) {
-                data = snap.data();
-                try { sessionStorage.setItem(cacheKey, JSON.stringify(data)); } catch(e) {}
-            }
-            return data;
-        }).catch(function(){ return data; });
-
-        // Si no hay caché, esperar el fetch; si hay caché, renderizar ya
-        if (!Object.keys(data).length) data = await fetchPromise;
-        else fetchPromise.then(function(freshData) {
-            // Refrescar UI silenciosamente si los datos cambiaron
-            if (freshData.displayName !== data.displayName || freshData.bio !== data.bio) cargarPerfil();
-        });
+            var snap = await getDoc(doc(db, 'usuarios', perfilUID));
+            if (snap.exists()) data = snap.data();
+        } catch(e) { console.error('cargarPerfil Firestore error:', e); }
         // Exponer para notif-chat
         window._mmPerfilUID      = perfilUID;
         window._mmPerfilUsername = perfilUsername;
