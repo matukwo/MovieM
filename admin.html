@@ -882,7 +882,7 @@ window.iniciarCargaMasiva = async function() {
     let ok = 0;
     const noEncontradas = [];
 
-    for (const { rawTitulo, url } of items) {
+    for (const { rawTitulo, url, extras: itemExtras = [] } of items) {
         // Extraer año del título si viene entre paréntesis al final
         const matchAnio = rawTitulo.match(/\((\d{4})\)\s*$/);
         const anio = matchAnio ? matchAnio[1] : '';
@@ -982,7 +982,7 @@ window.iniciarCargaMasiva = async function() {
                 const ex = snap.data();
                 const slots = ['url','url2','url3','url4','url5'];
                 // Todos los links del item (principal + extras)
-                const todosLinks = [url, ...(item.extras||[])].filter(Boolean);
+                const todosLinks = [url, ...(itemExtras||[])].filter(Boolean);
                 // Links ya guardados en Firestore
                 const yaGuardados = slots.map(s => ex[s]).filter(Boolean);
                 // Solo agregar los que NO están ya guardados
@@ -1002,7 +1002,7 @@ window.iniciarCargaMasiva = async function() {
                 }
             } else {
                 const dataNew = { url, titulo: tituloReal, anio: anioReal, fecha: new Date().toISOString() };
-                const extras = item.extras || [];
+                const extras = itemExtras || [];
                 if (extras[0]) dataNew.url2 = extras[0];
                 if (extras[1]) dataNew.url3 = extras[1];
                 if (extras[2]) dataNew.url4 = extras[2];
