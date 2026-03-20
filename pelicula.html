@@ -239,12 +239,17 @@
     <section class="border-t border-white/5 pt-8 md:pt-12 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 mb-16 fade-in" style="animation-delay:.4s">
         <div class="bg-zinc-900/40 p-6 md:p-10 rounded-2xl md:rounded-3xl border border-white/5 shadow-2xl">
             <h3 class="text-lg md:text-2xl font-bold mb-5 italic">Tu resena en <span class="text-red-600">MovieM</span></h3>
-            <div id="starRating" class="flex gap-2 mb-5 text-zinc-700">
-                <span onclick="setRating(1)" class="star text-3xl md:text-4xl">&#9733;</span>
-                <span onclick="setRating(2)" class="star text-3xl md:text-4xl">&#9733;</span>
-                <span onclick="setRating(3)" class="star text-3xl md:text-4xl">&#9733;</span>
-                <span onclick="setRating(4)" class="star text-3xl md:text-4xl">&#9733;</span>
-                <span onclick="setRating(5)" class="star text-3xl md:text-4xl">&#9733;</span>
+            <div id="starRating" class="flex gap-1 mb-5">
+                <div class="star-wrap" data-val="0.5" onmouseenter="hoverRating(0.5)" onmouseleave="leaveRating()" onclick="setRating(0.5)"><span class="star-full text-3xl md:text-4xl">&#9733;</span><span class="star-half-overlay"><span class="star-half text-3xl md:text-4xl">&#9733;</span></span></div>
+                <div class="star-wrap" data-val="1" onmouseenter="hoverRating(1)" onmouseleave="leaveRating()" onclick="setRating(1)"><span class="star-full text-3xl md:text-4xl">&#9733;</span></div>
+                <div class="star-wrap" data-val="1.5" onmouseenter="hoverRating(1.5)" onmouseleave="leaveRating()" onclick="setRating(1.5)"><span class="star-full text-3xl md:text-4xl">&#9733;</span><span class="star-half-overlay"><span class="star-half text-3xl md:text-4xl">&#9733;</span></span></div>
+                <div class="star-wrap" data-val="2" onmouseenter="hoverRating(2)" onmouseleave="leaveRating()" onclick="setRating(2)"><span class="star-full text-3xl md:text-4xl">&#9733;</span></div>
+                <div class="star-wrap" data-val="2.5" onmouseenter="hoverRating(2.5)" onmouseleave="leaveRating()" onclick="setRating(2.5)"><span class="star-full text-3xl md:text-4xl">&#9733;</span><span class="star-half-overlay"><span class="star-half text-3xl md:text-4xl">&#9733;</span></span></div>
+                <div class="star-wrap" data-val="3" onmouseenter="hoverRating(3)" onmouseleave="leaveRating()" onclick="setRating(3)"><span class="star-full text-3xl md:text-4xl">&#9733;</span></div>
+                <div class="star-wrap" data-val="3.5" onmouseenter="hoverRating(3.5)" onmouseleave="leaveRating()" onclick="setRating(3.5)"><span class="star-full text-3xl md:text-4xl">&#9733;</span><span class="star-half-overlay"><span class="star-half text-3xl md:text-4xl">&#9733;</span></span></div>
+                <div class="star-wrap" data-val="4" onmouseenter="hoverRating(4)" onmouseleave="leaveRating()" onclick="setRating(4)"><span class="star-full text-3xl md:text-4xl">&#9733;</span></div>
+                <div class="star-wrap" data-val="4.5" onmouseenter="hoverRating(4.5)" onmouseleave="leaveRating()" onclick="setRating(4.5)"><span class="star-full text-3xl md:text-4xl">&#9733;</span><span class="star-half-overlay"><span class="star-half text-3xl md:text-4xl">&#9733;</span></span></div>
+                <div class="star-wrap" data-val="5" onmouseenter="hoverRating(5)" onmouseleave="leaveRating()" onclick="setRating(5)"><span class="star-full text-3xl md:text-4xl">&#9733;</span></div>
             </div>
             <textarea id="comentarioTxt" placeholder="Que te parecio la pelicula?" class="w-full bg-zinc-800/50 p-4 rounded-2xl text-white mb-5 h-28 outline-none focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600 text-sm resize-none border-none"></textarea>
             <button onclick="publicarComentario()" class="w-full bg-red-600 py-3.5 rounded-2xl font-black hover:bg-red-700 transition tracking-widest uppercase text-sm shadow-xl active:scale-95">PUBLICAR</button>
