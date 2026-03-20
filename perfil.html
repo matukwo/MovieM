@@ -20,6 +20,14 @@
         .sk-circle{border-radius:9999px!important}
         .fade-in { animation: fi .5s ease forwards; opacity: 0; }
         @keyframes fi { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        /* Carrusel actores/directores */
+        #actorCarousel, #directorCarousel {
+            transition: transform .35s cubic-bezier(.4,0,.2,1);
+        }
+        .carousel-slide-in-right { animation: slideInR .3s cubic-bezier(.4,0,.2,1) both; }
+        .carousel-slide-in-left  { animation: slideInL .3s cubic-bezier(.4,0,.2,1) both; }
+        @keyframes slideInR { from{opacity:0;transform:translateX(32px)} to{opacity:1;transform:translateX(0)} }
+        @keyframes slideInL { from{opacity:0;transform:translateX(-32px)} to{opacity:1;transform:translateX(0)} }
     </style>
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden pb-24 md:pb-0">
@@ -678,9 +686,19 @@
         }).join('');
     }
     window.eliminarActor = async function(){ actoresLocal.splice(actorIndex,1); actorIndex=0; await guardarDato('actores',actoresLocal); renderizarActores(); moverCarrusel(); };
-    window.nextActor = function(){ actorIndex = actorIndex<actoresLocal.length-1 ? actorIndex+1 : 0; moverCarrusel(); };
-    window.prevActor = function(){ actorIndex = actorIndex>0 ? actorIndex-1 : actoresLocal.length-1; moverCarrusel(); };
-    function moverCarrusel(){ document.getElementById('actorCarousel').style.transform='translateX(-'+(actorIndex*100)+'%)'; }
+    window.nextActor = function(){ actorIndex = actorIndex<actoresLocal.length-1 ? actorIndex+1 : 0; moverCarrusel('next'); };
+    window.prevActor = function(){ actorIndex = actorIndex>0 ? actorIndex-1 : actoresLocal.length-1; moverCarrusel('prev'); };
+    function moverCarrusel(dir) {
+        var el = document.getElementById('actorCarousel');
+        el.style.transform = 'translateX(-'+(actorIndex*100)+'%)';
+        // Animar el slide activo
+        var slides = el.querySelectorAll('.min-w-full');
+        if (slides[actorIndex]) {
+            slides[actorIndex].classList.remove('carousel-slide-in-right','carousel-slide-in-left');
+            void slides[actorIndex].offsetWidth; // reflow
+            slides[actorIndex].classList.add(dir === 'prev' ? 'carousel-slide-in-left' : 'carousel-slide-in-right');
+        }
+    }
 
     // ── Directores Favoritos ──────────────────────────────────
     function renderizarDirectores() {
@@ -697,9 +715,19 @@
         }).join('');
     }
     window.eliminarDirector = async function(){ directoresLocal.splice(directorIndex,1); directorIndex=0; await guardarDato('directores',directoresLocal); renderizarDirectores(); moverCarruselDirector(); };
-    window.nextDirector = function(){ directorIndex = directorIndex<directoresLocal.length-1 ? directorIndex+1 : 0; moverCarruselDirector(); };
-    window.prevDirector = function(){ directorIndex = directorIndex>0 ? directorIndex-1 : directoresLocal.length-1; moverCarruselDirector(); };
-    function moverCarruselDirector(){ var el=document.getElementById('directorCarousel'); if(el) el.style.transform='translateX(-'+(directorIndex*100)+'%)'; }
+    window.nextDirector = function(){ directorIndex = directorIndex<directoresLocal.length-1 ? directorIndex+1 : 0; moverCarruselDirector('next'); };
+    window.prevDirector = function(){ directorIndex = directorIndex>0 ? directorIndex-1 : directoresLocal.length-1; moverCarruselDirector('prev'); };
+    function moverCarruselDirector(dir) {
+        var el = document.getElementById('directorCarousel');
+        if (!el) return;
+        el.style.transform = 'translateX(-'+(directorIndex*100)+'%)';
+        var slides = el.querySelectorAll('.min-w-full');
+        if (slides[directorIndex]) {
+            slides[directorIndex].classList.remove('carousel-slide-in-right','carousel-slide-in-left');
+            void slides[directorIndex].offsetWidth;
+            slides[directorIndex].classList.add(dir === 'prev' ? 'carousel-slide-in-left' : 'carousel-slide-in-right');
+        }
+    }
     window.abrirBuscadorDirector = function(){ tipoBusq='director'; mostrarModal('Agregar Director'); }
 
     // ── Comentarios ───────────────────────────────────────────────
@@ -979,11 +1007,8 @@ window.guardarEditarPerfil = async function() {
     try {
         var updates = { bio, redes };
         if (displayName) updates.displayName = displayName;
-        var _db = window._perfilDB || window.db;
-        var _doc = window._perfilDoc || window.doc;
-        var _setDoc = window._perfilSetDoc || window.setDoc;
-        if (!_db || !_doc || !_setDoc) throw new Error('Firebase no inicializado');
-        await _setDoc(_doc(_db, 'usuarios', window._mmPerfilUID), updates, {merge:true});
+        if (!window._perfilSave) throw new Error('Firebase no listo, intentá en un segundo');
+        await window._perfilSave(window._mmPerfilUID, updates);
         if (displayName) {
             var nameEl = document.getElementById('profileName');
             if (nameEl.childNodes[0]) nameEl.childNodes[0].textContent = displayName;
