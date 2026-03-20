@@ -997,12 +997,17 @@ window.iniciarCargaMasiva = async function() {
                     logLine(`⚠️ "${tituloReal}" ya tiene ese link como principal — omitida`, 'warn');
                     continue;
                 }
-                // Tiene links → agregar extras en slots libres
+                // Tiene links → agregar en slots libres los que no estén ya guardados
                 const slots = ['url','url2','url3','url4','url5'];
-                const toAdd = [url, ...(item.extras||[])].filter(Boolean);
+                // Todos los links del item (principal + extras)
+                const todosLinks = [url, ...(item.extras||[])].filter(Boolean);
+                // Links ya guardados en Firestore
+                const yaGuardados = slots.map(s => ex[s]).filter(Boolean);
+                // Solo agregar los que NO están ya guardados
+                const nuevos = todosLinks.filter(u => !yaGuardados.includes(u));
                 const update = { ...ex };
                 let added = 0;
-                for (const newUrl of toAdd) {
+                for (const newUrl of nuevos) {
                     const libre = slots.find(s => !update[s]);
                     if (!libre) break;
                     update[libre] = newUrl; added++;
@@ -1011,7 +1016,7 @@ window.iniciarCargaMasiva = async function() {
                     await window.setDoc(window.doc(window.db,'latinoLinks',movieID), update);
                     logLine(`✓ [ID:${movieID}] "${tituloReal}" → ${added} servidor${added>1?'es':''}  agregado${added>1?'s':''}`, 'ok');
                 } else {
-                    logLine(`⚠️ "${tituloReal}" ya tiene 5 servidores — omitida`, 'warn');
+                    logLine(`⚠️ "${tituloReal}" ya tiene todos los servidores cargados — omitida`, 'warn');
                 }
             } else {
                 const dataNew = { url, titulo: tituloReal, anio: anioReal, fecha: new Date().toISOString() };
