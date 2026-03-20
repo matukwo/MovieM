@@ -658,7 +658,7 @@
             } catch (error) { console.error(error); }
         };
 
-        window.cerrarActor = () => { document.getElementById('modalActor').classList.add('hidden'); document.body.style.overflow = "auto"; };
+        window.cerrarActor = () => { document.getElementById('modalActor').classList.add('hidden'); };
         window.scrollPelis = (distancia) => document.getElementById('listaPelisActor').scrollBy({ left: distancia, behavior: 'smooth' });
         window.scrollReparto = (distancia) => document.getElementById('reparto').scrollBy({ left: distancia, behavior: 'smooth' });
 
@@ -670,7 +670,6 @@
                 if(tr) {
                     document.getElementById('videoContainer').innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${tr.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>`;
                     document.getElementById('modalVideo').classList.remove('hidden');
-                    document.body.style.overflow = "hidden";
                 }
             } catch (error) { console.error(error); }
         };
@@ -678,7 +677,6 @@
         window.cerrarTrailer = () => { 
             document.getElementById('modalVideo').classList.add('hidden'); 
             document.getElementById('videoContainer').innerHTML = '';
-            document.body.style.overflow = "auto";
         };
 
         // --- OTROS HELPERS ---
@@ -859,7 +857,6 @@
             document.getElementById('btnFuenteLat').className = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition flex items-center gap-1 border-white/10 text-white/40 hover:text-yellow-400';
             document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
             document.getElementById('playerOverlay').style.display = 'flex';
-            document.body.style.overflow = "hidden";
             progresoInicio = Date.now();
             // Guardar cada 15s: _progresoBase + tiempo transcurrido esta sesión
             progresoTimer = setInterval(() => {
@@ -881,7 +878,6 @@
             document.getElementById('playerOverlay').style.display = 'none';
             document.getElementById('movieFrame').src = "";
             document.getElementById('btnRespaldoWrap').classList.add('hidden');
-            document.body.style.overflow = "auto";
         };
 
         async function cargarSimilares() {
