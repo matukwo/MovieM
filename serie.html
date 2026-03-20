@@ -698,6 +698,8 @@
         if (!miUID_serie) return alert('Debes iniciar sesión.');
         const btn = document.getElementById('btnVisto');
         const isVisto = btn.classList.contains('text-green-500');
+        // Optimistic
+        actualizarBtnVisto(!isVisto);
         try {
             const userRef = window.doc(window.db, 'usuarios', miUID_serie);
             const snap = await window.getDoc(userRef);
@@ -712,8 +714,7 @@
                 visto.push({ id: String(serieID), tipo: 'serie', titulo: nombre, poster, fecha: Date.now() });
             }
             await window.setDoc(userRef, { visto }, { merge: true });
-            actualizarBtnVisto(!isVisto);
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error(e); actualizarBtnVisto(isVisto); }
     };
 
     function actualizarBtnVisto(visto) {
@@ -735,10 +736,14 @@
         if (!miUID_serie) return alert('Debes iniciar sesión.');
         const btn = document.getElementById('btnLike');
         const isLiked = btn.classList.contains('bg-red-600');
+        // Optimistic
+        ['btnLike','btnLikeDesktop'].forEach(id => { const b=document.getElementById(id); if(!b)return; if(!isLiked){b.classList.add('bg-red-600','border-red-600','text-white');b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5');}else{b.classList.remove('bg-red-600','border-red-600','text-white');b.classList.add('bg-zinc-900','text-zinc-400','border-white/5');} });
         try {
             await window.setDoc(window.doc(window.db,'usuarios',miUID_serie), { seriesLikes: isLiked ? window.arrayRemove(serieID) : window.arrayUnion(serieID) }, { merge: true });
-            ['btnLike','btnLikeDesktop'].forEach(id => { const b=document.getElementById(id); if(!b)return; if(!isLiked){b.classList.add('bg-red-600','border-red-600','text-white');b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5');}else{b.classList.remove('bg-red-600','border-red-600','text-white');b.classList.add('bg-zinc-900','text-zinc-400','border-white/5');} });
-        } catch(e) { console.error(e); }
+        } catch(e) {
+            console.error(e);
+            ['btnLike','btnLikeDesktop'].forEach(id => { const b=document.getElementById(id); if(!b)return; if(isLiked){b.classList.add('bg-red-600','border-red-600','text-white');b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5');}else{b.classList.remove('bg-red-600','border-red-600','text-white');b.classList.add('bg-zinc-900','text-zinc-400','border-white/5');} });
+        }
     };
 
     window.compartir = async () => {
