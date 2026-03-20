@@ -10,14 +10,10 @@
     <script type="module" src="firebase-config.js"></script>
     <style>
         /* Estrellas con media estrella */
-        .star-wrap { position:relative; display:inline-block; cursor:pointer; }
-        .star-full, .star-half { transition: color .15s; }
-        .star-full { color: #3f3f46; }
-        .star-half-overlay {
-            position:absolute; top:0; left:0; width:50%; height:100%;
-            overflow:hidden; pointer-events:none;
-        }
-        .star-half-overlay .star-half { color: #3f3f46; }
+        .star-item { position:relative; display:inline-block; cursor:pointer; font-size:2rem; color:#3f3f46; line-height:1; transition:none; }
+        @media(min-width:768px){ .star-item { font-size:2.5rem; } }
+        .star-item .star-bg  { position:relative; z-index:1; }
+        .star-item .star-fg  { position:absolute; top:0; left:0; overflow:hidden; color:#eab308; z-index:2; width:0; pointer-events:none; white-space:nowrap; }
         .no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
         .glass-card{background:rgba(255,255,255,.04);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 60px -15px rgba(0,0,0,.8)}
         @keyframes pulse-bg{0%{background-color:rgba(39,39,42,.5)}50%{background-color:rgba(63,63,70,.5)}100%{background-color:rgba(39,39,42,.5)}}
@@ -224,17 +220,12 @@
     <section class="border-t border-white/5 pt-8 md:pt-12 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 mb-16 fade-in" style="animation-delay:.4s">
         <div class="bg-zinc-900/40 p-6 md:p-10 rounded-2xl md:rounded-3xl border border-white/5 shadow-2xl">
             <h3 class="text-lg md:text-2xl font-bold mb-5 italic">Tu resena en <span class="text-red-600">MovieM</span></h3>
-            <div id="starRating" class="flex gap-1 mb-5">
-                <div class="star-wrap" data-val="0.5" onmouseenter="hoverRating(0.5)" onmouseleave="leaveRating()" onclick="setRating(0.5)"><span class="star-full text-3xl md:text-4xl">&#9733;</span><span class="star-half-overlay"><span class="star-half text-3xl md:text-4xl">&#9733;</span></span></div>
-                <div class="star-wrap" data-val="1" onmouseenter="hoverRating(1)" onmouseleave="leaveRating()" onclick="setRating(1)"><span class="star-full text-3xl md:text-4xl">&#9733;</span></div>
-                <div class="star-wrap" data-val="1.5" onmouseenter="hoverRating(1.5)" onmouseleave="leaveRating()" onclick="setRating(1.5)"><span class="star-full text-3xl md:text-4xl">&#9733;</span><span class="star-half-overlay"><span class="star-half text-3xl md:text-4xl">&#9733;</span></span></div>
-                <div class="star-wrap" data-val="2" onmouseenter="hoverRating(2)" onmouseleave="leaveRating()" onclick="setRating(2)"><span class="star-full text-3xl md:text-4xl">&#9733;</span></div>
-                <div class="star-wrap" data-val="2.5" onmouseenter="hoverRating(2.5)" onmouseleave="leaveRating()" onclick="setRating(2.5)"><span class="star-full text-3xl md:text-4xl">&#9733;</span><span class="star-half-overlay"><span class="star-half text-3xl md:text-4xl">&#9733;</span></span></div>
-                <div class="star-wrap" data-val="3" onmouseenter="hoverRating(3)" onmouseleave="leaveRating()" onclick="setRating(3)"><span class="star-full text-3xl md:text-4xl">&#9733;</span></div>
-                <div class="star-wrap" data-val="3.5" onmouseenter="hoverRating(3.5)" onmouseleave="leaveRating()" onclick="setRating(3.5)"><span class="star-full text-3xl md:text-4xl">&#9733;</span><span class="star-half-overlay"><span class="star-half text-3xl md:text-4xl">&#9733;</span></span></div>
-                <div class="star-wrap" data-val="4" onmouseenter="hoverRating(4)" onmouseleave="leaveRating()" onclick="setRating(4)"><span class="star-full text-3xl md:text-4xl">&#9733;</span></div>
-                <div class="star-wrap" data-val="4.5" onmouseenter="hoverRating(4.5)" onmouseleave="leaveRating()" onclick="setRating(4.5)"><span class="star-full text-3xl md:text-4xl">&#9733;</span><span class="star-half-overlay"><span class="star-half text-3xl md:text-4xl">&#9733;</span></span></div>
-                <div class="star-wrap" data-val="5" onmouseenter="hoverRating(5)" onmouseleave="leaveRating()" onclick="setRating(5)"><span class="star-full text-3xl md:text-4xl">&#9733;</span></div>
+            <div id="starRating" class="flex gap-0.5 mb-5" onmouseleave="leaveRating()">
+                <div class="star-item" data-n="1" onmousemove="previewStar(event,1)" onclick="clickStar(event,1)"><span class="star-bg">&#9733;</span><span class="star-fg">&#9733;</span></div>
+                <div class="star-item" data-n="2" onmousemove="previewStar(event,2)" onclick="clickStar(event,2)"><span class="star-bg">&#9733;</span><span class="star-fg">&#9733;</span></div>
+                <div class="star-item" data-n="3" onmousemove="previewStar(event,3)" onclick="clickStar(event,3)"><span class="star-bg">&#9733;</span><span class="star-fg">&#9733;</span></div>
+                <div class="star-item" data-n="4" onmousemove="previewStar(event,4)" onclick="clickStar(event,4)"><span class="star-bg">&#9733;</span><span class="star-fg">&#9733;</span></div>
+                <div class="star-item" data-n="5" onmousemove="previewStar(event,5)" onclick="clickStar(event,5)"><span class="star-bg">&#9733;</span><span class="star-fg">&#9733;</span></div>
             </div>
             <textarea id="comentarioTxt" placeholder="Que te parecio la serie?" class="w-full bg-zinc-800/50 p-4 rounded-2xl text-white mb-5 h-28 outline-none focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600 text-sm resize-none border-none"></textarea>
             <button onclick="publicarComentario()" class="w-full bg-red-600 py-3.5 rounded-2xl font-black hover:bg-red-700 transition tracking-widest uppercase text-sm shadow-xl active:scale-95">PUBLICAR</button>
@@ -839,18 +830,25 @@
     window.setRating = (n) => { currentRating = n; renderStars(n); };
     window.hoverRating = (n) => { renderStars(n); };
     window.leaveRating = () => { renderStars(currentRating); };
+    window.previewStar = function(e, n) {
+        var half = e.offsetX < e.currentTarget.offsetWidth / 2;
+        renderStars(half ? n - 0.5 : n);
+    };
+    window.clickStar = function(e, n) {
+        var half = e.offsetX < e.currentTarget.offsetWidth / 2;
+        window.setRating(half ? n - 0.5 : n);
+    };
     function renderStars(val) {
-        document.querySelectorAll('#starRating .star-wrap').forEach(function(wrap) {
-            var v = parseFloat(wrap.dataset.val);
-            var full = wrap.querySelector('.star-full');
-            var halfOv = wrap.querySelector('.star-half-overlay');
-            var halfStar = halfOv ? halfOv.querySelector('.star-half') : null;
-            if (halfOv) {
-                if (halfStar) halfStar.style.color = val >= v ? '#eab308' : '#3f3f46';
-                full.style.color = '#3f3f46';
-            } else {
-                full.style.color = val >= v ? '#eab308' : '#3f3f46';
-            }
+        document.querySelectorAll('#starRating .star-item').forEach(function(el) {
+        var n = parseInt(el.dataset.n);
+        var fg = el.querySelector('.star-fg');
+        if (val >= n) {
+            fg.style.width = '100%';      // estrella entera
+        } else if (val >= n - 0.5) {
+            fg.style.width = '50%';       // media estrella
+        } else {
+            fg.style.width = '0';         // vacía
+        }
         });
     }
 
