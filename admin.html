@@ -819,72 +819,61 @@ window.iniciarCargaMasiva = async function() {
         logEl.scrollTop = logEl.scrollHeight;
     }
 
-    // Parser robusto:
-    // Formato 1 (una línea):  Título (año) | url1 | url2 | url3
-    // Formato 2 (multilínea): Título (año)
-    //                         url1
-    //                         url2
-    //                         url3
-    //                         (línea vacía o nuevo título)
-    const todasLineas = raw.split('\n').map(l => l.trim());
-    const items = [];
-
-    function esUrl(s) { return s && (s.startsWith('http') || s.startsWith('//') || s.includes('/')); }
-    function esTitulo(s) { return s && !esUrl(s) && s.length > 1; }
-
-    let i = 0;
-    while (i < todasLineas.length) {
-        const linea = todasLineas[i];
-        if (!linea) { i++; continue; }
-
-        // Formato con | → Título | url1 | url2 | url3
-        if (linea.includes('|')) {
-            const partes = linea.split('|').map(p => p.trim()).filter(p => p);
-            const rawTitulo = partes[0];
-            const urls = partes.slice(1).filter(esUrl).map(u => u.startsWith('http') ? u : 'https://' + u);
-            if (rawTitulo && urls.length) {
-                items.push({ rawTitulo, url: urls[0], extras: urls.slice(1) });
+    // Parser: soporta título+URL en misma línea y URLs extras en líneas siguientes
+    function esUrl(s) { return !!(s && (s.includes('://') || s.startsWith('//'))); }
+    function parsearLinea(linea) {
+        // Busca el último token que sea URL
+        var tokens = linea.trim().split(/\s+/);
+        for (var j = tokens.length - 1; j >= 0; j--) {
+            if (esUrl(tokens[j])) {
+                var titulo = tokens.slice(0, j).join(' ').trim();
+                return { titulo: titulo, url: tokens[j] };
             }
-            i++; continue;
         }
-
-        // Detectar si la línea es un título (no es URL)
-        if (esTitulo(linea) && !esUrl(linea)) {
-            const rawTitulo = linea;
-            const urls = [];
-            i++;
-            // Recolectar URLs siguientes hasta línea vacía o nuevo título
-            while (i < todasLineas.length) {
-                const sig = todasLineas[i].trim();
-                if (!sig) { i++; break; } // línea vacía = fin del bloque
-                if (esTitulo(sig) && !esUrl(sig)) break; // nuevo título = fin del bloque
-                if (esUrl(sig)) {
-                    let u = sig;
-                    if (!u.startsWith('http')) u = 'https://' + u;
-                    urls.push(u);
-                }
-                i++;
-            }
-            if (rawTitulo && urls.length) {
-                items.push({ rawTitulo, url: urls[0], extras: urls.slice(1) });
-            }
-            continue;
-        }
-
-        // Línea suelta con URL y título junto (Título url)
-        const tokens = linea.split(/\s+/);
-        let urlIdx = -1;
-        for (let j = tokens.length - 1; j >= 0; j--) {
-            if (tokens[j].includes('/')) { urlIdx = j; break; }
-        }
-        if (urlIdx > 0) {
-            let url = tokens[urlIdx];
-            if (!url.startsWith('http')) url = 'https://' + url;
-            items.push({ rawTitulo: tokens.slice(0, urlIdx).join(' ').trim(), url, extras: [] });
-        }
-        i++;
+        return { titulo: linea.trim(), url: null };
     }
 
+    const todasLineas = raw.split('\n');
+    const items = [];
+    let idx2 = 0;
+
+    while (idx2 < todasLineas.length) {
+        const linea = todasLineas[idx2].trim();
+        if (!linea) { idx2++; continue; }
+
+        const parsed = parsearLinea(linea);
+
+        if (parsed.titulo) {
+            // Línea con título (con o sin URL inline)
+            const titulo = parsed.titulo;
+            const urls = parsed.url ? [parsed.url] : [];
+            idx2++;
+
+            // Recolectar URLs extras en líneas siguientes
+            while (idx2 < todasLineas.length) {
+                const sig = todasLineas[idx2].trim();
+                if (!sig) { idx2++; break; } // línea vacía = fin del bloque
+                const sigParsed = parsearLinea(sig);
+                if (sigParsed.url && !sigParsed.titulo) {
+                    // Solo URL → agregar al bloque actual
+                    urls.push(sigParsed.url);
+                    idx2++;
+                } else if (sigParsed.url && sigParsed.titulo) {
+                    // Título + URL → nueva película, NO avanzar
+                    break;
+                } else {
+                    // Solo texto → nuevo título sin URL, NO avanzar
+                    break;
+                }
+            }
+
+            if (urls.length) {
+                items.push({ rawTitulo: titulo, url: urls[0], extras: urls.slice(1) });
+            }
+        } else {
+            idx2++;
+        }
+    }
     if (!items.length) {
         logLine('✗ No se pudo leer la lista. Formato: Película (año) | https://... o Película (año) https://...', 'error');
         btn.disabled = false; btn.textContent = 'Iniciar Carga'; return;
