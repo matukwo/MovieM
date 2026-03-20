@@ -74,61 +74,42 @@
 <div id="modalEditarPerfil" class="fixed inset-0 z-[400] flex items-end md:items-center justify-center bg-black/80 hidden px-0 md:px-4">
     <div class="bg-zinc-900 border border-white/10 w-full max-w-md rounded-t-3xl md:rounded-3xl p-6 shadow-2xl overflow-y-auto max-h-[95vh] no-scrollbar">
         <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-5 md:hidden"></div>
-        <h4 class="text-sm font-black uppercase tracking-widest mb-6 text-white text-center">Editar Perfil</h4>
-
-        <!-- Nombre de display -->
+        <h4 class="text-sm font-black uppercase tracking-widest mb-5 text-white text-center">Editar Perfil</h4>
         <div class="mb-4">
             <label class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-2 block">Nombre de Display</label>
             <input id="editNombreDisplay" type="text" maxlength="30" placeholder="Tu nombre visible..."
                 class="w-full bg-zinc-800 border border-zinc-700 focus:border-accent rounded-2xl px-4 py-3 text-sm text-white outline-none transition placeholder-zinc-600">
-            <p class="text-[9px] text-zinc-600 mt-1">Nombre que aparece en tu perfil. Tu @usuario no cambia.</p>
         </div>
-
-        <!-- Bio -->
         <div class="mb-4">
             <label class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-2 block">Biografía</label>
             <textarea id="editBioModal" rows="3" maxlength="200" placeholder="Contá algo sobre vos..."
                 class="w-full bg-zinc-800 border border-zinc-700 focus:border-accent rounded-2xl px-4 py-3 text-sm text-white outline-none transition resize-none placeholder-zinc-600"></textarea>
         </div>
-
-        <!-- Redes sociales -->
-        <div class="mb-4">
+        <div class="mb-5">
             <label class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-3 block">Redes Sociales</label>
             <div class="space-y-2">
                 <div class="flex items-center gap-3 bg-zinc-800 border border-zinc-700 focus-within:border-accent rounded-2xl px-4 py-2.5 transition">
                     <svg class="w-4 h-4 text-pink-500 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                    <input id="editInstagram" type="text" maxlength="60" placeholder="usuario de Instagram"
-                        class="flex-1 bg-transparent text-sm text-white outline-none placeholder-zinc-600">
+                    <input id="editInstagram" type="text" maxlength="60" placeholder="usuario de Instagram" class="flex-1 bg-transparent text-sm text-white outline-none placeholder-zinc-600">
                 </div>
                 <div class="flex items-center gap-3 bg-zinc-800 border border-zinc-700 focus-within:border-accent rounded-2xl px-4 py-2.5 transition">
                     <svg class="w-4 h-4 text-sky-400 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.213 5.567zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                    <input id="editTwitter" type="text" maxlength="60" placeholder="usuario de X / Twitter"
-                        class="flex-1 bg-transparent text-sm text-white outline-none placeholder-zinc-600">
+                    <input id="editTwitter" type="text" maxlength="60" placeholder="usuario de X / Twitter" class="flex-1 bg-transparent text-sm text-white outline-none placeholder-zinc-600">
                 </div>
                 <div class="flex items-center gap-3 bg-zinc-800 border border-zinc-700 focus-within:border-accent rounded-2xl px-4 py-2.5 transition">
                     <svg class="w-4 h-4 text-red-500 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                    <input id="editYoutube" type="text" maxlength="80" placeholder="URL de tu canal de YouTube"
-                        class="flex-1 bg-transparent text-sm text-white outline-none placeholder-zinc-600">
+                    <input id="editYoutube" type="text" maxlength="80" placeholder="URL canal de YouTube" class="flex-1 bg-transparent text-sm text-white outline-none placeholder-zinc-600">
                 </div>
                 <div class="flex items-center gap-3 bg-zinc-800 border border-zinc-700 focus-within:border-accent rounded-2xl px-4 py-2.5 transition">
                     <svg class="w-4 h-4 text-zinc-400 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
-                    <input id="editGithub" type="text" maxlength="60" placeholder="usuario de GitHub"
-                        class="flex-1 bg-transparent text-sm text-white outline-none placeholder-zinc-600">
+                    <input id="editGithub" type="text" maxlength="60" placeholder="usuario de GitHub" class="flex-1 bg-transparent text-sm text-white outline-none placeholder-zinc-600">
                 </div>
                 <div class="flex items-center gap-3 bg-zinc-800 border border-zinc-700 focus-within:border-accent rounded-2xl px-4 py-2.5 transition">
                     <svg class="w-4 h-4 text-zinc-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-                    <input id="editWebsite" type="url" maxlength="100" placeholder="Tu sitio web"
-                        class="flex-1 bg-transparent text-sm text-white outline-none placeholder-zinc-600">
+                    <input id="editWebsite" type="url" maxlength="100" placeholder="Tu sitio web" class="flex-1 bg-transparent text-sm text-white outline-none placeholder-zinc-600">
                 </div>
             </div>
         </div>
-
-        <!-- Películas Favoritas -->
-        <div class="mb-6">
-            <label class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-3 block">Películas Favoritas</label>
-            <div class="grid grid-cols-4 gap-2" id="editFavsGrid"></div>
-        </div>
-
         <div class="flex gap-3">
             <button onclick="guardarEditarPerfil()" class="flex-1 py-3 bg-accent rounded-2xl text-sm font-black uppercase tracking-widest text-white hover:opacity-90 active:scale-95 transition">Guardar</button>
             <button onclick="cerrarModalEditarPerfil()" class="px-6 py-3 bg-zinc-800 rounded-2xl text-sm font-black uppercase tracking-widest text-zinc-400 hover:text-white active:scale-95 transition">Cancelar</button>
@@ -223,7 +204,7 @@
             <!-- Géneros -->
             <div class="flex flex-wrap gap-2 justify-center sm:justify-start" id="generosCont"></div>
 
-            <!-- Redes sociales del perfil -->
+            <!-- Redes sociales -->
             <div id="perfilRedes" class="flex flex-wrap gap-2 mt-3 justify-center sm:justify-start"></div>
         </div>
     </section>
@@ -284,33 +265,31 @@
                 <button id="btnAgregarDirector" class="hidden mt-4 text-[9px] font-black uppercase tracking-widest text-accent hover:underline" onclick="abrirBuscadorDirector()">+ Agregar Director</button>
             </section>
 
-        <!-- Películas/Series Vistas -->
-        <section id="secVistas" class="bg-zinc-900/30 p-5 md:p-6 rounded-2xl md:rounded-3xl border border-white/5 shadow-lg fade-in">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 italic">Vistas</h3>
-                <span id="contVistas" class="text-xs font-black text-accent">0</span>
-            </div>
-            <div id="gridVistas" class="grid grid-cols-3 gap-2"></div>
-            <p id="sinVistas" class="text-[10px] text-zinc-600 italic text-center py-4">Ninguna todavía.</p>
-            <button id="btnVerTodasVistas" class="hidden mt-3 w-full text-[9px] font-black uppercase tracking-widest text-zinc-500 hover:text-accent transition" onclick="verTodasVistas()">Ver todas →</button>
-        </section>
-    </aside>
+            <!-- Vistas -->
+            <section id="secVistas" class="bg-zinc-900/30 p-5 md:p-6 rounded-2xl md:rounded-3xl border border-white/5 shadow-lg">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 italic">Vistas</h3>
+                    <span id="contVistas" class="text-xs font-black text-accent">0</span>
+                </div>
+                <div id="gridVistas" class="grid grid-cols-3 gap-2"></div>
+                <p id="sinVistas" class="text-[10px] text-zinc-600 italic text-center py-4">Ninguna todavía.</p>
+                <button id="btnVerTodasVistas" class="hidden mt-3 w-full text-[9px] font-black uppercase tracking-widest text-zinc-500 hover:text-accent transition" onclick="verTodasVistas()">Ver todas →</button>
+            </section>
+        </aside>
     </div>
 </main>
+
 
 <!-- Modal todas las vistas -->
 <div id="modalTodasVistas" class="fixed inset-0 z-[400] flex items-end md:items-center justify-center bg-black/80 hidden px-0 md:px-4">
     <div class="bg-zinc-900 border border-white/10 w-full max-w-3xl rounded-t-3xl md:rounded-3xl shadow-2xl flex flex-col max-h-[85vh]">
         <div class="flex items-center justify-between px-5 py-4 border-b border-white/5 shrink-0">
-            <h4 class="text-sm font-black uppercase tracking-widest text-white flex items-center gap-2">
-                <span class="w-1 h-4 bg-accent rounded-full inline-block"></span>
-                Vistas <span id="modalContVistas" class="text-accent"></span>
-            </h4>
+            <h4 class="text-sm font-black uppercase tracking-widest text-white">Todas las Vistas</h4>
             <button onclick="cerrarModalVistas()" class="text-zinc-500 hover:text-white transition p-1">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
-        <div id="gridTodasVistas" class="overflow-y-auto flex-1 p-4 grid grid-cols-3 md:grid-cols-5 gap-3 no-scrollbar"></div>
+        <div id="gridTodasVistas" class="overflow-y-auto no-scrollbar flex-1 p-4 grid grid-cols-3 md:grid-cols-5 gap-3"></div>
     </div>
 </div>
 
@@ -509,8 +488,8 @@
         }
         renderizarActores();
         renderizarDirectores();
+        cargarVistas(data.visto||[]);
         cargarComentarios();
-        cargarVistas(data.visto || []);
     }
 
     // ── Panel ajustes toggle ──────────────────────────────────────
@@ -537,6 +516,30 @@
         btn.innerText = sig ? 'Siguiendo ✓' : 'Seguir';
         btn.classList.toggle('bg-accent', sig); btn.classList.toggle('text-white', sig);
         btn.classList.toggle('text-accent', !sig);
+    }
+
+    // ── Redes sociales ──────────────────────────────────────────
+    function renderizarRedes(redes) {
+        var cont = document.getElementById('perfilRedes');
+        if (!cont) return;
+        cont.innerHTML = '';
+        if (!redes || !Object.keys(redes).length) return;
+        var defs = {
+            instagram: { color:'text-pink-500', href:function(v){return 'https://instagram.com/'+v.replace('@','');}, icon:'<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>' },
+            twitter:   { color:'text-sky-400',  href:function(v){return 'https://x.com/'+v.replace('@','');}, icon:'<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.213 5.567zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>' },
+            youtube:   { color:'text-red-500',  href:function(v){return v.startsWith('http')?v:'https://youtube.com/'+v;}, icon:'<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>' },
+            github:    { color:'text-zinc-400', href:function(v){return 'https://github.com/'+v.replace('@','');}, icon:'<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>' },
+            website:   { color:'text-zinc-400', href:function(v){return v.startsWith('http')?v:'https://'+v;}, icon:'<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>' }
+        };
+        Object.entries(defs).forEach(function(entry){
+            var key=entry[0], def=entry[1];
+            if (!redes[key]) return;
+            var a=document.createElement('a');
+            a.href=def.href(redes[key]); a.target='_blank'; a.rel='noopener noreferrer';
+            a.className='w-8 h-8 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center hover:border-white/30 hover:bg-zinc-800 transition '+def.color;
+            a.innerHTML=def.icon;
+            cont.appendChild(a);
+        });
     }
 
     async function guardarDato(campo, valor) {
@@ -646,7 +649,7 @@
                 var src = f.poster.startsWith('http') ? f.poster : 'https://image.tmdb.org/t/p/w500'+f.poster;
                 return '<div class="aspect-[2/3] bg-zinc-900 rounded-xl border border-white/10 overflow-hidden cursor-pointer group relative active:scale-95 transition" onclick="location.href=\'pelicula.html?id='+f.id+'\'">'
                     +'<img src="'+src+'" class="w-full h-full object-cover">'
-                    // Sin overlay quitar — se edita desde Editar Perfil
+                    +(editable?'<div onclick="event.stopPropagation();quitarFav('+i+')" class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center text-[9px] font-bold uppercase">Quitar</div>':'')
                     +'</div>';
             }
             return '<div class="aspect-[2/3] bg-zinc-900/60 rounded-xl border border-dashed border-white/10 flex flex-col items-center justify-center gap-2'+(editable?' cursor-pointer hover:border-accent hover:bg-zinc-800/60 transition group/slot':'')+'" '+(editable?'onclick="abrirBuscadorFav('+i+')"':'')+' >'
@@ -675,162 +678,83 @@
     window.prevActor = function(){ actorIndex = actorIndex>0 ? actorIndex-1 : actoresLocal.length-1; moverCarrusel(); };
     function moverCarrusel(){ document.getElementById('actorCarousel').style.transform='translateX(-'+(actorIndex*100)+'%)'; }
 
-    // ── Directores ────────────────────────────────────────────────
+    // ── Directores Favoritos ──────────────────────────────────
     function renderizarDirectores() {
         var c3 = document.getElementById('directorCarousel');
         if (!c3) return;
-        if (!directoresLocal.length) {
-            c3.innerHTML='<div class="min-w-full h-full flex items-center justify-center text-zinc-600 text-[9px] font-bold uppercase italic">Sin directores</div>';
-            return;
-        }
-        c3.innerHTML = directoresLocal.map(function(d) {
-            var src = d.foto && d.foto.startsWith('http') ? d.foto : 'https://image.tmdb.org/t/p/w200' + d.foto;
+        if (!directoresLocal.length) { c3.innerHTML='<div class="min-w-full h-full flex items-center justify-center text-zinc-600 text-[9px] font-bold uppercase italic">Sin directores</div>'; return; }
+        c3.innerHTML = directoresLocal.map(function(d){
+            var src = d.foto&&d.foto.startsWith('http') ? d.foto : 'https://image.tmdb.org/t/p/w200'+d.foto;
             return '<div class="min-w-full flex flex-col items-center justify-center h-full">'
-                + '<div class="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-accent overflow-hidden mb-2 shadow-xl shrink-0"><img src="' + src + '" class="w-full h-full object-cover" loading="lazy"></div>'
-                + '<p class="text-[9px] font-black text-white uppercase tracking-widest truncate w-full px-2 text-center">' + d.nombre + '</p>'
-                + (isMiPerfil ? '<button onclick="eliminarDirector()" class="text-[8px] text-zinc-600 mt-1 hover:text-red-500 uppercase font-bold">Quitar</button>' : '')
-                + '</div>';
+                +'<div class="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-accent overflow-hidden mb-2 shadow-xl shrink-0"><img src="'+src+'" class="w-full h-full object-cover" loading="lazy"></div>'
+                +'<p class="text-[9px] font-black text-white uppercase tracking-widest truncate w-full px-2 text-center">'+d.nombre+'</p>'
+                +(isMiPerfil?'<button onclick="eliminarDirector()" class="text-[8px] text-zinc-600 mt-1 hover:text-red-500 uppercase font-bold">Quitar</button>':'')
+                +'</div>';
         }).join('');
     }
-    window.eliminarDirector = async function() {
-        directoresLocal.splice(directorIndex, 1);
-        directorIndex = 0;
-        await guardarDato('directores', directoresLocal);
-        renderizarDirectores();
-        moverCarruselDirector();
-    };
-    window.nextDirector = function() { directorIndex = directorIndex < directoresLocal.length-1 ? directorIndex+1 : 0; moverCarruselDirector(); };
-    window.prevDirector = function() { directorIndex = directorIndex > 0 ? directorIndex-1 : directoresLocal.length-1; moverCarruselDirector(); };
-    function moverCarruselDirector() {
-        var el = document.getElementById('directorCarousel');
-        if (el) el.style.transform = 'translateX(-' + (directorIndex*100) + '%)';
-    }
-    window.abrirBuscadorDirector = function() { tipoBusq = 'director'; mostrarModal('Agregar Director'); };
-
-    // ── Vistas ────────────────────────────────────────────────────
-    function cargarVistas(vistas) {
-        const grid     = document.getElementById('gridVistas');
-        const sinEl    = document.getElementById('sinVistas');
-        const contEl   = document.getElementById('contVistas');
-        const btnTodas = document.getElementById('btnVerTodasVistas');
-        if (!grid) return;
-
-        contEl.textContent = vistas.length;
-        document.getElementById('modalContVistas').textContent = '(' + vistas.length + ')';
-
-        if (!vistas.length) {
-            grid.innerHTML = '';
-            sinEl.classList.remove('hidden');
-            btnTodas.classList.add('hidden');
-            return;
-        }
-
-        sinEl.classList.add('hidden');
-        const recientes = [...vistas].sort((a,b) => (b.fecha||0)-(a.fecha||0)).slice(0, 3);
-        grid.innerHTML = '';
-        recientes.forEach(function(v) {
-            const poster = v.poster || '';
-            const href = (v.tipo === 'serie' ? 'serie' : 'pelicula') + '.html?id=' + v.id;
-            const div = document.createElement('div');
-            div.className = 'aspect-[2/3] rounded-xl overflow-hidden border border-white/5 cursor-pointer hover:border-accent/40 transition group';
-            div.onclick = () => location.href = href;
-            var posterSrc = poster.startsWith('http') ? poster : 'https://image.tmdb.org/t/p/w500' + poster;
-            div.innerHTML = poster
-                ? '<img src="' + posterSrc + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">'
-                : '<div class="w-full h-full bg-zinc-800 flex items-center justify-center text-zinc-600 text-xs font-bold">' + (v.titulo||'?').charAt(0) + '</div>';
-            grid.appendChild(div);
-        });
-
-        if (vistas.length > 3) btnTodas.classList.remove('hidden');
-        else btnTodas.classList.add('hidden');
-
-        // Rellenar el modal con todas
-        const gridTodas = document.getElementById('gridTodasVistas');
-        if (gridTodas) {
-            gridTodas.innerHTML = '';
-            [...vistas].sort((a,b) => (b.fecha||0)-(a.fecha||0)).forEach(function(v) {
-                const poster = v.poster || '';
-                const href = (v.tipo === 'serie' ? 'serie' : 'pelicula') + '.html?id=' + v.id;
-                const div = document.createElement('div');
-                div.className = 'aspect-[2/3] rounded-xl overflow-hidden border border-white/5 cursor-pointer hover:border-accent/40 transition';
-                div.onclick = () => location.href = href;
-                var posterSrc2 = poster.startsWith('http') ? poster : 'https://image.tmdb.org/t/p/w500' + poster;
-                div.innerHTML = poster
-                    ? '<img src="' + posterSrc2 + '" class="w-full h-full object-cover" loading="lazy">'
-                    : '<div class="w-full h-full bg-zinc-800 flex items-center justify-center text-zinc-600 text-xs font-bold">' + (v.titulo||'?').charAt(0) + '</div>';
-                gridTodas.appendChild(div);
-            });
-        }
-    }
-
-    window.verTodasVistas = function() {
-        document.getElementById('modalTodasVistas').classList.remove('hidden');
-    };
-    window.cerrarModalVistas = function() {
-        document.getElementById('modalTodasVistas').classList.add('hidden');
-    };
-    document.getElementById('modalTodasVistas').addEventListener('click', function(e) {
-        if (e.target === this) window.cerrarModalVistas();
-    });
+    window.eliminarDirector = async function(){ directoresLocal.splice(directorIndex,1); directorIndex=0; await guardarDato('directores',directoresLocal); renderizarDirectores(); moverCarruselDirector(); };
+    window.nextDirector = function(){ directorIndex = directorIndex<directoresLocal.length-1 ? directorIndex+1 : 0; moverCarruselDirector(); };
+    window.prevDirector = function(){ directorIndex = directorIndex>0 ? directorIndex-1 : directoresLocal.length-1; moverCarruselDirector(); };
+    function moverCarruselDirector(){ var el=document.getElementById('directorCarousel'); if(el) el.style.transform='translateX(-'+(directorIndex*100)+'%)'; }
+    window.abrirBuscadorDirector = function(){ tipoBusq='director'; mostrarModal('Agregar Director'); }
 
     // ── Comentarios ───────────────────────────────────────────────
     async function cargarComentarios() {
         var cont = document.getElementById('contenedorComentarios');
         var esAdmin = miUID !== null && miUID === ADMIN_UID;
-        cont.innerHTML = '<p class="text-zinc-600 text-xs italic animate-pulse">Cargando...</p>';
         try {
             var snap = await getDocs(query(collection(db,'comentarios'), where('user','==',perfilUsername)));
             if (snap.empty) { cont.innerHTML='<p class="text-zinc-600 text-xs italic">Sin comentarios aún.</p>'; return; }
             var docs=[]; snap.forEach(function(d){ docs.push({id:d.id, ...d.data()}); });
             docs.sort(function(a,b){ return (b.fecha||0)-(a.fecha||0); });
             var recientes = docs.slice(0,5);
-
-            // Cargar datos de TMDB en paralelo (sin bloquear si falla)
             var pelisData = {};
             await Promise.all(recientes.map(async function(cm){
-                if (!cm.movieID) return;
+                var movieKey = cm.movieID;
+                if (!movieKey) return;
                 try {
-                    var isSerie = String(cm.movieID).startsWith('tv-');
-                    var realID = isSerie ? cm.movieID.replace('tv-','') : cm.movieID;
-                    var lang = 'es-MX';
-                    var tipo = isSerie ? 'tv' : 'movie';
-                    var r = await fetch('https://api.themoviedb.org/3/'+tipo+'/'+realID+'?api_key='+API+'&language='+lang);
+                    var isSerie = String(movieKey).startsWith('tv-');
+                    var realID = isSerie ? movieKey.replace('tv-','') : movieKey;
+                    var endpoint = isSerie
+                        ? 'https://api.themoviedb.org/3/tv/'+realID+'?api_key='+API+'&language=es-ES'
+                        : 'https://api.themoviedb.org/3/movie/'+realID+'?api_key='+API+'&language=es-ES';
+                    var r = await fetch(endpoint);
                     var d = await r.json();
-                    if (d && (d.title||d.name)) pelisData[cm.movieID] = d;
+                    if (d && (d.title||d.name)) pelisData[movieKey] = d;
                 } catch(e) {}
             }));
-
             cont.innerHTML = '';
             recientes.forEach(function(cm){
                 var peli = pelisData[cm.movieID];
                 var posterURL = peli && peli.poster_path ? 'https://image.tmdb.org/t/p/w92'+peli.poster_path : null;
-                var nombrePeli = peli ? (peli.title||peli.name) : (String(cm.movieID||'').startsWith('tv-') ? 'Serie' : 'Película');
-                var isSerie = String(cm.movieID||'').startsWith('tv-');
-                var realID = isSerie ? String(cm.movieID).replace('tv-','') : cm.movieID;
-                var href = (isSerie ? 'serie' : 'pelicula') + '.html?id=' + realID;
-                var estrellas = '★'.repeat(Math.min(cm.rating||0, 5));
+                var nombrePeli = peli ? (peli.title||peli.name) : (String(cm.movieID).startsWith('tv-') ? 'Serie' : 'Película');
+                var isSerie = String(cm.movieID).startsWith('tv-');
+                var realID = isSerie ? cm.movieID.replace('tv-','') : cm.movieID;
+                var href = isSerie ? 'serie.html?id='+realID : 'pelicula.html?id='+realID;
 
                 var div = document.createElement('div');
-                div.className = 'bg-zinc-900/50 rounded-xl border border-white/5 overflow-hidden hover:border-white/10 transition group/cm';
-                div.innerHTML = '<div class="flex gap-3">'
-                    + (posterURL
-                        ? '<img src="'+posterURL+'" class="w-12 h-[72px] object-cover shrink-0">'
-                        : '<div class="w-12 h-[72px] bg-zinc-800 shrink-0 flex items-center justify-center"><svg class="w-4 h-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="2" y="3" width="20" height="18" rx="2" stroke-width="1.5"/></svg></div>')
-                    + '<div class="flex-1 p-2.5 min-w-0">'
-                    + '<div class="flex justify-between items-start gap-2 mb-1">'
-                    + '<p class="text-[11px] font-black text-white uppercase tracking-tight truncate cursor-pointer hover:text-accent transition" onclick="location.href=''+href+''">'+nombrePeli+'</p>'
-                    + '<div class="flex items-center gap-1.5 shrink-0">'
-                    + '<span class="text-yellow-500 text-[9px]">'+estrellas+'</span>'
-                    + (esAdmin ? '<button onclick="borrarComentario(''+cm.id+'')" class="opacity-0 group-hover/cm:opacity-100 transition-opacity w-4 h-4 rounded-full bg-red-900/60 hover:bg-red-600 flex items-center justify-center"><svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>' : '')
-                    + '</div></div>'
-                    + '<p class="text-zinc-400 text-[10px] italic leading-relaxed line-clamp-2">"'+cm.txt+'"</p>'
-                    + '</div></div>';
+                div.className = 'bg-zinc-900/50 rounded-xl border border-white/5 overflow-hidden hover:border-accent transition group/cm';
+                div.innerHTML =
+                    '<div class="flex gap-3">'
+                    +(posterURL ? '<img src="'+posterURL+'" class="w-14 h-20 object-cover shrink-0">'
+                        : '<div class="w-14 h-20 bg-zinc-800 shrink-0 flex items-center justify-center"><svg class="w-5 h-5 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="2" y="3" width="20" height="18" rx="2" stroke-width="1.5"/><path stroke-width="1.5" d="M7 3v18M17 3v18M2 9h5M2 15h5M17 9h5M17 15h5"/></svg></div>')
+                    +'<div class="flex-1 p-3 min-w-0">'
+                    +'<div class="flex justify-between items-start gap-2 mb-1">'
+                    +'<p class="text-xs font-black text-white uppercase tracking-tight truncate max-w-[160px] cursor-pointer hover:text-accent transition" onclick="location.href=\''+href+'\'">'+nombrePeli+'</p>'
+                    +'<div class="flex items-center gap-2 shrink-0">'
+                    +'<span class="text-yellow-500 text-[10px]">'+'★'.repeat(cm.rating||0)+'</span>'
+                    // Botón borrar — solo visible para el admin
+                    +(esAdmin
+                        ? '<button onclick="borrarComentario(\''+cm.id+'\')" class="opacity-0 group-hover/cm:opacity-100 transition-opacity w-5 h-5 rounded-full bg-red-900/60 hover:bg-red-600 flex items-center justify-center" title="Borrar comentario"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>'
+                        : '')
+                    +'</div>'
+                    +'</div>'
+                    +'<p class="text-zinc-400 text-[11px] italic leading-relaxed line-clamp-2">"'+cm.txt+'"</p>'
+                    +'</div>'
+                    +'</div>';
                 cont.appendChild(div);
             });
-        } catch(e) {
-            console.error('cargarComentarios:', e);
-            cont.innerHTML = '<p class="text-zinc-600 text-xs italic">Error al cargar comentarios.</p>';
-        }
+        } catch(e){ cont.innerHTML='<p class="text-zinc-600 text-xs italic">Error al cargar comentarios.</p>'; }
     }
 
     // ── Borrar comentario (solo admin) ────────────────────────────
@@ -843,7 +767,52 @@
         } catch(e) { alert('Error al borrar.'); }
     };
 
-    // ── Color / Sesión ────────────────────────────────────────────
+    
+    // ── Vistas ────────────────────────────────────────────────
+    function cargarVistas(vistas) {
+        var grid=document.getElementById('gridVistas');
+        var sinEl=document.getElementById('sinVistas');
+        var contEl=document.getElementById('contVistas');
+        var btnTodas=document.getElementById('btnVerTodasVistas');
+        if (!grid) return;
+        contEl.textContent=vistas.length;
+        if (!vistas.length){grid.innerHTML='';sinEl.classList.remove('hidden');btnTodas.classList.add('hidden');return;}
+        sinEl.classList.add('hidden');
+        var recientes=[...vistas].sort((a,b)=>(b.fecha||0)-(a.fecha||0)).slice(0,3);
+        grid.innerHTML='';
+        recientes.forEach(function(v){
+            var poster=v.poster||'';
+            var src=poster?(poster.startsWith('http')?poster:'https://image.tmdb.org/t/p/w500'+poster):'';
+            var href=(v.tipo==='serie'?'serie':'pelicula')+'.html?id='+v.id;
+            var div=document.createElement('div');
+            div.className='aspect-[2/3] rounded-xl overflow-hidden border border-white/5 cursor-pointer hover:border-accent/40 transition group';
+            div.onclick=function(){location.href=href;};
+            div.innerHTML=src?'<img src="'+src+'" class="w-full h-full object-cover group-hover:scale-105 transition-transform" loading="lazy">':'<div class="w-full h-full bg-zinc-800 flex items-center justify-center text-zinc-600 text-xs font-bold">'+(v.titulo||'?').charAt(0)+'</div>';
+            grid.appendChild(div);
+        });
+        if(vistas.length>3)btnTodas.classList.remove('hidden');
+        else btnTodas.classList.add('hidden');
+        window._todasVistas=[...vistas].sort((a,b)=>(b.fecha||0)-(a.fecha||0));
+    }
+    window.verTodasVistas=function(){
+        document.getElementById('modalTodasVistas').classList.remove('hidden');
+        var g=document.getElementById('gridTodasVistas');
+        if(!g||!window._todasVistas)return;
+        g.innerHTML='';
+        window._todasVistas.forEach(function(v){
+            var poster=v.poster||'';
+            var src=poster?(poster.startsWith('http')?poster:'https://image.tmdb.org/t/p/w500'+poster):'';
+            var href=(v.tipo==='serie'?'serie':'pelicula')+'.html?id='+v.id;
+            var div=document.createElement('div');
+            div.className='aspect-[2/3] rounded-xl overflow-hidden border border-white/5 cursor-pointer hover:border-accent/40 transition';
+            div.onclick=function(){location.href=href;};
+            div.innerHTML=src?'<img src="'+src+'" class="w-full h-full object-cover" loading="lazy">':'<div class="w-full h-full bg-zinc-800 flex items-center justify-center text-zinc-600 text-xs">'+(v.titulo||'?').charAt(0)+'</div>';
+            g.appendChild(div);
+        });
+    };
+    window.cerrarModalVistas=function(){document.getElementById('modalTodasVistas').classList.add('hidden');};
+
+// ── Color / Sesión ────────────────────────────────────────────
     window.cambiarColor = async function(hex) {
         document.documentElement.style.setProperty('--accent', hex);
         localStorage.setItem('movieM_color', hex);
@@ -940,6 +909,20 @@
     });
 </script>
 
+
+<!-- Modal todas las vistas -->
+<div id="modalTodasVistas" class="fixed inset-0 z-[400] flex items-end md:items-center justify-center bg-black/80 hidden px-0 md:px-4">
+    <div class="bg-zinc-900 border border-white/10 w-full max-w-3xl rounded-t-3xl md:rounded-3xl shadow-2xl flex flex-col max-h-[85vh]">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-white/5 shrink-0">
+            <h4 class="text-sm font-black uppercase tracking-widest text-white">Todas las Vistas</h4>
+            <button onclick="cerrarModalVistas()" class="text-zinc-500 hover:text-white transition p-1">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div id="gridTodasVistas" class="overflow-y-auto no-scrollbar flex-1 p-4 grid grid-cols-3 md:grid-cols-5 gap-3"></div>
+    </div>
+</div>
+
 <!-- Bottom nav mobile -->
 <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-zinc-950/95 backdrop-blur-xl border-t border-white/5">
     <div class="flex items-center justify-around py-3 px-2">
@@ -967,50 +950,19 @@ window.abrirModalEditarPerfil = function() {
     document.getElementById('editBioModal').value = snap.bio || '';
     var redes = snap.redes || {};
     document.getElementById('editInstagram').value = redes.instagram || '';
-    document.getElementById('editTwitter').value = redes.twitter || '';
-    document.getElementById('editYoutube').value = redes.youtube || '';
-    document.getElementById('editGithub').value = redes.github || '';
-    document.getElementById('editWebsite').value = redes.website || '';
-    // Favoritas en el modal
-    var favs = window._perfilGetFavoritasLocal ? window._perfilGetFavoritasLocal() : [null,null,null,null];
-    var favsGrid = document.getElementById('editFavsGrid');
-    if (favsGrid) {
-        favsGrid.innerHTML = '';
-        favs.forEach(function(f, i) {
-            var div = document.createElement('div');
-            div.className = 'aspect-[2/3] rounded-xl border border-dashed border-white/10 overflow-hidden cursor-pointer hover:border-accent transition relative group/ef';
-            if (f && f.poster) {
-                var src = f.poster.startsWith('http') ? f.poster : 'https://image.tmdb.org/t/p/w500'+f.poster;
-                div.innerHTML = '<img src="'+src+'" class="w-full h-full object-cover">'
-                    + '<div class="absolute inset-0 bg-black/70 opacity-0 group-hover/ef:opacity-100 flex items-center justify-center text-[9px] font-bold uppercase text-white transition" data-idx="'+i+'">Quitar</div>';
-                div.querySelector('[data-idx]').onclick = function(e) { e.stopPropagation(); window.quitarFavModal(i); };
-                div.onclick = function() { window._perfilSlotSel = i; window._perfilMostrarModal('Película Favorita'); };
-            } else {
-                div.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="w-5 h-5 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div>';
-                div.onclick = function() { window._perfilSlotSel = i; window._perfilMostrarModal('Película Favorita'); };
-            }
-            favsGrid.appendChild(div);
-        });
-    }
+    document.getElementById('editTwitter').value   = redes.twitter   || '';
+    document.getElementById('editYoutube').value   = redes.youtube   || '';
+    document.getElementById('editGithub').value    = redes.github    || '';
+    document.getElementById('editWebsite').value   = redes.website   || '';
     document.getElementById('toastEditarPerfil').classList.add('hidden');
     document.getElementById('modalEditarPerfil').classList.remove('hidden');
-};
-
-window.quitarFavModal = async function(i) {
-    if (!window._perfilGetFavoritasLocal) return;
-    var favs = window._perfilGetFavoritasLocal();
-    favs[i] = null;
-    window._perfilSetFavoritasLocal(favs);
-    await window._perfilGuardarDato('favoritas', favs);
-    window._perfilRenderizarFavs(false);
-    window.abrirModalEditarPerfil();
 };
 window.cerrarModalEditarPerfil = function() {
     document.getElementById('modalEditarPerfil').classList.add('hidden');
 };
 window.guardarEditarPerfil = async function() {
     var displayName = document.getElementById('editNombreDisplay').value.trim();
-    var bio = document.getElementById('editBioModal').value.trim();
+    var bio         = document.getElementById('editBioModal').value.trim();
     var redes = {
         instagram: document.getElementById('editInstagram').value.trim(),
         twitter:   document.getElementById('editTwitter').value.trim(),
@@ -1018,29 +970,21 @@ window.guardarEditarPerfil = async function() {
         github:    document.getElementById('editGithub').value.trim(),
         website:   document.getElementById('editWebsite').value.trim()
     };
-    // Limpiar claves vacías
     Object.keys(redes).forEach(function(k){ if (!redes[k]) delete redes[k]; });
     var toast = document.getElementById('toastEditarPerfil');
     try {
         var updates = { bio, redes };
         if (displayName) updates.displayName = displayName;
         await window.setDoc(window.doc(window.db, 'usuarios', window._mmPerfilUID), updates, {merge:true});
-        // Actualizar UI nombre
         if (displayName) {
             var nameEl = document.getElementById('profileName');
             if (nameEl.childNodes[0]) nameEl.childNodes[0].textContent = displayName;
         }
-        // Actualizar bio en pantalla
         var bioEl = document.getElementById('userBio');
         if (bioEl) bioEl.textContent = bio || '';
-        // Actualizar redes en pantalla
+        // Actualizar redes en pantalla — llamar a la fn del module si ya está lista
         if (window._perfilRenderizarRedes) window._perfilRenderizarRedes(redes);
-        // Cache
-        if (window._mmPerfilData) {
-            window._mmPerfilData.displayName = displayName;
-            window._mmPerfilData.bio = bio;
-            window._mmPerfilData.redes = redes;
-        }
+        if (window._mmPerfilData) { window._mmPerfilData.displayName=displayName; window._mmPerfilData.bio=bio; window._mmPerfilData.redes=redes; }
         toast.className = 'mt-4 px-4 py-3 rounded-2xl text-xs font-bold text-center bg-green-500/20 text-green-400';
         toast.textContent = '✓ Perfil actualizado.';
         setTimeout(() => window.cerrarModalEditarPerfil(), 1200);
