@@ -965,7 +965,6 @@ window.abrirModalEditarPerfil = function() {
     var snap = window._mmPerfilData || {};
     document.getElementById('editNombreDisplay').value = snap.displayName || '';
     document.getElementById('editBioModal').value = snap.bio || '';
-    // Redes sociales
     var redes = snap.redes || {};
     document.getElementById('editInstagram').value = redes.instagram || '';
     document.getElementById('editTwitter').value = redes.twitter || '';
@@ -973,20 +972,22 @@ window.abrirModalEditarPerfil = function() {
     document.getElementById('editGithub').value = redes.github || '';
     document.getElementById('editWebsite').value = redes.website || '';
     // Favoritas en el modal
+    var favs = window._perfilGetFavoritasLocal ? window._perfilGetFavoritasLocal() : [null,null,null,null];
     var favsGrid = document.getElementById('editFavsGrid');
     if (favsGrid) {
         favsGrid.innerHTML = '';
-        (favoritasLocal||[null,null,null,null]).forEach(function(f, i) {
+        favs.forEach(function(f, i) {
             var div = document.createElement('div');
             div.className = 'aspect-[2/3] rounded-xl border border-dashed border-white/10 overflow-hidden cursor-pointer hover:border-accent transition relative group/ef';
             if (f && f.poster) {
                 var src = f.poster.startsWith('http') ? f.poster : 'https://image.tmdb.org/t/p/w500'+f.poster;
                 div.innerHTML = '<img src="'+src+'" class="w-full h-full object-cover">'
-                    + '<div onclick="event.stopPropagation();quitarFavModal('+i+')" class="absolute inset-0 bg-black/70 opacity-0 group-hover/ef:opacity-100 flex items-center justify-center text-[9px] font-bold uppercase text-white transition">Quitar</div>';
-                div.onclick = function() { slotSel = i; tipoBusq = 'peli'; mostrarModal('Película Favorita'); };
+                    + '<div class="absolute inset-0 bg-black/70 opacity-0 group-hover/ef:opacity-100 flex items-center justify-center text-[9px] font-bold uppercase text-white transition" data-idx="'+i+'">Quitar</div>';
+                div.querySelector('[data-idx]').onclick = function(e) { e.stopPropagation(); window.quitarFavModal(i); };
+                div.onclick = function() { window._perfilSlotSel = i; window._perfilMostrarModal('Película Favorita'); };
             } else {
                 div.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="w-5 h-5 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div>';
-                div.onclick = function() { slotSel = i; tipoBusq = 'peli'; mostrarModal('Película Favorita'); };
+                div.onclick = function() { window._perfilSlotSel = i; window._perfilMostrarModal('Película Favorita'); };
             }
             favsGrid.appendChild(div);
         });
@@ -996,10 +997,13 @@ window.abrirModalEditarPerfil = function() {
 };
 
 window.quitarFavModal = async function(i) {
-    favoritasLocal[i] = null;
-    await guardarDato('favoritas', favoritasLocal);
-    renderizarFavs(false);
-    window.abrirModalEditarPerfil(); // refrescar grid del modal
+    if (!window._perfilGetFavoritasLocal) return;
+    var favs = window._perfilGetFavoritasLocal();
+    favs[i] = null;
+    window._perfilSetFavoritasLocal(favs);
+    await window._perfilGuardarDato('favoritas', favs);
+    window._perfilRenderizarFavs(false);
+    window.abrirModalEditarPerfil();
 };
 window.cerrarModalEditarPerfil = function() {
     document.getElementById('modalEditarPerfil').classList.add('hidden');
@@ -1030,7 +1034,7 @@ window.guardarEditarPerfil = async function() {
         var bioEl = document.getElementById('userBio');
         if (bioEl) bioEl.textContent = bio || '';
         // Actualizar redes en pantalla
-        renderizarRedes(redes);
+        if (window._perfilRenderizarRedes) window._perfilRenderizarRedes(redes);
         // Cache
         if (window._mmPerfilData) {
             window._mmPerfilData.displayName = displayName;
