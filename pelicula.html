@@ -29,11 +29,17 @@
         <span class="text-red-600 font-black tracking-tighter text-lg md:text-xl shrink-0">MOVIE<span class="text-white font-light">M</span></span>
         <div id="fuentesBtns" class="flex gap-2">
             <button id="btnFuenteSub" onclick="cambiarFuente('sub')" class="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition bg-white/10 border-white/20 text-white">Subtitulado</button>
-            <button id="btnSrv1" onclick="cambiarFuente(1)" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">Servidor 1</button>
-            <button id="btnSrv2" onclick="cambiarFuente(2)" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">Servidor 2</button>
-            <button id="btnSrv3" onclick="cambiarFuente(3)" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">Servidor 3</button>
-            <button id="btnSrv4" onclick="cambiarFuente(4)" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">Servidor 4</button>
-            <button id="btnSrv5" onclick="cambiarFuente(5)" class="hidden text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400">Servidor 5</button>
+            <!-- Botón Latino con dropdown -->
+            <div class="relative hidden" id="latinoWrap">
+                <button id="btnFuenteLat" onclick="toggleLatinoMenu()" class="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400 flex items-center gap-1">
+                    Latino
+                    <svg id="latArrow" class="w-3 h-3 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <!-- Dropdown servidores -->
+                <div id="latinoMenu" class="hidden absolute top-full left-0 mt-1 bg-zinc-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl z-50 min-w-[130px]">
+                    <div id="latinoMenuItems"></div>
+                </div>
+            </div>
         </div>
         <button onclick="cerrarPelicula()" class="text-white/60 font-black uppercase text-[10px] tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/5 shrink-0">Cerrar x</button>
     </div>
@@ -742,12 +748,23 @@
                 if (snap.exists()) {
                     const d = snap.data();
                     _latinoUrls = [d.url, d.url2||null, d.url3||null, d.url4||null, d.url5||null];
-                    _latinoUrls.forEach(function(u, i) {
-                        if (u) {
-                            var btn = document.getElementById('btnSrv' + (i+1));
-                            if (btn) btn.classList.remove('hidden');
-                        }
-                    });
+                    const disponibles = _latinoUrls.filter(Boolean);
+                    if (disponibles.length) {
+                        // Mostrar el botón Latino
+                        document.getElementById('latinoWrap').classList.remove('hidden');
+                        // Construir items del menú
+                        const menuItems = document.getElementById('latinoMenuItems');
+                        menuItems.innerHTML = '';
+                        _latinoUrls.forEach(function(u, i) {
+                            if (!u) return;
+                            const btn = document.createElement('button');
+                            btn.className = 'w-full text-left px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:bg-zinc-800 hover:text-yellow-400 transition';
+                            btn.textContent = 'Servidor ' + (i + 1);
+                            btn.dataset.idx = i;
+                            btn.onclick = function() { seleccionarServidor(i); };
+                            menuItems.appendChild(btn);
+                        });
+                    }
                 }
             } catch(e) { console.log('Sin link latino para esta película'); }
         }
@@ -759,47 +776,74 @@
             document.getElementById('btnRespaldoWrap').classList.add('hidden');
         };
 
-        window.cambiarFuente = function(fuente) {
+        // Abrir/cerrar el menú de servidores latinos
+        window.toggleLatinoMenu = function() {
+            const menu = document.getElementById('latinoMenu');
+            const arrow = document.getElementById('latArrow');
+            const isOpen = !menu.classList.contains('hidden');
+            menu.classList.toggle('hidden', isOpen);
+            if (arrow) arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
+        };
+
+        // Seleccionar un servidor del menú
+        window.seleccionarServidor = function(idx) {
+            const url = _latinoUrls[idx];
+            if (!url) return;
+            // Cerrar menú
+            document.getElementById('latinoMenu').classList.add('hidden');
+            document.getElementById('latArrow').style.transform = '';
+            // Marcar botón Latino como activo
+            const base = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition flex items-center gap-1';
+            document.getElementById('btnFuenteSub').className = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-white';
+            document.getElementById('btnFuenteLat').className = base + ' bg-yellow-500/20 border-yellow-500/50 text-yellow-400';
+            // Marcar el item activo en el menú
+            document.querySelectorAll('#latinoMenuItems button').forEach(function(b, i) {
+                b.classList.toggle('text-yellow-400', i === idx);
+                b.classList.toggle('bg-zinc-800/50', i === idx);
+            });
+            // Guardar progreso y cambiar fuente
             if (progresoInicio) {
                 const duracionMs = (window._peliculaDuracion || 120) * 60 * 1000;
-                const incremento = ((Date.now() - progresoInicio) / duracionMs) * 100;
-                _progresoBase += incremento;
+                _progresoBase += ((Date.now() - progresoInicio) / duracionMs) * 100;
                 guardarProgreso(_progresoBase);
                 progresoInicio = Date.now();
             }
-            const base  = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition';
-            const off   = base + ' border-white/10 text-white/40 hover:text-yellow-400';
-            const offW  = base + ' border-white/10 text-white/40 hover:text-white';
-            const activ = base + ' bg-yellow-500/20 border-yellow-500/50 text-yellow-400';
+            document.getElementById('movieFrame').src = url;
+        };
 
-            // Resetear todos los botones
-            document.getElementById('btnFuenteSub').className = offW;
-            for (var i = 1; i <= 5; i++) {
-                var b = document.getElementById('btnSrv'+i);
-                if (b) b.className = off;
+        window.cambiarFuente = function(fuente) {
+            if (progresoInicio) {
+                const duracionMs = (window._peliculaDuracion || 120) * 60 * 1000;
+                _progresoBase += ((Date.now() - progresoInicio) / duracionMs) * 100;
+                guardarProgreso(_progresoBase);
+                progresoInicio = Date.now();
             }
-            document.getElementById('btnRespaldoWrap').classList.add('hidden');
+            const base = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition';
+            // Cerrar menú latino si está abierto
+            document.getElementById('latinoMenu')?.classList.add('hidden');
+            document.getElementById('latArrow').style.transform = '';
 
             if (fuente === 'sub') {
                 document.getElementById('btnFuenteSub').className = base + ' bg-white/10 border-white/20 text-white';
+                document.getElementById('btnFuenteLat').className = base + ' flex items-center gap-1 border-white/10 text-white/40 hover:text-yellow-400';
+                document.getElementById('btnRespaldoWrap').classList.add('hidden');
                 document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
-            } else {
-                // fuente es número 1-5
-                var idx = fuente - 1;
-                var url = _latinoUrls[idx];
-                if (!url) return;
-                var btn = document.getElementById('btnSrv' + fuente);
-                if (btn) btn.className = activ;
-                document.getElementById('movieFrame').src = url;
             }
         };
 
+        // Cerrar dropdown al clickear fuera
+        document.addEventListener('click', function(e) {
+            const wrap = document.getElementById('latinoWrap');
+            if (wrap && !wrap.contains(e.target)) {
+                document.getElementById('latinoMenu')?.classList.add('hidden');
+                const arrow = document.getElementById('latArrow');
+                if (arrow) arrow.style.transform = '';
+            }
+        });
+
         window.verPelicula = () => {
             document.getElementById('btnFuenteSub').className = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition bg-white/10 border-white/20 text-white';
-            for (var i = 1; i <= 5; i++) {
-                var b = document.getElementById('btnSrv'+i);
-                if (b) b.className = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition border-white/10 text-white/40 hover:text-yellow-400';
-            }
+            document.getElementById('btnFuenteLat').className = 'text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition flex items-center gap-1 border-white/10 text-white/40 hover:text-yellow-400';
             document.getElementById('movieFrame').src = `https://vidsrc.cc/v3/embed/movie/${movieID}?auto_lang=es`;
             document.getElementById('playerOverlay').style.display = 'flex';
             document.body.style.overflow = "hidden";
