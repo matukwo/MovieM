@@ -509,22 +509,28 @@
 
         window.toggleWatchlist = async () => {
             if (!miUID_pelicula) return alert("Debes iniciar sesión para guardar películas.");
-
             const btn = document.getElementById('btnWatchlist');
-            const userRef = window.doc(window.db, "usuarios", miUID_pelicula);
             const isSaved = btn.classList.contains('bg-zinc-100');
-
+            // Optimistic
+            ['btnWatchlist','btnWatchlistDesktop'].forEach(id => {
+                const b = document.getElementById(id); if(!b) return;
+                if(!isSaved){b.classList.add('bg-zinc-100','text-black','border-white');b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5');}
+                else{b.classList.remove('bg-zinc-100','text-black','border-white');b.classList.add('bg-zinc-900','text-zinc-400','border-white/5');}
+            });
+            // Firestore en segundo plano
             try {
-                await window.setDoc(userRef, { 
+                await window.setDoc(window.doc(window.db,"usuarios",miUID_pelicula), { 
                     watchlist: isSaved ? window.arrayRemove(movieID) : window.arrayUnion(movieID) 
                 }, { merge: true });
-                
+            } catch(e) {
+                console.error(e);
+                // Revertir si falla
                 ['btnWatchlist','btnWatchlistDesktop'].forEach(id => {
                     const b = document.getElementById(id); if(!b) return;
-                    if(!isSaved){b.classList.add('bg-zinc-100','text-black','border-white');b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5');}
+                    if(isSaved){b.classList.add('bg-zinc-100','text-black','border-white');b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5');}
                     else{b.classList.remove('bg-zinc-100','text-black','border-white');b.classList.add('bg-zinc-900','text-zinc-400','border-white/5');}
                 });
-            } catch (e) { console.error("Error en Watchlist:", e); }
+            }
         };
 
         window.compartir = async () => {
@@ -557,6 +563,9 @@
             if (!miUID_pelicula) return alert('Debes iniciar sesión.');
             const btn = document.getElementById('btnVisto');
             const isVisto = btn.classList.contains('text-green-500');
+            // Optimistic: actualizar UI al instante
+            actualizarBtnVisto(!isVisto);
+            // Guardar en Firestore en segundo plano
             try {
                 const userRef = window.doc(window.db, 'usuarios', miUID_pelicula);
                 const snap = await window.getDoc(userRef);
@@ -571,8 +580,7 @@
                     visto.push({ id: String(movieID), tipo: 'pelicula', titulo, poster, fecha: Date.now() });
                 }
                 await window.setDoc(userRef, { visto }, { merge: true });
-                actualizarBtnVisto(!isVisto);
-            } catch(e) { console.error(e); }
+            } catch(e) { console.error(e); actualizarBtnVisto(isVisto); } // revertir si falla
         };
 
         function actualizarBtnVisto(visto) {
@@ -591,22 +599,27 @@
         }
 
         window.toggleLike = async () => {
-
             const btn = document.getElementById('btnLike');
-            const userRef = window.doc(window.db, "usuarios", miUID_pelicula);
             const isLiked = btn.classList.contains('bg-red-600');
-
+            // Optimistic
+            ['btnLike','btnLikeDesktop'].forEach(id => {
+                const b = document.getElementById(id); if(!b) return;
+                if(!isLiked){b.classList.add('bg-red-600','border-red-600','text-white');b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5');}
+                else{b.classList.remove('bg-red-600','border-red-600','text-white');b.classList.add('bg-zinc-900','text-zinc-400','border-white/5');}
+            });
+            // Firestore en segundo plano
             try {
-                await window.setDoc(userRef, { 
+                await window.setDoc(window.doc(window.db,"usuarios",miUID_pelicula), { 
                     likes: isLiked ? window.arrayRemove(movieID) : window.arrayUnion(movieID) 
                 }, { merge: true });
-                
+            } catch(e) {
+                console.error(e);
                 ['btnLike','btnLikeDesktop'].forEach(id => {
                     const b = document.getElementById(id); if(!b) return;
-                    if(!isLiked){b.classList.add('bg-red-600','border-red-600','text-white');b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5');}
+                    if(isLiked){b.classList.add('bg-red-600','border-red-600','text-white');b.classList.remove('bg-zinc-900','text-zinc-400','border-white/5');}
                     else{b.classList.remove('bg-red-600','border-red-600','text-white');b.classList.add('bg-zinc-900','text-zinc-400','border-white/5');}
                 });
-            } catch (e) { console.error("Error en Like:", e); }
+            }
         };
 
         // --- MODAL ACTORES & TRAILER ---
