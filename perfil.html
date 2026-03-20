@@ -239,6 +239,22 @@
                 </button>
                 <button id="btnAgregarActor" class="hidden mt-4 text-[9px] font-black uppercase tracking-widest text-accent hover:underline" onclick="abrirBuscadorActor()">+ Agregar Actor</button>
             </section>
+
+            <!-- Directores Favoritos -->
+            <section class="bg-zinc-900/30 p-5 md:p-6 rounded-2xl md:rounded-3xl border border-white/5 text-center relative overflow-hidden group shadow-lg min-h-[180px] md:min-h-[220px] flex flex-col">
+                <h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-4 italic">Directores Favoritos</h3>
+                <div class="relative overflow-hidden flex-1">
+                    <div id="directorCarousel" class="flex h-full"></div>
+                </div>
+                <button onclick="prevDirector()" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition z-10">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <button onclick="nextDirector()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition z-10">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M9 5l7 7-7 7"/></svg>
+                </button>
+                <button id="btnAgregarDirector" class="hidden mt-4 text-[9px] font-black uppercase tracking-widest text-accent hover:underline" onclick="abrirBuscadorDirector()">+ Agregar Director</button>
+            </section>
+
         <!-- Películas/Series Vistas -->
         <section id="secVistas" class="bg-zinc-900/30 p-5 md:p-6 rounded-2xl md:rounded-3xl border border-white/5 shadow-lg fade-in">
             <div class="flex items-center justify-between mb-4">
@@ -459,6 +475,7 @@
             }
         }
         renderizarActores();
+        renderizarDirectores();
         cargarComentarios();
         cargarVistas(data.visto || []);
     }
@@ -581,6 +598,7 @@
             d.onclick = async function() {
                 if (tipoBusq==='peli') { favoritasLocal[slotSel]={poster:img,id:item.id}; await guardarDato('favoritas',favoritasLocal); renderizarFavs(true); }
                 else if (tipoBusq==='actor') { actoresLocal.push({nombre:item.name,foto:img}); await guardarDato('actores',actoresLocal); actorIndex=actoresLocal.length-1; renderizarActores(); moverCarrusel(); }
+                else if (tipoBusq==='director') { directoresLocal.push({nombre:item.name,foto:img}); await guardarDato('directores',directoresLocal); directorIndex=directoresLocal.length-1; renderizarDirectores(); moverCarruselDirector(); }
                 else { await guardarDato('avatar','https://image.tmdb.org/t/p/w500'+img); document.getElementById('userAvatarFrame').innerHTML='<img src="https://image.tmdb.org/t/p/w500'+img+'" class="w-full h-full object-cover">'; }
                 cerrarModalBusqueda();
             };
@@ -624,6 +642,38 @@
     window.prevActor = function(){ actorIndex = actorIndex>0 ? actorIndex-1 : actoresLocal.length-1; moverCarrusel(); };
     function moverCarrusel(){ document.getElementById('actorCarousel').style.transform='translateX(-'+(actorIndex*100)+'%)'; }
 
+    // ── Directores ────────────────────────────────────────────────
+    function renderizarDirectores() {
+        var c3 = document.getElementById('directorCarousel');
+        if (!c3) return;
+        if (!directoresLocal.length) {
+            c3.innerHTML='<div class="min-w-full h-full flex items-center justify-center text-zinc-600 text-[9px] font-bold uppercase italic">Sin directores</div>';
+            return;
+        }
+        c3.innerHTML = directoresLocal.map(function(d) {
+            var src = d.foto && d.foto.startsWith('http') ? d.foto : 'https://image.tmdb.org/t/p/w200' + d.foto;
+            return '<div class="min-w-full flex flex-col items-center justify-center h-full">'
+                + '<div class="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-accent overflow-hidden mb-2 shadow-xl shrink-0"><img src="' + src + '" class="w-full h-full object-cover" loading="lazy"></div>'
+                + '<p class="text-[9px] font-black text-white uppercase tracking-widest truncate w-full px-2 text-center">' + d.nombre + '</p>'
+                + (isMiPerfil ? '<button onclick="eliminarDirector()" class="text-[8px] text-zinc-600 mt-1 hover:text-red-500 uppercase font-bold">Quitar</button>' : '')
+                + '</div>';
+        }).join('');
+    }
+    window.eliminarDirector = async function() {
+        directoresLocal.splice(directorIndex, 1);
+        directorIndex = 0;
+        await guardarDato('directores', directoresLocal);
+        renderizarDirectores();
+        moverCarruselDirector();
+    };
+    window.nextDirector = function() { directorIndex = directorIndex < directoresLocal.length-1 ? directorIndex+1 : 0; moverCarruselDirector(); };
+    window.prevDirector = function() { directorIndex = directorIndex > 0 ? directorIndex-1 : directoresLocal.length-1; moverCarruselDirector(); };
+    function moverCarruselDirector() {
+        var el = document.getElementById('directorCarousel');
+        if (el) el.style.transform = 'translateX(-' + (directorIndex*100) + '%)';
+    }
+    window.abrirBuscadorDirector = function() { tipoBusq = 'director'; mostrarModal('Agregar Director'); };
+
     // ── Vistas ────────────────────────────────────────────────────
     function cargarVistas(vistas) {
         const grid     = document.getElementById('gridVistas');
@@ -643,7 +693,7 @@
         }
 
         sinEl.classList.add('hidden');
-        const recientes = [...vistas].sort((a,b) => (b.fecha||0)-(a.fecha||0)).slice(0, 9);
+        const recientes = [...vistas].sort((a,b) => (b.fecha||0)-(a.fecha||0)).slice(0, 3);
         grid.innerHTML = '';
         recientes.forEach(function(v) {
             const poster = v.poster || '';
@@ -657,7 +707,7 @@
             grid.appendChild(div);
         });
 
-        if (vistas.length > 9) btnTodas.classList.remove('hidden');
+        if (vistas.length > 3) btnTodas.classList.remove('hidden');
         else btnTodas.classList.add('hidden');
 
         // Rellenar el modal con todas
