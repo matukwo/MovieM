@@ -441,6 +441,7 @@
         document.getElementById('contSiguiendo').innerText = sig;
 
         actoresLocal = data.actores||[];
+        directoresLocal = data.directores||[];
         favoritasLocal = data.favoritas||[null,null,null,null];
 
         if (isMiPerfil) {
@@ -448,6 +449,7 @@
             oe.classList.remove('hidden'); oe.classList.add('flex');
             document.getElementById('btnEditarBio').classList.remove('hidden');
             document.getElementById('btnAgregarActor').classList.remove('hidden');
+            document.getElementById('btnAgregarDirector').classList.remove('hidden');
             document.getElementById('btnSeccionColor').classList.remove('hidden');
             document.getElementById('btnBell').classList.remove('hidden');
             document.getElementById('btnEditarPerfil').classList.remove('hidden');
@@ -701,8 +703,9 @@
             const div = document.createElement('div');
             div.className = 'aspect-[2/3] rounded-xl overflow-hidden border border-white/5 cursor-pointer hover:border-accent/40 transition group';
             div.onclick = () => location.href = href;
+            var posterSrc = poster.startsWith('http') ? poster : 'https://image.tmdb.org/t/p/w500' + poster;
             div.innerHTML = poster
-                ? '<img src="' + poster + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">'
+                ? '<img src="' + posterSrc + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">'
                 : '<div class="w-full h-full bg-zinc-800 flex items-center justify-center text-zinc-600 text-xs font-bold">' + (v.titulo||'?').charAt(0) + '</div>';
             grid.appendChild(div);
         });
@@ -720,8 +723,9 @@
                 const div = document.createElement('div');
                 div.className = 'aspect-[2/3] rounded-xl overflow-hidden border border-white/5 cursor-pointer hover:border-accent/40 transition';
                 div.onclick = () => location.href = href;
+                var posterSrc2 = poster.startsWith('http') ? poster : 'https://image.tmdb.org/t/p/w500' + poster;
                 div.innerHTML = poster
-                    ? '<img src="' + poster + '" class="w-full h-full object-cover" loading="lazy">'
+                    ? '<img src="' + posterSrc2 + '" class="w-full h-full object-cover" loading="lazy">'
                     : '<div class="w-full h-full bg-zinc-800 flex items-center justify-center text-zinc-600 text-xs font-bold">' + (v.titulo||'?').charAt(0) + '</div>';
                 gridTodas.appendChild(div);
             });
@@ -730,11 +734,9 @@
 
     window.verTodasVistas = function() {
         document.getElementById('modalTodasVistas').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
     };
     window.cerrarModalVistas = function() {
         document.getElementById('modalTodasVistas').classList.add('hidden');
-        document.body.style.overflow = 'auto';
     };
     document.getElementById('modalTodasVistas').addEventListener('click', function(e) {
         if (e.target === this) window.cerrarModalVistas();
