@@ -20,14 +20,6 @@
         .sk-circle{border-radius:9999px!important}
         .fade-in { animation: fi .5s ease forwards; opacity: 0; }
         @keyframes fi { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-        /* Carrusel actores/directores */
-        #actorCarousel, #directorCarousel {
-            transition: transform .35s cubic-bezier(.4,0,.2,1);
-        }
-        .carousel-slide-in-right { animation: slideInR .3s cubic-bezier(.4,0,.2,1) both; }
-        .carousel-slide-in-left  { animation: slideInL .3s cubic-bezier(.4,0,.2,1) both; }
-        @keyframes slideInR { from{opacity:0;transform:translateX(32px)} to{opacity:1;transform:translateX(0)} }
-        @keyframes slideInL { from{opacity:0;transform:translateX(-32px)} to{opacity:1;transform:translateX(0)} }
     </style>
 </head>
 <body class="bg-zinc-950 text-white font-sans overflow-x-hidden pb-24 md:pb-0">
@@ -80,56 +72,61 @@
 
 <!-- Modal Editar Perfil -->
 <div id="modalEditarPerfil" class="fixed inset-0 z-[400] flex items-end md:items-center justify-center bg-black/80 hidden px-0 md:px-4">
-    <div class="bg-zinc-900 border border-white/10 w-full max-w-md rounded-t-3xl md:rounded-3xl p-6 shadow-2xl overflow-y-auto max-h-[95vh] no-scrollbar">
+    <div class="bg-zinc-900 border border-white/10 w-full max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl overflow-y-auto max-h-[95vh]">
+        <div class="p-6">
         <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-5 md:hidden"></div>
-        <h4 class="text-sm font-black uppercase tracking-widest mb-5 text-white text-center">Editar Perfil</h4>
+        <h4 class="text-sm font-black uppercase tracking-widest mb-6 text-white text-center">Editar Perfil</h4>
+
         <div class="mb-4">
             <label class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-2 block">Nombre de Display</label>
             <input id="editNombreDisplay" type="text" maxlength="30" placeholder="Tu nombre visible..."
                 class="w-full bg-zinc-800 border border-zinc-700 focus:border-accent rounded-2xl px-4 py-3 text-sm text-white outline-none transition placeholder-zinc-600">
         </div>
+
         <div class="mb-4">
             <label class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-2 block">Biografía</label>
             <textarea id="editBioModal" rows="3" maxlength="200" placeholder="Contá algo sobre vos..."
                 class="w-full bg-zinc-800 border border-zinc-700 focus:border-accent rounded-2xl px-4 py-3 text-sm text-white outline-none transition resize-none placeholder-zinc-600"></textarea>
         </div>
+
         <div class="mb-5">
             <label class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-3 block">Redes Sociales</label>
             <div class="space-y-2">
                 <div class="flex items-center gap-3 bg-zinc-800 border border-zinc-700 focus-within:border-accent rounded-2xl px-4 py-2.5 transition">
                     <svg class="w-4 h-4 text-white shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                    <input id="editInstagram" type="text" maxlength="60" placeholder="usuario de Instagram" class="flex-1 bg-transparent text-sm text-white outline-none placeholder-zinc-600">
+                    <input id="editInstagram" type="text" placeholder="usuario de Instagram" class="flex-1 bg-transparent text-sm text-white outline-none placeholder-zinc-600">
                 </div>
                 <div class="flex items-center gap-3 bg-zinc-800 border border-zinc-700 focus-within:border-accent rounded-2xl px-4 py-2.5 transition">
-                    <svg class="w-4 h-4 text-white shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.213 5.567zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                    <input id="editTwitter" type="text" maxlength="60" placeholder="usuario de X / Twitter" class="flex-1 bg-transparent text-sm text-white outline-none placeholder-zinc-600">
+                    <svg class="w-4 h-4 text-white shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.73-8.835L1.254 2.25H8.08l4.259 5.63L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
+                    <input id="editTwitter" type="text" placeholder="usuario de X / Twitter" class="flex-1 bg-transparent text-sm text-white outline-none placeholder-zinc-600">
                 </div>
                 <div class="flex items-center gap-3 bg-zinc-800 border border-zinc-700 focus-within:border-accent rounded-2xl px-4 py-2.5 transition">
                     <svg class="w-4 h-4 text-white shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                    <input id="editYoutube" type="text" maxlength="80" placeholder="URL canal de YouTube" class="flex-1 bg-transparent text-sm text-white outline-none placeholder-zinc-600">
+                    <input id="editYoutube" type="url" placeholder="URL canal de YouTube" class="flex-1 bg-transparent text-sm text-white outline-none placeholder-zinc-600">
                 </div>
                 <div class="flex items-center gap-3 bg-zinc-800 border border-zinc-700 focus-within:border-accent rounded-2xl px-4 py-2.5 transition">
-                    <!-- Letterboxd icon -->
-                    <svg class="w-4 h-4 text-white shrink-0" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><circle cx="5" cy="12" r="4"/><circle cx="12" cy="12" r="4"/><circle cx="19" cy="12" r="4"/></svg>
-                    <input id="editLetterboxd" type="text" maxlength="60" placeholder="usuario de Letterboxd" class="flex-1 bg-transparent text-sm text-white outline-none placeholder-zinc-600">
+                    <svg class="w-4 h-4 text-white shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="4"/><circle cx="12" cy="12" r="4"/><circle cx="19" cy="12" r="4"/></svg>
+                    <input id="editLetterboxd" type="text" placeholder="usuario de Letterboxd" class="flex-1 bg-transparent text-sm text-white outline-none placeholder-zinc-600">
                 </div>
                 <div class="flex items-center gap-3 bg-zinc-800 border border-zinc-700 focus-within:border-accent rounded-2xl px-4 py-2.5 transition">
                     <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-                    <input id="editWebsite" type="url" maxlength="100" placeholder="Tu sitio web" class="flex-1 bg-transparent text-sm text-white outline-none placeholder-zinc-600">
+                    <input id="editWebsite" type="url" placeholder="Tu sitio web" class="flex-1 bg-transparent text-sm text-white outline-none placeholder-zinc-600">
                 </div>
             </div>
         </div>
+
         <div class="flex gap-3">
             <button onclick="guardarEditarPerfil()" class="flex-1 py-3 bg-accent rounded-2xl text-sm font-black uppercase tracking-widest text-white hover:opacity-90 active:scale-95 transition">Guardar</button>
             <button onclick="cerrarModalEditarPerfil()" class="px-6 py-3 bg-zinc-800 rounded-2xl text-sm font-black uppercase tracking-widest text-zinc-400 hover:text-white active:scale-95 transition">Cancelar</button>
         </div>
         <div id="toastEditarPerfil" class="hidden mt-4 px-4 py-3 rounded-2xl text-xs font-bold text-center"></div>
+        </div>
     </div>
 </div>
 
 <!-- Nav -->
 <nav class="px-4 md:px-6 py-4 flex items-center justify-between bg-zinc-950/90 backdrop-blur-md sticky top-0 w-full z-50 border-b border-white/5">
-    <h1 class="text-xl md:text-2xl font-black text-accent tracking-tighter cursor-pointer" onclick="location.href='index.html'">MOVIE<span class="text-white font-light">M</span></h1>
+    <img src="data:image/png;base64,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" alt="MovieM" class="h-8 cursor-pointer mx-auto" onclick="location.href='index.html'">
     <div class="flex items-center gap-3">
         <button id="btnSeccionColor" class="hidden text-[9px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition px-3 py-2 bg-zinc-900 rounded-full border border-white/5">Ajustes</button>
         <button id="btnBell" class="hidden relative w-9 h-9 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center hover:bg-zinc-700 transition shrink-0">
@@ -190,7 +187,7 @@
                 <!-- Botón seguir + te sigue + editar perfil -->
                 <div class="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
                     <button id="btnEditarPerfil" class="hidden px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest transition-all bg-zinc-800 border border-zinc-700 text-zinc-300 hover:border-white hover:text-white active:scale-95" onclick="abrirModalEditarPerfil()">
-                        Editar Perfil
+                        ✏️ Editar Perfil
                     </button>
                     <button id="btnSeguir" class="hidden px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest transition-all border-2 border-accent text-accent hover:bg-accent hover:text-white active:scale-95" onclick="toggleSeguir()">
                         Seguir
@@ -202,6 +199,8 @@
                 </div>
             </div>
 
+            <!-- Redes Sociales -->
+            <div id="perfilRedes" class="flex gap-2 mb-3 justify-center sm:justify-start flex-wrap"></div>
             <!-- Bio -->
             <div id="contenedorBio" class="mb-4 flex items-start gap-2 group justify-center sm:justify-start min-h-[40px]">
                 <p class="text-zinc-300 text-sm md:text-base italic leading-relaxed max-w-lg sk rounded-lg w-48 h-5" id="userBio">...</p>
@@ -213,8 +212,10 @@
             <!-- Géneros -->
             <div class="flex flex-wrap gap-2 justify-center sm:justify-start" id="generosCont"></div>
 
-            <!-- Redes sociales -->
-            <div id="perfilRedes" class="flex flex-wrap gap-2 mt-3 justify-center sm:justify-start"></div>
+            <!-- Link de perfil -->
+            <a id="perfilLink" href="#" target="_blank" rel="noopener noreferrer"
+                class="hidden mt-2 text-xs text-accent font-bold hover:underline truncate max-w-xs">
+            </a>
         </div>
     </section>
 
@@ -259,7 +260,7 @@
                 <button id="btnAgregarActor" class="hidden mt-4 text-[9px] font-black uppercase tracking-widest text-accent hover:underline" onclick="abrirBuscadorActor()">+ Agregar Actor</button>
             </section>
 
-            <!-- Directores Favoritos -->
+            <!-- Directores favoritos -->
             <section class="bg-zinc-900/30 p-5 md:p-6 rounded-2xl md:rounded-3xl border border-white/5 text-center relative overflow-hidden group shadow-lg min-h-[180px] md:min-h-[220px] flex flex-col">
                 <h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-4 italic">Directores Favoritos</h3>
                 <div class="relative overflow-hidden flex-1">
@@ -275,30 +276,25 @@
             </section>
 
             <!-- Vistas -->
-            <section id="secVistas" class="bg-zinc-900/30 p-5 md:p-6 rounded-2xl md:rounded-3xl border border-white/5 shadow-lg">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 italic">Vistas</h3>
-                    <span id="contVistas" class="text-xs font-black text-accent">0</span>
-                </div>
+            <section id="secVistas" class="bg-zinc-900/30 p-5 rounded-2xl border border-white/5">
+                <h3 class="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-4 italic">Vistas Recientemente</h3>
                 <div id="gridVistas" class="grid grid-cols-3 gap-2"></div>
-                <p id="sinVistas" class="text-[10px] text-zinc-600 italic text-center py-4">Ninguna todavía.</p>
-                <button id="btnVerTodasVistas" class="hidden mt-3 w-full text-[9px] font-black uppercase tracking-widest text-zinc-500 hover:text-accent transition" onclick="verTodasVistas()">Ver todas →</button>
+                <button id="btnVerTodasVistas" class="hidden mt-3 text-[9px] font-black uppercase tracking-widest text-accent hover:underline w-full text-center" onclick="verTodasVistas()">Ver todas →</button>
             </section>
         </aside>
     </div>
 </main>
 
-
-<!-- Modal todas las vistas -->
-<div id="modalTodasVistas" class="fixed inset-0 z-[400] flex items-end md:items-center justify-center bg-black/80 hidden px-0 md:px-4">
-    <div class="bg-zinc-900 border border-white/10 w-full max-w-3xl rounded-t-3xl md:rounded-3xl shadow-2xl flex flex-col max-h-[85vh]">
+<!-- Modal Todas las Vistas -->
+<div id="modalVistas" class="fixed inset-0 z-[450] hidden items-center justify-center bg-black/80 px-4">
+    <div class="bg-zinc-900 border border-white/10 w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col max-h-[85vh]">
         <div class="flex items-center justify-between px-5 py-4 border-b border-white/5 shrink-0">
-            <h4 class="text-sm font-black uppercase tracking-widest text-white">Todas las Vistas</h4>
-            <button onclick="cerrarModalVistas()" class="text-zinc-500 hover:text-white transition p-1">
+            <h4 class="text-xs font-black uppercase tracking-widest text-white">Historial de Vistas</h4>
+            <button onclick="cerrarModalVistas()" class="text-zinc-500 hover:text-white transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
-        <div id="gridTodasVistas" class="overflow-y-auto no-scrollbar flex-1 p-4 grid grid-cols-3 md:grid-cols-5 gap-3"></div>
+        <div id="gridVistasModal" class="overflow-y-auto flex-1 p-4 grid grid-cols-3 md:grid-cols-5 gap-3"></div>
     </div>
 </div>
 
@@ -336,7 +332,6 @@
     const paramUser = params.get('user');
     let miUID=null, miUsername=null, perfilUID=null, perfilUsername=null, isMiPerfil=false;
     let actorIndex=0, actoresLocal=[], favoritasLocal=[null,null,null,null], slotSel=null, tipoBusq='peli';
-    let directorIndex=0, directoresLocal=[];
 
     // ── UID del creador/admin de la página ────────────────────────
     // Reemplazá este valor con tu UID real de Firebase (lo encontrás en Firebase Console → Authentication)
@@ -454,14 +449,12 @@
             : (perfilUsername||'U').charAt(0).toUpperCase();
 
         renderizarBio(data.bio||'');
-        renderizarRedes(data.redes||{});
 
         var segs = (data.seguidores||[]).length, sig = (data.siguiendo||[]).length;
         document.getElementById('contSeguidores').innerText = segs;
         document.getElementById('contSiguiendo').innerText = sig;
 
         actoresLocal = data.actores||[];
-        directoresLocal = data.directores||[];
         favoritasLocal = data.favoritas||[null,null,null,null];
 
         if (isMiPerfil) {
@@ -469,7 +462,8 @@
             oe.classList.remove('hidden'); oe.classList.add('flex');
             document.getElementById('btnEditarBio').classList.remove('hidden');
             document.getElementById('btnAgregarActor').classList.remove('hidden');
-            document.getElementById('btnAgregarDirector').classList.remove('hidden');
+            var btnDir = document.getElementById('btnAgregarDirector');
+            if (btnDir) btnDir.classList.remove('hidden');
             document.getElementById('btnSeccionColor').classList.remove('hidden');
             document.getElementById('btnBell').classList.remove('hidden');
             document.getElementById('btnEditarPerfil').classList.remove('hidden');
@@ -497,8 +491,14 @@
             }
         }
         renderizarActores();
-        renderizarDirectores();
-        cargarVistas(data.visto||[]);
+        // Directores
+        window._directores = data.directores || [];
+        window._dirIdx = 0;
+        renderizarDirectoresUI();
+        // Redes
+        renderizarRedesUI(data.redes || {});
+        // Vistas (historial)
+        cargarVistasUI(data.vistas || []);
         cargarComentarios();
     }
 
@@ -526,33 +526,6 @@
         btn.innerText = sig ? 'Siguiendo ✓' : 'Seguir';
         btn.classList.toggle('bg-accent', sig); btn.classList.toggle('text-white', sig);
         btn.classList.toggle('text-accent', !sig);
-    }
-
-    // ── Redes sociales ──────────────────────────────────────────
-    var _REDES_DEFS = {
-        instagram:   { href:function(v){return 'https://instagram.com/'+v.replace('@','');},   icon:'<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>' },
-        twitter:     { href:function(v){return 'https://x.com/'+v.replace('@','');},           icon:'<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.213 5.567zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>' },
-        youtube:     { href:function(v){return v.startsWith('http')?v:'https://youtube.com/'+v;}, icon:'<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>' },
-        letterboxd:  { href:function(v){return 'https://letterboxd.com/'+v.replace('@','');},  icon:'<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="4"/><circle cx="12" cy="12" r="4"/><circle cx="19" cy="12" r="4"/></svg>' },
-        website:     { href:function(v){return v.startsWith('http')?v:'https://'+v;},          icon:'<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>' }
-    };
-    function renderizarRedes(redes) {
-        var cont = document.getElementById('perfilRedes');
-        if (!cont) return;
-        cont.innerHTML = '';
-        if (!redes || !Object.keys(redes).length) return;
-        Object.entries(_REDES_DEFS).forEach(function(entry){
-            var key=entry[0], def=entry[1];
-            if (!redes[key]) return;
-            var a=document.createElement('a');
-            a.href=def.href(redes[key]);
-            a.target='_blank';
-            a.rel='noopener noreferrer';
-            a.title=key.charAt(0).toUpperCase()+key.slice(1);
-            a.className='w-8 h-8 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center hover:border-white/30 hover:bg-zinc-800 transition text-white';
-            a.innerHTML=def.icon;
-            cont.appendChild(a);
-        });
     }
 
     async function guardarDato(campo, valor) {
@@ -636,7 +609,8 @@
     };
     document.getElementById('inputBusquedaGral').addEventListener('input', async function() {
         var q = this.value; if (q.length<2) return;
-        var ep = tipoBusq==='peli' ? 'search/movie' : 'search/person';
+        var tipoBusqActual = tipoBusq || window._tipoBusqExtra || 'peli';
+        var ep = (tipoBusqActual==='peli') ? 'search/movie' : 'search/person';
         var res = await fetch('https://api.themoviedb.org/3/'+ep+'?api_key='+API+'&query='+encodeURIComponent(q)+'&language=es-ES');
         var data = await res.json();
         var cont = document.getElementById('resultadosGral'); cont.innerHTML='';
@@ -645,15 +619,12 @@
             var d = document.createElement('div'); d.className='flex items-center gap-3 p-2.5 hover:bg-zinc-800 rounded-xl cursor-pointer active:scale-95 transition';
             d.innerHTML = '<img src="https://image.tmdb.org/t/p/w92'+img+'" class="w-8 h-12 rounded-lg object-cover"><span class="text-sm font-bold">'+( item.title||item.name)+'</span>';
             d.onclick = async function() {
-                if (tipoBusq==='peli') {
-                    if (favoritasLocal.some(function(f){ return f && String(f.id)===String(item.id); })) {
-                        cerrarModalBusqueda(); return; // ya está en favoritas
-                    }
-                    favoritasLocal[slotSel]={poster:img,id:item.id}; await guardarDato('favoritas',favoritasLocal); renderizarFavs(true);
-                }
-                else if (tipoBusq==='actor') { if(actoresLocal.some(function(a){return a.nombre===item.name;})){cerrarModalBusqueda();return;} actoresLocal.push({nombre:item.name,foto:img}); await guardarDato('actores',actoresLocal); actorIndex=actoresLocal.length-1; renderizarActores(); moverCarrusel('next'); }
-                else if (tipoBusq==='director') { if(directoresLocal.some(function(d){return d.nombre===item.name;})){cerrarModalBusqueda();return;} directoresLocal.push({nombre:item.name,foto:img}); await guardarDato('directores',directoresLocal); directorIndex=directoresLocal.length-1; renderizarDirectores(); moverCarruselDirector('next'); }
+                var tipoBusqActual = tipoBusq || window._tipoBusqExtra || 'peli';
+                if (tipoBusqActual==='peli') { favoritasLocal[slotSel]={poster:img,id:item.id}; await guardarDato('favoritas',favoritasLocal); renderizarFavs(true); }
+                else if (tipoBusqActual==='actor') { actoresLocal.push({nombre:item.name,foto:img}); await guardarDato('actores',actoresLocal); actorIndex=actoresLocal.length-1; renderizarActores(); moverCarrusel(); }
+                else if (tipoBusqActual==='director') { window._directores=window._directores||[]; window._directores.push({nombre:item.name,foto:img}); await guardarDato('directores',window._directores); window._dirIdx=(window._directores.length-1); renderizarDirectoresUI(); moverCarruselDirModule(); }
                 else { await guardarDato('avatar','https://image.tmdb.org/t/p/w500'+img); document.getElementById('userAvatarFrame').innerHTML='<img src="https://image.tmdb.org/t/p/w500'+img+'" class="w-full h-full object-cover">'; }
+                window._tipoBusqExtra=null;
                 cerrarModalBusqueda();
             };
             cont.appendChild(d);
@@ -667,7 +638,7 @@
                 var src = f.poster.startsWith('http') ? f.poster : 'https://image.tmdb.org/t/p/w500'+f.poster;
                 return '<div class="aspect-[2/3] bg-zinc-900 rounded-xl border border-white/10 overflow-hidden cursor-pointer group relative active:scale-95 transition" onclick="location.href=\'pelicula.html?id='+f.id+'\'">'
                     +'<img src="'+src+'" class="w-full h-full object-cover">'
-                    // sin overlay quitar — se gestiona desde editar perfil
+                    +(editable?'<div onclick="event.stopPropagation();quitarFav('+i+')" class="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center text-[9px] font-bold uppercase">Quitar</div>':'')
                     +'</div>';
             }
             return '<div class="aspect-[2/3] bg-zinc-900/60 rounded-xl border border-dashed border-white/10 flex flex-col items-center justify-center gap-2'+(editable?' cursor-pointer hover:border-accent hover:bg-zinc-800/60 transition group/slot':'')+'" '+(editable?'onclick="abrirBuscadorFav('+i+')"':'')+' >'
@@ -692,49 +663,9 @@
         }).join('');
     }
     window.eliminarActor = async function(){ actoresLocal.splice(actorIndex,1); actorIndex=0; await guardarDato('actores',actoresLocal); renderizarActores(); moverCarrusel(); };
-    window.nextActor = function(){ actorIndex = actorIndex<actoresLocal.length-1 ? actorIndex+1 : 0; moverCarrusel('next'); };
-    window.prevActor = function(){ actorIndex = actorIndex>0 ? actorIndex-1 : actoresLocal.length-1; moverCarrusel('prev'); };
-    function moverCarrusel(dir) {
-        var el = document.getElementById('actorCarousel');
-        el.style.transform = 'translateX(-'+(actorIndex*100)+'%)';
-        // Animar el slide activo
-        var slides = el.querySelectorAll('.min-w-full');
-        if (slides[actorIndex]) {
-            slides[actorIndex].classList.remove('carousel-slide-in-right','carousel-slide-in-left');
-            void slides[actorIndex].offsetWidth; // reflow
-            slides[actorIndex].classList.add(dir === 'prev' ? 'carousel-slide-in-left' : 'carousel-slide-in-right');
-        }
-    }
-
-    // ── Directores Favoritos ──────────────────────────────────
-    function renderizarDirectores() {
-        var c3 = document.getElementById('directorCarousel');
-        if (!c3) return;
-        if (!directoresLocal.length) { c3.innerHTML='<div class="min-w-full h-full flex items-center justify-center text-zinc-600 text-[9px] font-bold uppercase italic">Sin directores</div>'; return; }
-        c3.innerHTML = directoresLocal.map(function(d){
-            var src = d.foto&&d.foto.startsWith('http') ? d.foto : 'https://image.tmdb.org/t/p/w200'+d.foto;
-            return '<div class="min-w-full flex flex-col items-center justify-center h-full">'
-                +'<div class="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-accent overflow-hidden mb-2 shadow-xl shrink-0"><img src="'+src+'" class="w-full h-full object-cover" loading="lazy"></div>'
-                +'<p class="text-[9px] font-black text-white uppercase tracking-widest truncate w-full px-2 text-center">'+d.nombre+'</p>'
-                +(isMiPerfil?'<button onclick="eliminarDirector()" class="text-[8px] text-zinc-600 mt-1 hover:text-red-500 uppercase font-bold">Quitar</button>':'')
-                +'</div>';
-        }).join('');
-    }
-    window.eliminarDirector = async function(){ directoresLocal.splice(directorIndex,1); directorIndex=0; await guardarDato('directores',directoresLocal); renderizarDirectores(); moverCarruselDirector(); };
-    window.nextDirector = function(){ directorIndex = directorIndex<directoresLocal.length-1 ? directorIndex+1 : 0; moverCarruselDirector('next'); };
-    window.prevDirector = function(){ directorIndex = directorIndex>0 ? directorIndex-1 : directoresLocal.length-1; moverCarruselDirector('prev'); };
-    function moverCarruselDirector(dir) {
-        var el = document.getElementById('directorCarousel');
-        if (!el) return;
-        el.style.transform = 'translateX(-'+(directorIndex*100)+'%)';
-        var slides = el.querySelectorAll('.min-w-full');
-        if (slides[directorIndex]) {
-            slides[directorIndex].classList.remove('carousel-slide-in-right','carousel-slide-in-left');
-            void slides[directorIndex].offsetWidth;
-            slides[directorIndex].classList.add(dir === 'prev' ? 'carousel-slide-in-left' : 'carousel-slide-in-right');
-        }
-    }
-    window.abrirBuscadorDirector = function(){ tipoBusq='director'; mostrarModal('Agregar Director'); }
+    window.nextActor = function(){ actorIndex = actorIndex<actoresLocal.length-1 ? actorIndex+1 : 0; moverCarrusel(); };
+    window.prevActor = function(){ actorIndex = actorIndex>0 ? actorIndex-1 : actoresLocal.length-1; moverCarrusel(); };
+    function moverCarrusel(){ document.getElementById('actorCarousel').style.transform='translateX(-'+(actorIndex*100)+'%)'; }
 
     // ── Comentarios ───────────────────────────────────────────────
     async function cargarComentarios() {
@@ -805,56 +736,56 @@
         } catch(e) { alert('Error al borrar.'); }
     };
 
-    
-    // ── Vistas ────────────────────────────────────────────────
-    function cargarVistas(vistas) {
-        var grid=document.getElementById('gridVistas');
-        var sinEl=document.getElementById('sinVistas');
-        var contEl=document.getElementById('contVistas');
-        var btnTodas=document.getElementById('btnVerTodasVistas');
-        if (!grid) return;
-        contEl.textContent=vistas.length;
-        if (!vistas.length){grid.innerHTML='';sinEl.classList.remove('hidden');btnTodas.classList.add('hidden');return;}
-        sinEl.classList.add('hidden');
-        var recientes=[...vistas].sort((a,b)=>(b.fecha||0)-(a.fecha||0)).slice(0,3);
-        grid.innerHTML='';
-        recientes.forEach(function(v){
-            var poster=v.poster||'';
-            var src=poster?(poster.startsWith('http')?poster:'https://image.tmdb.org/t/p/w500'+poster):'';
-            var href=(v.tipo==='serie'?'serie':'pelicula')+'.html?id='+v.id;
-            var div=document.createElement('div');
-            div.className='aspect-[2/3] rounded-xl overflow-hidden border border-white/5 cursor-pointer hover:border-accent/40 transition group';
-            div.onclick=function(){location.href=href;};
-            div.innerHTML=src?'<img src="'+src+'" class="w-full h-full object-cover group-hover:scale-105 transition-transform" loading="lazy">':'<div class="w-full h-full bg-zinc-800 flex items-center justify-center text-zinc-600 text-xs font-bold">'+(v.titulo||'?').charAt(0)+'</div>';
-            grid.appendChild(div);
-        });
-        if(vistas.length>3)btnTodas.classList.remove('hidden');
-        else btnTodas.classList.add('hidden');
-        window._todasVistas=[...vistas].sort((a,b)=>(b.fecha||0)-(a.fecha||0));
+    // ── Directores ────────────────────────────────────────────────────────────
+    function renderizarDirectoresUI() {
+        var c2 = document.getElementById('directorCarousel');
+        if (!c2) return;
+        var dirs = window._directores || [];
+        if (!dirs.length) {
+            c2.innerHTML='<div class="min-w-full h-full flex items-center justify-center text-zinc-600 text-[9px] font-bold uppercase italic">Sin directores</div>';
+            return;
+        }
+        c2.innerHTML = dirs.map(function(d){
+            var src = d.foto && d.foto.startsWith('http') ? d.foto : 'https://image.tmdb.org/t/p/w200'+d.foto;
+            return '<div class="min-w-full flex flex-col items-center justify-center h-full">'
+                +'<div class="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-accent overflow-hidden mb-2 shadow-xl shrink-0"><img src="'+src+'" class="w-full h-full object-cover" loading="lazy"></div>'
+                +'<p class="text-[9px] font-black text-white uppercase tracking-widest truncate w-full px-2 text-center">'+d.nombre+'</p>'
+                +(isMiPerfil?'<button onclick="eliminarDirectorUI()" class="text-[8px] text-zinc-600 mt-1 hover:text-red-500 uppercase font-bold">Quitar</button>':'')
+                +'</div>';
+        }).join('');
     }
-    window.verTodasVistas=function(){
-        document.getElementById('modalTodasVistas').classList.remove('hidden');
-        var g=document.getElementById('gridTodasVistas');
-        if(!g||!window._todasVistas)return;
-        g.innerHTML='';
-        window._todasVistas.forEach(function(v){
-            var poster=v.poster||'';
-            var src=poster?(poster.startsWith('http')?poster:'https://image.tmdb.org/t/p/w500'+poster):'';
-            var href=(v.tipo==='serie'?'serie':'pelicula')+'.html?id='+v.id;
-            var div=document.createElement('div');
-            div.className='aspect-[2/3] rounded-xl overflow-hidden border border-white/5 cursor-pointer hover:border-accent/40 transition';
-            div.onclick=function(){location.href=href;};
-            div.innerHTML=src?'<img src="'+src+'" class="w-full h-full object-cover" loading="lazy">':'<div class="w-full h-full bg-zinc-800 flex items-center justify-center text-zinc-600 text-xs">'+(v.titulo||'?').charAt(0)+'</div>';
-            g.appendChild(div);
-        });
+    window.eliminarDirectorUI = async function() {
+        window._directores.splice(window._dirIdx||0,1);
+        window._dirIdx=0;
+        await guardarDato('directores', window._directores);
+        renderizarDirectoresUI();
+        moverCarruselDirModule();
     };
-    window.cerrarModalVistas=function(){document.getElementById('modalTodasVistas').classList.add('hidden');};
+    function moverCarruselDirModule(){
+        var c2=document.getElementById('directorCarousel');
+        if(c2) c2.style.transform='translateX(-'+((window._dirIdx||0)*100)+'%)';
+    }
 
-    // ── Exponer funciones del module al window ──────────────
-    window._perfilSave = async function(uid, updates) {
-        await setDoc(doc(db, 'usuarios', uid), updates, { merge: true });
-    };
-    window._perfilRenderizarRedes = renderizarRedes;
+    // ── Vistas ────────────────────────────────────────────────────────────────
+    function cargarVistasUI(vistas) {
+        var cont = document.getElementById('gridVistas');
+        var btn = document.getElementById('btnVerTodasVistas');
+        if (!cont) return;
+        window._todasVistas = [...vistas].sort(function(a,b){ return (b.fecha||0)-(a.fecha||0); });
+        var top = window._todasVistas.slice(0,3);
+        cont.innerHTML = '';
+        top.forEach(function(v){
+            var src = v.poster && v.poster.startsWith('http') ? v.poster : 'https://image.tmdb.org/t/p/w200'+(v.poster||'');
+            var d = document.createElement('div');
+            d.className = 'relative group cursor-pointer';
+            d.onclick = function(){ location.href=(v.tipo==='pelicula'?'pelicula.html':'serie.html')+'?id='+v.id; };
+            d.innerHTML = '<div class="aspect-[2/3] rounded-xl overflow-hidden border border-white/5 group-hover:border-accent transition"><img src="'+src+'" class="w-full h-full object-cover" loading="lazy"></div>';
+            cont.appendChild(d);
+        });
+        var sec = document.getElementById('secVistas');
+        if (sec) sec.classList.toggle('hidden', !top.length);
+        if (btn) btn.classList.toggle('hidden', window._todasVistas.length <= 3);
+    }
 
     // ── Color / Sesión ────────────────────────────────────────────
     window.cambiarColor = async function(hex) {
@@ -953,20 +884,6 @@
     });
 </script>
 
-
-<!-- Modal todas las vistas -->
-<div id="modalTodasVistas" class="fixed inset-0 z-[400] flex items-end md:items-center justify-center bg-black/80 hidden px-0 md:px-4">
-    <div class="bg-zinc-900 border border-white/10 w-full max-w-3xl rounded-t-3xl md:rounded-3xl shadow-2xl flex flex-col max-h-[85vh]">
-        <div class="flex items-center justify-between px-5 py-4 border-b border-white/5 shrink-0">
-            <h4 class="text-sm font-black uppercase tracking-widest text-white">Todas las Vistas</h4>
-            <button onclick="cerrarModalVistas()" class="text-zinc-500 hover:text-white transition p-1">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
-        <div id="gridTodasVistas" class="overflow-y-auto no-scrollbar flex-1 p-4 grid grid-cols-3 md:grid-cols-5 gap-3"></div>
-    </div>
-</div>
-
 <!-- Bottom nav mobile -->
 <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-zinc-950/95 backdrop-blur-xl border-t border-white/5">
     <div class="flex items-center justify-around py-3 px-2">
@@ -989,15 +906,11 @@
 <script>
 // ── Editar Perfil ─────────────────────────────────────────────────
 window.abrirModalEditarPerfil = function() {
+    // Pre-cargar valores actuales
     var snap = window._mmPerfilData || {};
     document.getElementById('editNombreDisplay').value = snap.displayName || '';
     document.getElementById('editBioModal').value = snap.bio || '';
-    var redes = snap.redes || {};
-    document.getElementById('editInstagram').value  = redes.instagram  || '';
-    document.getElementById('editTwitter').value    = redes.twitter    || '';
-    document.getElementById('editYoutube').value    = redes.youtube    || '';
-    document.getElementById('editLetterboxd').value = redes.letterboxd || '';
-    document.getElementById('editWebsite').value    = redes.website    || '';
+    document.getElementById('editLink').value = snap.link || '';
     document.getElementById('toastEditarPerfil').classList.add('hidden');
     document.getElementById('modalEditarPerfil').classList.remove('hidden');
 };
@@ -1006,50 +919,38 @@ window.cerrarModalEditarPerfil = function() {
 };
 window.guardarEditarPerfil = async function() {
     var displayName = document.getElementById('editNombreDisplay').value.trim();
-    var bio         = document.getElementById('editBioModal').value.trim();
-    var redes = {
-        instagram:  document.getElementById('editInstagram').value.trim(),
-        twitter:    document.getElementById('editTwitter').value.trim(),
-        youtube:    document.getElementById('editYoutube').value.trim(),
-        letterboxd: document.getElementById('editLetterboxd').value.trim(),
-        website:    document.getElementById('editWebsite').value.trim()
-    };
-    Object.keys(redes).forEach(function(k){ if (!redes[k]) delete redes[k]; });
+    var bio = document.getElementById('editBioModal').value.trim();
+    var link = document.getElementById('editLink').value.trim();
     var toast = document.getElementById('toastEditarPerfil');
     try {
-        var uid = window._mmPerfilUID;
-        if (!uid) throw new Error('No se pudo identificar el usuario.');
-        // Esperar hasta 3s a que firebase-config.js exponga window.db/setDoc/doc
-        var intentos = 0;
-        while ((!window.db || !window.setDoc || !window.doc) && intentos < 30) {
-            await new Promise(function(r){ setTimeout(r, 100); });
-            intentos++;
-        }
-        if (!window.db || !window.setDoc || !window.doc)
-            throw new Error('No se pudo conectar con Firebase.');
-        var updates = { bio: bio, redes: redes };
+        var updates = { bio, link };
         if (displayName) updates.displayName = displayName;
-        await window.setDoc(window.doc(window.db, 'usuarios', uid), updates, { merge: true });
+        // Guardar en Firestore usando la fn expuesta por firebase-config.js
+        await window.setDoc(window.doc(window.db, 'usuarios', window._mmPerfilUID), updates, {merge:true});
         // Actualizar UI
         if (displayName) {
             var nameEl = document.getElementById('profileName');
-            if (nameEl && nameEl.childNodes[0]) nameEl.childNodes[0].textContent = displayName;
+            // Preservar badge si existe
+            var badge = nameEl.querySelector('svg');
+            nameEl.childNodes[0].textContent = displayName;
+            if (!badge) nameEl.childNodes[0].textContent = displayName;
         }
+        // Actualizar bio en pantalla
         var bioEl = document.getElementById('userBio');
         if (bioEl) bioEl.textContent = bio || '';
-        if (window._perfilRenderizarRedes) window._perfilRenderizarRedes(redes);
-        if (window._mmPerfilData) {
-            window._mmPerfilData.displayName = displayName;
-            window._mmPerfilData.bio = bio;
-            window._mmPerfilData.redes = redes;
-        }
+        // Actualizar link
+        var linkEl = document.getElementById('perfilLink');
+        if (linkEl && link) { linkEl.href = link; linkEl.textContent = link.replace(/^https?:\/\//, ''); linkEl.classList.remove('hidden'); }
+        else if (linkEl && !link) linkEl.classList.add('hidden');
+        // Cache actualizado
+        if (window._mmPerfilData) { window._mmPerfilData.displayName = displayName; window._mmPerfilData.bio = bio; window._mmPerfilData.link = link; }
         toast.className = 'mt-4 px-4 py-3 rounded-2xl text-xs font-bold text-center bg-green-500/20 text-green-400';
         toast.textContent = '✓ Perfil actualizado.';
-        setTimeout(function(){ window.cerrarModalEditarPerfil(); }, 1200);
+        setTimeout(() => window.cerrarModalEditarPerfil(), 1200);
     } catch(e) {
         toast.className = 'mt-4 px-4 py-3 rounded-2xl text-xs font-bold text-center bg-red-500/20 text-red-400';
-        toast.textContent = 'Error: ' + (e.code || e.message || 'Intentá de nuevo');
-        console.error('guardarEditarPerfil:', e);
+        toast.textContent = 'Error al guardar. Intentá de nuevo.';
+        console.error(e);
     }
     toast.classList.remove('hidden');
 };
@@ -1059,6 +960,124 @@ document.getElementById('modalEditarPerfil').addEventListener('click', function(
 });
 </script>
 <script>
+// ── Editar Perfil ───────────────────────────────────────────────────────────
+window.abrirModalEditarPerfil = function() {
+    var snap = window._mmPerfilData || {};
+    document.getElementById('editNombreDisplay').value = snap.displayName || '';
+    document.getElementById('editBioModal').value = snap.bio || '';
+    var r = snap.redes || {};
+    document.getElementById('editInstagram').value  = r.instagram  || '';
+    document.getElementById('editTwitter').value    = r.twitter    || '';
+    document.getElementById('editYoutube').value    = r.youtube    || '';
+    document.getElementById('editLetterboxd').value = r.letterboxd || '';
+    document.getElementById('editWebsite').value    = r.website    || '';
+    document.getElementById('toastEditarPerfil').classList.add('hidden');
+    document.getElementById('modalEditarPerfil').classList.remove('hidden');
+};
+window.cerrarModalEditarPerfil = function() {
+    document.getElementById('modalEditarPerfil').classList.add('hidden');
+};
+window.guardarEditarPerfil = async function() {
+    var displayName = document.getElementById('editNombreDisplay').value.trim();
+    var bio = document.getElementById('editBioModal').value.trim();
+    var redes = {
+        instagram:  document.getElementById('editInstagram').value.trim(),
+        twitter:    document.getElementById('editTwitter').value.trim(),
+        youtube:    document.getElementById('editYoutube').value.trim(),
+        letterboxd: document.getElementById('editLetterboxd').value.trim(),
+        website:    document.getElementById('editWebsite').value.trim()
+    };
+    Object.keys(redes).forEach(function(k){ if (!redes[k]) delete redes[k]; });
+    var toast = document.getElementById('toastEditarPerfil');
+    toast.classList.remove('hidden');
+    toast.className = 'mt-4 px-4 py-3 rounded-2xl text-xs font-bold text-center bg-zinc-700/50 text-zinc-300';
+    toast.textContent = 'Guardando...';
+    try {
+        var uid = window._mmPerfilUID;
+        if (!uid) throw new Error('Sesión no iniciada.');
+        // Esperar a que firebase-config exponga window.db
+        for (var i=0; i<30; i++) {
+            if (window.db && window.setDoc && window.doc) break;
+            await new Promise(function(r){ setTimeout(r, 100); });
+        }
+        if (!window.db) throw new Error('Sin conexión con Firebase.');
+        var updates = { bio: bio, redes: redes };
+        if (displayName) updates.displayName = displayName;
+        await window.setDoc(window.doc(window.db, 'usuarios', uid), updates, { merge: true });
+        // Actualizar UI inline
+        if (displayName) {
+            var nameEl = document.getElementById('profileName');
+            if (nameEl) {
+                var badge = nameEl.querySelector('svg');
+                nameEl.textContent = displayName;
+                if (badge) nameEl.appendChild(badge);
+            }
+        }
+        var bioEl = document.getElementById('userBio');
+        if (bioEl) bioEl.textContent = bio || '';
+        // Redes sociales
+        renderizarRedesUI(redes);
+        if (window._mmPerfilData) {
+            window._mmPerfilData.displayName = displayName;
+            window._mmPerfilData.bio = bio;
+            window._mmPerfilData.redes = redes;
+        }
+        toast.className = 'mt-4 px-4 py-3 rounded-2xl text-xs font-bold text-center bg-green-500/20 text-green-400';
+        toast.textContent = '✓ Perfil actualizado.';
+        setTimeout(function(){ window.cerrarModalEditarPerfil(); }, 1000);
+    } catch(e) {
+        toast.className = 'mt-4 px-4 py-3 rounded-2xl text-xs font-bold text-center bg-red-500/20 text-red-400';
+        toast.textContent = 'Error: ' + (e.code || e.message || 'Intentá de nuevo.');
+        console.error(e);
+    }
+};
+
+// Render redes en #perfilRedes
+function renderizarRedesUI(redes) {
+    var cont = document.getElementById('perfilRedes');
+    if (!cont) return;
+    if (!redes || !Object.keys(redes).length) { cont.innerHTML = ''; return; }
+    var defs = {
+        instagram:  { label:'Instagram', href: function(v){ return 'https://instagram.com/'+v; },
+            icon:'<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>' },
+        twitter:    { label:'X', href: function(v){ return 'https://x.com/'+v; },
+            icon:'<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.73-8.835L1.254 2.25H8.08l4.259 5.63L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>' },
+        youtube:    { label:'YouTube', href: function(v){ return v.startsWith('http')?v:'https://youtube.com/'+v; },
+            icon:'<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>' },
+        letterboxd: { label:'Letterboxd', href: function(v){ return 'https://letterboxd.com/'+v; },
+            icon:'<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="4"/><circle cx="12" cy="12" r="4"/><circle cx="19" cy="12" r="4"/></svg>' },
+        website:    { label:'Web', href: function(v){ return v.startsWith('http')?v:'https://'+v; },
+            icon:'<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>' }
+    };
+    cont.innerHTML = Object.entries(defs).map(function(e){
+        var key=e[0], def=e[1], val=redes[key];
+        if (!val) return '';
+        return '<a href="'+def.href(val)+'" target="_blank" rel="noopener" title="'+def.label+'" class="w-8 h-8 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white hover:border-accent transition active:scale-95">'+def.icon+'</a>';
+    }).join('');
+}
+
+// Directores
+window.nextDirector = function(){ if(!window._directores||!window._directores.length)return; window._dirIdx=(window._dirIdx+1)%window._directores.length; moverCarruselDir(); };
+window.prevDirector = function(){ if(!window._directores||!window._directores.length)return; window._dirIdx=(window._dirIdx-1+window._directores.length)%window._directores.length; moverCarruselDir(); };
+function moverCarruselDir(){ var c=document.getElementById('directorCarousel'); if(c) c.style.transform='translateX(-'+(window._dirIdx||0)*100+'%)'; }
+window.abrirBuscadorDirector = function(){ window._tipoBusqExtra='director'; document.getElementById('tituloModalBusqueda').innerText='Agregar Director'; document.getElementById('inputBusquedaGral').classList.remove('hidden'); document.getElementById('inputBusquedaGral').value=''; document.getElementById('resultadosGral').innerHTML=''; document.getElementById('modalBusqueda').classList.remove('hidden'); setTimeout(function(){document.getElementById('inputBusquedaGral').focus();},200); };
+
+// Vistas
+window.verTodasVistas = function(){
+    var modal=document.getElementById('modalVistas'); if(!modal)return;
+    var grid=document.getElementById('gridVistasModal'); grid.innerHTML='';
+    (window._todasVistas||[]).forEach(function(v){
+        var src=v.poster&&v.poster.startsWith('http')?v.poster:'https://image.tmdb.org/t/p/w500'+(v.poster||'');
+        var d=document.createElement('div'); d.className='relative group cursor-pointer';
+        d.onclick=function(){location.href=(v.tipo==='pelicula'?'pelicula.html':'serie.html')+'?id='+v.id;};
+        d.innerHTML='<div class="aspect-[2/3] rounded-xl overflow-hidden border border-white/5 group-hover:border-accent transition"><img src="'+src+'" class="w-full h-full object-cover"></div><p class="text-[9px] font-bold uppercase tracking-tighter mt-1 truncate text-zinc-500">'+( v.titulo||'')+'</p>';
+        grid.appendChild(d);
+    });
+    modal.classList.remove('hidden'); modal.classList.add('flex');
+};
+window.cerrarModalVistas = function(){ document.getElementById('modalVistas').classList.add('hidden'); document.getElementById('modalVistas').classList.remove('flex'); };
+document.getElementById('modalVistas').addEventListener('click',function(e){if(e.target===this)window.cerrarModalVistas();});
+
 // Wire up buttons that depend on notif-chat — poll until ready
 (function() {
     var t = setInterval(function() {
