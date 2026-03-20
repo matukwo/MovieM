@@ -964,8 +964,10 @@ window.iniciarCargaMasiva = async function() {
             anioOk = Math.abs(parseInt(anio) - parseInt(anioReal)) <= 1;
         }
 
-        if (sim < 0.5 || !anioOk) {
-            const razon = sim < 0.5
+        // Umbral de similitud más permisivo (0.3) para cubrir títulos traducidos diferente
+        // ej: "28 días después" vs "Exterminio", "El engaño" vs "Conclave"
+        if (sim < 0.3 || !anioOk) {
+            const razon = sim < 0.3
                 ? `TMDB devolvió "${tituloReal}" (${anioReal}) — títulos muy distintos`
                 : `Año no coincide: buscado ${anio}, TMDB tiene ${anioReal}`;
             logLine(`✗ RECHAZADA: "${titulo}" → ${razon}`, 'error');
@@ -978,15 +980,6 @@ window.iniciarCargaMasiva = async function() {
             const snap = await window.getDoc(window.doc(window.db, 'latinoLinks', movieID));
             if (snap.exists()) {
                 const ex = snap.data();
-                if (ex.url2) {
-                    logLine(`⚠️ "${tituloReal}" ya tiene 2 links — omitida`, 'warn');
-                    continue;
-                }
-                if (ex.url === url) {
-                    logLine(`⚠️ "${tituloReal}" ya tiene ese link como principal — omitida`, 'warn');
-                    continue;
-                }
-                // Tiene links → agregar en slots libres los que no estén ya guardados
                 const slots = ['url','url2','url3','url4','url5'];
                 // Todos los links del item (principal + extras)
                 const todosLinks = [url, ...(item.extras||[])].filter(Boolean);
