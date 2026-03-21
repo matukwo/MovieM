@@ -67,6 +67,9 @@
         <button id="tabCarga" onclick="setTab('carga')" class="px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition active:scale-95 border border-white/10 text-white/40 hover:text-white">
             Carga Masiva
         </button>
+        <button id="tabScraper" onclick="setTab('scraper')" class="px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition active:scale-95 border border-white/10 text-white/40 hover:text-white">
+            🔍 Scraper
+        </button>
     </div>
 
     <!-- ══════════════════ PELÍCULAS ══════════════════ -->
@@ -98,24 +101,12 @@
                 </div>
                 <div class="flex flex-col gap-3 mb-3">
                     <div>
-                        <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">Servidor 1 <span class="text-red-500">*</span></label>
-                        <input id="inputEmbedURL" type="url" placeholder="https://embed-principal.com/..." class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600">
+                        <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">🔗 Link Principal</label>
+                        <input id="inputEmbedURL" type="url" placeholder="https://vidmoly.biz/embed-..." class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600">
                     </div>
                     <div>
-                        <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">Servidor 2 <span class="text-zinc-700">(opcional)</span></label>
-                        <input id="inputEmbedURL2" type="url" placeholder="https://embed-2.com/..." class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600">
-                    </div>
-                    <div>
-                        <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">Servidor 3 <span class="text-zinc-700">(opcional)</span></label>
-                        <input id="inputEmbedURL3" type="url" placeholder="https://embed-3.com/..." class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600">
-                    </div>
-                    <div>
-                        <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">Servidor 4 <span class="text-zinc-700">(opcional)</span></label>
-                        <input id="inputEmbedURL4" type="url" placeholder="https://embed-4.com/..." class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600">
-                    </div>
-                    <div>
-                        <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">Servidor 5 <span class="text-zinc-700">(opcional)</span></label>
-                        <input id="inputEmbedURL5" type="url" placeholder="https://embed-5.com/..." class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600">
+                        <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">🔗 Link de Respaldo <span class="text-zinc-700">(opcional)</span></label>
+                        <input id="inputEmbedURL2" type="url" placeholder="https://otro-embed.com/..." class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600">
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
@@ -177,24 +168,12 @@
                 </div>
                 <div class="flex flex-col gap-3 mb-3">
                     <div>
-                        <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">Servidor 1 <span class="text-red-500">*</span></label>
-                        <input id="inputSerieURL" type="url" placeholder="https://embed-principal.com/..." class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600">
+                        <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">🔗 Link Principal</label>
+                        <input id="inputSerieURL" type="url" placeholder="https://embed.com/..." class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600">
                     </div>
                     <div>
-                        <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">Servidor 2 <span class="text-zinc-700">(opcional)</span></label>
-                        <input id="inputSerieURL2" type="url" placeholder="https://embed-2.com/..." class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600">
-                    </div>
-                    <div>
-                        <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">Servidor 3 <span class="text-zinc-700">(opcional)</span></label>
-                        <input id="inputSerieURL3" type="url" placeholder="https://embed-3.com/..." class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600">
-                    </div>
-                    <div>
-                        <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">Servidor 4 <span class="text-zinc-700">(opcional)</span></label>
-                        <input id="inputSerieURL4" type="url" placeholder="https://embed-4.com/..." class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600">
-                    </div>
-                    <div>
-                        <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">Servidor 5 <span class="text-zinc-700">(opcional)</span></label>
-                        <input id="inputSerieURL5" type="url" placeholder="https://embed-5.com/..." class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600">
+                        <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">🔗 Link de Respaldo <span class="text-zinc-700">(opcional)</span></label>
+                        <input id="inputSerieURL2" type="url" placeholder="https://otro-embed.com/..." class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600">
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
@@ -253,6 +232,119 @@
         </div>
     </div>
 
+
+    <!-- ══════════════════ SCRAPER ══════════════════ -->
+    <div id="secScraper" class="hidden">
+        <div class="bg-zinc-900/60 rounded-3xl border border-white/5 overflow-hidden mb-6">
+            <div class="px-6 py-5 border-b border-white/5 flex items-center gap-3">
+                <div class="w-8 h-8 bg-green-600/20 border border-green-600/30 rounded-xl flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-sm font-black uppercase tracking-widest">Scraper Automático</h3>
+                    <p class="text-[9px] text-zinc-500 font-bold uppercase">FuegoCine · la.movie · Pelisplus · Cuevana — en paralelo</p>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 block">URL del Worker</label>
+                    <input id="scraperWorkerURL" type="url" placeholder="https://tu-worker.workers.dev"
+                        class="bg-zinc-800 border border-zinc-700 focus:border-green-500 rounded-xl px-3 py-2 text-xs text-white outline-none transition w-72"
+                        onchange="localStorage.setItem('movieM_workerURL', this.value)">
+                </div>
+            </div>
+
+            <!-- Buscador individual -->
+            <div class="p-6 border-b border-white/5">
+                <h4 class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-4">Buscar película / serie</h4>
+                <div class="flex gap-3 mb-3 flex-wrap">
+                    <div class="flex-1 min-w-[200px]">
+                        <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">Título</label>
+                        <input id="scraperTitulo" type="text" placeholder="ej: Interstellar"
+                            onkeydown="if(event.key==='Enter')scraperBuscar()"
+                            class="w-full bg-zinc-800 border border-zinc-700 focus:border-green-500 rounded-2xl px-4 py-3 text-sm text-white outline-none transition placeholder-zinc-600">
+                    </div>
+                    <div>
+                        <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">Fuente</label>
+                        <select id="scraperFuente" class="bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm text-white outline-none h-[50px]">
+                            <option value="todos">Todos (4 fuentes)</option>
+                            <option value="fuegocine">FuegoCine</option>
+                            <option value="lamovie">la.movie</option>
+                            <option value="pelisplus">Pelisplus</option>
+                            <option value="cuevana">Cuevana</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">Tipo</label>
+                        <select id="scraperTipo" class="bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm text-white outline-none h-[50px]">
+                            <option value="pelicula">Película</option>
+                            <option value="serie">Serie</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="scraperBuscar()"
+                            class="px-6 py-3 bg-green-600 hover:opacity-90 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition active:scale-95 h-[50px]">
+                            Buscar
+                        </button>
+                    </div>
+                </div>
+                <!-- Preview TMDB -->
+                <div id="scraperTMDBPreview" class="hidden mb-4 flex items-center gap-3 p-3 bg-zinc-800/60 rounded-2xl border border-white/5">
+                    <img id="scraperTMDBPoster" src="" class="w-10 h-14 rounded-lg object-cover shrink-0">
+                    <div>
+                        <p id="scraperTMDBTitulo" class="text-sm font-black text-white"></p>
+                        <p id="scraperTMDBInfo" class="text-[9px] text-zinc-500 font-bold uppercase mt-0.5"></p>
+                    </div>
+                    <span id="scraperTMDBID" class="ml-auto text-[9px] font-black text-zinc-600 uppercase"></span>
+                </div>
+                <!-- Resultados del scraper -->
+                <div id="scraperResultados" class="space-y-2"></div>
+            </div>
+
+            <!-- Scraper de tendencias -->
+            <div class="p-6 border-b border-white/5">
+                <h4 class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-4">Importar tendencias del sitio</h4>
+                <div class="flex gap-3 items-end flex-wrap">
+                    <div>
+                        <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">Fuente</label>
+                        <select id="tendFuente" class="bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm text-white outline-none">
+                            <option value="fuegocine">FuegoCine ⭐</option>
+                            <option value="lamovie">la.movie ⭐</option>
+                            <option value="pelisplus">Pelisplus</option>
+                            <option value="cuevana">Cuevana</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">Tipo</label>
+                        <select id="tendTipo" class="bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm text-white outline-none">
+                            <option value="pelicula">Películas</option>
+                            <option value="serie">Series</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[9px] font-black uppercase tracking-widest text-zinc-600 mb-1.5 block">Página</label>
+                        <input id="tendPagina" type="number" value="1" min="1" class="w-20 bg-zinc-800 border border-zinc-700 rounded-2xl px-4 py-3 text-sm text-white outline-none">
+                    </div>
+                    <button onclick="scraperTendencias()" class="px-5 py-3 bg-zinc-700 hover:bg-zinc-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition active:scale-95">
+                        Traer listado
+                    </button>
+                    <button id="btnImportarTodos" onclick="scraperImportarTodos()" class="hidden px-5 py-3 bg-green-600 hover:opacity-90 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition active:scale-95">
+                        ↓ Importar todos a Firestore
+                    </button>
+                </div>
+                <div id="tendResultados" class="mt-4 space-y-2 max-h-96 overflow-y-auto"></div>
+            </div>
+
+            <!-- Config dominios -->
+            <div class="p-6">
+                <h4 class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-3">Dominios activos</h4>
+                <p class="text-[10px] text-zinc-600 mb-3">Si los sitios cambiaron de dominio, actualizá el archivo <code class="text-green-400">scraper-worker.js</code> en tu Worker y redesplegar.</p>
+                <button onclick="verificarDominios()" class="px-4 py-2 bg-zinc-800 border border-zinc-700 text-zinc-400 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition active:scale-95">
+                    Verificar dominios activos
+                </button>
+                <div id="dominiosStatus" class="mt-3 space-y-1.5"></div>
+            </div>
+        </div>
+    </div>
+
 </main>
 
 <script type="module">
@@ -286,9 +378,11 @@ window.setTab = function(tab) {
     document.getElementById('secPeliculas').classList.toggle('hidden', tab !== 'peliculas');
     document.getElementById('secSeries').classList.toggle('hidden', tab !== 'series');
     document.getElementById('secCarga').classList.toggle('hidden', tab !== 'carga');
+    document.getElementById('secScraper').classList.toggle('hidden', tab !== 'scraper');
     document.getElementById('tabPeliculas').className = tab === 'peliculas' ? on : off;
     document.getElementById('tabSeries').className    = tab === 'series'    ? on : off;
     document.getElementById('tabCarga').className     = tab === 'carga'     ? on : off;
+    document.getElementById('tabScraper').className   = tab === 'scraper'   ? on : off;
 };
 
 // ── MODAL EDITAR ──────────────────────────────────────────────────────────────
@@ -308,23 +402,14 @@ window.editarPelicula = function(item) {
     document.getElementById('modalEditarTitulo').textContent = `Editar — ${item.titulo || item.id}`;
     document.getElementById('modalEditarBody').innerHTML =
         inputModal('🔗 Link Principal', 'meURL', item.url) +
-        inputModal('Servidor 2', 'meURL2', item.url2||'') +
-        inputModal('Servidor 3', 'meURL3', item.url3||'') +
-        inputModal('Servidor 4', 'meURL4', item.url4||'') +
-        inputModal('Servidor 5', 'meURL5', item.url5||'');
+        inputModal('🔗 Link de Respaldo', 'meURL2', item.url2||'');
     document.getElementById('modalGuardarBtn').onclick = async () => {
-        const url  = document.getElementById('meURL').value.trim();
+        const url = document.getElementById('meURL').value.trim();
         const url2 = document.getElementById('meURL2').value.trim();
-        const url3 = document.getElementById('meURL3').value.trim();
-        const url4 = document.getElementById('meURL4').value.trim();
-        const url5 = document.getElementById('meURL5').value.trim();
         if (!url) { showModalToast('El link principal no puede estar vacío', 'error'); return; }
         try {
             const data = { ...item, url }; delete data.id;
             if (url2) data.url2 = url2; else delete data.url2;
-            if (url3) data.url3 = url3; else delete data.url3;
-            if (url4) data.url4 = url4; else delete data.url4;
-            if (url5) data.url5 = url5; else delete data.url5;
             await window.setDoc(window.doc(window.db, 'latinoLinks', item.id), data);
             showModalToast('✓ Guardado', 'ok');
             setTimeout(() => { cerrarModal(); cargarLinks(); }, 800);
@@ -342,23 +427,14 @@ window.editarEpisodio = function(item) {
             <span>Ep: <span class="text-white">${item.episodio}</span></span>
         </div>` +
         inputModal('🔗 Link Principal', 'meEpURL', item.url) +
-        inputModal('Servidor 2', 'meEpURL2', item.url2||'') +
-        inputModal('Servidor 3', 'meEpURL3', item.url3||'') +
-        inputModal('Servidor 4', 'meEpURL4', item.url4||'') +
-        inputModal('Servidor 5', 'meEpURL5', item.url5||'');
+        inputModal('🔗 Link de Respaldo', 'meEpURL2', item.url2||'');
     document.getElementById('modalGuardarBtn').onclick = async () => {
-        const url  = document.getElementById('meEpURL').value.trim();
+        const url = document.getElementById('meEpURL').value.trim();
         const url2 = document.getElementById('meEpURL2').value.trim();
-        const url3 = document.getElementById('meEpURL3').value.trim();
-        const url4 = document.getElementById('meEpURL4').value.trim();
-        const url5 = document.getElementById('meEpURL5').value.trim();
         if (!url) { showModalToast('El link principal no puede estar vacío', 'error'); return; }
         try {
             const data = { ...item, url }; delete data.id;
             if (url2) data.url2 = url2; else delete data.url2;
-            if (url3) data.url3 = url3; else delete data.url3;
-            if (url4) data.url4 = url4; else delete data.url4;
-            if (url5) data.url5 = url5; else delete data.url5;
             await window.setDoc(window.doc(window.db, 'latinoSeries', item.id), data);
             showModalToast('✓ Guardado', 'ok');
             setTimeout(() => { cerrarModal(); cargarEpisodios(); }, 800);
@@ -490,11 +566,8 @@ async function checkExistePelicula(id) {
 
 window.guardarLink = async function() {
     const id = document.getElementById('inputMovieID').value.trim();
-    const url  = document.getElementById('inputEmbedURL').value.trim();
+    const url = document.getElementById('inputEmbedURL').value.trim();
     const url2 = document.getElementById('inputEmbedURL2').value.trim();
-    const url3 = document.getElementById('inputEmbedURL3').value.trim();
-    const url4 = document.getElementById('inputEmbedURL4').value.trim();
-    const url5 = document.getElementById('inputEmbedURL5').value.trim();
     if (!id||!url) { showToast('toastPelis','Completá el ID y el link principal','error'); return; }
     try {
         const snap = await window.getDoc(window.doc(window.db, 'latinoLinks', id));
@@ -502,38 +575,9 @@ window.guardarLink = async function() {
         if (snap.exists()) {
             const existente = snap.data();
 
-            // Si el link existente (url o url2) es de gscdn.cam → reemplazarlo con el nuevo
-            const urlExistente = existente.url || '';
-            const url2Existente = existente.url2 || '';
-            const esGscdn_url  = urlExistente.includes('gscdn.cam');
-            const esGscdn_url2 = url2Existente.includes('gscdn.cam');
-
-            if (esGscdn_url) {
-                // Reemplazar el link principal por el nuevo
-                const data = { ...existente, url };
-                if (url2) data.url2 = url2;
-                await window.setDoc(window.doc(window.db,'latinoLinks',id), data);
-                showToast('toastPelis','✓ Link de gscdn.cam reemplazado por el nuevo','ok');
-                ['inputMovieID','inputEmbedURL','inputEmbedURL2','inputEmbedURL3','inputEmbedURL4','inputEmbedURL5'].forEach(i=>document.getElementById(i).value='');
-                document.getElementById('peliculaPreview').classList.add('hidden');
-                cargarLinks();
-                return;
-            }
-
-            if (esGscdn_url2) {
-                // Reemplazar el link de respaldo por el nuevo
-                const data = { ...existente, url2: url };
-                await window.setDoc(window.doc(window.db,'latinoLinks',id), data);
-                showToast('toastPelis','✓ Respaldo de gscdn.cam reemplazado por el nuevo','ok');
-                ['inputMovieID','inputEmbedURL','inputEmbedURL2','inputEmbedURL3','inputEmbedURL4','inputEmbedURL5'].forEach(i=>document.getElementById(i).value='');
-                document.getElementById('peliculaPreview').classList.add('hidden');
-                cargarLinks();
-                return;
-            }
-
-            // Ya tiene los 5 slots llenos (ninguno es gscdn) → error
-            if (existente.url2 && existente.url3 && existente.url4 && existente.url5) {
-                showToast('toastPelis', '✗ Ya tiene 5 servidores. Editá o borrá uno primero.', 'error');
+            // Ya tiene url2 → error
+            if (existente.url2) {
+                showToast('toastPelis', '✗ Ya tiene 2 links. Editá o borrá uno primero.', 'error');
                 return;
             }
 
@@ -543,19 +587,10 @@ window.guardarLink = async function() {
                 return;
             }
 
-            // Agregar en el primer slot libre (hasta 5)
-            const slots = ['url2','url3','url4','url5'];
-            const libre = slots.find(s => !existente[s]);
-            if (libre) {
-                const upd = {}; upd[libre] = url;
-                await window.setDoc(window.doc(window.db,'latinoLinks',id), upd, { merge: true });
-                const num = slots.indexOf(libre) + 2;
-                showToast('toastPelis', '✓ Agregado como Servidor ' + num, 'ok');
-            } else {
-                showToast('toastPelis', '✗ Ya tiene 5 servidores. Editá o borrá uno primero.', 'error');
-                return;
-            }
-            ['inputMovieID','inputEmbedURL','inputEmbedURL2','inputEmbedURL3','inputEmbedURL4','inputEmbedURL5'].forEach(i=>document.getElementById(i).value='');
+            // Solo tiene url principal → subir el nuevo como respaldo
+            await window.setDoc(window.doc(window.db,'latinoLinks',id), { ...existente, url2: url }, { merge: true });
+            showToast('toastPelis', '✓ Agregado como link de respaldo', 'ok');
+            ['inputMovieID','inputEmbedURL','inputEmbedURL2'].forEach(i=>document.getElementById(i).value='');
             document.getElementById('peliculaPreview').classList.add('hidden');
             cargarLinks();
             return;
@@ -566,17 +601,15 @@ window.guardarLink = async function() {
         const anio   = document.getElementById('previewYear').textContent||'';
         const data   = { url, titulo, anio, fecha: new Date().toISOString() };
         if (url2) data.url2 = url2;
-        if (url3) data.url3 = url3;
-        if (url4) data.url4 = url4;
-        if (url5) data.url5 = url5;
         await window.setDoc(window.doc(window.db,'latinoLinks',id), data);
         showToast('toastPelis','✓ Guardado correctamente','ok');
         try { localStorage.removeItem('movieM_latinoIDs'); } catch(e) {}
-        ['inputMovieID','inputEmbedURL','inputEmbedURL2','inputEmbedURL3','inputEmbedURL4','inputEmbedURL5'].forEach(i=>document.getElementById(i).value='');
+        ['inputMovieID','inputEmbedURL','inputEmbedURL2'].forEach(i=>document.getElementById(i).value='');
         document.getElementById('peliculaPreview').classList.add('hidden');
         cargarLinks();
     } catch(e) { showToast('toastPelis','Error al guardar','error'); }
-}
+};
+
 window.borrarLink = async function(id) {
     if (!confirm(`¿Borrar el link de la película ID ${id}?`)) return;
     try {
@@ -705,91 +738,54 @@ window.onSerieIDChange = function() {
 };
 
 window.guardarEpisodio = async function() {
-    const serieID   = document.getElementById('inputSerieID').value.trim();
+    const serieID  = document.getElementById('inputSerieID').value.trim();
     const temporada = parseInt(document.getElementById('inputTemporada').value);
     const episodio  = parseInt(document.getElementById('inputEpisodio').value);
     let url  = document.getElementById('inputSerieURL').value.trim();
     let url2 = document.getElementById('inputSerieURL2').value.trim();
-    let url3 = document.getElementById('inputSerieURL3').value.trim();
-    let url4 = document.getElementById('inputSerieURL4').value.trim();
-    let url5 = document.getElementById('inputSerieURL5').value.trim();
-    if (url  && !url.startsWith('http'))  url  = 'https://' + url;
+    if (url && !url.startsWith('http')) url = 'https://' + url;
     if (url2 && !url2.startsWith('http')) url2 = 'https://' + url2;
-    if (url3 && !url3.startsWith('http')) url3 = 'https://' + url3;
-    if (url4 && !url4.startsWith('http')) url4 = 'https://' + url4;
-    if (url5 && !url5.startsWith('http')) url5 = 'https://' + url5;
     if (!serieID||!temporada||!episodio||!url) { showToast('toastSeries','Completá todos los campos obligatorios','error'); return; }
     try {
         const docID = `${serieID}_t${temporada}_e${episodio}`;
+        // Verificar si ya existe
         const snapExiste = await window.getDoc(window.doc(window.db, 'latinoSeries', docID));
-
         if (snapExiste.exists()) {
-            const existente = snapExiste.data();
-            const esGscdn_url  = (existente.url  || '').includes('gscdn.cam');
-            const esGscdn_url2 = (existente.url2 || '').includes('gscdn.cam');
-
-            if (esGscdn_url) {
-                // Reemplazar link principal por el nuevo
-                const data = { ...existente, url }; delete data.id;
-                if (url2) data.url2 = url2; else delete data.url2;
-                await window.setDoc(window.doc(window.db, 'latinoSeries', docID), data);
-                showToast('toastSeries', '✓ Link de gscdn.cam reemplazado por el nuevo', 'ok');
-                ['inputEpisodio','inputSerieURL','inputSerieURL2','inputSerieURL3','inputSerieURL4','inputSerieURL5'].forEach(i=>document.getElementById(i).value='');
-                document.getElementById('inputEpisodio').focus();
-                cargarEpisodios();
-                return;
-            }
-
-            if (esGscdn_url2) {
-                // Reemplazar respaldo por el nuevo
-                const data = { ...existente, url2: url }; delete data.id;
-                await window.setDoc(window.doc(window.db, 'latinoSeries', docID), data);
-                showToast('toastSeries', '✓ Respaldo de gscdn.cam reemplazado por el nuevo', 'ok');
-                ['inputEpisodio','inputSerieURL','inputSerieURL2','inputSerieURL3','inputSerieURL4','inputSerieURL5'].forEach(i=>document.getElementById(i).value='');
-                document.getElementById('inputEpisodio').focus();
-                cargarEpisodios();
-                return;
-            }
-
-            // Ninguno es gscdn → abrir editor
             showToast('toastSeries', '⚠️ Ya existe — abriendo editor…', 'error');
-            setTimeout(() => editarEpisodio({ id: docID, ...existente }), 600);
+            setTimeout(() => editarEpisodio({ id: docID, ...snapExiste.data() }), 600);
             return;
         }
-
-        // No existe → guardar normalmente
-        let serieName = document.getElementById('previewSerieName').textContent || '';
+        // Buscar nombre de la serie siempre (por si se escribió el ID a mano)
+        let serieName = document.getElementById('previewSerieName').textContent||'';
         let epName = '';
         try {
             if (!serieName) {
                 const sr = await fetch(`https://api.themoviedb.org/3/tv/${serieID}?api_key=${API_KEY}&language=es-MX`);
                 const sd = await sr.json();
-                serieName = sd.name || '';
+                serieName = sd.name||'';
                 if (serieName) {
                     document.getElementById('previewSerieName').textContent = serieName;
                     document.getElementById('previewSerieYear').textContent = (sd.first_air_date||'').split('-')[0];
-                    document.getElementById('previewSeriePoster').src = sd.poster_path ? `https://image.tmdb.org/t/p/w92${sd.poster_path}` : '';
+                    document.getElementById('previewSeriePoster').src = sd.poster_path?`https://image.tmdb.org/t/p/w92${sd.poster_path}`:'';
                     document.getElementById('seriePreview').classList.remove('hidden');
                 }
             }
             const er = await fetch(`https://api.themoviedb.org/3/tv/${serieID}/season/${temporada}/episode/${episodio}?api_key=${API_KEY}&language=es-MX`);
             const ed = await er.json();
-            epName = ed.name || '';
-        } catch(e) {}
-
+            epName = ed.name||'';
+        } catch(e){}
         const data = { serieID, temporada, episodio, url, serieName, epName, fecha: new Date().toISOString() };
         if (url2) data.url2 = url2;
-        if (url3) data.url3 = url3;
-        if (url4) data.url4 = url4;
-        if (url5) data.url5 = url5;
-        await window.setDoc(window.doc(window.db, 'latinoSeries', docID), data);
-        showToast('toastSeries', '✓ Guardado correctamente', 'ok');
+        await window.setDoc(window.doc(window.db,'latinoSeries',docID), data);
+        showToast('toastSeries','✓ Guardado correctamente','ok');
         try { localStorage.removeItem('movieM_latinoSeriesIDs'); } catch(e) {}
-        ['inputEpisodio','inputSerieURL','inputSerieURL2','inputSerieURL3','inputSerieURL4','inputSerieURL5'].forEach(i=>document.getElementById(i).value='');
+        // Solo limpiar episodio y links — mantener serie y temporada
+        ['inputEpisodio','inputSerieURL','inputSerieURL2'].forEach(i=>document.getElementById(i).value='');
         document.getElementById('inputEpisodio').focus();
         cargarEpisodios();
     } catch(e) { showToast('toastSeries','Error al guardar','error'); console.error(e); }
-}
+};
+
 window.borrarEpisodio = async function(id) {
     if (!confirm('¿Borrar este episodio?')) return;
     try {
@@ -819,61 +815,33 @@ window.iniciarCargaMasiva = async function() {
         logEl.scrollTop = logEl.scrollHeight;
     }
 
-    // Parser: soporta título+URL en misma línea y URLs extras en líneas siguientes
-    function esUrl(s) { return !!(s && (s.includes('://') || s.startsWith('//'))); }
-    function parsearLinea(linea) {
-        // Busca el último token que sea URL
-        var tokens = linea.trim().split(/\s+/);
-        for (var j = tokens.length - 1; j >= 0; j--) {
-            if (esUrl(tokens[j])) {
-                var titulo = tokens.slice(0, j).join(' ').trim();
-                return { titulo: titulo, url: tokens[j] };
-            }
-        }
-        return { titulo: linea.trim(), url: null };
-    }
-
-    const todasLineas = raw.split('\n');
+    // Parser robusto — acepta "|" o espacio como separador, y URLs sin https://
+    const todasLineas = raw.split('\n').map(l => l.trim()).filter(l => l);
     const items = [];
-    let idx2 = 0;
-
-    while (idx2 < todasLineas.length) {
-        const linea = todasLineas[idx2].trim();
-        if (!linea) { idx2++; continue; }
-
-        const parsed = parsearLinea(linea);
-
-        if (parsed.titulo) {
-            // Línea con título (con o sin URL inline)
-            const titulo = parsed.titulo;
-            const urls = parsed.url ? [parsed.url] : [];
-            idx2++;
-
-            // Recolectar URLs extras en líneas siguientes
-            while (idx2 < todasLineas.length) {
-                const sig = todasLineas[idx2].trim();
-                if (!sig) { idx2++; break; } // línea vacía = fin del bloque
-                const sigParsed = parsearLinea(sig);
-                if (sigParsed.url && !sigParsed.titulo) {
-                    // Solo URL → agregar al bloque actual
-                    urls.push(sigParsed.url);
-                    idx2++;
-                } else if (sigParsed.url && sigParsed.titulo) {
-                    // Título + URL → nueva película, NO avanzar
-                    break;
-                } else {
-                    // Solo texto → nuevo título sin URL, NO avanzar
-                    break;
-                }
-            }
-
-            if (urls.length) {
-                items.push({ rawTitulo: titulo, url: urls[0], extras: urls.slice(1) });
-            }
+    for (const linea of todasLineas) {
+        let rawTitulo, url;
+        if (linea.includes('|')) {
+            const idx = linea.indexOf('|');
+            rawTitulo = linea.slice(0, idx).trim();
+            url = linea.slice(idx + 1).trim();
         } else {
-            idx2++;
+            // La URL siempre es el último "token" — buscar desde el final el primer token con "/"
+            const tokens = linea.split(/\s+/);
+            // Recorrer de atrás hacia adelante hasta encontrar el token que es la URL
+            let urlIdx = -1;
+            for (let i = tokens.length - 1; i >= 0; i--) {
+                if (tokens[i].includes('/')) { urlIdx = i; break; }
+            }
+            if (urlIdx > 0) {
+                rawTitulo = tokens.slice(0, urlIdx).join(' ').trim();
+                url = tokens[urlIdx];
+            }
         }
+        if (!rawTitulo || !url) continue;
+        if (!url.startsWith('http')) url = 'https://' + url;
+        items.push({ rawTitulo, url });
     }
+
     if (!items.length) {
         logLine('✗ No se pudo leer la lista. Formato: Película (año) | https://... o Película (año) https://...', 'error');
         btn.disabled = false; btn.textContent = 'Iniciar Carga'; return;
@@ -882,7 +850,7 @@ window.iniciarCargaMasiva = async function() {
     let ok = 0;
     const noEncontradas = [];
 
-    for (const { rawTitulo, url, extras: itemExtras = [] } of items) {
+    for (const { rawTitulo, url } of items) {
         // Extraer año del título si viene entre paréntesis al final
         const matchAnio = rawTitulo.match(/\((\d{4})\)\s*$/);
         const anio = matchAnio ? matchAnio[1] : '';
@@ -964,10 +932,8 @@ window.iniciarCargaMasiva = async function() {
             anioOk = Math.abs(parseInt(anio) - parseInt(anioReal)) <= 1;
         }
 
-        // Umbral de similitud más permisivo (0.3) para cubrir títulos traducidos diferente
-        // ej: "28 días después" vs "Exterminio", "El engaño" vs "Conclave"
-        if (sim < 0.3 || !anioOk) {
-            const razon = sim < 0.3
+        if (sim < 0.5 || !anioOk) {
+            const razon = sim < 0.5
                 ? `TMDB devolvió "${tituloReal}" (${anioReal}) — títulos muy distintos`
                 : `Año no coincide: buscado ${anio}, TMDB tiene ${anioReal}`;
             logLine(`✗ RECHAZADA: "${titulo}" → ${razon}`, 'error');
@@ -980,36 +946,22 @@ window.iniciarCargaMasiva = async function() {
             const snap = await window.getDoc(window.doc(window.db, 'latinoLinks', movieID));
             if (snap.exists()) {
                 const ex = snap.data();
-                const slots = ['url','url2','url3','url4','url5'];
-                // Todos los links del item (principal + extras)
-                const todosLinks = [url, ...(itemExtras||[])].filter(Boolean);
-                // Links ya guardados en Firestore
-                const yaGuardados = slots.map(s => ex[s]).filter(Boolean);
-                // Solo agregar los que NO están ya guardados
-                const nuevos = todosLinks.filter(u => !yaGuardados.includes(u));
-                const update = { ...ex };
-                let added = 0;
-                for (const newUrl of nuevos) {
-                    const libre = slots.find(s => !update[s]);
-                    if (!libre) break;
-                    update[libre] = newUrl; added++;
+                if (ex.url2) {
+                    logLine(`⚠️ "${tituloReal}" ya tiene 2 links — omitida`, 'warn');
+                    continue;
                 }
-                if (added) {
-                    await window.setDoc(window.doc(window.db,'latinoLinks',movieID), update);
-                    logLine(`✓ [ID:${movieID}] "${tituloReal}" → ${added} servidor${added>1?'es':''}  agregado${added>1?'s':''}`, 'ok');
-                } else {
-                    logLine(`⚠️ "${tituloReal}" ya tiene todos los servidores cargados — omitida`, 'warn');
+                if (ex.url === url) {
+                    logLine(`⚠️ "${tituloReal}" ya tiene ese link como principal — omitida`, 'warn');
+                    continue;
                 }
+                // Tiene solo 1 link → agregar como respaldo
+                await window.setDoc(window.doc(window.db,'latinoLinks',movieID), { ...ex, url2: url }, { merge: true });
+                logLine(`✓ [ID:${movieID}] "${tituloReal}" → agregado como respaldo`, 'ok');
             } else {
-                const dataNew = { url, titulo: tituloReal, anio: anioReal, fecha: new Date().toISOString() };
-                const extras = itemExtras || [];
-                if (extras[0]) dataNew.url2 = extras[0];
-                if (extras[1]) dataNew.url3 = extras[1];
-                if (extras[2]) dataNew.url4 = extras[2];
-                if (extras[3]) dataNew.url5 = extras[3];
-                await window.setDoc(window.doc(window.db,'latinoLinks',movieID), dataNew);
-                const srvCount = 1 + extras.filter(Boolean).length;
-                logLine(`✓ [ID:${movieID}] "${tituloReal}" (${anioReal}) → guardada con ${srvCount} servidor${srvCount>1?'es':''}`, 'ok');
+                await window.setDoc(window.doc(window.db,'latinoLinks',movieID), {
+                    url, titulo: tituloReal, anio: anioReal, fecha: new Date().toISOString()
+                });
+                logLine(`✓ [ID:${movieID}] "${tituloReal}" (${anioReal}) → guardada`, 'ok');
             }
             ok++;
         } catch(e) {
@@ -1064,6 +1016,269 @@ function showToast(id, msg, tipo) {
     t.className = `text-xs font-bold ${tipo==='ok'?'text-green-400':'text-red-400'}`;
     t.classList.remove('hidden');
     setTimeout(()=>t.classList.add('hidden'), 3000);
+}
+</script>
+
+<script>
+// ══ SCRAPER — lógica cliente ══════════════════════════════════════════════
+
+function getWorkerURL() {
+    return localStorage.getItem('movieM_workerURL') || document.getElementById('scraperWorkerURL').value.trim();
+}
+
+// Restaurar URL guardada
+(function(){
+    var saved = localStorage.getItem('movieM_workerURL');
+    if (saved) document.getElementById('scraperWorkerURL').value = saved;
+})();
+
+// ── Buscar película individual ─────────────────────────────────────────────
+var _scraperTMDB = null; // datos TMDB del resultado actual
+var _tendItems   = [];   // listado de tendencias
+
+window.scraperBuscar = async function() {
+    var titulo  = document.getElementById('scraperTitulo').value.trim();
+    var fuente  = document.getElementById('scraperFuente').value;
+    var tipo    = document.getElementById('scraperTipo').value;
+    var worker  = getWorkerURL();
+    var cont    = document.getElementById('scraperResultados');
+    var tmdbPrev = document.getElementById('scraperTMDBPreview');
+
+    if (!titulo) { cont.innerHTML = '<p class="text-red-400 text-xs">Escribí un título.</p>'; return; }
+    if (!worker) {
+        cont.innerHTML = '<p class="text-yellow-400 text-xs">⚠️ Ingresá la URL del Cloudflare Worker primero.</p>';
+        return;
+    }
+
+    cont.innerHTML = '<p class="text-zinc-500 text-xs animate-pulse">🔍 Buscando en ' + fuente + '...</p>';
+    tmdbPrev.classList.add('hidden');
+
+    try {
+        var url = worker.replace(/\/$/, '') + '/buscar?titulo=' + encodeURIComponent(titulo)
+                  + '&fuente=' + fuente + '&tipo=' + tipo;
+        var r   = await fetch(url);
+        var d   = await r.json();
+
+        // Mostrar preview TMDB
+        if (d.tmdb) {
+            _scraperTMDB = d.tmdb;
+            document.getElementById('scraperTMDBPoster').src   = d.tmdb.poster || '';
+            document.getElementById('scraperTMDBTitulo').textContent = d.tmdb.titulo + ' (' + d.tmdb.anio + ')';
+            document.getElementById('scraperTMDBInfo').textContent   = '⭐ ' + (d.tmdb.voto||'-') + ' · TMDB ID: ' + d.tmdb.id;
+            document.getElementById('scraperTMDBID').textContent     = 'ID: ' + d.tmdb.id;
+            tmdbPrev.classList.remove('hidden');
+        }
+
+        cont.innerHTML = '';
+
+        if (!d.resultados || !d.resultados.length) {
+            cont.innerHTML = '<p class="text-zinc-500 text-xs italic text-center py-4">Sin resultados. Probá con otro título o fuente.</p>';
+            return;
+        }
+
+        // Mostrar resultados con botón guardar
+        d.resultados.forEach(function(item, i) {
+            var div = document.createElement('div');
+            div.className = 'flex items-center gap-3 p-3 bg-zinc-800/40 rounded-2xl border border-white/5';
+            div.innerHTML =
+                '<div class="flex-1 min-w-0">'
+              + '<p class="text-xs font-black text-white uppercase tracking-tight">' + esc(item.label||item.fuente) + '</p>'
+              + '<p class="text-[9px] text-zinc-500 truncate mt-0.5">' + esc(item.url) + '</p>'
+              + '</div>'
+              + '<button class="btn-probar shrink-0 text-[9px] font-black px-3 py-1.5 rounded-full bg-zinc-700 hover:bg-zinc-600 text-zinc-300 transition active:scale-95">▶ Probar</button>'
+              + (d.tmdb ? '<button class="btn-guardar shrink-0 text-[9px] font-black px-3 py-1.5 rounded-full bg-green-700 hover:bg-green-600 text-white transition active:scale-95">💾 Guardar</button>' : '')
+              + '<span class="badge-saved hidden text-[9px] text-green-400 font-black">✓</span>';
+            (function(url, tmdb){
+                div.querySelector('.btn-probar').onclick = function(){ window.open(url,'_blank'); };
+                if (tmdb) div.querySelector('.btn-guardar').onclick = function(){
+                    scraperGuardar(tmdb.id, tmdb.titulo, tmdb.anio, url);
+                };
+            })(item.url, d.tmdb);
+            cont.appendChild(div);
+        });
+
+    } catch (e) {
+        cont.innerHTML = '<p class="text-red-400 text-xs">Error: ' + esc(e.message) + '</p>';
+    }
+};
+
+window.scraperProbar = function(url) {
+    window.open(url, '_blank');
+};
+
+// ── Guardar un embed en Firestore ──────────────────────────────────────────
+window.scraperGuardar = async function(tmdbId, titulo, anio, url) {
+    try {
+        // Esperar a que firebase-config exponga window.db
+        for (var i=0; i<30; i++) {
+            if (window.db && window.setDoc && window.doc && window.getDoc) break;
+            await new Promise(function(r){ setTimeout(r, 100); });
+        }
+        var snap = await window.getDoc(window.doc(window.db, 'latinoLinks', String(tmdbId)));
+        var data;
+        if (snap.exists()) {
+            data = snap.data();
+            if (data.url2) {
+                alert('Ya tiene 2 links guardados. Editá o borrá uno primero.');
+                return;
+            }
+            if (data.url === url) { alert('Ese link ya está guardado como principal.'); return; }
+            data.url2 = url;
+        } else {
+            data = { url, titulo, anio, fecha: new Date().toISOString() };
+        }
+        await window.setDoc(window.doc(window.db, 'latinoLinks', String(tmdbId)), data);
+        try { localStorage.removeItem('movieM_latinoIDs'); } catch(e){}
+        // Marcar como guardado
+        // Marcar botones de guardar como completados
+        document.querySelectorAll('.btn-guardar').forEach(function(b){ b.textContent = '✓'; b.disabled = true; b.style.background='#3f3f46'; });
+    } catch(e) {
+        alert('Error al guardar: ' + (e.code || e.message));
+    }
+};
+
+// ── Tendencias ─────────────────────────────────────────────────────────────
+window.scraperTendencias = async function() {
+    var worker = getWorkerURL();
+    var fuente = document.getElementById('tendFuente').value;
+    var tipo   = document.getElementById('tendTipo').value;
+    var pagina = document.getElementById('tendPagina').value || '1';
+    var cont   = document.getElementById('tendResultados');
+    var btnImp = document.getElementById('btnImportarTodos');
+
+    if (!worker) { cont.innerHTML = '<p class="text-yellow-400 text-xs">⚠️ Configurá la URL del Worker.</p>'; return; }
+
+    cont.innerHTML = '<p class="text-zinc-500 text-xs animate-pulse">Obteniendo listado de ' + fuente + '...</p>';
+    btnImp.classList.add('hidden');
+
+    try {
+        var url = worker.replace(/\/$/, '') + '/tendencias?fuente=' + fuente + '&tipo=' + tipo + '&pagina=' + pagina;
+        var r   = await fetch(url);
+        var d   = await r.json();
+
+        _tendItems = d.resultados || [];
+        cont.innerHTML = '';
+
+        if (!_tendItems.length) {
+            cont.innerHTML = '<p class="text-zinc-500 text-xs italic text-center py-4">Sin resultados.</p>';
+            return;
+        }
+
+        _tendItems.forEach(function(item, i) {
+            var tmdb = item.tmdb;
+            var div  = document.createElement('div');
+            div.className = 'flex items-center gap-3 p-3 bg-zinc-800/40 rounded-2xl border border-white/5';
+            div.id = 'tend_' + i;
+            div.innerHTML =
+                (tmdb && tmdb.poster
+                    ? '<img src="' + tmdb.poster + '" class="w-8 h-11 rounded-lg object-cover shrink-0">'
+                    : '<div class="w-8 h-11 bg-zinc-700 rounded-lg shrink-0"></div>')
+              + '<div class="flex-1 min-w-0">'
+              +   '<p class="text-xs font-black text-white uppercase tracking-tight truncate">' + esc(item.titulo||tmdb?.titulo||'-') + '</p>'
+              +   '<p class="text-[9px] text-zinc-500 font-bold">'
+              +     (tmdb ? '⭐ ' + (tmdb.voto||'-') + ' · ' + (tmdb.anio||'-') + ' · ID: ' + tmdb.id : 'Sin datos TMDB')
+              +   '</p>'
+              + '</div>'
+              + '<span id="tendStatus_' + i + '" class="text-[9px] font-black text-zinc-600 uppercase shrink-0">'
+              + (tmdb ? 'listo' : 'sin tmdb')
+              + '</span>';
+            cont.appendChild(div);
+        });
+
+        var listos = _tendItems.filter(function(it){ return it.tmdb; }).length;
+        btnImp.textContent = '↓ Importar ' + listos + ' a Firestore';
+        if (listos > 0) btnImp.classList.remove('hidden');
+
+    } catch(e) {
+        cont.innerHTML = '<p class="text-red-400 text-xs">Error: ' + esc(e.message) + '</p>';
+    }
+};
+
+// ── Importar todos los de tendencias ──────────────────────────────────────
+window.scraperImportarTodos = async function() {
+    var worker  = getWorkerURL();
+    var fuente  = document.getElementById('tendFuente').value;
+    var tipo    = document.getElementById('tendTipo').value;
+    var items   = _tendItems.filter(function(it){ return it.tmdb; });
+    var btn     = document.getElementById('btnImportarTodos');
+
+    if (!items.length) return;
+    btn.disabled = true;
+    btn.textContent = 'Importando...';
+
+    for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var tmdb = item.tmdb;
+        var statusEl = document.getElementById('tendStatus_' + i);
+        if (statusEl) statusEl.textContent = '⏳';
+
+        try {
+            // Para cada título, hacer el scraping real
+            var urlWorker = worker.replace(/\/$/, '') + '/buscar?titulo='
+                + encodeURIComponent(tmdb.titulo) + '&fuente=' + fuente + '&tipo=' + tipo;
+            var r = await fetch(urlWorker);
+            var d = await r.json();
+
+            if (d.resultados && d.resultados.length > 0) {
+                var embedUrl  = d.resultados[0].url;
+                var embedUrl2 = d.resultados[1] ? d.resultados[1].url : null;
+
+                for (var j=0; j<30; j++) {
+                    if (window.db && window.setDoc && window.doc) break;
+                    await new Promise(function(res){ setTimeout(res, 100); });
+                }
+
+                var snapRef = window.doc(window.db, 'latinoLinks', String(tmdb.id));
+                var snap    = await window.getDoc(snapRef);
+                if (!snap.exists()) {
+                    var data = { url: embedUrl, titulo: tmdb.titulo, anio: tmdb.anio || '', fecha: new Date().toISOString() };
+                    if (embedUrl2) data.url2 = embedUrl2;
+                    await window.setDoc(snapRef, data);
+                    if (statusEl) statusEl.textContent = '✓';
+                } else {
+                    if (statusEl) statusEl.textContent = 'Ya existe';
+                }
+            } else {
+                if (statusEl) statusEl.textContent = '✗ No encontrada';
+            }
+        } catch(e) {
+            if (statusEl) statusEl.textContent = 'Error';
+        }
+
+        await new Promise(function(res){ setTimeout(res, 500); }); // esperar entre requests
+    }
+
+    try { localStorage.removeItem('movieM_latinoIDs'); } catch(e){}
+    btn.disabled = false;
+    btn.textContent = '✓ Importación completada';
+};
+
+// ── Verificar dominios ─────────────────────────────────────────────────────
+window.verificarDominios = async function() {
+    var worker = getWorkerURL();
+    var cont   = document.getElementById('dominiosStatus');
+    if (!worker) { cont.innerHTML = '<p class="text-yellow-400 text-xs">Configurá el Worker primero.</p>'; return; }
+
+    cont.innerHTML = '<p class="text-zinc-500 text-xs animate-pulse">Verificando...</p>';
+    try {
+        var r = await fetch(worker.replace(/\/$/, '') + '/dominios');
+        var d = await r.json();
+        cont.innerHTML = '';
+        Object.entries(d.dominios || {}).forEach(function(e) {
+            var sitio = e[0], doms = e[1];
+            var div = document.createElement('div');
+            div.className = 'flex items-center gap-2 flex-wrap';
+            div.innerHTML = '<span class="text-[9px] font-black uppercase text-zinc-400 w-20">' + sitio + '</span>'
+                + doms.map(function(d){ return '<span class="text-[9px] font-bold bg-zinc-800 px-2 py-0.5 rounded-full text-zinc-400">' + d + '</span>'; }).join('');
+            cont.appendChild(div);
+        });
+    } catch(e) {
+        cont.innerHTML = '<p class="text-red-400 text-xs">No se pudo conectar al Worker.</p>';
+    }
+};
+
+function esc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 </script>
 </body>
