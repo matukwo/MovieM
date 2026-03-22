@@ -215,10 +215,19 @@
             </div>
             <div class="p-6 border-b border-white/5">
                 <label class="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-3 block">
-                    Lista de películas — un ítem por línea:
-                    <span class="text-zinc-700 normal-case font-bold ml-2">Nombre de la película (año) | https://embed...</span>
+                    Películas y Series — formatos aceptados:
+                    <span class="text-zinc-700 normal-case font-bold ml-2">Película (año) | https://... · Serie (año) T1 E1 https://... (múltiples URLs por línea)</span>
                 </label>
-                <textarea id="listaCarga" rows="10" placeholder="Buenos Muchachos (1990) | https://gscdn.cam/video/embed/xxx&#10;El Padrino (1972) | https://embed.com/abc&#10;Interstellar | https://embed.com/xyz" class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600 resize-none font-mono"></textarea>
+                <textarea id="listaCarga" rows="10" placeholder="— PELÍCULAS —
+El Padrino (1972) | https://embed.com/abc
+Interstellar https://embed.com/xyz
+
+— SERIES (múltiples links por episodio) —
+The Pacific (2010) T1 E1 https://pelisplus.strp2p.com/#abc
+https://pelisplus.upns.pro/#def
+https://callistanise.com/v/xyz
+T1 E2 https://pelisplus.strp2p.com/#ghi
+https://callistanise.com/v/jkl" class="w-full bg-zinc-800 border border-zinc-700 focus:border-red-600 rounded-2xl px-4 py-3 text-sm text-white transition placeholder-zinc-600 resize-none font-mono"></textarea>
                 <div class="flex items-center gap-3 mt-4">
                     <button onclick="iniciarCargaMasiva()" id="btnCargaMasiva" class="px-6 py-2.5 bg-red-600 hover:opacity-90 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition active:scale-95">Iniciar Carga</button>
                     <button onclick="document.getElementById('listaCarga').value='';document.getElementById('logCarga').innerHTML=''" class="px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 rounded-2xl text-xs font-black uppercase tracking-widest transition active:scale-95">Limpiar</button>
@@ -795,7 +804,77 @@ window.borrarEpisodio = async function(id) {
     } catch(e) { showToast('toastSeries','Error al borrar','error'); }
 };
 
-// ── CARGA MASIVA ──────────────────────────────────────────────────────────────
+// ── CARGA MASIVA ─────────────────────────────────────────────────────────────
+// Parser universal: películas Y series con múltiples URLs por episodio
+function parsearCarga(raw) {
+    const lineas = raw.split('\n').map(l => l.trim());
+    const items  = [];
+    let serieActual = null, anioActual = null;
+    let tempActual  = null, epActual   = null;
+    let urlsActuales = [];
+
+    function guardarEp() {
+        if (serieActual && tempActual !== null && epActual !== null && urlsActuales.length) {
+            items.push({ tipo:'serie', titulo:serieActual, anio:anioActual,
+                         temp:tempActual, ep:epActual, urls:[...urlsActuales] });
+        }
+    }
+    function guardarPeli(titulo, anio, urls) {
+        if (titulo && urls.length) items.push({ tipo:'pelicula', titulo, anio, urls:[...urls] });
+    }
+
+    for (const linea of lineas) {
+        if (!linea) continue;
+
+        // ── URL pura ──────────────────────────────────────────────
+        if (/^https?:\/\//.test(linea)) {
+            if (tempActual !== null) urlsActuales.push(linea); // URL extra del episodio
+            continue;
+        }
+
+        // ── Marcador T{n} E{n} ────────────────────────────────────
+        const mTE = linea.match(/\bT(\d+)\s*E(\d+)\b/i);
+        if (mTE) {
+            guardarEp();
+            urlsActuales = [];
+            tempActual = parseInt(mTE[1]);
+            epActual   = parseInt(mTE[2]);
+            // Título de serie antes del marcador
+            const antes = linea.slice(0, mTE.index).trim();
+            if (antes) {
+                const mA = antes.match(/\((\d{4})\)\s*$/);
+                anioActual   = mA ? mA[1] : null;
+                serieActual  = antes.replace(/\s*\(\d{4}\)\s*$/, '').trim();
+            }
+            // URL en la misma línea después del marcador
+            const mUrl = linea.slice(mTE.index + mTE[0].length).match(/(https?:\/\/\S+)/);
+            if (mUrl) urlsActuales.push(mUrl[1]);
+            continue;
+        }
+
+        // ── Línea con URL inline → película ──────────────────────
+        const mUrlInline = linea.match(/\s(https?:\/\/\S+)/);
+        if (mUrlInline) {
+            guardarEp();
+            const partTit = linea.slice(0, mUrlInline.index).trim();
+            const mA = partTit.match(/\((\d{4})\)\s*$/);
+            guardarPeli(partTit.replace(/\s*\(\d{4}\)\s*$/, '').trim(), mA?mA[1]:'', [mUrlInline[1]]);
+            serieActual = null; tempActual = null; epActual = null; urlsActuales = [];
+            continue;
+        }
+
+        // ── Solo título → nuevo bloque serie o película pendiente ─
+        guardarEp();
+        urlsActuales = [];
+        tempActual = null; epActual = null;
+        const mA2 = linea.match(/\((\d{4})\)\s*$/);
+        anioActual  = mA2 ? mA2[1] : null;
+        serieActual = linea.replace(/\s*\(\d{4}\)\s*$/, '').trim();
+    }
+    guardarEp(); // último episodio
+    return items;
+}
+
 window.iniciarCargaMasiva = async function() {
     const raw = document.getElementById('listaCarga').value.trim();
     if (!raw) return;
@@ -803,8 +882,7 @@ window.iniciarCargaMasiva = async function() {
     const logEl = document.getElementById('logCarga');
     logEl.innerHTML = '';
     const btn = document.getElementById('btnCargaMasiva');
-    btn.disabled = true;
-    btn.textContent = 'Cargando...';
+    btn.disabled = true; btn.textContent = 'Cargando...';
 
     function logLine(msg, tipo) {
         const colors = { ok:'text-green-400', error:'text-red-400', warn:'text-yellow-400', info:'text-zinc-500' };
@@ -815,184 +893,159 @@ window.iniciarCargaMasiva = async function() {
         logEl.scrollTop = logEl.scrollHeight;
     }
 
-    // Parser robusto — acepta "|" o espacio como separador, y URLs sin https://
-    const todasLineas = raw.split('\n').map(l => l.trim()).filter(l => l);
-    const items = [];
-    for (const linea of todasLineas) {
-        let rawTitulo, url;
-        if (linea.includes('|')) {
-            const idx = linea.indexOf('|');
-            rawTitulo = linea.slice(0, idx).trim();
-            url = linea.slice(idx + 1).trim();
-        } else {
-            // La URL siempre es el último "token" — buscar desde el final el primer token con "/"
-            const tokens = linea.split(/\s+/);
-            // Recorrer de atrás hacia adelante hasta encontrar el token que es la URL
-            let urlIdx = -1;
-            for (let i = tokens.length - 1; i >= 0; i--) {
-                if (tokens[i].includes('/')) { urlIdx = i; break; }
-            }
-            if (urlIdx > 0) {
-                rawTitulo = tokens.slice(0, urlIdx).join(' ').trim();
-                url = tokens[urlIdx];
-            }
-        }
-        if (!rawTitulo || !url) continue;
-        if (!url.startsWith('http')) url = 'https://' + url;
-        items.push({ rawTitulo, url });
-    }
-
+    const items = parsearCarga(raw);
     if (!items.length) {
-        logLine('✗ No se pudo leer la lista. Formato: Película (año) | https://... o Película (año) https://...', 'error');
+        logLine('✗ No se pudo leer la lista. Revisá el formato.', 'error');
         btn.disabled = false; btn.textContent = 'Iniciar Carga'; return;
     }
 
+    logLine(`📋 ${items.length} ítems detectados (${items.filter(i=>i.tipo==='pelicula').length} películas, ${items.filter(i=>i.tipo==='serie').length} episodios)`, 'info');
+
     let ok = 0;
-    const noEncontradas = [];
+    const fallidos = []; // { item, razon } — para reconstruir el textarea
 
-    for (const { rawTitulo, url } of items) {
-        // Extraer año del título si viene entre paréntesis al final
-        const matchAnio = rawTitulo.match(/\((\d{4})\)\s*$/);
-        const anio = matchAnio ? matchAnio[1] : '';
-        const titulo = rawTitulo.replace(/\s*\(\d{4}\)\s*$/, '').trim();
-
-        logLine(`🔍 Buscando "${titulo}"${anio ? ` (${anio})` : ''}...`, 'info');
-
-        let resultado = null;
-        try {
-            // Intento 1: título + año en español
-            if (anio) {
-                const r1 = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=es-MX&query=${encodeURIComponent(titulo)}&year=${anio}`);
-                resultado = (await r1.json()).results?.[0];
-            }
-            // Intento 2: solo título en español
-            if (!resultado) {
-                const r2 = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=es-MX&query=${encodeURIComponent(titulo)}`);
-                resultado = (await r2.json()).results?.[0];
-            }
-            // Intento 3: en inglés con año
-            if (!resultado && anio) {
-                const r3 = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=en-US&query=${encodeURIComponent(titulo)}&year=${anio}`);
-                resultado = (await r3.json()).results?.[0];
-            }
-            // Intento 4: en inglés sin año
-            if (!resultado) {
-                const r4 = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=en-US&query=${encodeURIComponent(titulo)}`);
-                resultado = (await r4.json()).results?.[0];
-            }
-        } catch(e) {
-            logLine(`✗ Error buscando "${titulo}": ${e.message}`, 'error');
-            noEncontradas.push({ raw: rawTitulo, razon: `Error de red: ${e.message}` });
-            continue;
+    // ── TMDB search ───────────────────────────────────────────────
+    async function buscarTMDB(titulo, anio, tipo) {
+        const ep = tipo === 'serie' ? 'tv' : 'movie';
+        function norm(s) {
+            return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+                    .replace(/[^a-z0-9\s]/g,'').replace(/\s+/g,' ').trim();
         }
-
-        if (!resultado) {
-            logLine(`✗ NO ENCONTRADA: "${titulo}"${anio?` (${anio})`:''} — no se guardó`, 'error');
-            noEncontradas.push({ raw: rawTitulo, razon: 'No encontrada en TMDB' });
-            continue;
+        function sim(a, b) {
+            if (a===b) return 1;
+            if (b.includes(a)||a.includes(b)) return 1;
+            const wa=new Set(a.split(' ').filter(w=>w.length>2));
+            const wb=new Set(b.split(' ').filter(w=>w.length>2));
+            if(!wa.size) return 0;
+            let c=0; wa.forEach(w=>{ if(wb.has(w)) c++; });
+            return c/Math.max(wa.size,wb.size);
         }
+        const queries = anio
+            ? [`https://api.themoviedb.org/3/search/${ep}?api_key=${API_KEY}&language=es-MX&query=${encodeURIComponent(titulo)}&year=${anio}`,
+               `https://api.themoviedb.org/3/search/${ep}?api_key=${API_KEY}&language=es-MX&query=${encodeURIComponent(titulo)}`,
+               `https://api.themoviedb.org/3/search/${ep}?api_key=${API_KEY}&language=en-US&query=${encodeURIComponent(titulo)}&year=${anio}`,
+               `https://api.themoviedb.org/3/search/${ep}?api_key=${API_KEY}&language=en-US&query=${encodeURIComponent(titulo)}`]
+            : [`https://api.themoviedb.org/3/search/${ep}?api_key=${API_KEY}&language=es-MX&query=${encodeURIComponent(titulo)}`,
+               `https://api.themoviedb.org/3/search/${ep}?api_key=${API_KEY}&language=en-US&query=${encodeURIComponent(titulo)}`];
 
-        const movieID = String(resultado.id);
-        const tituloReal = resultado.title;
-        const anioReal = (resultado.release_date||'').split('-')[0];
-
-        // ── Validación de coincidencia ─────────────────────────────
-        // Normalizar: minúsculas, sin acentos, sin caracteres especiales
-        function normalizar(s) {
-            return s.toLowerCase()
-                .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-                .replace(/[^a-z0-9\s]/g,'')
-                .replace(/\s+/g,' ').trim();
+        for (const q of queries) {
+            const res = await fetch(q).then(r=>r.json()).catch(()=>null);
+            const it  = res?.results?.[0];
+            if (!it) continue;
+            const tReal = it.title || it.name || '';
+            const aReal = (it.release_date||it.first_air_date||'').split('-')[0];
+            const s = Math.max(sim(norm(titulo), norm(tReal)), sim(norm(titulo), norm(it.original_title||'')));
+            const anioOk = !anio || !aReal || Math.abs(parseInt(anio)-parseInt(aReal)) <= 1;
+            if (s >= 0.5 && anioOk) return { id: String(it.id), titulo: tReal, anio: aReal };
         }
-        const tituloNorm  = normalizar(titulo);
-        const realNorm    = normalizar(tituloReal);
-        // También verificar título original de TMDB (en inglés)
-        const originalNorm = normalizar(resultado.original_title || '');
-
-        // Similitud: el título buscado debe estar contenido en el real o viceversa,
-        // o compartir al menos el 60% de palabras
-        function similitud(a, b) {
-            if (a === b) return 1;
-            if (b.includes(a) || a.includes(b)) return 1;
-            const wa = new Set(a.split(' ').filter(w => w.length > 2));
-            const wb = new Set(b.split(' ').filter(w => w.length > 2));
-            if (!wa.size) return 0;
-            let comunes = 0;
-            wa.forEach(w => { if (wb.has(w)) comunes++; });
-            return comunes / Math.max(wa.size, wb.size);
-        }
-
-        const simReal     = similitud(tituloNorm, realNorm);
-        const simOriginal = similitud(tituloNorm, originalNorm);
-        const sim         = Math.max(simReal, simOriginal);
-
-        // Validar año si se proporcionó (tolerancia ±1 año)
-        let anioOk = true;
-        if (anio && anioReal) {
-            anioOk = Math.abs(parseInt(anio) - parseInt(anioReal)) <= 1;
-        }
-
-        if (sim < 0.5 || !anioOk) {
-            const razon = sim < 0.5
-                ? `TMDB devolvió "${tituloReal}" (${anioReal}) — títulos muy distintos`
-                : `Año no coincide: buscado ${anio}, TMDB tiene ${anioReal}`;
-            logLine(`✗ RECHAZADA: "${titulo}" → ${razon}`, 'error');
-            noEncontradas.push({ raw: rawTitulo, razon });
-            continue;
-        }
-
-        try {
-            // Verificar duplicado
-            const snap = await window.getDoc(window.doc(window.db, 'latinoLinks', movieID));
-            if (snap.exists()) {
-                const ex = snap.data();
-                if (ex.url2) {
-                    logLine(`⚠️ "${tituloReal}" ya tiene 2 links — omitida`, 'warn');
-                    continue;
-                }
-                if (ex.url === url) {
-                    logLine(`⚠️ "${tituloReal}" ya tiene ese link como principal — omitida`, 'warn');
-                    continue;
-                }
-                // Tiene solo 1 link → agregar como respaldo
-                await window.setDoc(window.doc(window.db,'latinoLinks',movieID), { ...ex, url2: url }, { merge: true });
-                logLine(`✓ [ID:${movieID}] "${tituloReal}" → agregado como respaldo`, 'ok');
-            } else {
-                await window.setDoc(window.doc(window.db,'latinoLinks',movieID), {
-                    url, titulo: tituloReal, anio: anioReal, fecha: new Date().toISOString()
-                });
-                logLine(`✓ [ID:${movieID}] "${tituloReal}" (${anioReal}) → guardada`, 'ok');
-            }
-            ok++;
-        } catch(e) {
-            logLine(`✗ Error guardando "${tituloReal}": ${e.message}`, 'error');
-            noEncontradas.push({ raw: rawTitulo, razon: `Error al guardar: ${e.message}` });
-        }
-
-        await new Promise(r => setTimeout(r, 250));
+        return null;
     }
 
-    // ── Resumen final ─────────────────────────────────────────────
-    logLine(`─────────────────────────────`, 'info');
-    logLine(`Guardadas: ${ok} de ${items.length}`, ok > 0 ? 'ok' : 'warn');
-    if (noEncontradas.length) {
-        logLine(`Errores (${noEncontradas.length}) — quedan en la lista para que los corrijas:`, 'error');
-        noEncontradas.forEach(({ raw, razon }) => {
-            logLine(`  • "${raw}" — ${razon}`, 'error');
-        });
-        // Dejar en el textarea solo los que fallaron, con su URL original
-        const fallidas = items
-            .filter(it => noEncontradas.some(n => n.raw === it.rawTitulo))
-            .map(it => it.rawTitulo + ' | ' + it.url);
-        document.getElementById('listaCarga').value = fallidas.join('\n');
+    // ── Procesar cada ítem ────────────────────────────────────────
+    // Agrupar series por título para no re-buscar TMDB en cada episodio
+    const tmdbCache = {};
+
+    for (const item of items) {
+        const cacheKey = `${item.tipo}:${item.titulo}:${item.anio||''}`;
+
+        // ── Buscar TMDB (con caché) ───────────────────────────────
+        if (!tmdbCache[cacheKey]) {
+            logLine(`🔍 Buscando "${item.titulo}"${item.anio?` (${item.anio})`:''}...`, 'info');
+            const tmdb = await buscarTMDB(item.titulo, item.anio, item.tipo).catch(()=>null);
+            tmdbCache[cacheKey] = tmdb || null;
+        }
+        const tmdb = tmdbCache[cacheKey];
+
+        if (!tmdb) {
+            logLine(`✗ No encontrada en TMDB: "${item.titulo}" — omitida`, 'error');
+            fallidos.push(item);
+            continue;
+        }
+
+        // ── PELÍCULA ─────────────────────────────────────────────
+        if (item.tipo === 'pelicula') {
+            const url  = item.urls[0];
+            const url2 = item.urls[1] || null;
+            try {
+                const ref  = window.doc(window.db, 'latinoLinks', tmdb.id);
+                const snap = await window.getDoc(ref);
+                if (snap.exists()) {
+                    const ex = snap.data();
+                    if (ex.url2) { logLine(`⚠️ "${tmdb.titulo}" ya tiene 2 links — omitida`, 'warn'); continue; }
+                    if (ex.url === url) { logLine(`⚠️ "${tmdb.titulo}" ya tiene ese link — omitida`, 'warn'); continue; }
+                    await window.setDoc(ref, { ...ex, url2: url }, { merge: true });
+                    logLine(`✓ [${tmdb.id}] "${tmdb.titulo}" → respaldo agregado`, 'ok');
+                } else {
+                    const data = { url, titulo: tmdb.titulo, anio: tmdb.anio, fecha: new Date().toISOString() };
+                    if (url2) data.url2 = url2;
+                    await window.setDoc(ref, data);
+                    logLine(`✓ [${tmdb.id}] "${tmdb.titulo}" (${tmdb.anio}) → guardada`, 'ok');
+                }
+                ok++;
+            } catch(e) { logLine(`✗ Error guardando "${tmdb.titulo}": ${e.message}`, 'error'); fallidos.push(item); }
+        }
+
+        // ── EPISODIO DE SERIE ────────────────────────────────────
+        if (item.tipo === 'serie') {
+            const docID = `${tmdb.id}_t${item.temp}_e${item.ep}`;
+            const url   = item.urls[0];
+            const url2  = item.urls[1] || null;
+            const url3  = item.urls[2] || null;
+            const url4  = item.urls[3] || null;
+            try {
+                const ref  = window.doc(window.db, 'latinoSeries', docID);
+                const snap = await window.getDoc(ref);
+                if (snap.exists()) {
+                    logLine(`⚠️ T${item.temp}E${item.ep} "${tmdb.titulo}" ya existe — omitido`, 'warn');
+                    continue;
+                }
+                const data = {
+                    serieID: tmdb.id, serieName: tmdb.titulo,
+                    temporada: item.temp, episodio: item.ep,
+                    url, fecha: new Date().toISOString()
+                };
+                if (url2) data.url2 = url2;
+                if (url3) data.url3 = url3;
+                if (url4) data.url4 = url4;
+                await window.setDoc(ref, data);
+                logLine(`✓ [${tmdb.id}] "${tmdb.titulo}" T${item.temp}E${item.ep} → ${item.urls.length} links`, 'ok');
+                ok++;
+            } catch(e) { logLine(`✗ Error guardando T${item.temp}E${item.ep}: ${e.message}`, 'error'); fallidos.push(item); }
+        }
+
+        await new Promise(r => setTimeout(r, 200));
+    }
+
+    // ── Resumen ───────────────────────────────────────────────────
+    logLine('─────────────────────────', 'info');
+    logLine(`Guardados: ${ok} de ${items.length}`, ok > 0 ? 'ok' : 'warn');
+
+    if (fallidos.length) {
+        logLine(`⚠️ ${fallidos.length} fallidos — quedan en el textarea:`, 'warn');
+        // Reconstruir solo los fallidos en el formato original
+        const lineasFallidas = [];
+        let serieAnt = null;
+        for (const f of fallidos) {
+            if (f.tipo === 'pelicula') {
+                lineasFallidas.push(`${f.titulo}${f.anio?` (${f.anio})`:''} ${f.urls.join('\n')}`);
+            } else {
+                if (f.titulo !== serieAnt) {
+                    lineasFallidas.push(`${f.titulo}${f.anio?` (${f.anio})`:''}`);
+                    serieAnt = f.titulo;
+                }
+                lineasFallidas.push(`T${f.temp} E${f.ep} ${f.urls[0]}`);
+                f.urls.slice(1).forEach(u => lineasFallidas.push(u));
+            }
+        }
+        document.getElementById('listaCarga').value = lineasFallidas.join('\n');
     } else {
-        logLine('Sin errores. Todo guardado correctamente.', 'ok');
+        logLine('✅ Sin errores.', 'ok');
         document.getElementById('listaCarga').value = '';
     }
 
-    btn.disabled = false;
-    btn.textContent = 'Iniciar Carga';
-    cargarLinks();
+    try { localStorage.removeItem('movieM_latinoIDs'); localStorage.removeItem('movieM_latinoSeriesIDs'); } catch(e){}
+    btn.disabled = false; btn.textContent = 'Iniciar Carga';
+    cargarLinks(); cargarEpisodios();
 };
 
 
